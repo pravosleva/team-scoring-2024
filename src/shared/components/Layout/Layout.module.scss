@@ -1,0 +1,25 @@
+.appWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+
+  // padding-bottom: 64px;
+  min-height: 100dvh;
+}
+
+.speedDialLink {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.inactive {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.code {
+  background: gray;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 4px;
+}

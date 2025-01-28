@@ -1,0 +1,6 @@
+export * from './about'
+export * from './home'
+export * from './employees'
+export * from './employees/[id]'
+export * from './jobs'
+export * from './jobs/[id]'

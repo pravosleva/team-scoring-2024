@@ -1,0 +1,30 @@
+.grid {
+  & a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+.gridItem {
+  background-color: #f7f5fa;
+  &:hover {
+    background-color: #02c39a;
+    color: #fff;
+  }
+
+  border-radius: 16px;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  height: 100%;
+
+  .title {
+    font-weight: bold;
+  }
+  .descr {
+    font-size: small;
+    margin-top: auto;
+  }
+}

@@ -1,0 +1,70 @@
+@use '~/shared/components/scss-vars/monitors.scss' as *;
+@use '~/shared/components/scss-vars/sizes.scss' as *;
+
+.base {
+  width: 100%;
+}
+.redBorder {
+  border: 1px solid red;
+}
+
+@media(max-width: #{$monitor-sm}px) {
+  .zero-pad-mob {
+    padding: 0px;
+  }
+}
+
+@media(max-width: #{$monitor-sm}px) {
+  .isLimitedForDesktop {
+    padding: 0;
+    // border: 2px solid greenyellow;
+  }
+}
+@media(min-width: calc(#{$monitor-sm}px + 1px)){
+  .isLimitedForDesktop {
+    max-width: calc(#{$limit-md}px + 32px);
+    // border: 2px solid red;
+
+    // padding: 0px 16px 0px 16px;
+  }
+}
+
+@media(max-width: #{$monitor-md}px) {
+  .isPaddedMobile {
+    padding: 0px 16px 0px 16px;
+  }
+}
+@media(min-width: calc(#{$monitor-md}px + 1px)){
+  .isPaddedMobile {
+    padding: 0px;
+  }
+}
+
+@media(max-width: #{$monitor-sm}px) {
+  .isLastSection {
+    padding-bottom: 30px;
+  }
+}
+@media(min-width: calc(#{$monitor-sm}px + 1px)){
+  .isLastSection {
+    padding-bottom: 50px;
+  }
+}
+
+@media(max-width: #{$monitor-sm}px) {
+  .isLimited {
+    width: 100%;
+  }
+}
+@media(min-width: calc(#{$monitor-sm}px + 1px)){
+  .isLimited {
+    max-width: calc(
+      #{$limit-md}px + 32px
+    );
+  }
+}
+
+.centered {
+  margin: 0 auto;
+  // border: 1px solid red;
+}
