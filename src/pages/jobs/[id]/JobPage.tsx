@@ -120,7 +120,11 @@ export const JobPage = () => {
               <div
                 style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
               >
-                <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.id}`}</div>
+                {
+                  !targetJob && (
+                    <div style={{ fontWeight: 'bold' }}>Ooops! Job not found...</div>
+                  )
+                }
                 {
                   !!targetJob && (
                     <Rating
@@ -136,7 +140,6 @@ export const JobPage = () => {
                 {!!targetJob && <JobResultReviewShort job={targetJob} />}
               </div>
             </Box>
-            {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
             <em style={{ fontSize: 'small' }}>Status: {statusText}</em>
             
             <div
@@ -154,6 +157,19 @@ export const JobPage = () => {
               <em>Updated at {dayjs(targetJob?.ts.update).format('DD.MM.YYYY')}</em>
             </div>
           </div>
+        </Grid>
+
+        <Grid size={12}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            }}
+          >
+            <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.id}`}</div>
+            {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
+          </Box>
         </Grid>
 
         {

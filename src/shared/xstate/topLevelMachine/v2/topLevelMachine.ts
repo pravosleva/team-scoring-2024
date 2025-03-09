@@ -3,6 +3,7 @@ import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress } from './types
 import { getCurrentPercentage } from '~/shared/utils'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
+import dayjs from 'dayjs'
 
 const getSpeed = (job: TJob): number =>
   (
@@ -30,6 +31,7 @@ export const topLevelMachine = setup({
       | { type: 'newTodo.commit'; value: Pick<TJob, 'title'>; }
       | { type: 'todo.commit'; job: TJob; comment?: string; }
       | { type: 'todo.clearDates'; id: number }
+      | { type: 'todo.addTimeToFinishDate'; id: number; hours: number; comment?: string; }
       | { type: 'todo.delete'; id: number }
       // | { type: 'filter.jobStatus.change'; filter: EJobsStatusFilter }
       // | { type: 'filter.assignedTo.change'; filter: number }
@@ -193,7 +195,8 @@ export const topLevelMachine = setup({
                     if (jobToUpdate.logs?.isEnabled) {
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
                       
-                      _newMsgs.add(comment || 'No comment')
+                      const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
+                      _newMsgs.add(normalizedComment || 'No comment')
                     }
                     break
                   default:
@@ -356,6 +359,61 @@ export const topLevelMachine = setup({
                 
                 todo.logs.items.unshift({ ts: updateTime, text: 'Dates cleared' })
               }
+
+              // console.log('-- clearDates: updated')
+              // console.log(todo)
+              // console.log('--')
+            }
+            newTodos.push(todo)
+          }
+          
+          return {
+            ...context.jobs,
+            items: newTodos,
+          }
+        }
+      })
+    },
+    'todo.addTimeToFinishDate': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const { id, comment, hours } = event
+          const newTodos: TJob[] = []
+
+          for (const todo of context.jobs.items) {
+            if (todo.id === id) {
+              const updateTime = new Date().getTime()
+              const msgs: string[] = []
+
+              // -- NOTE: Modify here
+              // 1. If exists -> add hrs
+              if (!!todo.forecast.finish) {
+                msgs.push(`+${hours}h to finish time`)
+                const oldTs = todo.forecast.finish
+                const newTs = todo.forecast.finish + (hours * 60 * 60 * 1000)
+                msgs.push(`${dayjs(oldTs).format('DD.MM.YYYY HH:mm')} -> ${dayjs(newTs).format('DD.MM.YYYY HH:mm')}`)
+                todo.forecast.finish = newTs
+              }
+              // 2. Recalc v if necessary
+              if (todo.completed) {
+                const v = getSpeed(todo)
+                todo.v = v
+                msgs.push(`v= ${v}`)
+              } else delete todo.v
+              // --
+
+              todo.ts.update = updateTime
+
+              if (todo.logs?.isEnabled) {
+                if (todo.logs.items.length >= todo.logs.limit)
+                  todo.logs.items.pop()
+
+                const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
+                msgs.push(normalizedComment || 'No comment')
+              }
+
+              if (msgs.length > 0)
+                todo.logs.items.unshift({ ts: updateTime, text: msgs.join(' // ') })
 
               // console.log('-- clearDates: updated')
               // console.log(todo)

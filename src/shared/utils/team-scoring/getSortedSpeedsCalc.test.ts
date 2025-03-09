@@ -159,7 +159,7 @@ test('getSortedSpeeds: sensibility 4', () => {
           prev: 0.5883905013192612,
           speed: 0.7647058823529411,
           delta: 0.17631538103367994,
-          isSensed: false,
+          isSensed: true,
           id: 2,
         },
         {

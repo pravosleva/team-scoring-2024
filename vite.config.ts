@@ -57,8 +57,8 @@ export default defineConfig({
       strategies: 'generateSW',
       injectRegister: 'auto',
       manifest: {
-        theme_color: '#ea580c',
-        background_color: '#000',
+        theme_color: '#1565C0',
+        background_color: '#1565C0',
         name: BRAND_NAME,
         short_name: BRAND_NAME,
         start_url: `${PUBLIC_URL}/#/?source=pwa&debug=1`,

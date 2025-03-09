@@ -1,4 +1,4 @@
-import { useState, forwardRef, Fragment } from  'react'
+import { useState, forwardRef, Fragment, memo } from  'react'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 // import ListItemText from '@mui/material/ListItemText'
@@ -20,6 +20,7 @@ import { Form } from '~/shared/components/Form/v2'
 // import { TJob } from '~/shared/xstate'
 import { TScheme } from '~/shared/components/Form/v2/types'
 import { TJobForm } from '~/shared/xstate/topLevelMachine/v2/types'
+import { Stack } from '@mui/material'
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -29,6 +30,18 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Slide direction='up' ref={ref} {...props} />
 })
+
+type TActionStandard = {
+  label: string;
+  startIcon?: React.ReactNode;
+  isEnabled: boolean;
+  color?: "inherit" | "warning" | "primary" | "secondary" | "error" | "info" | "success";
+  variant?: 'text' | 'outlined' | 'contained';
+  onClick: () => Promise<{
+    ok: boolean;
+    message?: string;
+  }>;
+}
 
 type TProps = {
   // initialValues: TJob;
@@ -41,15 +54,8 @@ type TProps = {
     }>;
   }[];
   title: string;
-  targetAction: {
-    label: string;
-    startIcon?: React.ReactNode;
-    isEnabled: boolean;
-    onClick: () => Promise<{
-      ok: boolean;
-      message?: string;
-    }>;
-  };
+  targetAction: TActionStandard;
+  optionalActions?: TActionStandard[];
   onClose?: () => Promise<{
     ok: boolean;
     message?: string;
@@ -58,7 +64,7 @@ type TProps = {
   middleInfoRender?: () => React.ReactNode;
   onReady: (state: unknown) => void;
   onNotReady: (state: unknown) => void;
-  onClearDates: () => void;
+  // onClearDates: () => void;
   __errsBeforeTouchedIgnoreList?: string[];
 }
 
@@ -66,16 +72,16 @@ const delay = (ms = 0) => new Promise((res) => {
   setTimeout(res, ms)
 })
 
-export const FullScreenDialog = ({
+export const FullScreenDialog = memo(({
   title,
   scheme,
   togglerRender,
   onClose,
   targetAction,
+  optionalActions,
   middleInfoRender,
   onReady,
   onNotReady,
-  // onClearDates,
   __errsBeforeTouchedIgnoreList,
 }: TProps) => {
   const [open, setOpen] = useState(false)
@@ -183,24 +189,41 @@ export const FullScreenDialog = ({
         {
           Object.keys(scheme).length > 0 && (
             <Box sx={{ padding: 2 }}>
-              <Grid container spacing={2}>
-                <Form<TJobForm>
-                  cb={{
-                    onClose: () => {},
-                    onError: () => {},
-                    onSuccess: () => Promise.resolve({ ok: true }),
-                  }}
-                  scheme={scheme}
-                  // initialValues={initialValues}
-                  onFormReady={({ state }) => onReady(state)}
-                  onFormNotReady={({ state }) => onNotReady(state)}
-                  __errsBeforeTouchedIgnoreList={__errsBeforeTouchedIgnoreList}
-                />
-              </Grid>
+              <Stack sx={{ gap: 2 }}>
+                <Grid container spacing={2}>
+                  <Form<TJobForm>
+                    cb={{
+                      onClose: () => {},
+                      onError: () => {},
+                      onSuccess: () => Promise.resolve({ ok: true }),
+                    }}
+                    scheme={scheme}
+                    // initialValues={initialValues}
+                    onFormReady={({ state }) => onReady(state)}
+                    onFormNotReady={({ state }) => onNotReady(state)}
+                    __errsBeforeTouchedIgnoreList={__errsBeforeTouchedIgnoreList}
+                  />
+                </Grid>
+                {
+                  !!optionalActions && optionalActions.map((action, i) => (
+                    <Button
+                      key={`${i}-${action.label}`}
+                      autoFocus
+                      color={action.color || 'inherit'}
+                      variant={action.variant || 'outlined'}
+                      onClick={action.onClick}
+                      disabled={!action.isEnabled}
+                      startIcon={action.startIcon}
+                    >
+                      {action.label}
+                    </Button>
+                  ))
+                }
+              </Stack>
             </Box>
           )
         }
       </Dialog>
     </Fragment>
   )
-}
+})

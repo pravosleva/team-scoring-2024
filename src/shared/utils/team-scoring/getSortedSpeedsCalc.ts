@@ -77,6 +77,11 @@ export class Probability {
     for (let i = 0, max = deltasInfo.all.length; i< max; i++) {
       if ((deltasInfo.all[i].delta as number) <= this.sensibility * deltasInfo.min) {
         deltasInfo.all[i].isSensed = true
+
+        // NOTE: Предыдущий кейс тоже надо учесть,
+        // т.к. он также соответствует комфортной работе
+        if (i >= 1) deltasInfo.all[i - 1].isSensed = true
+
         if (typeof deltasInfo.all[i].speed === 'number') {
           result.counter += 1
           result.speedValues.push((deltasInfo.all[i].speed as number))

@@ -21,6 +21,9 @@ import baseClasses from '~/App.module.scss'
 import { TimeAgo } from '~/shared/components/TimeAgo'
 // import EditIcon from '@mui/icons-material/Edit'
 import EditNoteIcon from '@mui/icons-material/EditNote';
+// import StopCircleIcon from '@mui/icons-material/StopCircle';
+import TimerOffIcon from '@mui/icons-material/TimerOff';
+import MoreTimeIcon from '@mui/icons-material/MoreTime';
 
 type TProps = {
   isActive: boolean;
@@ -32,7 +35,10 @@ type TProps = {
       ok: boolean;
       message?: string;
     }>;
-  onClearDates: ({ id }: { id: number }) => void;
+  onClearDates: (ps: { id: number; }) => void;
+  onAddTimeToFinishDate?: (ps: {
+    hours: number;
+  }) => void;
   onDeleteJob: () => void;
   // onCreateUser: (ps: {
   //   option: TOption;
@@ -138,7 +144,7 @@ const getNormalizedState = ({ state, jobId }: {
   return modifiedState as TJob
 }
 
-export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, onClearDates, onDeleteJob }: TProps) => {
+export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, onClearDates, onDeleteJob, onAddTimeToFinishDate }: TProps) => {
   const [isOpened, setIsOpened] = useState(false)
   const handleToggle = useCallback(() => setIsOpened((s) => !s), [setIsOpened])
   
@@ -457,9 +463,6 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             setFormState(getNormalizedState({ state, jobId: job.id }))
             setIsTargetActionEnabled(false)
           }}
-          onClearDates={() => {
-            onClearDates({ id: job.id })
-          }}
           scheme={memoizedScheme}
           onClose={handleCloseModal}
           targetAction={{
@@ -468,6 +471,69 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             isEnabled: isTargetActionEnabled,
             onClick: () => onSave({ state: formState }),
           }}
+          optionalActions={
+            !!job.forecast.estimate || !!job.forecast.start || !!job.forecast.finish
+            ? [
+              {
+                label: 'Clear dates & Close',
+                color: 'error',
+                variant: 'contained',
+                startIcon: <TimerOffIcon />,
+                isEnabled: true,
+                onClick: async () => {
+                  const isConfirmed = window.confirm('⚡ Sure? All dates will be removed!')
+                  if (isConfirmed) {
+                    onClearDates({ id: job.id });
+                    return Promise.resolve({ ok: true });
+                  } else {
+                    return Promise.reject({ ok: false, message: 'Canceled by user' });
+                  }
+                },
+              },
+              {
+                label: 'Add 4h to finish date',
+                color: 'error',
+                variant: 'outlined',
+                startIcon: <MoreTimeIcon />,
+                isEnabled: !!job.forecast.finish,
+                onClick: async () => {
+                  try {
+                    if (typeof onAddTimeToFinishDate === 'function') {
+                      const isConfirmed = window.confirm('⚡ Sure? +4h to finish date')
+                      if (isConfirmed) {
+                        onAddTimeToFinishDate({ hours: 4 });
+                        return Promise.resolve({ ok: true });
+                      }
+                      else throw new Error('Canceled by user')
+                    } else throw new Error('ERR1')
+                  } catch (err: any) {
+                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                  }
+                },
+              },
+              {
+                label: 'Add 8h to finish date',
+                color: 'error',
+                variant: 'outlined',
+                startIcon: <MoreTimeIcon />,
+                isEnabled: !!job.forecast.finish,
+                onClick: async () => {
+                  try {
+                    if (typeof onAddTimeToFinishDate === 'function') {
+                      const isConfirmed = window.confirm('⚡ Sure? +8h to finish date')
+                      if (isConfirmed) {
+                        onAddTimeToFinishDate({ hours: 8 });
+                        return Promise.resolve({ ok: true });
+                      }
+                      else throw new Error('Canceled by user')
+                    } else throw new Error('ERR2')
+                  } catch (err: any) {
+                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                  }
+                },
+              },
+            ] : undefined
+          }
           togglerRender={() => (
             <div className={classes.detailsPreviewWrapper}>
               <div className={classes.internalContent}>

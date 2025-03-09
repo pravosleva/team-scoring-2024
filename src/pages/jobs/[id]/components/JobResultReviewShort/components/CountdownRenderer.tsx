@@ -12,8 +12,11 @@ export const CountdownRenderer = ({ days, hours, minutes, seconds, completed }: 
 
   return (
     <Chip
-      variant='outlined'
+      variant='filled'
       size='small'
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      color='salmon'
       label={`${days} d ${zeroPad(hours)}:${zeroPad(minutes)}:${zeroPad(seconds)}`}
     />
   )

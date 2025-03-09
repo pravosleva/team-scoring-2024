@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef, memo } from 'react'
 import { TJob } from '~/shared/xstate'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
+import { Chip } from '@mui/material'
 import dayjs from 'dayjs'
 import Countdown from 'react-countdown'
 import { TimeAgo } from '~/shared/components'
@@ -54,10 +55,16 @@ export const JobResultReviewShort = memo(({ job }: {
             <div>{!isGood ? '+' : ''}{hrsDiff} h</div>
             {
               job.completed && !!job.forecast.finish && (
-                <TimeAgo
-                  date={job.forecast.finish}
-                  style={{ color: 'gray' }}
-                  prefix='Done'
+                <Chip
+                  variant='outlined'
+                  size='small'
+                  label={(
+                    <TimeAgo
+                      date={job.forecast.finish}
+                      style={{ color: 'gray' }}
+                      prefix='Done'
+                    />
+                  )}
                 />
               )
             }

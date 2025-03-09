@@ -10,6 +10,18 @@ import baseClasses from '~/App.module.scss'
 import { JobLogProgressGraph } from './components'
 import { getRounded } from '~/shared/utils/number-ops';
 // import { getSortedSpeedsCalc } from '~/shared/utils/team-scoring/getSortedSpeedsCalc';
+import { linear } from 'math-interpolate'
+
+const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
+  const result = linear({
+    x1: 0,
+    y1: 0,
+    x2: sum,
+    y2: 100,
+    x: x,
+  })
+  return result
+}
 
 type TProps = {
   job: TJob;
@@ -115,6 +127,35 @@ export const JobStats = ({ job }: TProps) => {
   )
   const hasProgress = useMemo(() => !!job.logs.items.some((l) => !!l.progress), [job.logs.items])
 
+  const sensedDeltaAsPercentageText = useMemo<string | null>(() => {
+    if (!calc?.dateSensed || !job.forecast.estimate || !job.forecast.start)
+      return null
+
+    const delta = getPercentage({
+      x: calc.dateSensed - job.forecast.start,
+      sum: job.forecast.estimate - job.forecast.start,
+    })
+    return delta < 100
+      ? `-${(100 - delta).toFixed(2)}%`
+      : `+${(delta - 100).toFixed(2)}%`
+    },
+    [job.forecast.estimate, calc?.dateSensed, job.forecast.start]
+  )
+  const worstDeltaAsPercentageText = useMemo<string | null>(() => {
+    if (!calc?.date100 || !job.forecast.estimate || !job.forecast.start)
+      return null
+
+    const delta = getPercentage({
+      x: calc.date100 - job.forecast.start,
+      sum: job.forecast.estimate - job.forecast.start,
+    })
+    return delta < 100
+      ? `-${(100 - delta).toFixed(2)}%`
+      : `+${(delta - 100).toFixed(2)}%`
+    },
+    [job.forecast.estimate, calc?.date100, job.forecast.start]
+  )
+
   return (
     <Grid container spacing={2}>
       {
@@ -137,7 +178,7 @@ export const JobStats = ({ job }: TProps) => {
             <Grid size={12}>
               <Grid container spacing={1}>
                 <Grid size={12}>
-                  <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('YYYY-MM-DD HH:mm')}</b><br />
+                  <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('YYYY-MM-DD HH:mm')}</b>
                 </Grid>
                 <Grid size={12}>
                   <AutoRefreshedProgressBar
@@ -174,7 +215,7 @@ export const JobStats = ({ job }: TProps) => {
         )
       }
 
-{
+      {
         !job.forecast.finish && (
           <>
             {
@@ -186,7 +227,9 @@ export const JobStats = ({ job }: TProps) => {
                 <Grid size={12}>
                   <Grid container spacing={1}>
                     <Grid size={12}>
-                      <b>⚖️ Sensed: {averageSensedDateUI}</b><br />
+                      <b>⚖️ Sensed: {averageSensedDateUI}</b>
+                      <br />
+                      <b style={{ color: 'gray' }}>{sensedDeltaAsPercentageText}</b>
                     </Grid>
                     <Grid size={12}>
                       <AutoRefreshedProgressBar
@@ -228,7 +271,9 @@ export const JobStats = ({ job }: TProps) => {
                 <Grid size={12}>
                   <Grid container spacing={1}>
                     <Grid size={12}>
-                      <b>😠 The worst: {worst100DateUI}</b><br />
+                      <b>😠 The worst: {worst100DateUI}</b>
+                      <br />
+                      <b style={{ color: 'gray' }}>{worstDeltaAsPercentageText}</b>
                     </Grid>
                     <Grid size={12}>
                       <AutoRefreshedProgressBar

@@ -84,7 +84,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
   // const stage = useMemo(() => getStage(job.forecast), [job.forecast])
 
   const handleDeleteJob = useCallback(({ id }: { id: number }) => () => {
-    const isConfirmed = window.confirm('Sure?')
+    const isConfirmed = window.confirm('⚡ Sure? This job will be deleted!')
     if (isConfirmed) jobsActorRef.send({ type: 'todo.delete', id })
   }, [jobsActorRef])
   const isStartedAndEstimated = useMemo(() =>
@@ -127,6 +127,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                   // checked={checked.includes(value)}
                   checked={completed}
                   inputProps={{ 'aria-labelledby': String(id) }}
+                  disabled={!isProjectOpened}
                 />
               )
             }
@@ -211,6 +212,11 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
               job={job}
               onClearDates={({ id }) => {
                 jobsActorRef.send({ type: 'todo.clearDates', id })
+              }}
+              onAddTimeToFinishDate={({ hours }) => {
+                const commentByUser = window.prompt('Your comment about add time?')
+
+                jobsActorRef.send({ type: 'todo.addTimeToFinishDate', hours, comment: commentByUser || '', id })
               }}
               onSave={({ state }) => {
                 // console.log('-state')
