@@ -15,7 +15,7 @@ import { TopLevelContext, TUser } from '~/shared/xstate/topLevelMachine/v2'
 // import SettingsIcon from '@mui/icons-material/Settings'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
 // import { useNavigate } from 'react-router-dom'
-import { TOption } from '~/shared/components/CreatableAutocomplete'
+import { TOption } from '~/shared/components/Autocomplete'
 import { getJobStage } from '../../utils'
 import baseClasses from '~/App.module.scss'
 import { TimeAgo } from '~/shared/components/TimeAgo'
@@ -62,6 +62,19 @@ const getUserValueOption = ({ assignedToId, users }: {
     }
     : undefined
 }
+const getJobValueOption = ({ jobId, jobs }: {
+  jobId: number;
+  jobs: TJob[];
+}): TOption | undefined => {
+  const targetJob = jobs.find(({ id }) => id === jobId)
+  return !!targetJob
+    ? {
+      label: targetJob.title,
+      value: String(targetJob.id),
+      inputValue: targetJob.title,
+    }
+    : undefined
+}
 
 const getNormalizedState = ({ state, jobId }: {
   state: unknown;
@@ -87,6 +100,20 @@ const getNormalizedState = ({ state, jobId }: {
   }
   for (const key in _state) {
     switch (key) {
+      case 'parentJob':
+        // label: "Work the WORST example", value: "1736248683210", _id: undefined
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (!!_state[key] && !Number.isNaN(Number(_state[key]?.value))) {
+          if (!modifiedState.relations) {
+            modifiedState.relations = {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              parent: Number(_state[key]?.value),
+            }
+          }
+        }
+        break
       case 'isLogsEnabled':
         if (typeof _state[key] === 'boolean') {
           modifiedState.logs.isEnabled = _state[key]
@@ -159,6 +186,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
   const [formState, setFormState] = useState<TJob | null>(null)
   // const navigate = useNavigate()
   // const jobsActorRef = TopLevelContext.useActorRef()
+  // const [filteredTodos] = useParamsInspectorContextStore((ctx) => ctx.filteredJobs)
+  // const todosActorRef = TopLevelContext.useActorRef()
+  const allJobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
 
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   // const topLevelActorRef = TopLevelContext.useActorRef()
@@ -167,6 +197,11 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
     value: String(id),
     inputValue: displayName,
   })), [users])
+  const memoizedJobList = useMemo(() => allJobs.filter(({ id }) => id !== job.id).map(({ id, title }) => ({
+    label: title,
+    value: String(id),
+    inputValue: title,
+  })), [allJobs, job.id])
   const memoizedScheme = useMemo<TScheme>(() => {
     return {
       // id: {
@@ -266,6 +301,47 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
               res.ok = false
               res.message = `Check value plz: "${String(value?.value)}" (${typeof value?.value})`
               break
+            default:
+              break
+          }
+
+          return res
+        },
+      },
+      parentJob: {
+        _selectCustomOpts: {
+          list: memoizedJobList,
+          // _onCreate: (option: TOption) => {
+          //   return onCreateUser({ option })
+          // },
+        },
+        initValue: typeof job.relations?.parent === 'number'
+          ? getJobValueOption({ jobId: job.relations.parent, jobs: allJobs })
+          : undefined,
+        label: 'Parent job',
+        type: 'autocomplete',
+        gridSize: 12,
+        isRequired: false,
+        validator: ({ value }: {
+          value: {
+            value: string;
+            label: string;
+            _id?: number;
+          };
+        }) => {
+          const res: { ok: boolean; message?: string; _isDisabled?: {
+            value: boolean;
+            reason?: string;
+          }; } = { ok: true }
+
+          switch (true) {
+            case !Number.isNaN(Number(value?._id)):
+              // NOTE: Ok
+              break
+            // case Number.isNaN(Number(value?.value)):
+            //   res.ok = false
+            //   res.message = `Check value plz: "${String(value?.value)}" (${typeof value?.value})`
+            //   break
             default:
               break
           }
@@ -387,7 +463,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         },
       },
     }
-  }, [job.descr, job.forecast.assignedTo, job.forecast.complexity, job.forecast.estimate, job.forecast.finish, job.forecast.start, job.logs.isEnabled, job.ts.update, job.title, memoizedUserList, users])
+  }, [job.descr, job.forecast.assignedTo, job.forecast.complexity, job.forecast.estimate, job.forecast.finish, job.forecast.start, job.logs.isEnabled, job.ts.update, job.title, memoizedUserList, users, allJobs, memoizedJobList, job.relations?.parent])
 
   return (
     <Box

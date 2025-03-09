@@ -26,6 +26,10 @@ export type TLogs = {
 };
 
 export type TJob = {
+  relations?: {
+    parent?: number;
+    children?: number[];
+  };
   id: number;
   title: string;
   descr?: string;

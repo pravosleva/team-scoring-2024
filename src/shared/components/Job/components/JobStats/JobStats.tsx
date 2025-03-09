@@ -49,7 +49,7 @@ const getObjAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): TObjAn
 
 export const JobStats = ({ job }: TProps) => {
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
-    const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetUser =  useMemo<TUser | null>(() => {
     const userId = Number(job?.forecast.assignedTo)
     return users?.find(({ id }) => id === userId) || null
@@ -155,6 +155,18 @@ export const JobStats = ({ job }: TProps) => {
     },
     [job.forecast.estimate, calc?.date100, job.forecast.start]
   )
+  const jobParent = useMemo<TJob | null | undefined>(() => typeof job.relations?.parent === 'number'
+    ? jobs.find(({ id }) => id === job.relations?.parent)
+    : null, [jobs, job.relations?.parent])
+  const jobsChildren = useMemo<TJob[]>(() =>
+    Array.isArray(job.relations?.children)
+    && job.relations.children.length > 0
+    ? job.relations.children.reduce((acc: TJob[], childrenJobId) => {
+      const targetJob: TJob | undefined = jobs.find(({ id }) => id === childrenJobId)
+      if (!!targetJob) acc.push(targetJob)
+      return acc
+    }, [])
+    : [], [jobs, job.relations?.children])
 
   return (
     <Grid container spacing={2}>
@@ -316,9 +328,50 @@ export const JobStats = ({ job }: TProps) => {
       }
 
       {
-        hasProgress && otherUserJobsForAnalysis.length > 0 && (
+        jobsChildren.length > 0 && (
           <Grid size={12}>
-            <JobLogProgressGraph targetJob={job} jobsForAnalysis={otherUserJobsForAnalysis} />
+            <Grid container spacing={1}>
+              <Grid size={12}>
+                <b>Jobs-children ({jobsChildren.length})</b>
+              </Grid>
+              <Grid size={12}>
+                <em style={{ fontSize: 'small' }}>Related as children to this job</em>
+              </Grid>
+              <Grid size={12}>
+                <ul className={baseClasses.compactList}>
+                  {
+                    jobsChildren.map(({ id, title, forecast }) => (
+                      <li key={id}>
+                        <Link to={`/jobs/${id}`}>
+                        <b>{title}</b> (complexity {forecast.complexity})
+                        </Link>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </Grid>
+            </Grid>
+          </Grid>
+        )
+      }
+
+      {
+        !!jobParent && (
+          <Grid size={12}>
+            <Grid container spacing={1}>
+              <Grid size={12}>
+                <b>Job-parent</b>
+              </Grid>
+              <Grid size={12}>
+                <ul className={baseClasses.compactList}>
+                  <li>
+                    <Link to={`/jobs/${jobParent.id}`}>
+                      <b>{jobParent.title}</b> (complexity {jobParent.forecast.complexity})
+                    </Link>
+                  </li>
+                </ul>
+              </Grid>
+            </Grid>
           </Grid>
         )
       }
@@ -353,6 +406,14 @@ export const JobStats = ({ job }: TProps) => {
               </Grid>
             </Grid>
         </Grid>
+        )
+      }
+
+      {
+        hasProgress && otherUserJobsForAnalysis.length > 0 && (
+          <Grid size={12}>
+            <JobLogProgressGraph targetJob={job} jobsForAnalysis={otherUserJobsForAnalysis} />
+          </Grid>
         )
       }
     </Grid>

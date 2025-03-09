@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TOption } from '~/shared/components/CreatableAutocomplete'
+import { TOption } from '~/shared/components/Autocomplete'
 
-export type TValue = string | boolean | number | TOption;
+export type TValue = string | boolean | number | TOption | null;
 
 export type TScheme = {
   [key: string]: {

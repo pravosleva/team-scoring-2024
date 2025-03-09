@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect, memo } from 'react'
 import TextField from '@mui/material/TextField'
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
+import MuiAutocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
 
 export type TOption = {
   inputValue?: string;
@@ -16,17 +16,19 @@ type TProps = {
   defaultValue?: TOption;
   isErrored?: boolean;
   helperText?: string;
+  isCreatable?: boolean;
 }
 
 const filter = createFilterOptions<TOption>()
 
-export const CreatableAutocomplete = memo(({
+export const Autocomplete = memo(({
   label,
   list,
   onSelect,
   defaultValue,
   isErrored,
   helperText,
+  isCreatable,
 }: TProps) => {
   const [selectedOption, setSelectedOption] = useState<TOption | null>(defaultValue || null)
 
@@ -35,7 +37,7 @@ export const CreatableAutocomplete = memo(({
   }, [selectedOption, onSelect])
 
   return (
-    <Autocomplete
+    <MuiAutocomplete
       value={selectedOption?.label}
       onChange={(_event, newValue) => {
         switch (true) {
@@ -67,7 +69,7 @@ export const CreatableAutocomplete = memo(({
         const { inputValue } = params;
         // Suggest the creation of a new value
         const isExisting = options.some((option) => inputValue === option.label);
-        if (inputValue !== '' && !isExisting) {
+        if (isCreatable && inputValue !== '' && !isExisting) {
           filtered.push({
             inputValue,
             label: `Add "${inputValue}"`,

@@ -154,182 +154,223 @@ export const topLevelMachine = setup({
 
           // if (!jobToUpdate.title.trim().length) return context.todos.filter((todo) => todo.id !== jobToUpdate.id)
 
+          const parentId = jobToUpdate.relations?.parent
+          const _newMsgsForParent = new Set()
+
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
-              if (todo.id === jobToUpdate.id) {
-                // console.log('-- jobToUpdate (1)')
-                // console.log(jobToUpdate)
-                // console.log('--')
-                const { ts: { create } } = todo
-                jobToUpdate.ts.create = create
-
-                const normalizedTitle = jobToUpdate.title.trim().replace(/\s+/g,' ')
-                const normalizedDescr = !!jobToUpdate.descr ? jobToUpdate.descr.trim().replace(/\s+/g,' ') : ''
-
-                if (jobToUpdate.title !== normalizedTitle) jobToUpdate.title = normalizedTitle
-                if (jobToUpdate.descr !== normalizedDescr) jobToUpdate.descr = normalizedDescr
-
-                delete jobToUpdate.forecast._assignedToName
-
-                jobToUpdate.logs.items = todo.logs?.items || []
-
-                const _newMsgs = new Set()
-
-                switch (true) {
-                  case !todo.logs.isEnabled && jobToUpdate.logs.isEnabled:
-                    if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
-                    
-                    _newMsgs.add(`Logs enabled (detailed with your comments). ${comment || 'No comment'}`)
-                    break
-                  case todo.logs.isEnabled && !jobToUpdate.logs.isEnabled: {
-                    if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
-                    
-                    _newMsgs.add('Logs disabled (minimal)')
-                    break
+              switch (true) {
+                // -- NOTE: Update children list for parent job
+                case typeof parentId === 'number' && todo.id === parentId: {
+                  _newMsgsForParent.add(`Child job set: [job=${jobToUpdate.id}]`)
+                  
+                  switch (true) {
+                    case !!todo.relations:
+                      if (Array.isArray(todo.relations.children))
+                        todo.relations.children = [...new Set([...todo.relations.children, jobToUpdate.id])]
+                      else
+                        todo.relations.children = [jobToUpdate.id]
+                      break
+                    default:
+                      todo.relations = {
+                        children: [jobToUpdate.id]
+                      }
+                      break
                   }
-                  case (
-                    (todo.logs.isEnabled && jobToUpdate.logs.isEnabled)
-                    || (!todo.logs.isEnabled && !jobToUpdate.logs.isEnabled)
-                  ):
-                    if (jobToUpdate.logs?.isEnabled) {
+
+                  if (_newMsgsForParent.size > 0) {
+                    if (todo.logs.items.length >= todo.logs.limit) todo.logs.items.pop()
+
+                    const newLog: TLogsItem = {
+                      ts: updateTime,
+                      text: _newMsgsForParent.size > 0 ? [..._newMsgsForParent].join(' // ') : 'Updated', // •
+                    }
+                    todo.logs.items.unshift(newLog)
+                  }
+                  
+                  break
+                }
+                // --
+                case (todo.id === jobToUpdate.id): {
+                  console.log('-- jobToUpdate (1)')
+                  console.log(jobToUpdate)
+                  console.log('--')
+                  const { ts: { create } } = todo
+                  jobToUpdate.ts.create = create
+  
+                  const normalizedTitle = jobToUpdate.title.trim().replace(/\s+/g,' ')
+                  const normalizedDescr = !!jobToUpdate.descr ? jobToUpdate.descr.trim().replace(/\s+/g,' ') : ''
+  
+                  if (jobToUpdate.title !== normalizedTitle) jobToUpdate.title = normalizedTitle
+                  if (jobToUpdate.descr !== normalizedDescr) jobToUpdate.descr = normalizedDescr
+  
+                  delete jobToUpdate.forecast._assignedToName
+  
+                  jobToUpdate.logs.items = todo.logs?.items || []
+  
+                  const _newMsgs = new Set()
+  
+                  switch (true) {
+                    case !todo.logs.isEnabled && jobToUpdate.logs.isEnabled:
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
                       
-                      const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
-                      _newMsgs.add(normalizedComment || 'No comment')
+                      _newMsgs.add(`Logs enabled (detailed with your comments). ${comment || 'No comment'}`)
+                      break
+                    case todo.logs.isEnabled && !jobToUpdate.logs.isEnabled: {
+                      if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
+                      
+                      _newMsgs.add('Logs disabled (minimal)')
+                      break
                     }
-                    break
-                  default:
-                    break
-                }
-
-                // NOTE: Reassigned
-                if (todo.forecast.assignedTo !== jobToUpdate.forecast.assignedTo) {
-                  if (!!jobToUpdate.forecast.assignedTo) {
-                    const oldValue = todo.forecast.assignedTo
-                    const targetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
-                    if (!!targetUser) {
-                      if (!!oldValue) {
-                        const oldTargetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
-                        _newMsgs.add(`Assigned: ${oldTargetUser?.displayName || 'unknown user'} (${oldValue}) -> ${targetUser.displayName} (${targetUser.id})`)
-                      } else {
-                        _newMsgs.add(`Assigned to ${targetUser.displayName} (${targetUser.id})`)
+                    case (
+                      (todo.logs.isEnabled && jobToUpdate.logs.isEnabled)
+                      || (!todo.logs.isEnabled && !jobToUpdate.logs.isEnabled)
+                    ):
+                      if (jobToUpdate.logs?.isEnabled) {
+                        if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
+                        
+                        const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
+                        _newMsgs.add(normalizedComment || 'No comment')
                       }
-                    }
-                    else _newMsgs.add(`Assigned to ${jobToUpdate.forecast.assignedTo}`)
-                  } else _newMsgs.add('Assigned to nobody')
-                }
-
-                // NOTE: complexity updated
-                if (todo.forecast.complexity !== jobToUpdate.forecast.complexity) {
-                  _newMsgs.add(`Complexity ${todo.forecast.complexity} -> ${jobToUpdate.forecast.complexity}`)
-                }
-
-                // NOTE: completed flag
-                const wasCompleted = todo.completed
-                if (!wasCompleted) {
-                  if (!todo.forecast.finish) {
-                    if (!!jobToUpdate.forecast.finish) {
-                      jobToUpdate.completed = true
-                      _newMsgs.add('Job finished, so set to completed')
-                    } else jobToUpdate.completed = false
-                  } else jobToUpdate.completed = true
-                }
-                jobToUpdate.completed = !!jobToUpdate.forecast.finish
-
-                
-                let progress: null | TLogProgress = null
-                // -- NOTE: Progress
-                switch (true) {
-                  // NOTE: 1. (Finish date was removed | updated) | Estimate | complexity updated
-                  case (
-                    (!!todo.forecast.finish && !jobToUpdate.forecast.finish)
-                    || (!!todo.forecast.finish && todo.forecast.finish !== jobToUpdate.forecast.finish)
-                    || jobToUpdate.forecast.estimate !== todo.forecast.estimate
-                    || jobToUpdate.forecast.complexity !== todo.forecast.complexity
-                  ):
-                    switch (true) {
-                      // NOTE: 1.1 Estimate | complexity updated
-                      case (
-                        jobToUpdate.forecast.estimate !== todo.forecast.estimate
-                        || jobToUpdate.forecast.complexity !== todo.forecast.complexity
-                      ): {
-                        // NOTE: 1.1.1 Estimate & start exists & job assigned
-                        if (
-                          !!jobToUpdate.forecast.estimate
-                          && !!jobToUpdate.forecast.start
-                          && !!jobToUpdate.forecast.assignedTo
-                        ) {
-                          const targetUserJobs = context.jobs.items
-                            .filter(({ forecast }) => forecast.assignedTo === jobToUpdate.forecast.assignedTo)
-                          const otherUserJobsForAnalysis = targetUserJobs
-                            .filter(({ forecast }) =>
-                              forecast.estimate
-                              && forecast.start
-                              && forecast.finish
-                              && forecast.assignedTo !== jobToUpdate.forecast.assignedTo
-                              && forecast.complexity === jobToUpdate.forecast.complexity
-                            )
-                          const worstDate = otherUserJobsForAnalysis.length > 0
-                            ? getWorstCalc({
-                              theJobList: otherUserJobsForAnalysis,
-                              ts: {
-                                testStart: jobToUpdate.forecast.start,
-                                testDiff: jobToUpdate.forecast.estimate - jobToUpdate.forecast.start,
-                              },
-                            }).date100
-                            : 0
-                          const worstProgress = getCurrentPercentage({
-                            targetDateTs: worstDate,
-                            startDateTs: jobToUpdate.forecast.start,
-                          })
-                          const estimateProgress = getCurrentPercentage({
-                            targetDateTs: jobToUpdate.forecast.estimate,
-                            startDateTs: jobToUpdate.forecast.start,
-                          })
-                          
-                          progress = {
-                            worst: otherUserJobsForAnalysis.length
-                              ? Math.round(worstProgress)
-                              : Math.round(estimateProgress),
-                            estimate: Math.round(estimateProgress),
-                          }
-
-                          _newMsgs.add('Progress updated')
+                      break
+                    default:
+                      break
+                  }
+  
+                  // NOTE: Reassigned
+                  if (todo.forecast.assignedTo !== jobToUpdate.forecast.assignedTo) {
+                    if (!!jobToUpdate.forecast.assignedTo) {
+                      const oldValue = todo.forecast.assignedTo
+                      const targetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
+                      if (!!targetUser) {
+                        if (!!oldValue) {
+                          const oldTargetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
+                          _newMsgs.add(`Assigned: ${oldTargetUser?.displayName || 'unknown user'} (${oldValue}) -> ${targetUser.displayName} (${targetUser.id})`)
+                        } else {
+                          _newMsgs.add(`Assigned to ${targetUser.displayName} (${targetUser.id})`)
                         }
-                        break
                       }
-                      default:
-                        break
-                    }
-                    break
-                  default:
-                    break
+                      else _newMsgs.add(`Assigned to ${jobToUpdate.forecast.assignedTo}`)
+                    } else _newMsgs.add('Assigned to nobody')
+                  }
+
+                  // NOTE: Set new parent
+                  if (todo.relations?.parent !== jobToUpdate.relations?.parent) {
+                    if (!!jobToUpdate.relations?.parent)
+                      _newMsgs.add(`Parent job set: [job=${jobToUpdate.relations?.parent}]`)
+                  }
+  
+                  // NOTE: complexity updated
+                  if (todo.forecast.complexity !== jobToUpdate.forecast.complexity) {
+                    _newMsgs.add(`Complexity ${todo.forecast.complexity} -> ${jobToUpdate.forecast.complexity}`)
+                  }
+  
+                  // NOTE: completed flag
+                  const wasCompleted = todo.completed
+                  if (!wasCompleted) {
+                    if (!todo.forecast.finish) {
+                      if (!!jobToUpdate.forecast.finish) {
+                        jobToUpdate.completed = true
+                        _newMsgs.add('Job finished, so set to completed')
+                      } else jobToUpdate.completed = false
+                    } else jobToUpdate.completed = true
+                  }
+                  jobToUpdate.completed = !!jobToUpdate.forecast.finish
+  
+                  
+                  let progress: null | TLogProgress = null
+                  // -- NOTE: Progress
+                  switch (true) {
+                    // NOTE: 1. (Finish date was removed | updated) | Estimate | complexity updated
+                    case (
+                      (!!todo.forecast.finish && !jobToUpdate.forecast.finish)
+                      || (!!todo.forecast.finish && todo.forecast.finish !== jobToUpdate.forecast.finish)
+                      || jobToUpdate.forecast.estimate !== todo.forecast.estimate
+                      || jobToUpdate.forecast.complexity !== todo.forecast.complexity
+                    ):
+                      switch (true) {
+                        // NOTE: 1.1 Estimate | complexity updated
+                        case (
+                          jobToUpdate.forecast.estimate !== todo.forecast.estimate
+                          || jobToUpdate.forecast.complexity !== todo.forecast.complexity
+                        ): {
+                          // NOTE: 1.1.1 Estimate & start exists & job assigned
+                          if (
+                            !!jobToUpdate.forecast.estimate
+                            && !!jobToUpdate.forecast.start
+                            && !!jobToUpdate.forecast.assignedTo
+                          ) {
+                            const targetUserJobs = context.jobs.items
+                              .filter(({ forecast }) => forecast.assignedTo === jobToUpdate.forecast.assignedTo)
+                            const otherUserJobsForAnalysis = targetUserJobs
+                              .filter(({ forecast }) =>
+                                forecast.estimate
+                                && forecast.start
+                                && forecast.finish
+                                && forecast.assignedTo !== jobToUpdate.forecast.assignedTo
+                                && forecast.complexity === jobToUpdate.forecast.complexity
+                              )
+                            const worstDate = otherUserJobsForAnalysis.length > 0
+                              ? getWorstCalc({
+                                theJobList: otherUserJobsForAnalysis,
+                                ts: {
+                                  testStart: jobToUpdate.forecast.start,
+                                  testDiff: jobToUpdate.forecast.estimate - jobToUpdate.forecast.start,
+                                },
+                              }).date100
+                              : 0
+                            const worstProgress = getCurrentPercentage({
+                              targetDateTs: worstDate,
+                              startDateTs: jobToUpdate.forecast.start,
+                            })
+                            const estimateProgress = getCurrentPercentage({
+                              targetDateTs: jobToUpdate.forecast.estimate,
+                              startDateTs: jobToUpdate.forecast.start,
+                            })
+                            
+                            progress = {
+                              worst: otherUserJobsForAnalysis.length
+                                ? Math.round(worstProgress)
+                                : Math.round(estimateProgress),
+                              estimate: Math.round(estimateProgress),
+                            }
+  
+                            _newMsgs.add('Progress updated')
+                          }
+                          break
+                        }
+                        default:
+                          break
+                      }
+                      break
+                    default:
+                      break
+                  }
+                  if (jobToUpdate.completed) {
+                    const v = getSpeed(jobToUpdate)
+                    jobToUpdate.v = v
+                    _newMsgs.add(`v= ${v}`)
+                  } else delete jobToUpdate.v
+                  // --
+  
+                  const newLog: TLogsItem = {
+                    ts: updateTime,
+                    text: _newMsgs.size > 0 ? [..._newMsgs].join(' // ') : 'Updated', // •
+                  }
+                  if (!!progress) newLog.progress = progress
+  
+                  jobToUpdate.logs.items.unshift(newLog)
+  
+                  // console.log('-- jobToUpdate (2)')
+                  // console.log(jobToUpdate)
+                  // console.log('--')
+  
+                  return jobToUpdate
                 }
-                if (jobToUpdate.completed) {
-                  const v = getSpeed(jobToUpdate)
-                  jobToUpdate.v = v
-                  _newMsgs.add(`v= ${v}`)
-                } else delete jobToUpdate.v
-                // --
-
-                const newLog: TLogsItem = {
-                  ts: updateTime,
-                  text: _newMsgs.size > 0 ? [..._newMsgs].join(' // ') : 'Updated', // •
-                }
-                if (!!progress) newLog.progress = progress
-
-                jobToUpdate.logs.items.unshift(newLog)
-
-                // console.log('-- jobToUpdate (2)')
-                // console.log(jobToUpdate)
-                // console.log('--')
-
-                return jobToUpdate
+                default:
+                  break
               }
-              // else {
-              //   console.log(`[!] todo.id (${todo.id} ${typeof todo.id}) === jobToUpdate.id (${jobToUpdate.id} ${typeof jobToUpdate.id})`)
-              // }
 
               return todo
             })

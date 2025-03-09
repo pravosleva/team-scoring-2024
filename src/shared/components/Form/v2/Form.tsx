@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useMemo, useLayoutEffect, useState, useCallback, useRef } from 'react'
@@ -19,10 +20,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker'
 import dayjs from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { CreatableAutocomplete, TOption } from '~/shared/components/CreatableAutocomplete'
+import { Autocomplete, TOption } from '~/shared/components/Autocomplete'
 import baseClasses from '~/App.module.scss'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 type TProps<Value> = {
   cb: {
     onSuccess: (values: any) => Promise<any>;
@@ -569,10 +570,39 @@ function GenericComponentForm<Value> ({
                     />
                   </Grid>
                 )
+              case 'autocomplete': {
+                return (
+                  <Grid size={scheme[key].gridSize} key={`${key}-${i}`}>
+                    <Autocomplete
+                      {...rest}
+                      // ref={(e) => ref(e)}
+                      label={scheme[key].label}
+                      // key={`${key}-${i}`}
+                      list={scheme[key]._selectCustomOpts?.list || []}
+                      onSelect={(item) => {
+                        console.log(item)
+                        if (!!item?.value) {
+                          const { value, label, _id } = item
+                          auxRef.current[key] = { value, label, _id }
+                          setValue(key, { value, label, _id })
+                        } else {
+                          auxRef.current[key] = null
+                          setValue(key, null)
+                        }
+                      }}
+                      defaultValue={scheme[key].initValue as TOption}
+                      isErrored={!!__errsState[key]}
+                      helperText={__errsState[key]}
+                      // isCreatable
+                    />
+                    {/* <pre>{JSON.stringify({ list: scheme[key]._selectCustomOpts?.list, initValue: scheme[key].initValue }, null, 2)}</pre> */}
+                  </Grid>
+                )
+              }
               case 'creatable-autocomplete': {
                 return (
                   <Grid size={scheme[key].gridSize} key={`${key}-${i}`}>
-                    <CreatableAutocomplete
+                    <Autocomplete
                       {...rest}
                       // ref={(e) => ref(e)}
                       label={scheme[key].label}
@@ -600,6 +630,7 @@ function GenericComponentForm<Value> ({
                       defaultValue={scheme[key].initValue as TOption}
                       isErrored={!!__errsState[key]}
                       helperText={__errsState[key]}
+                      isCreatable
                     />
                     {/* <pre>{JSON.stringify({ list: scheme[key]._selectCustomOpts?.list, initValue: scheme[key].initValue }, null, 2)}</pre> */}
                   </Grid>
@@ -612,7 +643,7 @@ function GenericComponentForm<Value> ({
                       key={`${key}-${scheme[key].specialKey}`}
                       name={key}
                       control={control}
-                      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                       
                       render={({ field: { value } }) => (
                         // NOTE: See also https://mui.com/x/react-date-pickers/date-time-picker/
                         <MobileDateTimePicker
