@@ -7,7 +7,7 @@ export type TForecast = {
   estimate?: number | null;
   start?: number | null;
   finish?: number | null;
-  complexity: 0 | 1 | 2 | 3 | 4 | 5;
+  complexity: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   comment?: string;
 }
 export type TLogProgress = {

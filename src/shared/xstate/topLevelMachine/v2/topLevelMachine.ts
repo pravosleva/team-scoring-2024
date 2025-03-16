@@ -159,16 +159,14 @@ export const topLevelMachine = setup({
 
           return {
             ...context.jobs,
-            items: context.jobs.items.map((todo) => {
+            items: context.jobs.items.map((todo, i, a) => {
               switch (true) {
                 // -- NOTE: Update children list for parent job
                 case typeof parentId === 'number' && todo.id === parentId: {
-                  _newMsgsForParent.add(`Child job set: [job=${jobToUpdate.id}]`)
-                  
                   switch (true) {
                     case !!todo.relations:
                       if (Array.isArray(todo.relations.children))
-                        todo.relations.children = [...new Set([...todo.relations.children, jobToUpdate.id])]
+                        todo.relations.children = [...new Set([jobToUpdate.id, ...todo.relations.children])]
                       else
                         todo.relations.children = [jobToUpdate.id]
                       break
@@ -178,6 +176,7 @@ export const topLevelMachine = setup({
                       }
                       break
                   }
+                  _newMsgsForParent.add(`Child job added: [job=${jobToUpdate.id}]`)
 
                   if (_newMsgsForParent.size > 0) {
                     if (todo.logs.items.length >= todo.logs.limit) todo.logs.items.pop()
@@ -193,9 +192,49 @@ export const topLevelMachine = setup({
                 }
                 // --
                 case (todo.id === jobToUpdate.id): {
-                  console.log('-- jobToUpdate (1)')
-                  console.log(jobToUpdate)
-                  console.log('--')
+                  if (!!todo.relations?.children) {
+                    if (!jobToUpdate.relations) {
+                      jobToUpdate.relations = {
+                        children: todo.relations?.children,
+                      }
+                    }
+                  }
+                  // console.log('-- jobToUpdate (1)')
+                  // console.log(jobToUpdate)
+                  // console.log('--')
+
+                  // -- NOTE: Remove child from parent if necessary
+                  const shouldChildBeRemovedFromParent: {
+                    doIt: boolean;
+                    targetChildId?: number;
+                  } = {
+                    doIt: false,
+                    targetChildId: undefined,
+                  }
+                  if (!!todo.relations?.parent && !jobToUpdate.relations?.parent) {
+                    // console.log('- [1] parent should be removed')
+                    shouldChildBeRemovedFromParent.doIt = true
+                    shouldChildBeRemovedFromParent.targetChildId = jobToUpdate.id
+                    if (shouldChildBeRemovedFromParent.doIt) {
+                      // console.log('- [1.1] parent should be removed')
+                      const parentIndex = a.findIndex(({ id }) => id === todo.relations?.parent)
+                      if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations?.children)) {
+                        // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                        a[parentIndex].relations.children = a[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+                        
+                        if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
+                          a[parentIndex].logs.items.pop()
+
+                        a[parentIndex].logs.items.unshift({
+                          ts: updateTime,
+                          text: `Child job removed: [job=${shouldChildBeRemovedFromParent.targetChildId}]`,
+                        })
+                        // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                      } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
+                    } // else console.log('- [2] parent should NOT be removed')
+                  }
+                  // --
+
                   const { ts: { create } } = todo
                   jobToUpdate.ts.create = create
   
@@ -240,19 +279,24 @@ export const topLevelMachine = setup({
   
                   // NOTE: Reassigned
                   if (todo.forecast.assignedTo !== jobToUpdate.forecast.assignedTo) {
+                    const oldValue = todo.forecast.assignedTo
                     if (!!jobToUpdate.forecast.assignedTo) {
-                      const oldValue = todo.forecast.assignedTo
                       const targetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
                       if (!!targetUser) {
                         if (!!oldValue) {
-                          const oldTargetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
-                          _newMsgs.add(`Assigned: ${oldTargetUser?.displayName || 'unknown user'} (${oldValue}) -> ${targetUser.displayName} (${targetUser.id})`)
+                          // const oldTargetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
+                          // _newMsgs.add(`Assigned: ${oldTargetUser?.displayName || 'unknown user'} [user=${oldValue}] -> ${targetUser.displayName} [user=${targetUser.id}]`)
+                          _newMsgs.add(`ReAssigned: [user=${oldValue}] -> [user=${targetUser.id}]`)
                         } else {
-                          _newMsgs.add(`Assigned to ${targetUser.displayName} (${targetUser.id})`)
+                          // _newMsgs.add(`Assigned to ${targetUser.displayName} [user=${targetUser.id}]`)
+                          _newMsgs.add(`Assigned to [user=${targetUser.id}]`)
                         }
                       }
-                      else _newMsgs.add(`Assigned to ${jobToUpdate.forecast.assignedTo}`)
-                    } else _newMsgs.add('Assigned to nobody')
+                      else _newMsgs.add(`Assigned to [user=${jobToUpdate.forecast.assignedTo}]`)
+                    } else {
+                      if (!!oldValue) _newMsgs.add(`ReAssigned: [user=${oldValue}] -> nobody`)
+                      else _newMsgs.add('Assigned to nobody')
+                    }
                   }
 
                   // NOTE: Set new parent
@@ -474,6 +518,48 @@ export const topLevelMachine = setup({
       actions: assign({
         jobs: ({ context, event }) => {
           const { id } = event
+          const updateTime = new Date().getTime()
+
+          // -- NOTE: Remove child from parent if necessary
+          const shouldChildBeRemovedFromParent: {
+            doIt: boolean;
+            targetChildId?: number;
+            targetChildTitle?: string;
+          } = {
+            doIt: false,
+            targetChildId: undefined,
+            targetChildTitle: undefined,
+          }
+          const targetJobIndex = context.jobs.items.findIndex(({ id }) => id)
+          const targetParentId = targetJobIndex !== -1
+            ? context.jobs.items[targetJobIndex].relations?.parent
+            : null
+          if (!!targetParentId) {
+            // console.log('- [1] parent should be removed')
+            shouldChildBeRemovedFromParent.doIt = true
+            shouldChildBeRemovedFromParent.targetChildId = id
+            if (shouldChildBeRemovedFromParent.doIt) {
+              // console.log('- [1.1] parent should be removed')
+              const parentIndex = context.jobs.items.findIndex(({ id }) => id === targetParentId)
+              if (parentIndex !== -1 && Array.isArray(context.jobs.items[parentIndex].relations?.children)) {
+                // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                context.jobs.items[parentIndex].relations.children = context.jobs.items[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+                
+                if (context.jobs.items[parentIndex].logs.items.length >= context.jobs.items[parentIndex].logs.limit)
+                  context.jobs.items[parentIndex].logs.items.pop()
+
+                const targetChildTitle = context.jobs.items.find(({ id }) => id === shouldChildBeRemovedFromParent.targetChildId)?.title
+                const _parentMsgs = [`Child job deleted [job=${shouldChildBeRemovedFromParent.targetChildId}]`]
+                if (!!targetChildTitle) _parentMsgs.push(`(${targetChildTitle})`)
+                context.jobs.items[parentIndex].logs.items.unshift({
+                  ts: updateTime,
+                  text: _parentMsgs.join(' '),
+                })
+                // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+              } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
+            } // else console.log('- [2] parent should NOT be removed')
+          }
+          // --
 
           return {
             ...context.jobs,

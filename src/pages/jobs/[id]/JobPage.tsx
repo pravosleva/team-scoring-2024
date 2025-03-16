@@ -134,6 +134,7 @@ export const JobPage = () => {
                       readOnly
                       icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
                       emptyIcon={<StarBorderIcon fontSize='inherit' />}
+                      max={targetJob.forecast.complexity > 5 ? targetJob.forecast.complexity : 5}
                     />
                   )
                 }

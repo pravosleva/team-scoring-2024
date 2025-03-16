@@ -5,12 +5,13 @@ import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
 import { Alert } from '@mui/material'
-import { Link } from 'react-router-dom'
-import baseClasses from '~/App.module.scss'
 import { JobLogProgressGraph } from './components'
 import { getRounded } from '~/shared/utils/number-ops';
-// import { getSortedSpeedsCalc } from '~/shared/utils/team-scoring/getSortedSpeedsCalc';
 import { linear } from 'math-interpolate'
+import { SubjobsList } from './components'
+import { JobTimingInfo } from './components/SubjobsList/components'
+import { CollapsibleBox } from '~/shared/components'
+import { JobResultReviewShort } from '~/pages/jobs/[id]/components';
 
 const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
   const result = linear({
@@ -32,12 +33,12 @@ type TObjAnalysisProps = {
   testedObj: any;
   requiredProps: string[];
 }
-type TObjAnalysisResult = {
+type TInputDataAnalysisResult = {
   missingProps: string[];
   expectedProps: string[];
 }
-const getObjAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): TObjAnalysisResult => {
-  const res: TObjAnalysisResult = {
+const getInputDataAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): TInputDataAnalysisResult => {
+  const res: TInputDataAnalysisResult = {
     missingProps: [],
     expectedProps: requiredProps,
   }
@@ -73,7 +74,7 @@ export const JobStats = ({ job }: TProps) => {
       && job.id !== id
       && forecast.assignedTo === targetUser?.id
       && forecast.complexity === job.forecast.complexity
-    ), [targetUserJobs, targetUser, job.forecast, job.id])
+    ), [targetUserJobs, targetUser?.id, job.forecast.complexity, job.id])
 
   const isJobDone = useMemo(() => !!job?.forecast.finish, [job])
   const isJobStarted = useMemo(() => !!job?.forecast.start, [job])
@@ -98,7 +99,7 @@ export const JobStats = ({ job }: TProps) => {
     : null, [calc])
 
   const forecastEstimateStatAnalysis = useMemo(() =>
-    getObjAnalysis({
+    getInputDataAnalysis({
       testedObj: {
         'Start date': job.forecast.start,
         'Estimate date': job.forecast.estimate,
@@ -110,7 +111,7 @@ export const JobStats = ({ job }: TProps) => {
     [targetUser, job.forecast.start, job.forecast.estimate]
   )
   const forecastWorstStatAnalysis = useMemo(() =>
-    getObjAnalysis({
+    getInputDataAnalysis({
       testedObj: {
         // ...job.forecast,
         'Start date': job.forecast.start,
@@ -169,7 +170,11 @@ export const JobStats = ({ job }: TProps) => {
     : [], [jobs, job.relations?.children])
 
   return (
-    <Grid container spacing={2}>
+    <Grid
+      container
+      spacing={2}
+      // sx={{ border: '1px dashed red' }}
+    >
       {
         !targetUser && (
           <Grid size={12}>
@@ -188,7 +193,7 @@ export const JobStats = ({ job }: TProps) => {
           isJobStarted && isJobEstimated && !!targetUser
           ? (
             <Grid size={12}>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} sx={{ border: 'none' }}>
                 <Grid size={12}>
                   <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('YYYY-MM-DD HH:mm')}</b>
                 </Grid>
@@ -196,11 +201,22 @@ export const JobStats = ({ job }: TProps) => {
                   <AutoRefreshedProgressBar
                     startDate={job.forecast.start as number}
                     targetDate={job.forecast.estimate as number}
-                    delay={1000}
+                    delay={5000}
                   />
                 </Grid>
                 <Grid size={12}>
-                  <em style={{ fontSize: 'small' }}>by {targetUser?.displayName}</em>
+                  <CollapsibleBox
+                    header={`by ${targetUser?.displayName || 'No target user info'}`}
+                    text={
+                      <>
+                        <em style={{ fontSize: 'small' }}>
+                          <JobTimingInfo job={job} />
+                        </em>
+                        <br />
+                        <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                      </>
+                    }
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -216,13 +232,31 @@ export const JobStats = ({ job }: TProps) => {
             </Grid>
           )
         ) : (
-          <Grid size={12}>
-            <Alert
-              severity='success'
-              variant='filled'
-            >
-              <em>Job is done</em>
-            </Alert>
+          <Grid container spacing={1} sx={{ border: 'none' }}>
+            <Grid size={12}>
+              <Alert
+                severity='success'
+                variant='filled'
+              >
+                <em>Job is done</em>
+                <br />
+                <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.finish).format('DD.MM.YYYY HH:mm')}</em>
+              </Alert>
+            </Grid>
+            <Grid size={12}>
+              <CollapsibleBox
+                header={`Resume [${targetUser?.displayName || 'No target user info'}]`}
+                text={
+                  <>
+                    <em style={{ fontSize: 'small' }}>
+                      <JobTimingInfo job={job} />
+                    </em>
+                    <br />
+                    <JobResultReviewShort job={job} />
+                  </>
+                }
+              />
+            </Grid>
           </Grid>
         )
       }
@@ -237,21 +271,31 @@ export const JobStats = ({ job }: TProps) => {
               && !!targetUser
               ? (
                 <Grid size={12}>
-                  <Grid container spacing={1}>
+                  <Grid container spacing={1} sx={{ border: 'none' }}>
                     <Grid size={12}>
                       <b>⚖️ Sensed: {averageSensedDateUI}</b>
-                      <br />
-                      <b style={{ color: 'gray' }}>{sensedDeltaAsPercentageText}</b>
                     </Grid>
                     <Grid size={12}>
                       <AutoRefreshedProgressBar
+                        key={job.forecast.complexity}
                         startDate={job.forecast.start}
                         targetDate={calc?.dateSensed}
-                        delay={1000}
+                        delay={5000}
                       />
                     </Grid>
                     <Grid size={12}>
-                      <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
+                      <CollapsibleBox
+                        header={`${sensedDeltaAsPercentageText || 'No analysis for delta'} [${targetUser.displayName}]`}
+                        text={
+                          <>
+                            <em style={{ fontSize: 'small' }}>
+                              <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
+                            </em>
+                            <br />
+                            <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
+                          </>
+                        }
+                      />
                     </Grid>
                   </Grid>
                 </Grid>
@@ -262,7 +306,7 @@ export const JobStats = ({ job }: TProps) => {
                     severity='warning'
                     variant='filled'
                   >
-                    <em>Sens date could not be calculated. ERR</em>
+                    <em>Sens date could not be calculated.</em>
                   </Alert>
                 </Grid>
               )
@@ -281,25 +325,34 @@ export const JobStats = ({ job }: TProps) => {
               && !!targetUser
               ? (
                 <Grid size={12}>
-                  <Grid container spacing={1}>
+                  <Grid container spacing={1} sx={{ border: 'none' }}>
                     <Grid size={12}>
                       <b>😠 The worst: {worst100DateUI}</b>
-                      <br />
-                      <b style={{ color: 'gray' }}>{worstDeltaAsPercentageText}</b>
                     </Grid>
                     <Grid size={12}>
                       <AutoRefreshedProgressBar
+                        key={job.forecast.complexity}
                         startDate={job.forecast.start}
                         targetDate={calc?.date100}
-                        delay={1000}
+                        delay={5000}
                       />
                     </Grid>
                     <Grid size={12}>
-                      <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
+                      <CollapsibleBox
+                        header={`${worstDeltaAsPercentageText} [${targetUser.displayName}]`}
+                        text={
+                          <>
+                            <em style={{ fontSize: 'small' }}>
+                              <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.date100 }}} />
+                            </em>
+                            <br />
+                            <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
+                          </>
+                        }
+                      />
                     </Grid>
                     {/*
                       job.forecast.estimate < worst100DateUI
-
                       <Grid size={12}>
                         <Alert
                           severity='warning'
@@ -329,83 +382,33 @@ export const JobStats = ({ job }: TProps) => {
 
       {
         jobsChildren.length > 0 && (
-          <Grid size={12}>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <b>Jobs-children ({jobsChildren.length})</b>
-              </Grid>
-              <Grid size={12}>
-                <em style={{ fontSize: 'small' }}>Related as children to this job</em>
-              </Grid>
-              <Grid size={12}>
-                <ul className={baseClasses.compactList}>
-                  {
-                    jobsChildren.map(({ id, title, forecast }) => (
-                      <li key={id}>
-                        <Link to={`/jobs/${id}`}>
-                        <b>{title}</b> (complexity {forecast.complexity})
-                        </Link>
-                      </li>
-                    ))
-                  }
-                </ul>
-              </Grid>
-            </Grid>
-          </Grid>
+          <SubjobsList
+            header={<b>Jobs-children</b>}
+            jobs={jobsChildren}
+            descr='Related as children.'
+          />
         )
       }
 
       {
         !!jobParent && (
-          <Grid size={12}>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <b>Job-parent</b>
-              </Grid>
-              <Grid size={12}>
-                <ul className={baseClasses.compactList}>
-                  <li>
-                    <Link to={`/jobs/${jobParent.id}`}>
-                      <b>{jobParent.title}</b> (complexity {jobParent.forecast.complexity})
-                    </Link>
-                  </li>
-                </ul>
-              </Grid>
-            </Grid>
-          </Grid>
+          <SubjobsList
+            header={<b>Job-parent</b>}
+            noPercentageInHeader
+            jobs={[jobParent]}
+            descr='This job is a children for that parent job:'
+            noTotalTiming
+          />
         )
       }
 
       {
         otherUserJobsForAnalysis.length > 0 && (
-          <Grid size={12}>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <b>Similar jobs ({otherUserJobsForAnalysis.length})</b>
-              </Grid>
-              {
-                !!targetUser && (
-                  <Grid size={12}>
-                    <em style={{ fontSize: 'small' }}>Completed and assigned to {targetUser.displayName || `#${targetUser.id}`}</em>
-                  </Grid>
-                )
-              }
-              <Grid size={12}>
-                <ul className={baseClasses.compactList}>
-                  {
-                    otherUserJobsForAnalysis.map(({ id, title, forecast }) => (
-                      <li key={id}>
-                        {/* <span>{id === job.id ? '👉 ' : ''}</span> */}
-                        <Link to={`/jobs/${id}`}>
-                          <b>{title}</b> (complexity {forecast.complexity})
-                        </Link>
-                      </li>
-                    ))
-                  }
-                </ul>
-              </Grid>
-            </Grid>
-        </Grid>
+          <SubjobsList
+            header={<b>Similar jobs</b>}
+            jobs={otherUserJobsForAnalysis}
+            descr={!!targetUser ? `Assigned to ${targetUser.displayName || `#${targetUser.id}`} and completed.` : undefined}
+          />
         )
       }
 

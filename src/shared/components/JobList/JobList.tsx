@@ -128,6 +128,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                   send({ type: 'newTodo.change', value: ev.currentTarget.value })
                 }}
                 value={todo}
+                size='small'
               />
             )
           }
@@ -171,7 +172,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                           && !activeFilters.assignedTo
                           ? 'contained' : 'outlined'}
                         startIcon={<FilterAltIcon />}>
-                        All active ({mainCounters.allActive})
+                        Active ({mainCounters.allActive})
                       </Button>
                     </Link>
                   )
@@ -190,7 +191,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                           ? 'contained' : 'outlined'}
                         startIcon={<FilterAltIcon />}
                       >
-                        All completed ({mainCounters.allCompleted})
+                        Completed ({mainCounters.allCompleted})
                       </Button>
                     </Link>
                   )
@@ -223,7 +224,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                         && activeFilters.values.estimateReached === 1
                         && !activeFilters.assignedTo
                         ? 'contained' : 'outlined'} startIcon={<FilterAltIcon />}>
-                        All Active Fuckups ({mainCounters.estimateReached})
+                        Active Fuckups ({mainCounters.estimateReached})
                       </Button>
                     </Link>
                   )

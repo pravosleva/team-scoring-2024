@@ -1,4 +1,5 @@
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
+// import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
 // import SettingsIcon from '@mui/icons-material/Settings'
 // import ConstructionIcon from '@mui/icons-material/Construction'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
@@ -7,9 +8,16 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import { TJob } from '~/shared/xstate'
 // import stc from 'string-to-color'
 // import invert from 'invert-color'
+import HiveIcon from '@mui/icons-material/Hive'
+import ExtensionIcon from '@mui/icons-material/Extension'
 
 export const getIcon = ({ job }: { job: TJob }): string | React.ReactNode => {
   switch (true) {
+    case !!job.relations?.parent:
+      return <ExtensionIcon />
+    case Array.isArray(job.relations?.children)
+      && job.relations.children.length > 0:
+      return <HiveIcon />
     case typeof job.forecast.start === 'number'
       && typeof job.forecast.estimate === 'undefined'
       && typeof job.forecast.finish === 'undefined': {
@@ -29,7 +37,7 @@ export const getIcon = ({ job }: { job: TJob }): string | React.ReactNode => {
     case typeof job.forecast.start === 'number'
       && typeof job.forecast.estimate === 'number'
       && typeof job.forecast.finish === 'number': {
-      return <WorkspacePremiumIcon />
+      return <TaskAltIcon />
     }
     default:
       return <NewReleasesIcon />

@@ -1,16 +1,20 @@
-import { TJob } from '~/shared/xstate'
+import { memo } from 'react'
+import { TJob, TopLevelContext } from '~/shared/xstate'
 import baseClasses from '~/App.module.scss'
 import { ResponsiveBlock } from '~/shared/components'
 import dayjs from 'dayjs'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import { getModifiedJobLogText } from '~/pages/jobs/[id]/utils/getModifiedJobLogText'
 
 type TPros = {
   job: TJob;
 }
 
-export const ActiveJobInfo = ({ job }: TPros) => {
+export const JobAdditionalInfo = memo(({ job }: TPros) => {
   const { logs, ...withoutLogs } = job
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const users = TopLevelContext.useSelector((s) => s.context.users)
 
   return (
     <ResponsiveBlock>
@@ -52,7 +56,7 @@ export const ActiveJobInfo = ({ job }: TPros) => {
                         gap: '8px',
                       }}
                     >
-                      <div>{text}</div>
+                      <div>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
                       <em
                         style={{
                           color: 'gray',
@@ -72,4 +76,4 @@ export const ActiveJobInfo = ({ job }: TPros) => {
       }
     </ResponsiveBlock>
   )
-}
+})

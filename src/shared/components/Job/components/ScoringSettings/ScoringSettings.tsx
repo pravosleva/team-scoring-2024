@@ -20,10 +20,12 @@ import { getJobStage } from '../../utils'
 import baseClasses from '~/App.module.scss'
 import { TimeAgo } from '~/shared/components/TimeAgo'
 // import EditIcon from '@mui/icons-material/Edit'
-import EditNoteIcon from '@mui/icons-material/EditNote';
-// import StopCircleIcon from '@mui/icons-material/StopCircle';
-import TimerOffIcon from '@mui/icons-material/TimerOff';
-import MoreTimeIcon from '@mui/icons-material/MoreTime';
+import EditNoteIcon from '@mui/icons-material/EditNote'
+// import StopCircleIcon from '@mui/icons-material/StopCircle'
+import TimerOffIcon from '@mui/icons-material/TimerOff'
+import MoreTimeIcon from '@mui/icons-material/MoreTime'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { useTheme } from '@mui/material/styles'
 
 type TProps = {
   isActive: boolean;
@@ -202,6 +204,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
     value: String(id),
     inputValue: title,
   })), [allJobs, job.id])
+
+  const theme = useTheme()
+  const upSm = useMediaQuery(theme.breakpoints.up('sm'))
   const memoizedScheme = useMemo<TScheme>(() => {
     return {
       // id: {
@@ -238,8 +243,8 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         isRequired: false,
         validator: ({ value }: any) => {
           return {
-            ok: typeof value === 'number' && value >= 0 && value <= 5,
-            message: `Expected number from 1 to 5 (received ${typeof value}: "${String(value)}")`,
+            ok: typeof value === 'number' && value >= 0 && value <= 6,
+            message: `Expected number from 1 to 6 (received ${typeof value}: "${String(value)}")`,
           }
         },
       },
@@ -279,7 +284,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           : undefined,
         label: 'Employee',
         type: 'creatable-autocomplete',
-        gridSize: 12,
+        gridSize: upSm ? 6 : 12,
         isRequired: false,
         validator: ({ value }: {
           value: {
@@ -320,7 +325,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           : undefined,
         label: 'Parent job',
         type: 'autocomplete',
-        gridSize: 12,
+        gridSize: upSm ? 6 : 12,
         isRequired: false,
         validator: ({ value }: {
           value: {
@@ -366,7 +371,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         initValue: job.forecast.start || undefined,
         label: 'Start date',
         type: 'date-ts',
-        gridSize: 4,
+        gridSize: upSm ? 4 : 12,
         isRequired: false,
         validator: ({ value }: any) => {
           return {
@@ -380,7 +385,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         initValue: job.forecast.estimate || undefined,
         label: 'Estimate date',
         type: 'date-ts',
-        gridSize: 4,
+        gridSize: upSm ? 4 : 12,
         isRequired: false,
         validator: ({ value, internalState }: any) => {
           const res: {
@@ -431,7 +436,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         initValue: job.forecast.finish || undefined,
         label: 'Finish date',
         type: 'date-ts',
-        gridSize: 4,
+        gridSize: upSm ? 4 : 12,
         isRequired: false,
         validator: ({ value, internalState }: any) => {
           const res: { ok: boolean; message?: string; _isDisabled?: {
@@ -463,7 +468,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         },
       },
     }
-  }, [job.descr, job.forecast.assignedTo, job.forecast.complexity, job.forecast.estimate, job.forecast.finish, job.forecast.start, job.logs.isEnabled, job.ts.update, job.title, memoizedUserList, users, allJobs, memoizedJobList, job.relations?.parent])
+  }, [upSm, job.descr, job.forecast.assignedTo, job.forecast.complexity, job.forecast.estimate, job.forecast.finish, job.forecast.start, job.logs.isEnabled, job.ts.update, job.title, memoizedUserList, users, allJobs, memoizedJobList, job.relations?.parent])
 
   return (
     <Box
@@ -565,9 +570,32 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                     return Promise.reject({ ok: false, message: 'Canceled by user' });
                   }
                 },
+                gridItemSize: 12,
               },
               {
-                label: 'Add 4h to finish date',
+                label: '+2h to finish',
+                color: 'error',
+                variant: 'outlined',
+                startIcon: <MoreTimeIcon />,
+                isEnabled: !!job.forecast.finish,
+                onClick: async () => {
+                  try {
+                    if (typeof onAddTimeToFinishDate === 'function') {
+                      const isConfirmed = window.confirm('⚡ Sure? +2h to finish date')
+                      if (isConfirmed) {
+                        onAddTimeToFinishDate({ hours: 2 });
+                        return Promise.resolve({ ok: true });
+                      }
+                      else throw new Error('Canceled by user')
+                    } else throw new Error('ERR1')
+                  } catch (err: any) {
+                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                  }
+                },
+                gridItemSize: 6,
+              },
+              {
+                label: '+4h to finish',
                 color: 'error',
                 variant: 'outlined',
                 startIcon: <MoreTimeIcon />,
@@ -581,32 +609,12 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                         return Promise.resolve({ ok: true });
                       }
                       else throw new Error('Canceled by user')
-                    } else throw new Error('ERR1')
-                  } catch (err: any) {
-                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
-                  }
-                },
-              },
-              {
-                label: 'Add 8h to finish date',
-                color: 'error',
-                variant: 'outlined',
-                startIcon: <MoreTimeIcon />,
-                isEnabled: !!job.forecast.finish,
-                onClick: async () => {
-                  try {
-                    if (typeof onAddTimeToFinishDate === 'function') {
-                      const isConfirmed = window.confirm('⚡ Sure? +8h to finish date')
-                      if (isConfirmed) {
-                        onAddTimeToFinishDate({ hours: 8 });
-                        return Promise.resolve({ ok: true });
-                      }
-                      else throw new Error('Canceled by user')
                     } else throw new Error('ERR2')
                   } catch (err: any) {
                     return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
                   }
                 },
+                gridItemSize: 6,
               },
             ] : undefined
           }

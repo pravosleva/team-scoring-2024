@@ -185,6 +185,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                             readOnly
                             icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
                             emptyIcon={<StarBorderIcon fontSize='inherit' />}
+                            max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
                           />
                           {job.logs.isEnabled && <ToggleOnIcon htmlColor='gray' />}
                         </div>

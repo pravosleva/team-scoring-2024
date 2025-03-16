@@ -1,4 +1,4 @@
-import { useState, forwardRef, Fragment, memo } from  'react'
+import { useState, forwardRef, Fragment, memo, useEffect, useCallback, useRef } from  'react'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 // import ListItemText from '@mui/material/ListItemText'
@@ -21,6 +21,7 @@ import { Form } from '~/shared/components/Form/v2'
 import { TScheme } from '~/shared/components/Form/v2/types'
 import { TJobForm } from '~/shared/xstate/topLevelMachine/v2/types'
 import { Stack } from '@mui/material'
+import { scrollToElm } from '~/shared/components/Layout/utils'
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -41,6 +42,7 @@ type TActionStandard = {
     ok: boolean;
     message?: string;
   }>;
+  gridItemSize: number;
 }
 
 type TProps = {
@@ -54,7 +56,7 @@ type TProps = {
     }>;
   }[];
   title: string;
-  targetAction: TActionStandard;
+  targetAction: Omit<TActionStandard, 'gridItemSize'>;
   optionalActions?: TActionStandard[];
   onClose?: () => Promise<{
     ok: boolean;
@@ -85,9 +87,13 @@ export const FullScreenDialog = memo(({
   __errsBeforeTouchedIgnoreList,
 }: TProps) => {
   const [open, setOpen] = useState(false)
-  const handleClickOpen = () => {
+  const handleClickOpen = useCallback(() => {
     setOpen(true)
-  }
+  }, [])
+  const topContentRef = useRef(null)
+  useEffect(() => {
+    if (!!topContentRef.current) scrollToElm(topContentRef.current)
+  }, [open])
   const handleClose = () => {
     setOpen(false)
     if (typeof onClose === 'function')
@@ -128,7 +134,8 @@ export const FullScreenDialog = memo(({
       >
         <AppBar
           sx={{
-            position: 'relative',
+            position: 'sticky',
+            top: '0',
           }}
           color='warning'
         >
@@ -174,6 +181,7 @@ export const FullScreenDialog = memo(({
             </Button> */}
           </Toolbar>
         </AppBar>
+        <div ref={topContentRef} />
         {/* <List>
           <ListItemButton>
             <ListItemText primary="Phone ringtone" secondary="Titania" />
@@ -188,7 +196,7 @@ export const FullScreenDialog = memo(({
         </List> */}
         {
           Object.keys(scheme).length > 0 && (
-            <Box sx={{ padding: 2 }}>
+            <Box sx={{ p: 2, maxWidth: 'md', margin: '0 auto' }}>
               <Stack sx={{ gap: 2 }}>
                 <Grid container spacing={2}>
                   <Form<TJobForm>
@@ -205,19 +213,38 @@ export const FullScreenDialog = memo(({
                   />
                 </Grid>
                 {
-                  !!optionalActions && optionalActions.map((action, i) => (
-                    <Button
-                      key={`${i}-${action.label}`}
-                      autoFocus
-                      color={action.color || 'inherit'}
-                      variant={action.variant || 'outlined'}
-                      onClick={action.onClick}
-                      disabled={!action.isEnabled}
-                      startIcon={action.startIcon}
+                  !!optionalActions && (
+                    <Grid
+                      container
+                      spacing={2}
+                      // sx={{
+                      //   borderTop: '1px solid lightgray',
+                      //   position: 'sticky',
+                      //   bottom: 0,
+                      //   p: 2,
+                      //   backgroundColor: '#fff',
+                      //   zIndex: 1,
+                      // }}
                     >
-                      {action.label}
-                    </Button>
-                  ))
+                      {
+                        optionalActions.map((action, i) => (
+                          <Grid key={`${i}-${action.label}`} size={action.gridItemSize}>
+                            <Button
+                              // autoFocus
+                              color={action.color || 'inherit'}
+                              variant={action.variant || 'outlined'}
+                              onClick={action.onClick}
+                              disabled={!action.isEnabled}
+                              startIcon={action.startIcon}
+                              fullWidth
+                            >
+                              {action.label}
+                            </Button>
+                          </Grid>
+                        ))
+                      }
+                    </Grid>
+                  )
                 }
               </Stack>
             </Box>

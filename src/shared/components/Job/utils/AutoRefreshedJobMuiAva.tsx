@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, memo } from 'react'
+import { useEffect, useRef, useState, useCallback, memo, useMemo } from 'react'
 import { Avatar } from '@mui/material'
 import { getJobColor } from './getJobColor'
 import { TJob } from '~/shared/xstate'
@@ -35,14 +35,16 @@ export const AutoRefreshedJobMuiAva = memo(({ job, delay }: TProps) => {
       if (!!timeout.current) clearTimeout(timeout.current)
     }
   }, [percentageValue, job.forecast.estimate, job.forecast.start, updateValue, delay])
+  const MemoizedIcon = useMemo(() => getIcon({ job }), [job])
+  const jobColor = useMemo(() => getJobColor({ forecast: job.forecast, percentageValue }), [job.forecast, percentageValue])
 
   return (
     <Avatar
       sx={{
-        backgroundColor: getJobColor({ forecast: job.forecast, percentageValue }),
+        backgroundColor: jobColor,
       }}
     >
-      {getIcon({ job })}
+      {MemoizedIcon}
     </Avatar>
   )
 })

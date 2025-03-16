@@ -514,6 +514,7 @@ function GenericComponentForm<Value> ({
                           setValue(key, newValue || 0)
                           setAuxState((s) => ({ ...s, [key]: newValue || 0 }))
                         }}
+                        max={6}
                       />
                       <div>{scheme[key].label}</div>
                     </div>
@@ -580,7 +581,7 @@ function GenericComponentForm<Value> ({
                       // key={`${key}-${i}`}
                       list={scheme[key]._selectCustomOpts?.list || []}
                       onSelect={(item) => {
-                        console.log(item)
+                        // console.log(item)
                         if (!!item?.value) {
                           const { value, label, _id } = item
                           auxRef.current[key] = { value, label, _id }
