@@ -1,7 +1,7 @@
 import { TJob } from '~/shared/xstate'
 import { getSortedSpeedsCalc } from './getSortedSpeedsCalc'
 import { NResult } from './types'
-import { getArithmeticalMean } from '~/shared/utils/number-ops'
+import { getMedian } from '~/shared/utils/number-ops'
 
 type TProps = {
   theJobList: TJob[];
@@ -46,7 +46,7 @@ export const getWorstCalc = ({ theJobList, ts }: TProps): TResult => {
       ts,
     })
 
-    result.averageSpeed = getArithmeticalMean(speedsCalc.sortedSpeeds.map(({ v }) => v))
+    result.averageSpeed = getMedian(speedsCalc.sortedSpeeds.map(({ v }) => v))
     // result.averageValue = averageValue
     result.date0 = (speedsCalc.dates?.best as number)
     result.date50 = (speedsCalc.dates?.average as number)

@@ -1,5 +1,5 @@
 import { TJob } from '~/shared/xstate'
-import { getArithmeticalMean } from '~/shared/utils/number-ops'
+import { getMedian } from '~/shared/utils/number-ops'
 import { NResult } from './types'
 
 type TProps = {
@@ -90,7 +90,7 @@ export class Probability {
       else
         deltasInfo.all[i].isSensed = false
     }
-    result.averageSpeed = getArithmeticalMean(result.speedValues)
+    result.averageSpeed = getMedian(result.speedValues)
 
     return result
   }
@@ -106,7 +106,7 @@ export class Probability {
       const averageValue =
         testPredSorted.length % 2 === 0
           ? Math.floor(
-              getArithmeticalMean([
+            getMedian([
                 testPredSorted[Math.floor(testPredSorted.length / 2) - 1],
                 testPredSorted[Math.floor(testPredSorted.length / 2)],
               ])

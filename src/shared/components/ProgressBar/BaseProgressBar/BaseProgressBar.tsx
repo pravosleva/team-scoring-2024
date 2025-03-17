@@ -1,15 +1,56 @@
+import { memo } from 'react'
 import { styled } from '@mui/material/styles'
 
-type TProps = {
+type TUiConnectVariant = 'bottom' | 'right';
+
+export type TBaseProgressBarProps = {
   label: string;
   value: number;
+  connectedOnThe?: TUiConnectVariant[];
 }
 
-const ProgressBar = styled('div')<TProps>(({ label, value }) => ({
+type TBorderRadiusResult = {
+  values: [number, number, number, number];
+  extentalMui: string;
+}
+
+const getBorderRadiusByUiConnectVariant = ({ codes }: {
+  codes?: TUiConnectVariant[];
+}): TBorderRadiusResult => {
+  const res: TBorderRadiusResult = {
+    values: [24, 24, 24, 24],
+    extentalMui: '24px 24px 24px 24px',
+  }
+  switch (true) {
+    case !codes:
+      // Nothing...
+      break
+    case codes?.includes('bottom'):
+      res.values[2] = 0
+      res.values[3] = 0
+      break
+    case codes?.includes('right'):
+      res.values[1] = 0
+      res.values[2] = 0
+      break
+    default:
+      break
+  }
+  res.extentalMui = res.values.map((n) => `${n}px`).join(' ')
+  return res
+}
+
+const ProgressBar = styled('div')<TBaseProgressBarProps>(({
+  label,
+  value,
+  connectedOnThe,
+}) => ({
   // color: 'darkslategray',
   // backgroundColor: 'aliceblue',
   padding: 8,
-  borderRadius: 24,
+  borderRadius: getBorderRadiusByUiConnectVariant({
+    codes: connectedOnThe,
+  }).extentalMui,
   position: 'relative',
   backgroundColor: 'lightgray',
   boxSizing: 'border-box',
@@ -47,6 +88,8 @@ const ProgressBar = styled('div')<TProps>(({ label, value }) => ({
   }
 }))
 
-export const BaseProgressBar = ({ label, value }: TProps) => {
-  return <ProgressBar label={label} value={value} />
-}
+export const BaseProgressBar = memo(
+  ({ label, value, ...others }: TBaseProgressBarProps) => (
+    <ProgressBar label={label} value={value} {...others} />
+  )
+)

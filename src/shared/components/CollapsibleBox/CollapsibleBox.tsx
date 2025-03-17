@@ -4,13 +4,16 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import classes from './CollapsibleBox.module.scss'
 import clsx from 'clsx'
 import baseClasses from '~/App.module.scss'
+import { TUiConnectVariant } from './types'
+import { getStylesByUiConnectVariant } from './getStylesByUiConnectVariant'
 
 type TProps = {
   header: string;
   text: string | React.ReactNode;
+  connectedOnThe?: TUiConnectVariant[];
 }
 
-export const CollapsibleBox = memo(({ header, text }: TProps) => {
+export const CollapsibleBox = memo(({ header, text, connectedOnThe }: TProps) => {
   const [isOpened, setIsOpened] = useState(false)
   const handleToggle = useCallback(() => {
     setIsOpened((s) => !s)
@@ -22,13 +25,26 @@ export const CollapsibleBox = memo(({ header, text }: TProps) => {
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
-        border: '2px solid inherit',
+        // border: '2px solid inherit',
         padding: '12px 16px',
         transition: '0.2s all ease',
-        borderRadius: isOpened ? '20px' : '28px',
+        borderRadius: isOpened
+          ? getStylesByUiConnectVariant({ codes: connectedOnThe }).output.opened.border.radius
+          : getStylesByUiConnectVariant({ codes: connectedOnThe }).output.collapsed.border.radius,
         // color: textColor,
         // backgroundColor: bgColor,
-        boxShadow: '0 2px 10px -2px rgba(0,0,0,0.3)',
+        // boxShadow: '0 2px 10px -2px rgba(0,0,0,0.3)',
+        // border: '2px solid lightgray',
+        borderWidth: isOpened
+          ? getStylesByUiConnectVariant({ codes: connectedOnThe }).output.opened.border.width
+          : getStylesByUiConnectVariant({ codes: connectedOnThe }).output.collapsed.border.width,
+        borderStyle: isOpened
+          ? getStylesByUiConnectVariant({ codes: connectedOnThe }).output.opened.border.style
+          : getStylesByUiConnectVariant({ codes: connectedOnThe }).output.collapsed.border.style,
+        borderColor: isOpened
+          ? getStylesByUiConnectVariant({ codes: connectedOnThe }).output.opened.border.color
+          : getStylesByUiConnectVariant({ codes: connectedOnThe }).output.collapsed.border.color,
+
         // marginBottom: '20px',
 
         cursor: 'pointer',
@@ -48,7 +64,7 @@ export const CollapsibleBox = memo(({ header, text }: TProps) => {
       >
         {/* <input id={togglerSlug} type='checkbox' style={{ border: '1px solid red' }} />
         <label style={{ fontWeight: 'bold' }} htmlFor={togglerSlug}>{header}</label> */}
-        <div style={{ fontWeight: 'bold' }} className={baseClasses.truncate}>{header}</div>
+        <div style={{ fontWeight: 'bold', fontSize: 'small' }} className={baseClasses.truncate}>{header}</div>
         <div
           style={{
             marginLeft: 'auto',

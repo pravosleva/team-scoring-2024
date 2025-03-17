@@ -1,14 +1,20 @@
 import { useState, useRef, useCallback, useEffect, memo } from 'react'
 import { getCurrentPercentage } from '~/shared/utils'
-import { BaseProgressBar } from './BaseProgressBar'
+import { BaseProgressBar, TBaseProgressBarProps } from './BaseProgressBar'
 
 type TProps = {
   targetDate: number;
   startDate: number;
   delay: number;
+  connectedOnThe?: Pick<TBaseProgressBarProps, 'connectedOnThe'>['connectedOnThe'];
 }
 
-export const AutoRefreshedProgressBar = memo(({ targetDate, startDate, delay }: TProps) => {
+export const AutoRefreshedProgressBar = memo(({
+  targetDate,
+  startDate,
+  delay,
+  connectedOnThe,
+}: TProps) => {
   const [value, setValue] = useState(
     getCurrentPercentage({
       targetDateTs: targetDate,
@@ -36,7 +42,11 @@ export const AutoRefreshedProgressBar = memo(({ targetDate, startDate, delay }: 
 
   return (
     <div style={{ width: '100%' }}>
-      <BaseProgressBar value={value} label={`${value.toFixed(0)} %`} />
+      <BaseProgressBar
+        value={value}
+        label={`${value.toFixed(0)} %`}
+        connectedOnThe={connectedOnThe}
+      />
     </div>
   )
 })

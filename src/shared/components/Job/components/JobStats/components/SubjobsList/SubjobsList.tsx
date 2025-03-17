@@ -25,9 +25,10 @@ type TProps = {
   descr?: string;
   noPercentageInHeader?: boolean;
   noTotalTiming?: boolean;
+  showLastLog?: boolean;
 }
 
-export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, noTotalTiming }: TProps) => {
+export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, noTotalTiming, showLastLog }: TProps) => {
   const doneItems = useMemo<number>(() => jobs.reduce((acc, job) => {
     if (job.completed) acc += 1
     return acc
@@ -99,6 +100,21 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
                     key={job.id}
                     job={job}
                   />
+                  {
+                    showLastLog && job.logs.items.length > 0 && (
+                      <>
+                        <br />
+                        <span
+                          style={{
+                            borderLeft: '4px solid lightgray',
+                            paddingLeft: '8px',
+                          }}
+                        >
+                          <span style={{ color: 'gray' }}>Last log:</span> <b>{job.logs.items[0].text}</b>
+                        </span>
+                      </>
+                    )
+                  }
                 </li>
               ))
             }

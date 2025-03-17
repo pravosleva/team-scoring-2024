@@ -12,6 +12,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import { JobAdditionalInfo } from '../../components'
 // import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
+import HistoryIcon from '@mui/icons-material/History'
+import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 
 type TProps = {
   isOpened: boolean;
@@ -73,9 +75,9 @@ export const ActiveJobContent = memo(({
               gap: '4px',
             }}
           >
-            <b>#{job.id}</b>
+            <code><b>#{job.id}</b></code>
             <StarIcon fontSize='inherit' />
-            {job.forecast.complexity}
+            <code>{job.forecast.complexity}</code>
           </span>
           <IconButton
             color='inherit'
@@ -102,10 +104,14 @@ export const ActiveJobContent = memo(({
             borderBottom: '1px solid lightgray',
           }}
         >
-          <h2>
+          <h2 style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
             {
               !job.forecast.finish
-              ? '[ Scenario variants ]'
+              ? <>
+                <span>[ Scenario variants</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center' }}>{ratingIcons[expressAppraiserStars].icon}</span>
+                <span>]</span>
+              </>
               : '[ Details ]'
             }
           </h2>
@@ -136,7 +142,8 @@ export const ActiveJobContent = memo(({
                   value={expressAppraiserStars}
                   // icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
                   // emptyIcon={<StarBorderIcon fontSize='inherit' />}
-                  max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
+                  // max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
+                  max={6}
                   // disabled
                   // aria-readonly
                   // readOnly
@@ -147,9 +154,10 @@ export const ActiveJobContent = memo(({
                 {
                   isNeedToReset && (
                     <Button
+                      color='error'
                       variant='text'
                       size='small'
-                      // startIcon={<AccountCircleIcon />}
+                      endIcon={<HistoryIcon />}
                       // fullWidth
                       // className={baseClasses.truncate}
                       onClick={resetExpressAppraiserStars}
@@ -159,6 +167,7 @@ export const ActiveJobContent = memo(({
                   )
                 }
               </div>
+              <div>Grade: {ratingIcons[expressAppraiserStars].label}</div>
               {!!job.descr && <div style={{ color: 'gray', fontSize: 'small' }}>{job.descr}</div>}
             </div>
             <JobStats

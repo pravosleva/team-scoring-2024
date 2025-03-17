@@ -3,15 +3,15 @@ import { useMemo } from 'react'
 import { AutoRefreshedProgressBar } from '~/shared/components/ProgressBar'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
-import Grid from '@mui/material/Grid2'
-import { Alert } from '@mui/material'
+// import Grid from '@mui/material/Grid2'
+import { Alert, Grid2 as Grid } from '@mui/material'
 import { JobLogProgressGraph } from './components'
 import { getRounded } from '~/shared/utils/number-ops';
 import { linear } from 'math-interpolate'
 import { SubjobsList } from './components'
 import { JobTimingInfo } from './components/SubjobsList/components'
 import { CollapsibleBox } from '~/shared/components'
-import { JobResultReviewShort } from '~/pages/jobs/[id]/components';
+import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 
 const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
   const result = linear({
@@ -197,26 +197,30 @@ export const JobStats = ({ job }: TProps) => {
                 <Grid size={12}>
                   <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('YYYY-MM-DD HH:mm')}</b>
                 </Grid>
-                <Grid size={12}>
-                  <AutoRefreshedProgressBar
-                    startDate={job.forecast.start as number}
-                    targetDate={job.forecast.estimate as number}
-                    delay={5000}
-                  />
-                </Grid>
-                <Grid size={12}>
-                  <CollapsibleBox
-                    header={`by ${targetUser?.displayName || 'No target user info'}`}
-                    text={
-                      <>
-                        <em style={{ fontSize: 'small' }}>
-                          <JobTimingInfo job={job} />
-                        </em>
-                        <br />
-                        <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
-                      </>
-                    }
-                  />
+                <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                  <Grid size={12}>
+                    <AutoRefreshedProgressBar
+                      startDate={job.forecast.start as number}
+                      targetDate={job.forecast.estimate as number}
+                      delay={1000}
+                      connectedOnThe={['bottom']}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <CollapsibleBox
+                      connectedOnThe={['top']}
+                      header={`by ${targetUser?.displayName || 'No target user info'}`}
+                      text={
+                        <>
+                          <em style={{ fontSize: 'small' }}>
+                            <JobTimingInfo job={job} />
+                          </em>
+                          <br />
+                          <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                        </>
+                      }
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -275,27 +279,31 @@ export const JobStats = ({ job }: TProps) => {
                     <Grid size={12}>
                       <b>⚖️ Sensed: {averageSensedDateUI}</b>
                     </Grid>
-                    <Grid size={12}>
-                      <AutoRefreshedProgressBar
-                        key={job.forecast.complexity}
-                        startDate={job.forecast.start}
-                        targetDate={calc?.dateSensed}
-                        delay={5000}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <CollapsibleBox
-                        header={`${sensedDeltaAsPercentageText || 'No analysis for delta'} [${targetUser.displayName}]`}
-                        text={
-                          <>
-                            <em style={{ fontSize: 'small' }}>
-                              <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
-                            </em>
-                            <br />
-                            <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
-                          </>
-                        }
-                      />
+                    <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                      <Grid size={12}>
+                        <AutoRefreshedProgressBar
+                          key={job.forecast.complexity}
+                          startDate={job.forecast.start}
+                          targetDate={calc?.dateSensed}
+                          delay={5000}
+                          connectedOnThe={['bottom']}
+                        />
+                      </Grid>
+                      <Grid size={12}>
+                        <CollapsibleBox
+                          header={`${sensedDeltaAsPercentageText || 'No analysis for delta'} for ${targetUser.displayName}`}
+                          text={
+                            <>
+                              <em style={{ fontSize: 'small' }}>
+                                <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
+                              </em>
+                              <br />
+                              <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
+                            </>
+                          }
+                          connectedOnThe={['top']}
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -329,27 +337,31 @@ export const JobStats = ({ job }: TProps) => {
                     <Grid size={12}>
                       <b>😠 The worst: {worst100DateUI}</b>
                     </Grid>
-                    <Grid size={12}>
-                      <AutoRefreshedProgressBar
-                        key={job.forecast.complexity}
-                        startDate={job.forecast.start}
-                        targetDate={calc?.date100}
-                        delay={5000}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <CollapsibleBox
-                        header={`${worstDeltaAsPercentageText} [${targetUser.displayName}]`}
-                        text={
-                          <>
-                            <em style={{ fontSize: 'small' }}>
-                              <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.date100 }}} />
-                            </em>
-                            <br />
-                            <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
-                          </>
-                        }
-                      />
+                    <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                      <Grid size={12}>
+                        <AutoRefreshedProgressBar
+                          key={job.forecast.complexity}
+                          startDate={job.forecast.start}
+                          targetDate={calc?.date100}
+                          delay={5000}
+                          connectedOnThe={['bottom']}
+                        />
+                      </Grid>
+                      <Grid size={12}>
+                        <CollapsibleBox
+                          header={`${worstDeltaAsPercentageText} for ${targetUser.displayName}`}
+                          text={
+                            <>
+                              <em style={{ fontSize: 'small' }}>
+                                <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 }}} />
+                              </em>
+                              <br />
+                              <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
+                            </>
+                          }
+                          connectedOnThe={['top']}
+                        />
+                      </Grid>
                     </Grid>
                     {/*
                       job.forecast.estimate < worst100DateUI
@@ -386,6 +398,7 @@ export const JobStats = ({ job }: TProps) => {
             header={<b>Jobs-children</b>}
             jobs={jobsChildren}
             descr='Related as children.'
+            showLastLog
           />
         )
       }
@@ -398,6 +411,7 @@ export const JobStats = ({ job }: TProps) => {
             jobs={[jobParent]}
             descr='This job is a children for that parent job:'
             noTotalTiming
+            showLastLog
           />
         )
       }
