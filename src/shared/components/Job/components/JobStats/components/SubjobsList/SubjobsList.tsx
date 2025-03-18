@@ -6,7 +6,9 @@ import { linear } from 'math-interpolate'
 import { getDoneTimeDiff } from '~/shared/components/Job/utils/getDoneTimeDiff'
 import { Link } from 'react-router-dom'
 import { getJobStatus } from '~/shared/components/Job/utils/getJobStatus'
+// import { getModifiedJobLogText } from '~/pages/jobs/[id]/utils/getModifiedJobLogText'
 import { JobTimingInfo } from './components'
+import dayjs from 'dayjs'
 
 const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
   const result = linear({
@@ -88,18 +90,18 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
           )
         }
         <Grid size={12}>
-          <ul className={baseClasses.compactList}>
+          <ul
+            className={baseClasses.compactList}
+            // style={{ listStyleType: 'circle' }}
+          >
             {
               jobs.map((job) => (
-                <li>
+                <li
+                  // style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}
+                >
                   <Link to={`/jobs/${job.id}`}>
                     <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity})
                   </Link>
-                  <br />
-                  <JobTimingInfo
-                    key={job.id}
-                    job={job}
-                  />
                   {
                     showLastLog && job.logs.items.length > 0 && (
                       <>
@@ -110,11 +112,18 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
                             paddingLeft: '8px',
                           }}
                         >
-                          <span style={{ color: 'gray' }}>Last log:</span> <b>{job.logs.items[0].text}</b>
+                          <span style={{ color: 'gray' }}>Last log [{dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}]:</span> <b>{job.logs.items[0].text}</b>
                         </span>
                       </>
                     )
                   }
+                  <br />
+                  <span>
+                    <JobTimingInfo
+                      key={job.id}
+                      job={job}
+                    />
+                  </span>
                 </li>
               ))
             }

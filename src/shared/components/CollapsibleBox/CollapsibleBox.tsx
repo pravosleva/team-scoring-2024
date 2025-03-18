@@ -11,9 +11,10 @@ type TProps = {
   header: string;
   text: string | React.ReactNode;
   connectedOnThe?: TUiConnectVariant[];
+  icon?: React.ReactNode;
 }
 
-export const CollapsibleBox = memo(({ header, text, connectedOnThe }: TProps) => {
+export const CollapsibleBox = memo(({ icon, header, text, connectedOnThe }: TProps) => {
   const [isOpened, setIsOpened] = useState(false)
   const handleToggle = useCallback(() => {
     setIsOpened((s) => !s)
@@ -58,10 +59,11 @@ export const CollapsibleBox = memo(({ header, text, connectedOnThe }: TProps) =>
           display: 'flex',
           flexWrap: 'nowrap',
           alignItems: 'center',
-          gap: '16px',
+          gap: '8px',
         }}
         className={classes.collapsible}
       >
+        {!!icon && icon}
         {/* <input id={togglerSlug} type='checkbox' style={{ border: '1px solid red' }} />
         <label style={{ fontWeight: 'bold' }} htmlFor={togglerSlug}>{header}</label> */}
         <div style={{ fontWeight: 'bold', fontSize: 'small' }} className={baseClasses.truncate}>{header}</div>

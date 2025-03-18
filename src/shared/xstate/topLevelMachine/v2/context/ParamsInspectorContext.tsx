@@ -9,6 +9,7 @@ type TCountersPack = {
   estimateNotReached: number;
   allActive: number;
   allCompleted: number;
+  allProjects: number;
 };
 type TPICCounters = {
   main: TCountersPack;
@@ -21,10 +22,12 @@ type TPICFilters = {
   jobStatusFilter: boolean;
   assignedTo: boolean;
   estimateReached: boolean;
+  isProject: boolean;
   values: {
     jobStatusFilter: null | EJobsStatusFilter;
     assignedTo: null | number;
     estimateReached: null | 0 | 1;
+    isProject: null | 0 | 1;
   },
 };
 type TPICStore = {
@@ -38,15 +41,18 @@ const initialState: TPICStore = {
     jobStatusFilter: false,
     assignedTo: false,
     estimateReached: false,
+    isProject: false,
     values: {
       jobStatusFilter: null,
       assignedTo: null,
       estimateReached: null,
+      isProject: null,
     },
   },
   filteredJobs: [],
   counters: {
     main: {
+      allProjects: 0,
       estimateReached: 0,
       estimateNotReached: 0,
       allActive: 0,
@@ -63,9 +69,11 @@ type TProps = {
   children: React.ReactNode;
 }
 
-const getIsJobAssigned = ({ job }: { job: TJob }): boolean => {
-  return !!job.forecast.assignedTo
-}
+const getIsJobAssigned = ({ job }: { job: TJob }): boolean =>
+  !!job.forecast.assignedTo
+
+const getIsJobProject = ({ job }: { job: TJob }): boolean =>
+  Array.isArray(job.relations?.children) && job.relations.children.length > 0
 
 const Logic = ({ children }: TProps) => {
   const todosActorRef = TopLevelContext.useActorRef()
@@ -91,14 +99,22 @@ const Logic = ({ children }: TProps) => {
       (!!assignedToFilterValue && !Number.isNaN(Number(assignedToFilterValue)))
     const estimateReachedFilterValue = urlSearchParams.get('estimateReached')
     const hasEstimateReachedFilter = !!estimateReachedFilterValue && !Number.isNaN(Number(estimateReachedFilterValue))
+    
+    const isProjectFilterValue = urlSearchParams.get('isProject')
+    const hasIsProjectFilterValue = !!isProjectFilterValue && !Number.isNaN(Number(isProjectFilterValue))
+
+    // console.log(`hasIsProjectFilterValue= ${hasIsProjectFilterValue}`)
+    // console.log(`Number(isProjectFilterValue)= ${Number(isProjectFilterValue)}`)
 
     let filteredJobs: TJob[] = []
     const activeFilters: TPICFilters = {
-      isAnyFilterActive: hasJobStatusFilter || hasAssignedToFilter || hasEstimateReachedFilter,
+      isAnyFilterActive: hasJobStatusFilter || hasAssignedToFilter || hasEstimateReachedFilter || hasIsProjectFilterValue,
       jobStatusFilter: hasJobStatusFilter,
       assignedTo: hasAssignedToFilter,
       estimateReached: hasEstimateReachedFilter,
+      isProject: hasIsProjectFilterValue,
       values: {
+        isProject: null,
         jobStatusFilter: null,
         assignedTo: null,
         estimateReached: null,
@@ -106,6 +122,7 @@ const Logic = ({ children }: TProps) => {
     }
     const counters: TPICCounters = {
       main: {
+        allProjects: 0,
         estimateReached: 0,
         estimateNotReached: 0,
         allActive: 0,
@@ -118,6 +135,7 @@ const Logic = ({ children }: TProps) => {
     for (const job of allJobs) {
       if (!!job.forecast.assignedTo && !counters.employees[String(job.forecast.assignedTo)])
         counters.employees[String(job.forecast.assignedTo)] = {
+          allProjects: 0,
           estimateReached: 0,
           estimateNotReached: 0,
           allActive: 0,
@@ -125,13 +143,14 @@ const Logic = ({ children }: TProps) => {
         }
 
       const isCompleted = job.completed
+      const isAssigned = getIsJobAssigned({ job })
       if (isCompleted) {
         counters.main.allCompleted += 1
-        if (getIsJobAssigned({ job }))
+        if (isAssigned)
           counters.employees[String(job.forecast.assignedTo)].allCompleted += 1
       } else {
         counters.main.allActive += 1
-        if (getIsJobAssigned({ job }))
+        if (isAssigned)
           counters.employees[String(job.forecast.assignedTo)].allActive += 1
       }
 
@@ -140,13 +159,21 @@ const Logic = ({ children }: TProps) => {
         const isEstimateReached = nowDate > (job.forecast.estimate as number)
         if (isEstimateReached) {
           counters.main.estimateReached += 1
-          if (getIsJobAssigned({ job }))
+          if (isAssigned)
             counters.employees[String(job.forecast.assignedTo)].estimateReached += 1
         } else {
           counters.main.estimateNotReached += 1
-          if (getIsJobAssigned({ job }))
+          if (isAssigned)
             counters.employees[String(job.forecast.assignedTo)].estimateNotReached += 1
         }
+      }
+
+      const isJobProject = getIsJobProject({ job })
+      // console.log(`isJobProject= ${isJobProject}`)
+      if (isJobProject) {
+        counters.main.allProjects += 1
+        if (isAssigned)
+          counters.employees[String(job.forecast.assignedTo)].allProjects += 1
       }
 
       switch (true) {
@@ -182,7 +209,6 @@ const Logic = ({ children }: TProps) => {
 
           // NOTE: 3. estimateReached filter
           if (hasEstimateReachedFilter) {
-            
             if (!!job.forecast.start && !!job.forecast.estimate) {
               const isReached = nowDate > job.forecast.estimate
               const normalizedValue = Number(estimateReachedFilterValue)
@@ -203,14 +229,37 @@ const Logic = ({ children }: TProps) => {
             } else jobIsReady.push(false)
           }
 
-          if (jobIsReady.every(v => !!v)) filteredJobs.push(job)
+          // NOTE: 4. isProject filter
+          if (
+            hasIsProjectFilterValue
+            && (Number(isProjectFilterValue) === 0 || Number(isProjectFilterValue) === 1)
+          ) {
+            const normalizedValue = Number(isProjectFilterValue)
+            switch (normalizedValue) {
+              case 1:
+                activeFilters.values.isProject = normalizedValue
+                if (isJobProject) jobIsReady.push(true)
+                else jobIsReady.push(false)
+                break
+              case 0:
+                activeFilters.values.isProject = normalizedValue
+                if (isJobProject) jobIsReady.push(false)
+                else jobIsReady.push(true)
+                break
+              default:
+                break
+            }
+          }
+
+          if (jobIsReady.every(v => v === true)) filteredJobs.push(job)
+          break
         }
-        break
         default:
-          filteredJobs = allJobs
+          // filteredJobs = allJobs
           break
       }
     }
+    if (!activeFilters.isAnyFilterActive) filteredJobs = allJobs
     setStore({ filteredJobs, activeFilters, counters })
     
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })

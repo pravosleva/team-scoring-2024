@@ -12,10 +12,11 @@ export const getModifiedJobLogText = ({ text, jobs, users }: {
   const regex = /(?<=\[)(job|user)=\d{13}(?=\])/g
   const foundItems = text.match(regex)
 
-  console.log(foundItems)
+  // console.log(foundItems)
 
   switch (true) {
     case Array.isArray(foundItems): {
+      // TODO: Refactoring
       // const regexpGroups = foundItems
       //   .map((r) => [`(?=.*${r})`]);
       // const regexp = new RegExp(`^${regexpGroups.join('|')}.*$`, 'im');

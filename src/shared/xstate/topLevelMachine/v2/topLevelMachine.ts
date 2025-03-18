@@ -611,8 +611,8 @@ export const topLevelMachine = setup({
                   newTodo.v = v
                   _msgs.push(`v= ${v}`)
                 } else if (!!newTodo.forecast?.finish) {
+                  _msgs.push(`Finish date [${dayjs(newTodo.forecast.finish).format('DD.MM.YYYY HH:mm')}] removed`)
                   delete newTodo.forecast.finish
-                  _msgs.push('Finish date removed')
                   delete newTodo.v
                 }
 

@@ -12,6 +12,7 @@ import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/
 import baseClasses from '~/App.module.scss'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
+import HiveIcon from '@mui/icons-material/Hive'
 
 // const { useStore: useParamsInspectorContextWrapper } = ParamsInspectoreContext
 
@@ -225,6 +226,22 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                         && !activeFilters.assignedTo
                         ? 'contained' : 'outlined'} startIcon={<FilterAltIcon />}>
                         Active Fuckups ({mainCounters.estimateReached})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  mainCounters.allProjects > 0 && (
+                    <Link to='/jobs?isProject=1'>
+                      <Button
+                        sx={{ borderRadius: 4 }} size='small' color='info'
+                        variant={
+                          activeFilters.values.isProject === 1
+                          ? 'contained' : 'outlined'
+                        }
+                        startIcon={<HiveIcon />}
+                      >
+                        Projects ({mainCounters.allProjects})
                       </Button>
                     </Link>
                   )

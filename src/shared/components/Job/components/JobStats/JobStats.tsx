@@ -12,6 +12,7 @@ import { SubjobsList } from './components'
 import { JobTimingInfo } from './components/SubjobsList/components'
 import { CollapsibleBox } from '~/shared/components'
 import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
 
 const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
   const result = linear({
@@ -92,10 +93,10 @@ export const JobStats = ({ job }: TProps) => {
     })
     : null, [job, isJobStartedAndEstimated, otherUserJobsForAnalysis])
   const worst100DateUI = useMemo(() => !!calc
-    ? dayjs(calc.date100).format('YYYY-MM-DD HH:mm')
+    ? dayjs(calc.date100).format('DD.MM.YYYY HH:mm')
     : null, [calc])
   const averageSensedDateUI = useMemo(() => !!calc
-    ? dayjs(calc.dateSensed).format('YYYY-MM-DD HH:mm')
+    ? dayjs(calc.dateSensed).format('DD.MM.YYYY HH:mm')
     : null, [calc])
 
   const forecastEstimateStatAnalysis = useMemo(() =>
@@ -189,80 +190,85 @@ export const JobStats = ({ job }: TProps) => {
       }
 
       {
-        !isJobDone ? (
-          isJobStarted && isJobEstimated && !!targetUser
+        !isJobDone
           ? (
-            <Grid size={12}>
-              <Grid container spacing={1} sx={{ border: 'none' }}>
-                <Grid size={12}>
-                  <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('YYYY-MM-DD HH:mm')}</b>
-                </Grid>
-                <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+            isJobStarted && isJobEstimated && !!targetUser
+            ? (
+              <Grid size={12}>
+                <Grid container spacing={1} sx={{ border: 'none' }}>
                   <Grid size={12}>
-                    <AutoRefreshedProgressBar
-                      startDate={job.forecast.start as number}
-                      targetDate={job.forecast.estimate as number}
-                      delay={1000}
-                      connectedOnThe={['bottom']}
-                    />
+                    <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</b>
                   </Grid>
-                  <Grid size={12}>
-                    <CollapsibleBox
-                      connectedOnThe={['top']}
-                      header={`by ${targetUser?.displayName || 'No target user info'}`}
-                      text={
-                        <>
-                          <em style={{ fontSize: 'small' }}>
-                            <JobTimingInfo job={job} />
-                          </em>
-                          <br />
-                          <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
-                        </>
-                      }
-                    />
+                  <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                    <Grid size={12}>
+                      <AutoRefreshedProgressBar
+                        startDate={job.forecast.start as number}
+                        targetDate={job.forecast.estimate as number}
+                        delay={1000}
+                        connectedOnThe={['bottom']}
+                      />
+                    </Grid>
+                    <Grid size={12}>
+                      <CollapsibleBox
+                        connectedOnThe={['top']}
+                        header={`by ${targetUser?.displayName || 'No target user info'}`}
+                        text={
+                          <>
+                            <em style={{ fontSize: 'small' }}>
+                              <JobTimingInfo job={job} />
+                            </em>
+                            <br />
+                            <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                            <br />
+                            <JobResultReviewShort job={job} />
+                          </>
+                        }
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
+            )
+            : (
+              <Grid size={12}>
+                <Alert
+                  severity='warning'
+                  variant='filled'
+                >
+                  <em>No stats for the job. <b>No data available: {forecastEstimateStatAnalysis.missingProps.join(', ')}</b></em>
+                </Alert>
+              </Grid>
+            )
           )
           : (
-            <Grid size={12}>
-              <Alert
-                severity='warning'
-                variant='filled'
-              >
-                <em>No stats for the job. <b>No data available: {forecastEstimateStatAnalysis.missingProps.join(', ')}</b></em>
-              </Alert>
+            <Grid container spacing={1} sx={{ border: 'none', width: '100%' }}>
+              {/* <Grid size={12}>
+                <Alert
+                  severity='success'
+                  variant='filled'
+                >
+                  <em>Job is done</em>
+                  <br />
+                  <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.finish).format('DD.MM.YYYY HH:mm')}</em>
+                </Alert>
+              </Grid> */}
+              <Grid size={12}>
+                <CollapsibleBox
+                  icon={<TaskAltIcon fontSize='small' />}
+                  header={`Resume [${targetUser?.displayName || 'No target user info'}]`}
+                  text={
+                    <>
+                      <em style={{ fontSize: 'small' }}>
+                        <JobTimingInfo job={job} />
+                      </em>
+                      <br />
+                      <JobResultReviewShort job={job} />
+                    </>
+                  }
+                />
+              </Grid>
             </Grid>
           )
-        ) : (
-          <Grid container spacing={1} sx={{ border: 'none' }}>
-            <Grid size={12}>
-              <Alert
-                severity='success'
-                variant='filled'
-              >
-                <em>Job is done</em>
-                <br />
-                <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.finish).format('DD.MM.YYYY HH:mm')}</em>
-              </Alert>
-            </Grid>
-            <Grid size={12}>
-              <CollapsibleBox
-                header={`Resume [${targetUser?.displayName || 'No target user info'}]`}
-                text={
-                  <>
-                    <em style={{ fontSize: 'small' }}>
-                      <JobTimingInfo job={job} />
-                    </em>
-                    <br />
-                    <JobResultReviewShort job={job} />
-                  </>
-                }
-              />
-            </Grid>
-          </Grid>
-        )
       }
 
       {
@@ -295,10 +301,12 @@ export const JobStats = ({ job }: TProps) => {
                           text={
                             <>
                               <em style={{ fontSize: 'small' }}>
-                                <JobTimingInfo job={{  ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
+                                <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
                               </em>
                               <br />
                               <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
+                              <br />
+                              <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed }}} />
                             </>
                           }
                           connectedOnThe={['top']}
@@ -357,6 +365,8 @@ export const JobStats = ({ job }: TProps) => {
                               </em>
                               <br />
                               <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
+                              <br />
+                              <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 }}} />
                             </>
                           }
                           connectedOnThe={['top']}

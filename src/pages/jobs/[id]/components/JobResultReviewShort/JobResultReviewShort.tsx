@@ -8,8 +8,9 @@ import Countdown from 'react-countdown'
 import { TimeAgo } from '~/shared/components'
 import { CountdownRenderer } from './components'
 
-export const JobResultReviewShort = memo(({ job }: {
+export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
   job: TJob;
+  isSpaceBetween?: boolean;
 }) => {
   const isJobDone = !!job.forecast.finish
   const isJobStartedAndEstimated = !!job.forecast.start && !!job.forecast.estimate
@@ -45,6 +46,7 @@ export const JobResultReviewShort = memo(({ job }: {
               alignItems: 'center',
               gap: '8px',
               fontSize: 'small',
+              // width: '100%',
             }}
           >
             {
@@ -56,6 +58,9 @@ export const JobResultReviewShort = memo(({ job }: {
             {
               job.completed && !!job.forecast.finish && (
                 <Chip
+                  sx={{
+                    marginLeft: isSpaceBetween ? 'auto' : 'none'
+                  }}
                   variant='outlined'
                   size='small'
                   label={(
@@ -85,6 +90,7 @@ export const JobResultReviewShort = memo(({ job }: {
               alignItems: 'center',
               gap: '8px',
               fontSize: 'small',
+              // width: '100%',
             }}
           >
             {
@@ -95,10 +101,16 @@ export const JobResultReviewShort = memo(({ job }: {
             <div>{!isGood ? '+' : ''}{hrsDiff} h</div>
             {
               !!job.forecast.estimate && !job.completed && (
-                <Countdown
-                  renderer={CountdownRenderer}
-                  date={job.forecast.estimate}
-                />
+                <span
+                  style={{
+                    marginLeft: isSpaceBetween ? 'auto' : 'none'
+                  }}
+                >
+                  <Countdown
+                    renderer={CountdownRenderer}
+                    date={job.forecast.estimate}
+                  />
+                </span>
               )
             }
           </div>
@@ -107,7 +119,15 @@ export const JobResultReviewShort = memo(({ job }: {
       default:
         return null
     }
-  }, [nowDate, isJobDone, job.forecast.estimate, job.forecast.finish, isJobStartedAndEstimated, job.completed])
+  }, [
+    nowDate,
+    isJobDone,
+    job.forecast.estimate,
+    job.forecast.finish,
+    isJobStartedAndEstimated,
+    job.completed,
+    isSpaceBetween,
+  ])
 
   return Image
 })

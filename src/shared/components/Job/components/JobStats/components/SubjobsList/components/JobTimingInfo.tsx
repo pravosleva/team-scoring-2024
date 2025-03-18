@@ -31,7 +31,7 @@ export const JobTimingInfo = memo(({ job }: {
   const sections = useMemo<TSections>(() => ({
     est: !!job.forecast.estimate
       ? getSectionMsgs({ timing, key: 'estimation', prefix: 'Estimated' }).join(' ')
-      : null,
+      : 'No estimation',
     real: !!job.forecast.finish
       ? getSectionMsgs({ timing, key: 'finish', prefix: 'Realistic' }).join(' ')
       : null

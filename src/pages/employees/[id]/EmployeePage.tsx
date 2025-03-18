@@ -15,6 +15,7 @@ import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 import {
   SpeedsFunctionGraph,
 } from '~/shared/components'
+import HiveIcon from '@mui/icons-material/Hive'
 
 export const EmployeePage = () => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -228,8 +229,25 @@ export const EmployeePage = () => {
                   )
                 }
                 {
+                  targetUserCounters.allProjects > 0 && (
+                    <Link to={`/employees/${targetUser?.id}?isProject=1`}>
+                      <Button
+                        sx={{ borderRadius: 4 }} size='small' color='info'
+                        variant={
+                          activeFilters.values.isProject === 1
+                          ? 'contained' : 'outlined'
+                        }
+                        startIcon={<HiveIcon />}
+                      >
+                        Projects ({targetUserCounters.allProjects})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
                   (activeFilters.estimateReached
-                  || activeFilters.jobStatusFilter) && (
+                  || activeFilters.jobStatusFilter
+                  || activeFilters.isProject) && (
                     <Button sx={{ borderRadius: 4 }}
                       size='small'
                       color='inherit'
