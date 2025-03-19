@@ -98,7 +98,7 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
               ? <ThumbUpIcon style={{ fontSize: '16px' }} />
               : <ThumbDownIcon style={{ fontSize: '16px' }} />
             }
-            <div>{!isGood ? '+' : ''}{hrsDiff} h</div>
+            <div>{!isGood ? '+' : ''}{hrsDiff}h</div>
             {
               !!job.forecast.estimate && !job.completed && (
                 <span

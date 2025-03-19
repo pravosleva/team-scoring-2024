@@ -26,6 +26,7 @@ import TimerOffIcon from '@mui/icons-material/TimerOff'
 import MoreTimeIcon from '@mui/icons-material/MoreTime'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
+// import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 
 type TProps = {
   isActive: boolean;
@@ -207,6 +208,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
 
   const theme = useTheme()
   const upSm = useMediaQuery(theme.breakpoints.up('sm'))
+  // const getRatingLabel = useCallback(({ value }: { value: number }) => ratingIcons[value].label, [])
   const memoizedScheme = useMemo<TScheme>(() => {
     return {
       // id: {
@@ -238,6 +240,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
       complexity: {
         initValue: job.forecast.complexity || 0,
         label: 'Employee\'s assessment of complexity',
+        // getLabel: getRatingLabel,
         type: 'rating',
         gridSize: 12,
         isRequired: false,

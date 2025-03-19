@@ -18,6 +18,7 @@ export type TScheme = {
     };
 
     label: string;
+    getLabel?: (ps: { value: any }) => string;
     gridSize: number;
     validator: ({ value, scheme, internalState }: {
       value: any;

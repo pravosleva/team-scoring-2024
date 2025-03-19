@@ -266,7 +266,7 @@ function GenericComponentForm<Value> ({
       }
     })
     return () => subscription.unsubscribe()
-  }, [setIsFormReady, onFormNotReady, onFormReady, scheme])
+  }, [setIsFormReady, onFormNotReady, onFormReady, scheme, watch])
 
   // const methods = useForm({
   //   values: Object.keys(scheme).reduce((acc: {[key: string]: TValue | undefined}, key) => {
@@ -454,6 +454,7 @@ function GenericComponentForm<Value> ({
   //   console.log('-- update scheme')
   // }, [scheme])
   */
+
   return (
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -516,7 +517,13 @@ function GenericComponentForm<Value> ({
                         }}
                         max={6}
                       />
-                      <div>{scheme[key].label}</div>
+                      <div>
+                        {
+                          typeof scheme[key].getLabel === 'function'
+                          ? scheme[key].getLabel({ value: auxState[key] })
+                          : scheme[key].label
+                        }
+                      </div>
                     </div>
                   </Grid>
                 )
