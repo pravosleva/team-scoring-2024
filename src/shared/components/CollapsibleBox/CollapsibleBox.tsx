@@ -8,7 +8,7 @@ import { TUiConnectVariant } from './types'
 import { getStylesByUiConnectVariant } from './getStylesByUiConnectVariant'
 
 type TProps = {
-  header: string;
+  header: string | React.ReactNode;
   text: string | React.ReactNode;
   connectedOnThe?: TUiConnectVariant[];
   icon?: React.ReactNode;

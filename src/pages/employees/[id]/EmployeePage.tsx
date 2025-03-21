@@ -16,6 +16,10 @@ import {
   SpeedsFunctionGraph,
 } from '~/shared/components'
 import HiveIcon from '@mui/icons-material/Hive'
+import NewReleasesIcon from '@mui/icons-material/NewReleases'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 
 export const EmployeePage = () => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -142,6 +146,19 @@ export const EmployeePage = () => {
                 }}
               >
                 {
+                  targetUserCounters.allNew > 0 && (
+                    <Link to='/jobs?jobStatusFilter=new'>
+                      <Button sx={{ borderRadius: 4 }} size='small'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
+                          ? 'contained' : 'outlined'}
+                        startIcon={<NewReleasesIcon />}>
+                        New ({targetUserCounters.allNew})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
                   targetUserCounters.allActive > 0 && (
                     <Link
                       // to={`/jobs?jobStatusFilter=active&assignedTo=${targetUser?.id}`}
@@ -158,7 +175,7 @@ export const EmployeePage = () => {
                         }
                         startIcon={<FilterAltIcon />}
                       >
-                        All active ({targetUserCounters?.allActive})
+                        Active ({targetUserCounters?.allActive})
                       </Button>
                     </Link>
                   )
@@ -171,15 +188,15 @@ export const EmployeePage = () => {
                     >
                       <Button sx={{ borderRadius: 4 }}
                         size='small'
-                        color='secondary'
+                        color='gray'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
                           && !activeFilters.estimateReached
                           && activeFilters.assignedTo
                           ? 'contained' : 'outlined'}
-                        startIcon={<FilterAltIcon />}
+                        startIcon={<TaskAltIcon />}
                       >
-                        All completed ({targetUserCounters.allCompleted})
+                        Completed ({targetUserCounters.allCompleted})
                       </Button>
                     </Link>
                   )
@@ -199,9 +216,9 @@ export const EmployeePage = () => {
                           && activeFilters.assignedTo
                           ? 'contained' : 'outlined'
                         }
-                        startIcon={<FilterAltIcon />}
+                        startIcon={<ThumbUpIcon />}
                       >
-                        Actual estimate ({targetUserCounters.estimateNotReached})
+                        Active Forecast ({targetUserCounters.estimateNotReached})
                       </Button>
                     </Link>
                   )
@@ -221,7 +238,7 @@ export const EmployeePage = () => {
                           && activeFilters.assignedTo
                           ? 'contained' : 'outlined'
                         }
-                        startIcon={<FilterAltIcon />}
+                        startIcon={<ThumbDownIcon />}
                       >
                         Active Fuckups ({targetUserCounters.estimateReached})
                       </Button>
@@ -301,7 +318,16 @@ export const EmployeePage = () => {
                             <AutoRefreshedJobMuiAva job={job} delay={1000} />
                           </ListItemAvatar>
                           <ListItemText
-                            primary={job.title}
+                            primary={
+                              <span
+                                className={baseClasses.truncate}
+                                style={{
+                                  display: 'block',
+                                }}
+                              >
+                                {job.title}
+                              </span>
+                            }
                             secondary={<JobResultReviewShort job={job} />}
                           />
                         </ListItemButton>

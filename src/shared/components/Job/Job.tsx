@@ -14,6 +14,8 @@ import clsx from 'clsx'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
+import baseClasses from '~/App.module.scss'
+// import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 
 type TProps = {
   isLastSeen?: boolean;
@@ -166,7 +168,16 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
               <ListItemText
                 sx={{ my: 0 }}
                 id={String(id)}
-                primary={job.title}
+                primary={
+                  <span
+                    className={baseClasses.truncate}
+                    style={{
+                      display: 'block',
+                    }}
+                  >
+                    {job.title}
+                  </span>
+                }
                 secondary={
                   <div
                     style={{
@@ -176,22 +187,38 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                     }}
                   >
                     {
-                      job.forecast.complexity > 0 && (
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <Rating
-                            size='small'
-                            name='rating-view'
-                            value={job.forecast.complexity}
-                            readOnly
-                            icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
-                            emptyIcon={<StarBorderIcon fontSize='inherit' />}
-                            max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
-                          />
-                          {job.logs.isEnabled && <ToggleOnIcon htmlColor='gray' />}
-                        </div>
-                      )
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '8px',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Rating
+                          size='small'
+                          name='rating-view'
+                          value={job.forecast.complexity}
+                          readOnly
+                          icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
+                          emptyIcon={<StarBorderIcon fontSize='inherit' />}
+                          max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
+                        />
+                        {assignedToName && (
+                          <span className={baseClasses.truncate}>{assignedToName}</span>
+                        )}
+                      </div>
                     }
-                    {assignedToName || null}
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {/* <JobResultReviewShort job={job} /> */}
+                      {job.logs.isEnabled && <ToggleOnIcon htmlColor='gray' />}
+                    </div>
                   </div>
                 }
               />

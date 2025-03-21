@@ -56,6 +56,7 @@ export enum EJobsStatusFilter {
   ALL = 'all',
   ACTIVE = 'active',
   COMPLETED = 'completed',
+  NEW = 'new'
 }
 
 export type TJobForm = Pick<TJob, 'id' | 'title' | 'descr' | 'completed'>

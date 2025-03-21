@@ -126,7 +126,13 @@ export const ActiveJobContent = memo(({
             <div
               className={baseClasses.stack1}
             >
-              <div style={{ fontWeight: 'bold' }}>{job.title}</div>
+              <div
+                style={{
+                  fontWeight: 'bold',
+                  // wordBreak: 'break-all',
+                  overflowWrap: 'break-word',
+                }}
+              >{job.title}</div>
               <div
                 style={{
                   display: 'flex',

@@ -6,10 +6,12 @@ import { createTheme } from '@mui/material/styles'
 declare module '@mui/material/styles' {
   interface Palette {
     salmon: Palette['primary'];
+    gray: Palette['primary'];
   }
 
   interface PaletteOptions {
     salmon?: PaletteOptions['primary'];
+    gray?: PaletteOptions['primary'];
   }
 }
 
@@ -17,6 +19,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
     salmon: true;
+    gray: true;
   }
 }
 
@@ -68,6 +71,12 @@ _theme = createTheme(_theme, {
         main: '#FF5733',
       },
       name: 'salmon',
+    }),
+    gray: _theme.palette.augmentColor({
+      color: {
+        main: '#808080',
+      },
+      name: 'gray',
     }),
   },
 });

@@ -13,6 +13,10 @@ import baseClasses from '~/App.module.scss'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import HiveIcon from '@mui/icons-material/Hive'
+import NewReleasesIcon from '@mui/icons-material/NewReleases'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 
 // const { useStore: useParamsInspectorContextWrapper } = ParamsInspectoreContext
 
@@ -164,6 +168,19 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                 }}
               >
                 {
+                  mainCounters.allNew > 0 && (
+                    <Link to='/jobs?jobStatusFilter=new'>
+                      <Button sx={{ borderRadius: 4 }} size='small'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
+                          ? 'contained' : 'outlined'}
+                        startIcon={<NewReleasesIcon />}>
+                        New ({mainCounters.allNew})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
                   mainCounters.allActive > 0 && (
                     <Link to='/jobs?jobStatusFilter=active'>
                       <Button sx={{ borderRadius: 4 }} size='small'
@@ -184,13 +201,13 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                       <Button
                         sx={{ borderRadius: 4 }}
                         size='small'
-                        color='secondary'
+                        color='gray'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
                           && !activeFilters.estimateReached
                           && !activeFilters.assignedTo
                           ? 'contained' : 'outlined'}
-                        startIcon={<FilterAltIcon />}
+                        startIcon={<TaskAltIcon />}
                       >
                         Completed ({mainCounters.allCompleted})
                       </Button>
@@ -209,9 +226,9 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                           && activeFilters.values.estimateReached === 0
                           && !activeFilters.assignedTo
                           ? 'contained' : 'outlined'}
-                        startIcon={<FilterAltIcon />}
+                        startIcon={<ThumbUpIcon />}
                       >
-                        Actual estimate ({mainCounters.estimateNotReached})
+                        Active Forecast ({mainCounters.estimateNotReached})
                       </Button>
                     </Link>
                   )
@@ -224,7 +241,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
                         activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
                         && activeFilters.values.estimateReached === 1
                         && !activeFilters.assignedTo
-                        ? 'contained' : 'outlined'} startIcon={<FilterAltIcon />}>
+                        ? 'contained' : 'outlined'} startIcon={<ThumbDownIcon />}>
                         Active Fuckups ({mainCounters.estimateReached})
                       </Button>
                     </Link>
