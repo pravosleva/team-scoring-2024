@@ -147,7 +147,7 @@ export const EmployeePage = () => {
               >
                 {
                   targetUserCounters.allNew > 0 && (
-                    <Link to='/jobs?jobStatusFilter=new'>
+                    <Link to={`/employees/${targetUser?.id}?jobStatusFilter=new`}>
                       <Button sx={{ borderRadius: 4 }} size='small'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW

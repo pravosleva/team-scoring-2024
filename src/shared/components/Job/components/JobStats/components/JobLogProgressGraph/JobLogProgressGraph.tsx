@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 import dayjs from 'dayjs'
 import { Chart } from 'react-google-charts'
 import { TJob, TLogsItem } from '~/shared/xstate'
@@ -11,7 +11,7 @@ type TProps = {
   jobsForAnalysis: TJob[];
 }
 
-export const JobLogProgressGraph = ({
+export const JobLogProgressGraph = memo(({
   targetJob,
   jobsForAnalysis,
 }: TProps) => {
@@ -111,4 +111,4 @@ export const JobLogProgressGraph = ({
       />
     </div>
   )
-}
+})

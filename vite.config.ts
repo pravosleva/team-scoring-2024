@@ -96,7 +96,7 @@ export default defineConfig({
       },
       useCredentials: true,
       includeManifestIcons: true,
-      disable: false,
+      disable: isDev,
     }),
 
     // NOTE: Last one

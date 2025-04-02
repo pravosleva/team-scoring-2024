@@ -1,27 +1,30 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { TJob } from '~/shared/xstate'
 import { getSortedSpeedsCalc } from './getSortedSpeedsCalc'
 import { NResult } from './types'
 import { getMedian } from '~/shared/utils/number-ops'
 
-type TProps = {
-  theJobList: TJob[];
-  ts: {
-    testDiff: number;
-    testStart: number;
-  };
-}
-type TResult = {
-  averageSpeed: number;
-  averageValue: number;
-  date0: number;
-  date50: number;
-  date100: number;
-  dateSensed: number;
-  sortedSpeedsCalcOutput: NResult.TOutput | null;
+export namespace NSWorstCalc {
+  export type TProps = {
+    theJobList: TJob[];
+    ts: {
+      testDiff: number;
+      testStart: number;
+    };
+  }
+  export type TResult = {
+    averageSpeed: number;
+    averageValue: number;
+    date0: number;
+    date50: number;
+    date100: number;
+    dateSensed: number;
+    sortedSpeedsCalcOutput: NResult.TOutput | null;
+  }
 }
 
-export const getWorstCalc = ({ theJobList, ts }: TProps): TResult => {
-  const result: TResult = {
+export const getWorstCalc = ({ theJobList, ts }: NSWorstCalc.TProps): NSWorstCalc.TResult => {
+  const result: NSWorstCalc.TResult = {
     averageSpeed: 0,
     averageValue: 0,
     date0: 0,

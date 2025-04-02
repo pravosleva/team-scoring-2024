@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { memo } from 'react'
 import dayjs from 'dayjs';
 import { Chart } from 'react-google-charts'
 import { TJob } from '~/shared/xstate'
@@ -20,7 +21,7 @@ type TShortJob = {
   compl: number;
 }
 
-export const DistributionFunctionGraph = ({
+export const DistributionFunctionGraph = memo(({
   targetJobs,
   ts,
   // targetJob,
@@ -85,4 +86,4 @@ export const DistributionFunctionGraph = ({
       />
     </div>
   )
-}
+})

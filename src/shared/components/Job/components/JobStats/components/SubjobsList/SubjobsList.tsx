@@ -112,7 +112,7 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
                             paddingLeft: '8px',
                           }}
                         >
-                          <span style={{ color: 'gray' }}>Last log [{dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}]:</span> <b>{job.logs.items[0].text}</b>
+                          <span style={{ color: 'gray' }}>Last log [{dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}]</span> <b>{job.logs.items[0].text}</b>
                         </span>
                       </>
                     )

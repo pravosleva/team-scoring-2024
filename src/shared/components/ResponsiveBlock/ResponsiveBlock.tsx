@@ -12,6 +12,7 @@ type TProps = {
   isLimitedForDesktop?: boolean;
   // isLastSection?: boolean;
   hasRedBorder?: boolean;
+  id?: string;
 }
 
 export const ResponsiveBlock = ({
@@ -25,11 +26,13 @@ export const ResponsiveBlock = ({
   isLimitedForDesktop,
   // isLastSection,
   hasRedBorder,
+  id,
 }: TProps) => {
   switch (true) {
     case isLimitedForDesktop:
       return (
         <div
+        id={id}
           className={clsx(
             classes.base,
             classes.isLimitedForDesktop,
@@ -63,6 +66,7 @@ export const ResponsiveBlock = ({
     default:
       return (
         <div
+          id={id}
           className={clsx(
             classes.base,
             {

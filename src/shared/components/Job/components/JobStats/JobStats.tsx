@@ -1,9 +1,11 @@
 import dayjs from 'dayjs';
-import { useMemo } from 'react'
+import { useMemo, useState, memo } from 'react'
 import { AutoRefreshedProgressBar } from '~/shared/components/ProgressBar'
-import { getWorstCalc } from '~/shared/utils/team-scoring'
+import {
+  // getWorstCalc,
+  NSWorstCalc,
+} from '~/shared/utils/team-scoring'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
-// import Grid from '@mui/material/Grid2'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { JobLogProgressGraph } from './components'
 import { getRounded } from '~/shared/utils/number-ops';
@@ -13,6 +15,9 @@ import { JobTimingInfo } from './components/SubjobsList/components'
 import { CollapsibleBox } from '~/shared/components'
 import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import { useWorstCalcWebWorker } from '~/shared/hooks'
+import { groupLog } from '~/shared/utils'
+import CircularProgress from '@mui/material/CircularProgress'
 
 const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
   const result = linear({
@@ -27,6 +32,7 @@ const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
 
 type TProps = {
   job: TJob;
+  isDebugEnabled?: boolean;
 }
 
 type TObjAnalysisProps = {
@@ -49,7 +55,7 @@ const getInputDataAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): 
   return res
 }
 
-export const JobStats = ({ job }: TProps) => {
+export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetUser =  useMemo<TUser | null>(() => {
@@ -82,16 +88,59 @@ export const JobStats = ({ job }: TProps) => {
   const isJobEstimated = useMemo(() => !!job?.forecast.estimate, [job])
   const isJobStartedAndEstimated = useMemo(() => !!job?.forecast.start && !!job.forecast.estimate, [job])
   
-  const calc = useMemo(() => 
-    !!job && isJobStartedAndEstimated
-    ? getWorstCalc({
-      theJobList: otherUserJobsForAnalysis,
-      ts: {
-        testStart: job.forecast.start as number,
-        testDiff: (job.forecast.estimate as number) - (job.forecast.start as number),
+  // -- NOTE: v1 (Main thread)
+  // const calc = useMemo(() => 
+  //   !!job && isJobStartedAndEstimated
+  //   ? getWorstCalc({
+  //     theJobList: otherUserJobsForAnalysis,
+  //     ts: {
+  //       testStart: job.forecast.start as number,
+  //       testDiff: (job.forecast.estimate as number) - (job.forecast.start as number),
+  //     },
+  //   })
+  //   : null, [job, isJobStartedAndEstimated, otherUserJobsForAnalysis])
+  // --
+
+  // -- NOTE: v2 (Web Worker)
+  const [calc, setCalc] = useState<NSWorstCalc.TResult | null>(null)
+  const [calcErr, setCalcErr] = useState<string | null>(null)
+  const isWorstCalcResultReady = useMemo(() => !!calc || !!calcErr, [calc, calcErr])
+  const isWorkerEnabled = useMemo(() => isJobStartedAndEstimated, [isJobStartedAndEstimated])
+  useWorstCalcWebWorker({
+    isEnabled: isWorkerEnabled,
+    isDebugEnabled: true,
+    cb: {
+      onEachSuccessItemData: (data) => {
+        if (isDebugEnabled)
+          groupLog({
+            namespace: '[debug] useWorkers:onEachNewsItemData -> data',
+            items: [
+              data
+            ],
+          })
+        if (!!data.originalResponse) {
+          setCalcErr(null)
+          setCalc(data.originalResponse)
+        }
       },
-    })
-    : null, [job, isJobStartedAndEstimated, otherUserJobsForAnalysis])
+      onFinalError: ({ id, reason }) => {
+        if (isDebugEnabled)
+          groupLog({
+            namespace: '[debug] useWorkers:onFinalError -> id, reason',
+            items: [
+              id,
+              reason
+            ],
+          })
+        setCalcErr(reason)
+      },
+    },
+    deps: {
+      job,
+      otherUserJobsForAnalysis,
+    },
+  })
+  // --
   const worst100DateUI = useMemo(() => !!calc
     ? dayjs(calc.date100).format('DD.MM.YYYY HH:mm')
     : null, [calc])
@@ -184,6 +233,27 @@ export const JobStats = ({ job }: TProps) => {
               variant='outlined'
             >
               <em>Target user not found in LS</em>
+            </Alert>
+          </Grid>
+        )
+      }
+
+      {
+        isWorkerEnabled && !isWorstCalcResultReady && (
+          <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        )
+      }
+
+      {
+        !!calcErr && (
+          <Grid size={12}>
+            <Alert
+              severity='error'
+              variant='outlined'
+            >
+              <em>Calc errored: {calcErr}</em>
             </Alert>
           </Grid>
         )
@@ -445,4 +515,4 @@ export const JobStats = ({ job }: TProps) => {
       }
     </Grid>
   )
-}
+})

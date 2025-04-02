@@ -14,6 +14,8 @@ import { JobAdditionalInfo } from '../../components'
 import StarIcon from '@mui/icons-material/Star'
 import HistoryIcon from '@mui/icons-material/History'
 import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 
 type TProps = {
   isOpened: boolean;
@@ -22,6 +24,10 @@ type TProps = {
     job?: TJob;
   }) => void;
 }
+
+// const TopResponsiveBlock = forwardRef<HTMLDivElement, { children: React.ReactNode; style: CSSRuleList }>(({ children, ...props }, ref) => (
+//   <ResponsiveBlock ref={ref} {...props}>{children}</ResponsiveBlock>
+// ))
 
 export const ActiveJobContent = memo(({
   isOpened,
@@ -42,6 +48,17 @@ export const ActiveJobContent = memo(({
     job.forecast.complexity !== expressAppraiserStars,
     [job.forecast.complexity, expressAppraiserStars]
   )
+  const scrollTop = useCallback(() => {
+    const targetElm = document.getElementById('topBox')
+    if (!!targetElm) targetElm?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+  const scrollLog = useCallback(() => {
+    const targetElm = document.getElementById('logBoxHeader')
+    if (!!targetElm) targetElm?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }, [])
 
   return (
     <div
@@ -67,6 +84,7 @@ export const ActiveJobContent = memo(({
             zIndex: 2,
           }}
           className={baseClasses.boxShadowBottom}
+          id='topBox'
         >
           <span
             style={{
@@ -96,15 +114,56 @@ export const ActiveJobContent = memo(({
       <ResponsiveBlock>
         <ResponsiveBlock
           style={{
-            padding: '16px 16px 16px 16px',
+            // padding: '16px 16px 16px 16px',
             position: 'sticky',
             top: 0,
+            backgroundColor: '#fff',
+            zIndex: 2,
+            // borderBottom: '1px solid lightgray',
+            // border: '1px solid red',
+            height: '30px',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '1px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'gray',
+              color: '#fff',
+              padding: '4px',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '8px',
+              alignItems: 'center',
+              width: '100%',
+              cursor: 'pointer',
+              fontSize: 'small',
+            }}
+            onClick={scrollLog}
+            className={baseClasses.stripedBlue}
+          >
+            <span>LOG</span>
+            <ArrowDownwardIcon fontSize='small' />
+          </div>
+        </ResponsiveBlock>
+
+        <ResponsiveBlock
+          style={{
+            padding: '16px 16px 16px 16px',
+            position: 'sticky',
+            top: '30px',
             backgroundColor: '#fff',
             zIndex: 1,
             borderBottom: '1px solid lightgray',
           }}
         >
-          <h2 style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+          <h2
+            style={{
+              display: 'inline-flex',
+              gap: '6px',
+              alignItems: 'center',
+            }}>
             {
               !job.forecast.finish
               ? <>
@@ -192,11 +251,46 @@ export const ActiveJobContent = memo(({
       </ResponsiveBlock>
 
       <ResponsiveBlock>
+      <ResponsiveBlock
+          style={{
+            // padding: '16px 16px 16px 16px',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: '#fff',
+            zIndex: 2,
+            // borderBottom: '1px solid lightgray',
+            // border: '1px solid red',
+            height: '30px',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '1px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'black',
+              color: '#fff',
+              padding: '4px',
+              display: 'flex',
+              gap: '8px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              cursor: 'pointer',
+              fontSize: 'small',
+            }}
+            onClick={scrollTop}
+          >
+            <span>TOP</span>
+            <ArrowUpwardIcon fontSize='small' />
+          </div>
+        </ResponsiveBlock>
+
         <ResponsiveBlock
           style={{
             padding: '16px 16px 16px 16px',
             position: 'sticky',
-            top: 0,
+            top: '30px',
             backgroundColor: '#fff',
             zIndex: 1,
             borderBottom: '1px solid lightgray',
@@ -226,8 +320,9 @@ export const ActiveJobContent = memo(({
           position: 'sticky',
           bottom: 0,
           backgroundColor: '#fff',
-          zIndex: 1,
+          zIndex: 3,
           marginTop: 'auto',
+          borderRadius: '16px 16px 0px 0px',
         }}
       >
         {

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 import { Layout } from '~/shared/components/Layout'
 import { useParams } from 'react-router-dom'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
@@ -25,7 +25,7 @@ import { JobResultReviewShort } from './components'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 
-export const JobPage = () => {
+export const JobPage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
   // const { send } = todosActorRef
   const params = useParams()
@@ -306,4 +306,4 @@ export const JobPage = () => {
       </Grid>
     </Layout>
   )
-}
+})
