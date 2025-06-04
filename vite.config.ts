@@ -17,7 +17,6 @@ const PUBLIC_URL = process.env.VITE_PUBLIC_URL || ''
 const GIT_SHA1 = process.env.VITE_GIT_SHA1
 const BRAND_NAME = process.env.VITE_BRAND_NAME || '[NN]'
 
-
 slugify.extend({ '/': '_' })
 
 function* Counter(initValue: number = 0) {

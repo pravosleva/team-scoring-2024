@@ -56,6 +56,17 @@ export const HomePage = () => {
                 <div className={classes.title}>About</div>
               </div>
             </Link>
+            <Link
+              to='/business-time'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <div className={classes.title}>⚙️ Business time</div>
+                <em className={classes.descr}>Local settings (experimental)</em>
+              </div>
+            </Link>
           </ResponsiveBlock>
         </Grid>
       </Grid>

@@ -1,59 +1,69 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Fragment, memo, useMemo } from 'react'
+ 
+import { memo, useMemo } from 'react'
 import { TJob } from '~/shared/xstate'
-import { getDoneTimeDiff, TResult } from '~/shared/components/Job/utils/getDoneTimeDiff'
-
-const getSectionMsgs = ({ key, timing, prefix }: {
-  key: 'estimation' | 'finish';
-  timing: TResult;
-  prefix: string;
-}): string[] => {
-  const sectionMsgs = []
-  if (!!timing[key]) sectionMsgs.push(`${prefix}: ${timing[key].uiText}`)
-  const sectionBusinessMsgs = []
-  if (!!timing[key]?.business.mg) sectionBusinessMsgs.push(`Business MG: ${timing[key].business.mg.uiText}`)
-  if (!!timing[key]?.business.mgExp) sectionBusinessMsgs.push(`MGEXP: ${timing[key].business.mgExp.uiText}`)  
-  if (!!timing[key]?.business.fdw) sectionBusinessMsgs.push(`5DW: ${timing[key].business.fdw.uiText}`)
-  // if (!!timing.finish) msgs.push(`Realistic: ${timing.finish.uiText} (Business: ${timing.finish.business.uiText})`)
-  if (sectionBusinessMsgs.length > 0) sectionMsgs.push(`(${sectionBusinessMsgs.join(', ')})`)
-  return sectionMsgs
-}
-
-type TSections = {
-  est: string | null;
-  real: string | null;
-};
+import { getDoneTimeDiff } from '~/shared/components/Job/utils/getDoneTimeDiff'
+import baseClasses from '~/App.module.scss'
+import { getCapitalizedFirstLetter } from '~/shared/utils/string-ops'
+import { TSections, getTimingInfo } from '~/shared/components/Job/components/JobStats/components/SubjobsList/utils'
 
 export const JobTimingInfo = memo(({ job }: {
   job: TJob;
 }) => {
   const timing = getDoneTimeDiff({ job })
-  const sections = useMemo<TSections>(() => ({
-    est: !!job.forecast.estimate
-      ? getSectionMsgs({ timing, key: 'estimation', prefix: 'Estimated' }).join(' ')
-      : 'No estimation',
-    real: !!job.forecast.finish
-      ? getSectionMsgs({ timing, key: 'finish', prefix: 'Realistic' }).join(' ')
-      : null
-  }), [timing, job.forecast.estimate, job.forecast.finish])
-  const output: string[] = useMemo(() => Object.keys(sections).reduce((acc: string[], key) => {
-    // @ts-ignore
-    if (!!sections[key]) acc.push(sections[key])
-    return acc
-  }, []), [sections])
+  const sections = useMemo<TSections>(() => getTimingInfo({
+    timing, job
+  }), [timing, job])
   
   return (
     <>
       {
-        output.map((report, i) => (
-          <Fragment key={`${i}-${report}`}>
-            {i > 0 && <br />}
-            <span>
-              {report}
-            </span>
-          </Fragment>
+        Object.keys(sections).map((reportName, i) => (
+          <div key={`${i}-${reportName}`} style={{ paddingBottom: 0 }}>
+            <div>
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+              {/* @ts-ignore */}
+              <b>{getCapitalizedFirstLetter(reportName)}{!!sections[reportName].comment ? ` - ${sections[reportName].comment}` : null}{sections[reportName].items.length > 0 ? ':' : null}</b>
+            </div>
+            {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              sections[reportName].items.length > 0
+              ? (
+                <ul
+                  className={baseClasses.compactList}
+                  style={{ listStyleType: 'circle', gap: 0 }}
+                >
+                  {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    sections[reportName].items.map((report, i) => (
+                      <li key={`${i}-${report}`}>
+                        {report}
+                      </li>
+                    ))
+                  }
+                </ul>
+              )
+              : null
+            }
+            
+          </div>
         ))
       }
+      {
+        (!!job.forecast.estimate || !!job.forecast.finish) && (
+          <>
+            <em>* BT - Business Time standard name</em>
+          </>
+        )
+      }
+      {/* <br />
+      <pre
+        className={baseClasses.preNormalized}
+        style={{
+          margin: '0px',
+        }}
+      >{JSON.stringify(timing, null, 2)}</pre> */}
     </>
   )
 })

@@ -1,8 +1,8 @@
+import { memo, useMemo } from 'react';
 import clsx from 'clsx'
 import classes from './ProgressBar.module.scss'
 // import { linear } from 'math-interpolate'
 import { progressBarCfg, colorSubZero, colorNormal, colorWarning, colorDanger } from './progressBarCfg'
-import { memo } from 'react';
 
 type TProps = {
   value: number;
@@ -10,6 +10,19 @@ type TProps = {
 }
 
 export const ProgressBar = memo(({ value, label }: TProps) => {
+  const memoizedWidth = useMemo(() => (
+    `${value <= 100 ? Math.abs(value).toFixed(0) : 100}%`
+  ), [value])
+  const memoizedColor = useMemo(() => (
+    value < 0
+      ? colorSubZero
+      : value >= 0 && value < progressBarCfg.first.limits.warning
+        ? colorNormal
+        : value >= progressBarCfg.first.limits.warning && value < progressBarCfg.first.limits.danger
+          ? colorWarning
+          : colorDanger
+  ), [value])
+
   return (
     <div className={clsx(classes.progressBar, classes.progressBar_external)}>
       <div
@@ -24,14 +37,8 @@ export const ProgressBar = memo(({ value, label }: TProps) => {
           // },
         )}
         style={{
-          width: `${value <= 100 ? Math.abs(value).toFixed(0) : 100}%`,
-          backgroundColor: value < 0
-            ? colorSubZero
-            : value >= 0 && value < progressBarCfg.first.limits.warning
-              ? colorNormal
-              : value >= progressBarCfg.first.limits.warning && value < progressBarCfg.first.limits.danger
-              ? colorWarning
-              : colorDanger
+          width: memoizedWidth,
+          backgroundColor: memoizedColor,
         }}
       >
         <span>{value.toFixed(0)}%</span>

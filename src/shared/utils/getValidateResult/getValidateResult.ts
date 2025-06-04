@@ -11,10 +11,10 @@ export const getValidateResult = ({ rules, event }: {
   for (const key in rules) {
    
     if (rules[key].isRequired && typeof event?.[key] === 'undefined') {
-      msgs.push(`Не найдено обязательное поле ${key} в ответе`)
+      msgs.push(`Не найдено обязательное поле ${key}`)
     }
     else if (rules[key].isRequired) {
-      const validateResult = rules[key].validate({ value: event?.[key], event })
+      const validateResult = rules[key].validate<typeof event>({ value: event?.[key], event, key })
       if (!validateResult.ok) {
         msgs.push(`Некорректное значение поля "${key}" <- ${validateResult?.message || 'No message'}`)
       }
@@ -22,6 +22,7 @@ export const getValidateResult = ({ rules, event }: {
     else if (!rules[key].isRequired && typeof event?.[key] !== 'undefined') {
       const validateResult = rules[key].validate<typeof event>({
         value: event?.[key],
+        key,
         event,
       })
       if (!validateResult.ok) {

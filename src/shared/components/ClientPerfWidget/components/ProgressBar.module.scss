@@ -1,6 +1,9 @@
 .progressBar {
-  &_external {
+  box-sizing: border-box;
+  & > * {
     box-sizing: border-box;
+  }
+  &_external {
     position: relative;
     width: 100%;
     height: 15px;
@@ -14,7 +17,6 @@
   &_internal {
     font-size: 0.75em;
     height: 100%;
-    box-sizing: border-box;
     white-space: pre;
     // content: `\'${label}\'`,
     // background-color:

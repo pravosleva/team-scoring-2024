@@ -1,4 +1,5 @@
 export * from './about'
+export * from './business-time'
 export * from './home'
 export * from './employees'
 export * from './employees/[id]'

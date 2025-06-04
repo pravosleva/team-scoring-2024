@@ -14,7 +14,7 @@ type TProps = {
   scheme: TScheme;
   btn: {
     label: string;
-    startIcon: React.ReactNode;
+    startIcon?: React.ReactNode;
   };
   actions?: {
     label: string;

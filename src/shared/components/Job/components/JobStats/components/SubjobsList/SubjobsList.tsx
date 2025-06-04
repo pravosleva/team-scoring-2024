@@ -30,44 +30,70 @@ type TProps = {
   showLastLog?: boolean;
 }
 
-export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, noTotalTiming, showLastLog }: TProps) => {
+export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, showLastLog }: TProps) => {
   const doneItems = useMemo<number>(() => jobs.reduce((acc, job) => {
     if (job.completed) acc += 1
     return acc
   }, 0), [jobs])
   const donePercentage = useMemo(() => getPercentage({ sum: jobs.length, x: doneItems }), [doneItems, jobs.length])
   const jobsTotalHoursTiming = useMemo(() => jobs
-    .reduce((acc, job) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .reduce((acc: any, job) => {
       const timing = getDoneTimeDiff({ job })
       if (!!timing.estimation) {
         acc.estimated.absolute += timing.estimation.totalHours
         if (!!timing.estimation.business) {
-          acc.estimated.business.mg += timing.estimation.business?.mg?.totalHours || 0
-          acc.estimated.business.mgExp += timing.estimation.business?.mgExp?.totalHours || 0
-          acc.estimated.business.s5w += timing.estimation.business?.fdw?.totalHours || 0
+          for (const businessTimeStandardName in timing.estimation.business) {
+            if (typeof acc.estimated.business[businessTimeStandardName] === 'undefined')
+              acc.estimated.business[businessTimeStandardName] = timing.estimation.business[businessTimeStandardName]?.totalHours || 0
+            else
+              acc.estimated.business[businessTimeStandardName] += timing.estimation.business[businessTimeStandardName]?.totalHours || 0
+          }
         }
       }
       if (!!timing.finish) {
         acc.realistic.absolute += timing.finish.totalHours
-        acc.realistic.business.mg += timing.finish.business?.mg?.totalHours || 0
-        acc.realistic.business.mgExp += timing.finish.business?.mgExp?.totalHours || 0
-        acc.realistic.business.s5w += timing.finish.business?.fdw?.totalHours || 0
+        if (!!timing.finish.business) {
+          for (const businessTimeStandardName in timing.finish.business) {
+            if (typeof timing.finish.business[businessTimeStandardName] !== 'undefined') {
+              if (!acc.realistic.business[businessTimeStandardName])
+                acc.realistic.business[businessTimeStandardName] = timing.finish.business[businessTimeStandardName]?.totalHours || 0
+              else
+                acc.realistic.business[businessTimeStandardName] += timing.finish.business[businessTimeStandardName]?.totalHours || 0
+            }
+          }
+        }
       }
       return acc
     }, {
-      estimated: { absolute: 0, business: { mg: 0, mgExp: 0, s5w: 0 } },
-      realistic: { absolute: 0, business: { mg: 0, mgExp: 0, s5w: 0 } },
+      estimated: { absolute: 0, business: {} },
+      realistic: { absolute: 0, business: {} },
     }), [jobs])
   const finalDescr = useMemo(() => {
     const msgs = []
     if (!!descr) msgs.push(descr)
-    if (!noTotalTiming) {
+    // if (!noTotalTiming) {
+    //   // NOTE: v1
+    //   // msgs.push(`Estimated Absolute: ${jobsTotalHoursTiming.estimated.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.estimated.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.estimated.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.estimated.business.s5w.toFixed(1)}h`)
+    //   // msgs.push(`Realistic Absolute: ${jobsTotalHoursTiming.realistic.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.realistic.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.realistic.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.realistic.business.s5w.toFixed(1)}h`)
+      
+    //   // NOTE: v2
+    //   msgs.push([
+    //     `Estimated: Absolute -> ${jobsTotalHoursTiming.estimated.absolute.toFixed(1)}h`,
+    //     Object.keys(jobsTotalHoursTiming.estimated.business).map((btName) =>
+    //       `"${btName}" -> ${jobsTotalHoursTiming.estimated.business[btName].toFixed(1)}h`
+    //     ).join(', ')
+    //   ].join('; '))
 
-      msgs.push(`Estimated Absolute: ${jobsTotalHoursTiming.estimated.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.estimated.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.estimated.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.estimated.business.s5w.toFixed(1)}h`)
-      msgs.push(`Realistic Absolute: ${jobsTotalHoursTiming.realistic.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.realistic.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.realistic.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.realistic.business.s5w.toFixed(1)}h`)
-    }
+    //   msgs.push([
+    //     `Business Time: Absolute -> ${jobsTotalHoursTiming.realistic.absolute.toFixed(1)}h`,
+    //     Object.keys(jobsTotalHoursTiming.realistic.business).map((btName) =>
+    //       `"${btName}" -> ${jobsTotalHoursTiming.realistic.business[btName].toFixed(1)}h`
+    //     ).join(', ')
+    //   ].join('; '))
+    // }
     return msgs.join('\n')
-  }, [jobsTotalHoursTiming, descr, noTotalTiming])
+  }, [descr])
 
   return (
     <Grid size={12}>
@@ -89,6 +115,29 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
             </Grid>
           )
         }
+        {
+          (!!jobsTotalHoursTiming?.estimated?.absolute || !!jobsTotalHoursTiming?.estimated?.realistic) && (
+            <Grid size={12}>
+              <pre className={baseClasses.preNormalized}>{JSON.stringify(jobsTotalHoursTiming, null, 2)}</pre>
+            </Grid>
+          )
+        }
+        {/* <Grid size={12}>
+          <ul
+            className={baseClasses.compactList}
+            style={{ listStyleType: 'circle', gap: 0 }}
+          >
+            {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              sections[reportName].items.map((report, i) => (
+                <li key={`${i}-${report}`}>
+                  {report}
+                </li>
+              ))
+            }
+          </ul>
+        </Grid> */}
         <Grid size={12}>
           <ul
             className={baseClasses.compactList}
@@ -97,6 +146,7 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
             {
               jobs.map((job) => (
                 <li
+                  key={job.id}
                   // style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}
                 >
                   <Link to={`/jobs/${job.id}`}>
@@ -112,7 +162,7 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, no
                             paddingLeft: '8px',
                           }}
                         >
-                          <span style={{ color: 'gray' }}>Last log [{dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}]</span> <b>{job.logs.items[0].text}</b>
+                          <span style={{ color: 'gray' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
                         </span>
                       </>
                     )

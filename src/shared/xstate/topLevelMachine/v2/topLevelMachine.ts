@@ -4,6 +4,7 @@ import { getCurrentPercentage } from '~/shared/utils'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
 import dayjs from 'dayjs'
+import { soundManager } from '~/shared/soundManager'
 
 const getSpeed = (job: TJob): number =>
   (
@@ -41,6 +42,8 @@ export const topLevelMachine = setup({
       | { type: 'todos.clearCompleted' }
       | { type: 'user.commit'; value: { displayName: string; value?: number; } }
       | { type: 'user.delete'; value: { id: number; } }
+      | { type: 'todo.editLog'; value: { jobId: number; logTs: number; text: string } }
+      | { type: 'todo.deleteLog'; value: { jobId: number; logTs: number } }
   }
 }).createMachine({
   id: 'topLevel',
@@ -92,12 +95,57 @@ export const topLevelMachine = setup({
 
           // if (!!newTodo.descr) newTodo.descr = event.value.descr.trim().replace(/\s+/g,' ')
 
+          soundManager.playSound({ soundCode: 'plop-1' })
+
           return ({
             ...context.jobs,
             items: [newTodo, ...context.jobs.items]
           })
         }
       })
+    },
+    'todo.editLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                const targetLogIndex = todo.logs.items.findIndex((log) => log.ts === event.value.logTs)
+                if (targetLogIndex !== -1) {
+                  todo.logs.items[targetLogIndex].text = event.value.text
+                }
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.deleteLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.filter(({ ts }) => ts !== event.value.logTs)
+              }
+              return todo
+            })
+          }
+        },
+      }),
     },
     'todo.commit': {
       actions: assign({
@@ -116,6 +164,7 @@ export const topLevelMachine = setup({
             const users = context.users
             const targetUser = users.items.find(({ id }) => id === jobToUpdate.forecast.assignedTo)
             if (!targetUser) {
+              soundManager.playSound({ soundCode: 'plop-3' })
               newUsers.unshift({
                 id: !Number.isNaN(Number(jobToUpdate.forecast.assignedTo))
                   ? Number(jobToUpdate.forecast.assignedTo)
@@ -163,10 +212,13 @@ export const topLevelMachine = setup({
               switch (true) {
                 // -- NOTE: Update children list for parent job
                 case typeof parentId === 'number' && todo.id === parentId: {
+                  let childWasAlreadyAdded = false
                   switch (true) {
                     case !!todo.relations:
-                      if (Array.isArray(todo.relations.children))
+                      if (Array.isArray(todo.relations.children)) {
+                        childWasAlreadyAdded = todo.relations?.children?.includes(jobToUpdate.id)
                         todo.relations.children = [...new Set([jobToUpdate.id, ...todo.relations.children])]
+                      }
                       else
                         todo.relations.children = [jobToUpdate.id]
                       break
@@ -176,7 +228,10 @@ export const topLevelMachine = setup({
                       }
                       break
                   }
-                  _newMsgsForParent.add(`Child job added: [job=${jobToUpdate.id}]`)
+
+                  if (!childWasAlreadyAdded) {
+                    _newMsgsForParent.add(`Child job added: [job=${jobToUpdate.id}]`)
+                  }
 
                   if (_newMsgsForParent.size > 0) {
                     if (todo.logs.items.length >= todo.logs.limit) todo.logs.items.pop()
@@ -278,31 +333,51 @@ export const topLevelMachine = setup({
                   }
   
                   // NOTE: Reassigned
-                  if (todo.forecast.assignedTo !== jobToUpdate.forecast.assignedTo) {
-                    const oldValue = todo.forecast.assignedTo
-                    if (!!jobToUpdate.forecast.assignedTo) {
-                      const targetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
-                      if (!!targetUser) {
-                        if (!!oldValue) {
-                          // const oldTargetUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
-                          // _newMsgs.add(`Assigned: ${oldTargetUser?.displayName || 'unknown user'} [user=${oldValue}] -> ${targetUser.displayName} [user=${targetUser.id}]`)
-                          _newMsgs.add(`ReAssigned: [user=${oldValue}] -> [user=${targetUser.id}]`)
-                        } else {
-                          // _newMsgs.add(`Assigned to ${targetUser.displayName} [user=${targetUser.id}]`)
-                          _newMsgs.add(`Assigned to [user=${targetUser.id}]`)
-                        }
-                      }
-                      else _newMsgs.add(`Assigned to [user=${jobToUpdate.forecast.assignedTo}]`)
-                    } else {
-                      if (!!oldValue) _newMsgs.add(`ReAssigned: [user=${oldValue}] -> nobody`)
-                      else _newMsgs.add('Assigned to nobody')
-                    }
+                  const hasOldUser = !!todo.forecast.assignedTo
+                  const hasNewUser = !!jobToUpdate.forecast.assignedTo
+                  const hasReassigned = hasOldUser && hasNewUser && hasOldUser !== hasNewUser
+                  const hasReassignedToNobody = hasOldUser && !hasNewUser
+                  const hasAssignedFromNobody = !hasOldUser && hasNewUser
+                  // let targetNewUser: TUser | undefined
+                  // if (hasNewUser) {
+                  //   targetNewUser = context.users.items.find((u) => u.id === jobToUpdate.forecast.assignedTo)
+                  // }
+                  // let targetOldUser: TUser | undefined
+                  // if (hasOldUser) {
+                  //   targetOldUser = context.users.items.find((u) => u.id === todo.forecast.assignedTo)
+                  // }
+                  switch (true) {
+                    case hasAssignedFromNobody:
+                      _newMsgs.add(`Assigned: to [user=${jobToUpdate.forecast.assignedTo}]`)
+                      break
+                    case hasReassignedToNobody:
+                      _newMsgs.add(`UnAssigned: from [user=${todo.forecast.assignedTo}] to nobody`)
+                      break
+                    case hasReassigned:
+                      _newMsgs.add(`ReAssigned: from [user=${todo.forecast.assignedTo}] to [user=${jobToUpdate.forecast.assignedTo}]`)
+                      break
+                    default:
+                      break
                   }
 
                   // NOTE: Set new parent
-                  if (todo.relations?.parent !== jobToUpdate.relations?.parent) {
-                    if (!!jobToUpdate.relations?.parent)
+                  const hasOldParent = !!todo.relations?.parent
+                  const hasNewParent = !!jobToUpdate.relations?.parent
+                  const hasParentReplaced = hasOldParent && hasNewParent && todo.relations?.parent !== jobToUpdate.relations?.parent
+                  const hasParentRemoved = hasOldParent && !hasNewParent
+                  const hasNewParentSetFromNothing = !hasOldParent && hasNewParent
+                  switch (true) {
+                    case hasNewParentSetFromNothing:
                       _newMsgs.add(`Parent job set: [job=${jobToUpdate.relations?.parent}]`)
+                      break
+                    case hasParentRemoved:
+                      _newMsgs.add(`Parent job removed: [job=${jobToUpdate.relations?.parent}]`)
+                      break
+                    case hasParentReplaced:
+                      _newMsgs.add(`Parent job replaced: from [job=${todo.relations?.parent}] to [job=${jobToUpdate.relations?.parent}]`)
+                      break
+                    default:
+                      break
                   }
   
                   // NOTE: complexity updated
@@ -318,7 +393,9 @@ export const topLevelMachine = setup({
                         jobToUpdate.completed = true
                         _newMsgs.add('Job finished, so set to completed')
                       } else jobToUpdate.completed = false
-                    } else jobToUpdate.completed = true
+                    } else {
+                      jobToUpdate.completed = true
+                    }
                   }
                   jobToUpdate.completed = !!jobToUpdate.forecast.finish
   
@@ -395,7 +472,11 @@ export const topLevelMachine = setup({
                     const v = getSpeed(jobToUpdate)
                     jobToUpdate.v = v
                     _newMsgs.add(`v= ${v}`)
-                  } else delete jobToUpdate.v
+                    soundManager.playSound({ soundCode: 'mech-3' })
+                  } else {
+                    delete jobToUpdate.v
+                    soundManager.playSound({ soundCode: 'click-1' })
+                  }
                   // --
   
                   const newLog: TLogsItem = {
@@ -409,6 +490,7 @@ export const topLevelMachine = setup({
                   // console.log('-- jobToUpdate (2)')
                   // console.log(jobToUpdate)
                   // console.log('--')
+                  soundManager.playSound({ soundCode: 'click-12' })
   
                   return jobToUpdate
                 }
@@ -448,6 +530,7 @@ export const topLevelMachine = setup({
               // console.log('-- clearDates: updated')
               // console.log(todo)
               // console.log('--')
+              soundManager.playSound({ soundCode: 'click-27' })
             }
             newTodos.push(todo)
           }
@@ -561,6 +644,9 @@ export const topLevelMachine = setup({
           }
           // --
 
+          if (context.jobs.items.some((todo) => todo.id === id))
+            soundManager.playSound({ soundCode: 'fail-41' })
+
           return {
             ...context.jobs,
             items: context.jobs.items.filter((todo) => todo.id !== id),
@@ -604,6 +690,7 @@ export const topLevelMachine = setup({
                 }
 
                 if (isCompleted) {
+                  soundManager.playSound({ soundCode: 'mech-3' })
                   newTodo.forecast.finish = updateTime
                   _msgs.push('Finish date was set to update time')
 
@@ -611,6 +698,7 @@ export const topLevelMachine = setup({
                   newTodo.v = v
                   _msgs.push(`v= ${v}`)
                 } else if (!!newTodo.forecast?.finish) {
+                  soundManager.playSound({ soundCode: 'click-1' })
                   _msgs.push(`Finish date [${dayjs(newTodo.forecast.finish).format('DD.MM.YYYY HH:mm')}] removed`)
                   delete newTodo.forecast.finish
                   delete newTodo.v
@@ -669,6 +757,9 @@ export const topLevelMachine = setup({
               update: createDate,
             }
           }
+
+          soundManager.playSound({ soundCode: 'plop-1' })
+
           return {
             ...context.users,
             items: [user, ...context.users.items]

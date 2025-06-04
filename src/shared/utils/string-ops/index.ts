@@ -1,3 +1,4 @@
+export * from './getCapitalizedFirstLetter'
 export * from './getMatchedByAnyString'
 export * from './getMatchedByRegExp'
 export * from './getSplittedCamelCase'
