@@ -9,12 +9,12 @@ export const getDefaultBusinessTimeConfig = ({ isReadOnly }: {
     cfg: {
       sunday: null,
       monday: [
-        { start: '10:00:00', end: '14:00:00' },
+        { start: '10:00:00', end: '14:00:00', _descr: 'Then Lunch 1h' },
         // NOTE: Lunch 1h
         { start: '15:00:00', end: '19:00:00' },
       ],
       tuesday: [
-        { start: '10:00:00', end: '14:00:00', _descr: 'Then Lunch 1h' },
+        { start: '10:00:00', end: '14:00:00' },
         // NOTE: Lunch 1h
         { start: '15:00:00', end: '19:00:00' },
       ],
