@@ -12,15 +12,25 @@ import HiveIcon from '@mui/icons-material/Hive'
 import ExtensionIcon from '@mui/icons-material/Extension'
 
 export const getIcon = ({ job }: { job: TJob }): string | React.ReactNode => {
+  const hasParent = !!job.relations?.parent
+  const hasChildren = Array.isArray(job.relations?.children)
+    && job.relations.children.length > 0
+  const isStartedOnly = typeof job.forecast.start === 'number'
+    && typeof job.forecast.estimate === 'undefined'
+    && typeof job.forecast.finish === 'undefined'
+  const isStartedAndEstimated = typeof job.forecast.start === 'number'
+    && typeof job.forecast.estimate === 'number'
+    && typeof job.forecast.finish === 'undefined'
+  const isFinished = typeof job.forecast.start === 'number'
+    && typeof job.forecast.estimate === 'number'
+    && typeof job.forecast.finish === 'number'
+
   switch (true) {
-    case !!job.relations?.parent:
+    case hasParent:
       return <ExtensionIcon />
-    case Array.isArray(job.relations?.children)
-      && job.relations.children.length > 0:
+    case hasChildren:
       return <HiveIcon />
-    case typeof job.forecast.start === 'number'
-      && typeof job.forecast.estimate === 'undefined'
-      && typeof job.forecast.finish === 'undefined': {
+    case isStartedOnly: {
         return <ContentPasteIcon />
       // const fields: TForecastKeys[] = ['start', 'estimate', 'finish']
       // for (const key of fields) {
@@ -29,14 +39,10 @@ export const getIcon = ({ job }: { job: TJob }): string | React.ReactNode => {
       // }
       // return res
     }
-    case typeof job.forecast.start === 'number'
-      && typeof job.forecast.estimate === 'number'
-      && typeof job.forecast.finish === 'undefined': {
+    case isStartedAndEstimated: {
       return <ContentPasteSearchIcon />
     }
-    case typeof job.forecast.start === 'number'
-      && typeof job.forecast.estimate === 'number'
-      && typeof job.forecast.finish === 'number': {
+    case isFinished: {
       return <TaskAltIcon />
     }
     default:

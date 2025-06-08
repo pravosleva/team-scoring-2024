@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
 import { Button, IconButton } from '@mui/material'
-import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
+import { TJob, TLogLink, TopLevelContext, TUser } from '~/shared/xstate'
 import { RadioGroupRating, ResponsiveBlock } from '~/shared/components'
 import { Link } from 'react-router-dom'
 import { JobStats } from '~/shared/components/Job/components'
@@ -16,6 +16,9 @@ import HistoryIcon from '@mui/icons-material/History'
 import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import { CopyToClipboardWrapper } from '~/shared/components'
+import dayjs from 'dayjs'
+import LinkIcon from '@mui/icons-material/Link';
 
 type TProps = {
   isOpened: boolean;
@@ -59,6 +62,20 @@ export const ActiveJobContent = memo(({
       block: 'center',
     })
   }, [])
+  const scrollLinks = useCallback(() => {
+    const targetElm = document.getElementById('linkBoxHeader')
+    if (!!targetElm) targetElm?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }, [])
+
+  const linksFromLogs = useMemo<(TLogLink & { logTs: number })[]>(() => job?.logs.items.reduce((acc: (TLogLink & { logTs: number })[], cur) => {
+    if (!!cur.links && Array.isArray(cur.links) && cur.links?.length > 0) {
+      for (const link of cur.links) acc.push({ ...link, logTs: cur.ts })
+    }
+    return acc
+  }, []), [job?.logs.items])
 
   return (
     <div
@@ -146,6 +163,29 @@ export const ActiveJobContent = memo(({
             <span>LOG</span>
             <ArrowDownwardIcon fontSize='small' />
           </div>
+          {
+            linksFromLogs.length > 0 && (
+              <div
+                style={{
+                  backgroundColor: 'gray',
+                  color: '#fff',
+                  padding: '4px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  alignItems: 'center',
+                  width: '100%',
+                  cursor: 'pointer',
+                  fontSize: 'small',
+                }}
+                onClick={scrollLinks}
+                className={baseClasses.stripedBlue}
+              >
+                <span>LINKS</span>
+                <ArrowDownwardIcon fontSize='small' />
+              </div>
+            )
+          }
         </ResponsiveBlock>
 
         <ResponsiveBlock
@@ -251,7 +291,7 @@ export const ActiveJobContent = memo(({
       </ResponsiveBlock>
 
       <ResponsiveBlock>
-      <ResponsiveBlock
+        <ResponsiveBlock
           style={{
             // padding: '16px 16px 16px 16px',
             position: 'sticky',
@@ -298,6 +338,42 @@ export const ActiveJobContent = memo(({
         >
           <h2>[ Active job info ]</h2>
         </ResponsiveBlock>
+
+        {
+          linksFromLogs.length > 0 && (
+            <ResponsiveBlock
+              style={{
+                padding: '16px 16px 16px 16px',
+              }}
+            >
+              <h3 id='linkBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                <span>[ All links: {linksFromLogs.length}</span>
+                <LinkIcon />
+                <span>]</span>
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {
+                  linksFromLogs.map((link) => (
+                    <div
+                      key={link.id}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                    >
+                      <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('YYYY.MM.DD HH:mm')}</em>
+                      <div style={{ fontSize: 'small' }}>
+                        <CopyToClipboardWrapper
+                          text={link.url}
+                          uiText={link.title}
+                        />
+                      </div>
+                      {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
+                    </div>
+                  ))
+                }
+              </div>
+            </ResponsiveBlock>
+          )
+        }
+
         {
           !!job && (
             <ResponsiveBlock

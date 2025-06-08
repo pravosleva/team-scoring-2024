@@ -20,7 +20,6 @@ import { getDefaultBusinessTimeConfig } from './utils/getDefaultBusinessTimeConf
 const defaultBusinessTimeConfigItemName = '5/2 by Default'
 
 export const BusinessTime = () => {
-  const [activeTab, setActiveTab] = useState<string>(defaultBusinessTimeConfigItemName)
   const [isReadyForSave, setIsReadyForSave] = useState<boolean>(false)
   // const [notCommitedNormalizedCfg, setNotCommitedNormalizedCfg] = useState<TWeekConfig | null>(null)
   const notCommitedNormalizedCfgRef = useRef<TWeekConfig | null>(null)
@@ -55,6 +54,7 @@ export const BusinessTime = () => {
       [defaultBusinessTimeConfigItemName]: getDefaultBusinessTimeConfig({ isReadOnly: true }),
     },
   })
+  const [activeTab, setActiveTab] = useState<string>(Object.keys(businessTimeConfig)[Object.keys(businessTimeConfig).length - 1]) // NOTE: Or? || defaultBusinessTimeConfigItemName
   const handleCreateTimeConfig = useCallback(({ name }: {
     name: string;
   }) => {
@@ -276,7 +276,7 @@ export const BusinessTime = () => {
                       <JsonEditor<TWeekConfig>
                         key={counter}
                         initialState={businessTimeConfig[key].cfg}
-                        isReadOnly={businessTimeConfig[key]?.isReadOnly || !isEditModeEnabled}
+                        isReadOnly={(businessTimeConfig[key]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isEditModeEnabled}
                         validationRules={{
                           [EDay.MON]: theDayValidationObject,
                           [EDay.THU]: theDayValidationObject,
@@ -330,7 +330,7 @@ export const BusinessTime = () => {
                       onClick={handleRemoveTimeConfig({ name: activeTab })}
                       startIcon={<DeleteIcon />}
                     >
-                      DEL TAB{/* getTruncated(activeTab, 10) */}
+                      DEL{/* getTruncated(activeTab, 10) */}
                     </Button>
                     {
                       isEditModeEnabled && (
@@ -339,7 +339,7 @@ export const BusinessTime = () => {
                           sx={{ borderRadius: 4 }}
                           size='small'
                           variant='contained'
-                          disabled={businessTimeConfig[activeTab]?.isReadOnly || !isReadyForSave}
+                          disabled={(businessTimeConfig[activeTab]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isReadyForSave}
                           onClick={handleSave}
                           endIcon={<SaveIcon />}
                         >
@@ -348,7 +348,7 @@ export const BusinessTime = () => {
                       )
                     }
                     {
-                      isEditModeEnabled && !businessTimeConfig[activeTab]?.isReadOnly && (
+                      isEditModeEnabled && !(businessTimeConfig[activeTab]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) && (
                         <>
                           <Button
                             color='secondary'
@@ -356,7 +356,7 @@ export const BusinessTime = () => {
                             size='small'
                             variant='outlined'
                             // startIcon={<NewReleasesIcon />}
-                            endIcon={<ClearIcon />}
+                            // endIcon={<ClearIcon />}
                             // disabled={!isReadyForSave}
                             onClick={() => {
                               removeInfoMessage()
@@ -365,13 +365,14 @@ export const BusinessTime = () => {
                               incCounter()
                             }}
                           >
-                            Clear
+                            <ClearIcon />
                           </Button>
                           <Button
                             color='secondary'
                             sx={{ borderRadius: 4 }}
                             size='small'
                             variant='outlined'
+                            disabled={businessTimeConfig[activeTab]?.isReadOnly}
                             onClick={handleRenameTimeConfig}
                           >
                             Rename
@@ -387,7 +388,10 @@ export const BusinessTime = () => {
                           size='small'
                           variant='contained'
                           startIcon={<ModeEditIcon />}
-                          disabled={businessTimeConfig[activeTab]?.isReadOnly}
+                          disabled={
+                            businessTimeConfig[activeTab]?.isReadOnly
+                            && Object.keys(businessTimeConfig).length < 2
+                          }
                           onClick={toggleEditMode}
                         >
                           Edit mode

@@ -4,9 +4,10 @@ import { ResponsiveBlock } from '~/shared/components'
 import dayjs from 'dayjs'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
-import { getModifiedJobLogText } from '~/pages/jobs/[id]/utils/getModifiedJobLogText'
-// import { DialogAsButton } from '~/shared/components/Dialog'
+import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils/getModifiedJobLogText'
 import { TopLevelContext, TJob } from '~/shared/xstate'
+import { Link } from 'react-router-dom'
+import { CopyToClipboardWrapper } from '~/shared/components'
 
 type TPros = {
   job: TJob;
@@ -52,6 +53,10 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
       handleEditLog({ logTs, text: newText })
     }
   }, [handleEditLog])
+
+  // const goToLogPage = useCallback(({ ts }: { ts: number }) => () => {
+  //   // /jobs/:job_id/logs/:log_ts
+  // }, [job.id])
   
   return (
     <ResponsiveBlock>
@@ -85,13 +90,17 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                 }
               </div>
               <ul className={baseClasses.compactList}>
-                {logs.items.map(({ ts, text }) => (
-                  <li key={ts}>
+                {logs.items.map(({ ts, text, links }) => (
+                  <li
+                    key={ts}
+                    // style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
+                  >
                     <em
                       style={{
                         color: 'gray',
                         // whiteSpace: 'pre-wrap',
                         fontSize: 'x-small',
+                        fontWeight: 'bold',
                         paddingTop: '3px',
                         display: 'flex',
                         flexDirection: 'row',
@@ -108,10 +117,60 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         }}
                       >
                         <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
-                        <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a></span>
+                        <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a>
+                        {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
+                        <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>
+                      </span>
                     </em>
                     <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
                     
+                    {/* {
+                      Array.isArray(links) && links.length > 0 && (
+                        <ul
+                          className={baseClasses.compactList}
+                          style={{ listStyleType: 'circle', gap: 0 }}
+                        >
+                          {
+                            links.map((link) => (
+                              <li key={link.id}>
+                                <a href={link.url} target='_blank'>{link.title}</a>
+                                <CopyToClipboardWrapper
+                                  text={link.url}
+                                  uiText={link.title}
+                                />
+                              </li>
+                            ))
+                          }
+                        </ul>
+                      )
+                    } */}
+
+                    {
+                      Array.isArray(links) && links.length > 0 && (
+                        <span
+                          className={baseClasses.truncate}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-end',
+                            gap: '4px',
+                          }}
+                        >
+                          {
+                            links.map((link) => (
+                              <span className={baseClasses.truncate} key={link.id}>
+                                {/* <a href={link.url} target='_blank'>{link.title}</a> */}
+                                <CopyToClipboardWrapper
+                                  text={link.url}
+                                  uiText={link.title}
+                                />
+                              </span>
+                            ))
+                          }
+                        </span>
+                      )
+                    }
+
                     {/* {
                       <DialogAsButton
                         modal={{

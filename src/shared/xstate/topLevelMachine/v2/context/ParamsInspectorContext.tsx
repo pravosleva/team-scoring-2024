@@ -32,10 +32,19 @@ type TPICFilters = {
     isNew: null | 0 | 1;
   },
 };
+type TUserRouteControlsItem = {
+  value: string;
+  uiText: string;
+}
+type TUserRouteControls = {
+  from?: TUserRouteControlsItem;
+  to?: TUserRouteControlsItem;
+};
 type TPICStore = {
   activeFilters: TPICFilters;
   filteredJobs: TJob[];
   counters: TPICCounters;
+  userRouteControls: TUserRouteControls;
 }
 const initialState: TPICStore = {
   activeFilters: {
@@ -64,6 +73,7 @@ const initialState: TPICStore = {
     },
     employees: {},
   },
+  userRouteControls: {},
 }
 export const ParamsInspectoreContext = createFastContext<TPICStore>(initialState)
 
@@ -93,13 +103,14 @@ const Logic = ({ children }: TProps) => {
   const [, setStore] = useStore((s) => s.filteredJobs)
 
   useEffect(() => {
-    const isUserPage = location.pathname === `/employees/${params.id}`
+    // NOTE: 2. Filters
+    const isUserPage = location.pathname === `/employees/${params.user_id}`
     const jobStatusFilterValue = urlSearchParams.get('jobStatusFilter')
     const hasJobStatusFilter = !!jobStatusFilterValue
       && Object.values(EJobsStatusFilter).includes(jobStatusFilterValue as EJobsStatusFilter)
     const assignedToFilterValue =
       isUserPage
-      ? params?.id
+      ? params?.user_id
       : urlSearchParams.get('assignedTo')
     const hasAssignedToFilter =
       (!!assignedToFilterValue && !Number.isNaN(Number(assignedToFilterValue)))
@@ -111,9 +122,6 @@ const Logic = ({ children }: TProps) => {
 
     const isNewFilterValue = urlSearchParams.get('isNew')
     const hasIsNewFilterValue = !!isNewFilterValue && !Number.isNaN(Number(isNewFilterValue))
-
-    // console.log(`hasIsProjectFilterValue= ${hasIsProjectFilterValue}`)
-    // console.log(`Number(isProjectFilterValue)= ${Number(isProjectFilterValue)}`)
 
     let filteredJobs: TJob[] = []
     const activeFilters: TPICFilters = {
@@ -314,10 +322,26 @@ const Logic = ({ children }: TProps) => {
       }
     }
     if (!activeFilters.isAnyFilterActive) filteredJobs = allJobs
-    setStore({ filteredJobs, activeFilters, counters })
+
+    // NOTE: 2. Controls
+    const fromRouteValue = urlSearchParams.get('from')
+    const fromRouteUiText = urlSearchParams.get('backActionUiText')
+    const toRouteValue = urlSearchParams.get('to')
+    const toRouteUiText = urlSearchParams.get('forwardActionUiText')
+    const userRouteControls: TUserRouteControls = {}
+    if (!!fromRouteValue) userRouteControls.from = {
+      value: fromRouteValue,
+      uiText: fromRouteUiText || 'Back',
+    }
+    if (!!toRouteValue) userRouteControls.to = {
+      value: toRouteValue,
+      uiText: toRouteUiText || 'Forward',
+    }
+
+    setStore({ filteredJobs, activeFilters, counters, userRouteControls })
     
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
-  }, [urlSearchParams, location, users, allJobs, setStore, params.id])
+  }, [urlSearchParams, location, users, allJobs, setStore, params.user_id])
 
   // Persist todos
   useEffect(() => {

@@ -18,13 +18,26 @@ export const FixedScrollTopBtn = memo(() => {
     scrollTopExtra()
 
     const jobIdToScroll = urlSearchParams.get('lastSeenJob')
-    if (!!jobIdToScroll) {
-      setTimeout(() => {
-        const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
-        if (!!targetElm) {
-          targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 0)
+    const logKeyToScroll = urlSearchParams.get('lastSeenLog')
+    switch (true) {
+      case !!jobIdToScroll:
+        setTimeout(() => {
+          const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
+          if (!!targetElm) {
+            targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }, 0)
+        break
+      case !!logKeyToScroll:
+        setTimeout(() => {
+          const targetElm = document.getElementById(`log_list_item_${logKeyToScroll}`)
+          if (!!targetElm) {
+            targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }, 0)
+        break
+      default:
+        break
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, urlSearchParams])

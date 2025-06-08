@@ -14,10 +14,17 @@ export type TLogProgress = {
   estimate: number;
   worst: number;
 };
+export type TLogLink = {
+  id: number;
+  url: string;
+  title: string;
+  descr: string;
+};
 export type TLogsItem = {
   ts: number;
   text: string;
   progress?: TLogProgress;
+  links?: TLogLink[];
 };
 export type TLogs = {
   limit: number;

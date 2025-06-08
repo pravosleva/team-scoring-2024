@@ -284,3 +284,61 @@
     #3bacff 20px
   );
 }
+.stripedRedLight {
+  background: repeating-linear-gradient(
+    45deg,
+    #e63946,
+    #e63946 10px,
+    #e19893 10px,
+    #e19893 20px
+  );
+}
+.stripedGrayLight {
+  background: repeating-linear-gradient(
+    45deg,
+    #E8E8E8,
+    #E8E8E8 10px,
+    #F8F8F8 10px,
+    #F8F8F8 20px
+  );
+}
+.stripedYellow {
+  background: repeating-linear-gradient(
+    45deg,
+    #6c4800,
+    #6c4800 10px,
+    #9b6f00 10px,
+    #9b6f00 20px
+  );
+}
+.stripedGreen {
+  background: repeating-linear-gradient(
+    45deg,
+    #4c9a52,
+    #4c9a52 10px,
+    #005411 10px,
+    #005411 20px
+  );
+}
+.stripedGreenHard {
+  background: repeating-linear-gradient(
+    45deg,
+    #2c7c37,
+    #2c7c37 10px,
+    #005411 10px,
+    #005411 20px
+  );
+}
+.stripedGreenHard2 {
+  background: repeating-linear-gradient(
+    45deg,
+    #005f1c,
+    #005f1c 10px,
+    #005411 10px,
+    #005411 20px
+  );
+}
+
+.backdropBlurLite {
+  background-color: rgba(255, 255, 255, .9);
+}

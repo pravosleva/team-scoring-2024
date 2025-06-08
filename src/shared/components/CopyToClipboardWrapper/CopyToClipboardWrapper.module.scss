@@ -1,0 +1,47 @@
+.wrapper {
+  // border: 1px dashed red;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0px;
+
+  border-radius: 16px 24px 24px 16px;
+  // background-color: #A64A4A;
+  
+  // background-color: #BFB1B1;
+  // color: #A64A4A;
+  // font-size: 15px;
+  font-weight: bold;
+
+  & code {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  cursor: pointer;
+
+  &.danger {
+    background-color: #FF0032;
+    color: #fff;
+  }
+  &.success {
+    background-color: #71bc81;
+    color: #fff;
+  }
+}
+.targetText {
+  letter-spacing: 0.10em;
+}
+
+.copyIcon {
+  // border: 1px solid red;
+  height: 23px;
+  width: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  // color: #FFF;
+}
+.copyInfo {
+  padding: 0 8px 0.1em 8px;
+}

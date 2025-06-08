@@ -11,7 +11,7 @@ import { UserAva } from '~/shared/components/Job/components'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
-import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
+import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components'
 import {
   SpeedsFunctionGraph,
 } from '~/shared/components'
@@ -36,8 +36,8 @@ export const EmployeePage = () => {
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetUser =  useMemo<TUser | null>(() => {
-    return users?.find(({ id }) => id === Number(params.id)) || null
-  }, [users, params.id])
+    return users?.find(({ id }) => id === Number(params.user_id)) || null
+  }, [users, params.user_id])
   // const targetJobs = useMemo(() => {
   //   return !!targetUser ? jobs.filter(({ forecast }) => forecast.assignedTo === targetUser.id) : []
   // }, [jobs, targetUser])
@@ -106,7 +106,7 @@ export const EmployeePage = () => {
               <div
                 style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0px' }}
               >
-                <div style={{ fontWeight: 'bold' }}>{targetUser?.displayName || `#${params.id}`}</div>
+                <div style={{ fontWeight: 'bold' }}>{targetUser?.displayName || `#${params.user_id}`}</div>
                 {/* <div>[WIP] AVG</div> */}
               </div>
             </Box>

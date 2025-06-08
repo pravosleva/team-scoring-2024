@@ -9,6 +9,7 @@ import PeopleIcon from '@mui/icons-material/People'
 import classes from './Layout.module.scss'
 import { useLocation } from 'react-router-dom'
 import AppsIcon from '@mui/icons-material/Apps'
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import clsx from 'clsx'
 import { ResponsiveBlock } from '~/shared/components'
 import SegmentIcon from '@mui/icons-material/Segment'
@@ -39,6 +40,11 @@ const allActions: TSpeedDialMenuItem[] = [
     to: '/',
     _Icon: <AppsIcon color='primary' />,
     name: 'Home',
+  },
+  {
+    to: '/last-activity',
+    _Icon: <LocalActivityIcon color='primary' />,
+    name: 'Last Activity',
   },
 ]
 

@@ -1,4 +1,5 @@
 export * from './CollapsibleBox'
+export * from './CopyToClipboardWrapper'
 export * from './DistributionFunctionGraph'
 export * from './RadioGroupRating'
 export * from './ResponsiveBlock'

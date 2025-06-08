@@ -1,5 +1,5 @@
 import { assign, setup } from 'xstate'
-import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress } from './types'
+import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink } from './types'
 import { getCurrentPercentage } from '~/shared/utils'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
@@ -44,6 +44,9 @@ export const topLevelMachine = setup({
       | { type: 'user.delete'; value: { id: number; } }
       | { type: 'todo.editLog'; value: { jobId: number; logTs: number; text: string } }
       | { type: 'todo.deleteLog'; value: { jobId: number; logTs: number } }
+      | { type: 'todo.addLinkToLog'; value: { jobId: number; logTs: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
+      | { type: 'todo.deleteLinkInLog'; value: { jobId: number; logTs: number; linkId: number } }
+      | { type: 'todo.editLinkInLog'; value: { jobId: number; logTs: number; linkId: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
   }
 }).createMachine({
   id: 'topLevel',
@@ -140,6 +143,103 @@ export const topLevelMachine = setup({
             items: context.jobs.items.map((todo) => {
               if (todo.id === event.value.jobId) {
                 todo.logs.items = todo.logs.items.filter(({ ts }) => ts !== event.value.logTs)
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.addLinkToLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          const limit = 100
+
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Add link for log
+                    if (!log.links) log.links = []
+                    const ts = new Date().getTime()
+                    const newLink: TLogLink = { ...event.value.state, id: ts }
+                    if (log.links.length >= limit) {
+                      log.links.pop()
+                    }
+                    log.links.unshift(newLink)
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.deleteLinkInLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Remove link
+                    if (!log.links) log.links = []
+                    log.links = log.links.filter((link) => link.id !== event.value.linkId)
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.editLinkInLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Add link for log
+                    if (!log.links) log.links = []
+                    
+                    log.links = log.links.map((oldLink) => {
+                      if (oldLink.id === event.value.linkId) {
+                        return {
+                          ...oldLink,
+                          ...event.value.state,
+                        }
+                      }
+                      return oldLink
+                    })
+                  }
+                  return log
+                })
               }
               return todo
             })
@@ -281,7 +381,7 @@ export const topLevelMachine = setup({
                           a[parentIndex].logs.items.pop()
 
                         a[parentIndex].logs.items.unshift({
-                          ts: updateTime,
+                          ts: updateTime + 1,
                           text: `Child job removed: [job=${shouldChildBeRemovedFromParent.targetChildId}]`,
                         })
                         // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)

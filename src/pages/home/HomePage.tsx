@@ -67,6 +67,16 @@ export const HomePage = () => {
                 <em className={classes.descr}>Local settings (experimental)</em>
               </div>
             </Link>
+            <Link
+              to='/last-activity'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <div className={classes.title}>Last activity</div>
+              </div>
+            </Link>
           </ResponsiveBlock>
         </Grid>
       </Grid>
