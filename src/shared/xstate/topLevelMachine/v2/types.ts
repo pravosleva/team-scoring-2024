@@ -20,11 +20,19 @@ export type TLogLink = {
   title: string;
   descr: string;
 };
+export type TLogChecklistItem = {
+  label: string;
+  descr: string;
+  isDone: boolean;
+  isDisabled: boolean;
+  links?: TLogLink[];
+}
 export type TLogsItem = {
   ts: number;
   text: string;
   progress?: TLogProgress;
   links?: TLogLink[];
+  checklist?: TLogChecklistItem[];
 };
 export type TLogs = {
   limit: number;

@@ -1,0 +1,11 @@
+.wrapper {
+  border: 1px dashed red;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.itemWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}

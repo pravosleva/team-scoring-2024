@@ -9,10 +9,11 @@ import PeopleIcon from '@mui/icons-material/People'
 import classes from './Layout.module.scss'
 import { useLocation } from 'react-router-dom'
 import AppsIcon from '@mui/icons-material/Apps'
-import LocalActivityIcon from '@mui/icons-material/LocalActivity';
+// import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import clsx from 'clsx'
 import { ResponsiveBlock } from '~/shared/components'
 import SegmentIcon from '@mui/icons-material/Segment'
+import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedScrollTopBtn } from './components'
 import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 
@@ -43,7 +44,7 @@ const allActions: TSpeedDialMenuItem[] = [
   },
   {
     to: '/last-activity',
-    _Icon: <LocalActivityIcon color='primary' />,
+    _Icon: <SportsBasketballIcon color='primary' />,
     name: 'Last Activity',
   },
 ]

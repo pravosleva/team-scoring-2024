@@ -322,6 +322,7 @@ export const JobPage = memo(() => {
             <Link to={`/employees/${targetJob.forecast.assignedTo}${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`} target='_self'>
               <Button
                 variant='outlined'
+                color='gray'
                 startIcon={<AccountCircleIcon />}
                 fullWidth
               >

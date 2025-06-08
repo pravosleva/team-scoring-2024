@@ -11,12 +11,12 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components/JobResultReviewShort'
 import { getJobStatusText } from '~/pages/jobs/[job_id]/utils'
-import { ResponsiveBlock } from '~/shared/components'
+import { ResponsiveBlock, SimpleCheckList } from '~/shared/components'
 import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 // import { getTruncated } from '~/shared/utils/string-ops'
-// import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 import { CommentManager, SingleTextManager } from './components'
@@ -141,6 +141,7 @@ export const LogPage = () => {
         </div>
       </Grid>
 
+      {/* NOTE: About job */}
       <Grid size={12}>
         <Box
           sx={{
@@ -157,8 +158,9 @@ export const LogPage = () => {
             )
           }
         </Box>
-      </Grid>
+      </Grid> 
 
+      {/* NOTE: About log */}
       {
         !!targetLog && (
           <Grid size={12}>
@@ -183,6 +185,7 @@ export const LogPage = () => {
                   handleEditLog({ text: state.text })
                 }}
               />
+              <SimpleCheckList items={[]} />
             </Box>
           </Grid>
         )
@@ -281,12 +284,12 @@ export const LogPage = () => {
       {
         !!targetJob && (
           <Grid
-            className={baseClasses.backdropBlurLite}
+            // className={baseClasses.backdropBlurLite}
             size={12}
             sx={{
               position: 'sticky',
               bottom: 0,
-              // backgroundColor: '#fff',
+              backgroundColor: '#fff',
               zIndex: 3,
               marginTop: 'auto',
               // borderRadius: '16px 16px 0px 0px',
@@ -299,7 +302,6 @@ export const LogPage = () => {
                 padding: '16px 0px 16px 0px',
                 // border: '1px dashed red',
                 boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-                
                 // borderRadius: '16px 16px 0px 0px',
               }}
             >
@@ -345,16 +347,30 @@ export const LogPage = () => {
                 )
               }
               
-              <Link to={`/jobs/${targetJob.id}`} target='_self'>
-                <Button
-                  variant='outlined'
-                  color='gray'
-                  // endIcon={<ArrowForwardIcon />}
-                  fullWidth
-                >
-                  Job
-                </Button>
-              </Link>
+              {
+                !!targetJob && !!targetLog && (
+                  <Link
+                    to={
+                      `/jobs/${targetJob.id}?from=${
+                        encodeURIComponent(`/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenLog=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`)
+                      }&backActionUiText=${
+                        encodeURIComponent('Log page')
+                      }`
+                    }
+                    target='_self'
+                  >
+                    <Button
+                      variant='outlined'
+                      color='primary'
+                      endIcon={<ArrowForwardIcon />}
+                      fullWidth
+                    >
+                      Job
+                    </Button>
+                  </Link>
+                )
+              }
+              
             </ResponsiveBlock>
           </Grid>
         )

@@ -295,6 +295,8 @@ export const LastActivityPage = memo(() => {
           zIndex: 3,
           marginTop: 'auto',
           borderRadius: '16px 16px 0px 0px',
+          // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+          boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
         }}
       >
         <ResponsiveBlock
@@ -302,7 +304,6 @@ export const LastActivityPage = memo(() => {
           style={{
             padding: '16px 16px 16px 16px',
             // border: '1px dashed red',
-            boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
             
             // borderRadius: '16px 16px 0px 0px',
           }}
@@ -328,7 +329,7 @@ export const LastActivityPage = memo(() => {
             to='/jobs'
             target='_self'
           >
-            <Button variant='outlined' startIcon={<ArrowBack />} fullWidth>
+            <Button color='gray' variant='outlined' startIcon={<ArrowBack />} fullWidth>
               Jobs
             </Button>
           </Link>
