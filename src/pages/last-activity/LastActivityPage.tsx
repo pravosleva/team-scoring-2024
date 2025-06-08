@@ -206,6 +206,7 @@ export const LastActivityPage = memo(() => {
                               <CopyToClipboardWrapper
                                 text={link.url}
                                 uiText={link.title}
+                                showNotifOnCopy
                               />
                             </div>
                             {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}

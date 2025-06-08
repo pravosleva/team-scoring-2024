@@ -23,10 +23,6 @@ import { CommentManager, SingleTextManager } from './components'
 
 export const LogPage = () => {
   const params = useParams()
-  // const [urlSearchParams] = useSearchParams()
-  // const urlSearchParamFrom = useMemo(() => urlSearchParams.get('from'), [urlSearchParams])
-  // const urlSearchParamBackActionUiText = useMemo(() => urlSearchParams.get('backActionUiText'), [urlSearchParams])
-  // const urlSearchParamLastSeenLog = useMemo(() => urlSearchParams.get('lastSeenLog'), [urlSearchParams])
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
   
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
@@ -156,19 +152,7 @@ export const LogPage = () => {
           <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Job not found #${params.job_id}`}</div>
           {
             !!targetJob && (
-              // <SingleTextManager
-              //   buttonText='Edit job description'
-              //   initialState={{ text: targetJob.descr || '' }}
-              //   isEditable
-              //   isDeletable={false}
-              //   onDelete={({ cleanup }) => {
-              //     cleanup()
-              //   }}
-              //   onSuccess={({ state }) => {
-              //     // TODO: Update log
-              //     // handleEditLog({ text: state.text })
-              //   }}
-              // />
+              // TODO: <SingleTextManager buttonText='Edit job description'
               <em style={{ fontSize: 'small', color: 'gray' }}>{targetJob.descr || 'No description'}</em>
             )
           }

@@ -124,27 +124,6 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                     </em>
                     <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
                     
-                    {/* {
-                      Array.isArray(links) && links.length > 0 && (
-                        <ul
-                          className={baseClasses.compactList}
-                          style={{ listStyleType: 'circle', gap: 0 }}
-                        >
-                          {
-                            links.map((link) => (
-                              <li key={link.id}>
-                                <a href={link.url} target='_blank'>{link.title}</a>
-                                <CopyToClipboardWrapper
-                                  text={link.url}
-                                  uiText={link.title}
-                                />
-                              </li>
-                            ))
-                          }
-                        </ul>
-                      )
-                    } */}
-
                     {
                       Array.isArray(links) && links.length > 0 && (
                         <span
@@ -163,6 +142,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                                 <CopyToClipboardWrapper
                                   text={link.url}
                                   uiText={link.title}
+                                  showNotifOnCopy
                                 />
                               </span>
                             ))
