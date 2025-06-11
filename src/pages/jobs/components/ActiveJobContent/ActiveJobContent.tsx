@@ -2,7 +2,10 @@ import { memo, useCallback, useMemo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
 import { Button, IconButton } from '@mui/material'
 import { TJob, TLogLink, TopLevelContext, TUser } from '~/shared/xstate'
-import { RadioGroupRating, ResponsiveBlock } from '~/shared/components'
+import {
+  RadioGroupRating, ResponsiveBlock,
+  // SimpleCheckList,
+} from '~/shared/components'
 import { Link } from 'react-router-dom'
 import { JobStats } from '~/shared/components/Job/components'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
@@ -19,12 +22,13 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import { CopyToClipboardWrapper } from '~/shared/components'
 import dayjs from 'dayjs'
 import LinkIcon from '@mui/icons-material/Link';
+// import ChecklistIcon from '@mui/icons-material/Checklist';
 
 type TProps = {
   isOpened: boolean;
   job: TJob;
-  onToggleDrawer: (val?: boolean) => ({ job }: {
-    job?: TJob;
+  onToggleDrawer: (val?: boolean) => ({ jobId }: {
+    jobId?: number;
   }) => void;
 }
 
@@ -76,6 +80,69 @@ export const ActiveJobContent = memo(({
     }
     return acc
   }, []), [job?.logs.items])
+
+  // const allChecklistItems = useMemo<{ [key: string]: { logText: string; checklist: TLogChecklistItem[]; jobTsUpdate: number } }>(() =>
+  //   job.logs.items.reduce(
+  //     (acc: { [key: string]: { logText: string; checklist: TLogChecklistItem[]; jobTsUpdate: number } }, cur) => {
+  //       if (!!cur.checklist) {
+  //         if (!acc[String(cur.ts)]) {
+  //           acc[String(cur.ts)] = {
+  //             logText: cur.text,
+  //             checklist: cur.checklist,
+  //             jobTsUpdate: job.ts.update,
+  //           }
+  //         }
+  //       }
+
+  //       return acc
+  //     },
+  //     {}
+  //   ),
+  //   [job?.logs.items, job.ts.update]
+  // )
+
+  // const logTsToChecklistIdMapping = useMemo<{ [key: string]: number[] }>(() => job.logs.items.reduce((acc: { [key: string]: number[] }, cur) => {
+  //   if (!acc[String(cur.ts)]) acc[String(cur.ts)] = []
+  //   if (!!cur.checklist) {
+  //     for (const checklistItem of cur.checklist) {
+  //       if (!acc[String(cur.ts)].includes(checklistItem.id)) {
+  //         acc[String(cur.ts)].push(checklistItem.id)
+  //       }
+  //     }
+  //   }
+
+  //   return acc
+  // }, {}), [job?.logs.items, job.ts.update])
+
+  // const jobsActorRef = TopLevelContext.useActorRef()
+  // const handleEditChecklistItem = useCallback(({ state, checklistItemId, _additionalInfo, cleanup }: any) => {
+  //   // console.log('- wip EDIT: ActiveJobContent')
+  //   // console.log(state)
+  //   // console.log(_additionalInfo)
+  //   let targetLogTs: number | undefined
+  //   for (const logTsAsString in logTsToChecklistIdMapping) {
+  //     if (logTsToChecklistIdMapping[logTsAsString].includes(checklistItemId)) {
+  //       targetLogTs = Number(logTsAsString)
+  //     }
+  //   }
+
+  //   if (typeof targetLogTs === 'number' && !!_additionalInfo?.jobId) {
+  //     // console.log(targetLogTs)
+  //     // console.log(_additionalInfo?.jobId)
+  //     // console.log(checklistItemId)
+  //     console.log(state)
+  //     jobsActorRef.send({
+  //       type: 'todo.editChecklistItemInLog',
+  //       value: {
+  //         jobId: _additionalInfo.jobId,
+  //         logTs: targetLogTs,
+  //         checklistItemId,
+  //         state,
+  //       },
+  //     })
+  //     cleanup()
+  //   }
+  // }, [jobsActorRef])
 
   return (
     <div
@@ -160,7 +227,7 @@ export const ActiveJobContent = memo(({
             onClick={scrollLog}
             className={baseClasses.stripedBlue}
           >
-            <span>LOG</span>
+            <span>LOGS</span>
             <ArrowDownwardIcon fontSize='small' />
           </div>
           {
@@ -194,7 +261,7 @@ export const ActiveJobContent = memo(({
             position: 'sticky',
             top: '30px',
             backgroundColor: '#fff',
-            zIndex: 1,
+            zIndex: 2,
             borderBottom: '1px solid lightgray',
           }}
         >
@@ -332,12 +399,59 @@ export const ActiveJobContent = memo(({
             position: 'sticky',
             top: '30px',
             backgroundColor: '#fff',
-            zIndex: 1,
+            zIndex: 2,
             borderBottom: '1px solid lightgray',
           }}
         >
           <h2>[ Active job info ]</h2>
         </ResponsiveBlock>
+
+        {/*
+          Object.keys(allChecklistItems).length > 0 && (
+            <ResponsiveBlock
+              style={{
+                padding: '16px 16px 16px 16px',
+              }}
+            >
+              <h3 id='linkBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                <span>[ All checklist items: {Object.keys(allChecklistItems).length}</span>
+                <ChecklistIcon />
+                <span>]</span>
+              </h3>
+              <SimpleCheckList
+                key={job.ts.update}
+                _additionalInfo={{
+                  _message: 'Helpful info example',
+                  jobId: job.id,
+                  // logTsToChecklistIdMapping,
+                }}
+                items={allChecklistItems}
+                infoLabel='Checklist'
+                createBtnLabel='Create checklist'
+                isCreatable={false}
+                isDeletable={false}
+                isEditable={true}
+                // onDeleteChecklist={console.info}
+                // onCreateNewChecklistItem={({ state }) => {
+                //   console.log('- wip CREATE: ActiveJobContent')
+                //   console.log(state)
+                //   // jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
+                // }}
+                onEditChecklistItem={handleEditChecklistItem}
+              />
+
+              <pre
+                key={job.ts.update}
+                style={{
+                  // fontSize: '13px',
+                  // maxHeight: '150px',
+                  // backgroundColor: 'lightgray',
+                }}
+                className={baseClasses.preNormalized}
+              >{JSON.stringify(allChecklistItems, null, 2)}</pre>
+            </ResponsiveBlock>
+          )
+        */}
 
         {
           linksFromLogs.length > 0 && (

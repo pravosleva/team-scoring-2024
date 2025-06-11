@@ -21,11 +21,16 @@ export type TLogLink = {
   descr: string;
 };
 export type TLogChecklistItem = {
-  label: string;
+  title: string;
   descr: string;
   isDone: boolean;
   isDisabled: boolean;
   links?: TLogLink[];
+  id: number;
+  ts: {
+    createdAt: number;
+    updatedAt: number;
+  };
 }
 export type TLogsItem = {
   ts: number;

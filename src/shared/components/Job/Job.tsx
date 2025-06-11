@@ -21,7 +21,7 @@ type TProps = {
   isLastSeen?: boolean;
   isActive?: boolean;
   job: TJob;
-  onToggleDrawer: (isDrawlerOpened: boolean) => ({ job }: { job: TJob }) => void;
+  onToggleDrawer: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
 }
 
 const FireNav = styled(List)<{ component?: React.ElementType }>({

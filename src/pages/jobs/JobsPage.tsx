@@ -1,22 +1,25 @@
-import { memo, useState, useCallback } from 'react'
+import { memo, useState, useCallback, useMemo } from 'react'
 import { JobList } from '~/shared/components/JobList'
 import baseClasses from '~/App.module.scss'
 import { Layout } from '~/shared/components/Layout'
 import { Drawer } from '@mui/material'
-import { TJob } from '~/shared/xstate'
+import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
 
 export const JobsPage = memo(() => {
   const [isOpened, setIsOpened] = useState(false)
-  const [activeJob, setActiveJob] = useState<TJob | null>()
+  const [activeJobId, setActiveJobId] = useState<number | null>(null)
   // const [, SetURLSearchParams] = useSearchParams()
 
-  const handleToggleDrawer = useCallback((newValue?: boolean) => ({ job }: {
-    job?: TJob;
+  const handleToggleDrawer = useCallback((newValue?: boolean) => ({ jobId }: {
+    jobId?: number;
   }) => {
     setIsOpened((s) => typeof newValue === 'boolean' ? newValue : !s)
-    if (!!job) setActiveJob(job)
-  }, [setIsOpened, setActiveJob])
+    if (!!jobId) setActiveJobId(jobId)
+  }, [setIsOpened, setActiveJobId])
+
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? jobs.find(({ id }) => id === activeJobId) : undefined, [jobs, activeJobId])
 
   return (
     <Layout>

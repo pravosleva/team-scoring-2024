@@ -6,10 +6,8 @@
 input, textarea {
   /* caret: block manual !important;
   animation: old-caret 2s infinite !important; */
-  /*styling of the screen omitted for brevity */
+  /* styling of the screen omitted for brevity */
 
   caret-shape: underscore !important;
   font-family: monospace;
-  // background: black;
-  // color: white;
 }

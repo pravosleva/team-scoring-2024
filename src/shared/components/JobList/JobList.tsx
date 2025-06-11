@@ -1,6 +1,6 @@
 import { memo, useLayoutEffect, useState, useCallback } from 'react'
 import { Job } from '~/shared/components/Job'
-import { TopLevelContext, TJob, EJobsStatusFilter } from '~/shared/xstate/topLevelMachine/v2'
+import { TopLevelContext, EJobsStatusFilter } from '~/shared/xstate/topLevelMachine/v2'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -35,7 +35,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 
 type TProps = {
   activeJobId?: number | null;
-  onToggleDrawer: (isDrawlerOpened: boolean) => ({ job }: { job: TJob }) => void;
+  onToggleDrawer: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
 }
 
 export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {

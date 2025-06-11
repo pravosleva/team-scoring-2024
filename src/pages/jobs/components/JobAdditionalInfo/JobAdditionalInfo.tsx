@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react'
 import baseClasses from '~/App.module.scss'
-import { ResponsiveBlock } from '~/shared/components'
+import { ResponsiveBlock, SimpleCheckList } from '~/shared/components'
 import dayjs from 'dayjs'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
@@ -89,12 +89,9 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                   )
                 }
               </div>
-              <ul className={baseClasses.compactList}>
-                {logs.items.map(({ ts, text, links }) => (
-                  <li
-                    key={ts}
-                    // style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
-                  >
+              <ul className={baseClasses.compactList2}>
+                {logs.items.map(({ ts, text, links, checklist }) => (
+                  <li key={ts}>
                     <em
                       style={{
                         color: 'gray',
@@ -122,7 +119,41 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>
                       </span>
                     </em>
+                    
                     <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
+
+                    {
+                      !!checklist && checklist?.length > 0 && (
+                        <div>
+                          <SimpleCheckList
+                            // connectedOnThe={['top']}
+                            isMiniVariant
+                            items={checklist || []}
+                            infoLabel='Checklist'
+                            createBtnLabel='Create checklist'
+                            isCreatable={false}
+                            isDeletable={false}
+                            isEditable={true}
+                            // onDeleteChecklist={console.info}
+                            onCreateNewChecklistItem={({ state }) => {
+                              jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: job.id, logTs: ts, state } })
+                            }}
+                            onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                              jobsActorRef.send({
+                                type: 'todo.editChecklistItemInLog',
+                                value: {
+                                  jobId: job.id,
+                                  logTs: ts,
+                                  checklistItemId,
+                                  state,
+                                },
+                              })
+                              cleanup()
+                            }}
+                          />
+                        </div>
+                      )
+                    }
                     
                     {
                       Array.isArray(links) && links.length > 0 && (

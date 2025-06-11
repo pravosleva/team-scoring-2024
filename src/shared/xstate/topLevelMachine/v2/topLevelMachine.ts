@@ -1,5 +1,5 @@
 import { assign, setup } from 'xstate'
-import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink } from './types'
+import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink, TLogChecklistItem } from './types'
 import { getCurrentPercentage } from '~/shared/utils'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
@@ -47,6 +47,10 @@ export const topLevelMachine = setup({
       | { type: 'todo.addLinkToLog'; value: { jobId: number; logTs: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
       | { type: 'todo.deleteLinkInLog'; value: { jobId: number; logTs: number; linkId: number } }
       | { type: 'todo.editLinkInLog'; value: { jobId: number; logTs: number; linkId: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
+      | { type: 'todo.addChecklistItemInLog'; value: { jobId: number; logTs: number; state: Pick<TLogChecklistItem, 'title' | 'descr'> } }
+      | { type: 'todo.editChecklistItemInLog'; value: { jobId: number; logTs: number; checklistItemId: number; state: Pick<TLogChecklistItem, 'title' | 'descr' | 'isDisabled' | 'isDone'> } }
+      | { type: 'todo.deleteChecklistFromLog'; value: { jobId: number; logTs: number } }
+      | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
   }
 }).createMachine({
   id: 'topLevel',
@@ -159,7 +163,6 @@ export const topLevelMachine = setup({
           }
 
           const limit = 100
-
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
@@ -170,10 +173,228 @@ export const topLevelMachine = setup({
                     if (!log.links) log.links = []
                     const ts = new Date().getTime()
                     const newLink: TLogLink = { ...event.value.state, id: ts }
-                    if (log.links.length >= limit) {
-                      log.links.pop()
-                    }
+                    if (log.links.length >= limit) log.links.pop()
+
                     log.links.unshift(newLink)
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.addChecklistItemInLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+          
+          const checklistItemsLimit = 100
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Add link to log
+                    // if (!log.links) log.links = []
+                    // const ts = new Date().getTime()
+                    // const newLink: TLogLink = { ...event.value.state, id: ts }
+                    // if (log.links.length >= limit) {
+                    //   log.links.pop()
+                    // }
+                    // log.links.unshift(newLink)
+
+                    // NOTE: Add checklist to log
+                    if (!log.checklist) log.checklist = []
+                    const tsCreate = new Date().getTime()
+                    const newChecklistItem: TLogChecklistItem = {
+                      id: tsCreate,
+                      isDone: false,
+                      isDisabled: false,
+                      links: [],
+                      title: event.value.state.title.trim().replace(/\s+/g,' '),
+                      descr: event.value.state.descr.trim().replace(/\s+/g,' '),
+                      ts: {
+                        createdAt: tsCreate,
+                        updatedAt: tsCreate,
+                      },
+                    }
+                    if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
+                    
+                    log.checklist.unshift(newChecklistItem)
+                    todo.ts.update = tsCreate
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.editChecklistItemInLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          const updateTs = new Date().getTime()
+          
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Add link to log
+                    // if (!log.links) log.links = []
+                    // const ts = new Date().getTime()
+                    // const newLink: TLogLink = { ...event.value.state, id: ts }
+                    // if (log.links.length >= limit) {
+                    //   log.links.pop()
+                    // }
+                    // log.links.unshift(newLink)
+
+                    // NOTE: Add checklist to log
+                    // if (!log.checklist) log.checklist = []
+                    // const tsCreate = new Date().getTime()
+                    // const newChecklistItem: TLogChecklistItem = {
+                    //   id: tsCreate,
+                    //   isDone: false,
+                    //   isDisabled: false,
+                    //   links: [],
+                    //   title: event.value.state.title.trim().replace(/\s+/g,' '),
+                    //   descr: event.value.state.descr.trim().replace(/\s+/g,' '),
+                    //   ts: {
+                    //     createdAt: tsCreate,
+                    //     updatedAt: tsCreate,
+                    //   },
+                    // }
+                    // if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
+                    
+                    // log.checklist.unshift(newChecklistItem)
+
+                    // NOTE: Edit
+                    if (!log.checklist) log.checklist = []
+                    log.checklist = log.checklist.map((checklistItem) => {
+                      switch (true) {
+                        case checklistItem.id === event.value.checklistItemId: {
+
+                          checklistItem.title = event.value.state.title
+                          checklistItem.descr = event.value.state.descr
+                          checklistItem.isDisabled = event.value.state.isDisabled
+
+                          // console.log(`UPD before: checklistItem.isDone -> ${checklistItem.isDone} (event.value.state.isDone === ${event.value.state.isDone})`)
+
+                          checklistItem.isDone = event.value.state.isDone
+
+                          // console.log(`UPD: checklistItem.isDone -> ${checklistItem.isDone} (event.value.state.isDone === ${event.value.state.isDone})`)
+
+                          checklistItem.ts.updatedAt = updateTs
+                          todo.ts.update = updateTs
+
+                          return checklistItem
+                        }
+                        default:
+                          return checklistItem
+                      }
+                    })
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.deleteChecklistFromLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+          
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    // NOTE: Add link to log
+                    // if (!log.links) log.links = []
+                    // const ts = new Date().getTime()
+                    // const newLink: TLogLink = { ...event.value.state, id: ts }
+                    // if (log.links.length >= limit) {
+                    //   log.links.pop()
+                    // }
+                    // log.links.unshift(newLink)
+
+                    // NOTE: Add checklist to log
+                    // if (!log.checklist) log.checklist = []
+                    // const tsCreate = new Date().getTime()
+                    // const newChecklistItem: TLogChecklistItem = {
+                    //   id: tsCreate,
+                    //   isDone: false,
+                    //   isDisabled: false,
+                    //   links: [],
+                    //   title: event.value.state.title.trim().replace(/\s+/g,' '),
+                    //   descr: event.value.state.descr.trim().replace(/\s+/g,' '),
+                    //   ts: {
+                    //     createdAt: tsCreate,
+                    //     updatedAt: tsCreate,
+                    //   },
+                    // }
+                    // if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
+                    
+                    // log.checklist.unshift(newChecklistItem)
+
+                    // NOTE: Edit
+                    // if (!log.checklist) log.checklist = []
+                    delete log.checklist
+
+                    const updateTs = new Date().getTime()
+                    todo.ts.update = updateTs
+                  }
+                  return log
+                })
+              }
+              return todo
+            })
+          }
+        },
+      }),
+    },
+    'todo.deleteChecklistItemFromLog': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+          
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              if (todo.id === event.value.jobId) {
+                todo.logs.items = todo.logs.items.map((log) => {
+                  if (log.ts === event.value.logTs) {
+                    log.checklist = log.checklist?.filter(({ id }) => id !== event.value.checklistItemId) || []
+                    if (log.checklist.length === 0) delete log.checklist
+
+                    const updateTs = new Date().getTime()
+                    todo.ts.update = updateTs
                   }
                   return log
                 })

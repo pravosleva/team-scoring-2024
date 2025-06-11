@@ -105,7 +105,6 @@ export const getDoneTimeDiff = ({ job }: {
 
     const businessTimeConfig = getBusinessTimeConfig()
     for (const businessType in businessTimeConfig) {
-      console.log(businessType)
       // NOTE: 1. Set Business Times in dayjs
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

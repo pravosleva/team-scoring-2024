@@ -134,7 +134,7 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
               <Button
                 // size='small'
                 fullWidth
-                disabled={!hasUpdated || localText.length > 200}
+                disabled={!hasUpdated || localText.length > 300}
                 variant='contained'
                 onClick={handleSubmit}
                 color='primary'

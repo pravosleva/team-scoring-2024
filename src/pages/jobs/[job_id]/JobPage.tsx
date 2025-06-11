@@ -20,11 +20,15 @@ import { getTruncated } from '~/shared/utils/string-ops'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
-import { getJobStatusText, getTargetUserNameUI } from './utils'
+import {
+  // getJobStatusText,
+  getTargetUserNameUI,
+} from './utils'
 import { JobResultReviewShort } from './components'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { TotalJobChecklist } from './components'
 
 export const JobPage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -66,10 +70,10 @@ export const JobPage = memo(() => {
     }).date100
     : null, [targetJob, isJobStartedAndEstimated, otherUserJobsForAnalysis])
 
-  const statusText = useMemo(() => getJobStatusText({
-    job: targetJob,
-    user: targetUser,
-  }), [targetJob, targetUser])
+  // const statusText = useMemo(() => getJobStatusText({
+  //   job: targetJob,
+  //   user: targetUser,
+  // }), [targetJob, targetUser])
 
   // const targetJobWithoutLogs = useMemo(() => {
   //   try {
@@ -146,7 +150,9 @@ export const JobPage = memo(() => {
               {!!targetJob && <JobResultReviewShort job={targetJob} />}
             </div>
           </Box>
-          <em style={{ fontSize: 'small' }}>Status: {statusText}</em>
+          {/* <em style={{ fontSize: 'small' }}>Status: {statusText}</em> */}
+
+          <div style={{ fontSize: 'small', fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.job_id}`}</div>
           
           <div
             style={{
@@ -165,7 +171,7 @@ export const JobPage = memo(() => {
         </div>
       </Grid>
 
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <Box
           sx={{
             display: 'flex',
@@ -176,6 +182,10 @@ export const JobPage = memo(() => {
           <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.job_id}`}</div>
           {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
         </Box>
+      </Grid> */}
+
+      <Grid size={12}>
+        <TotalJobChecklist />
       </Grid>
 
       <Grid size={12}>

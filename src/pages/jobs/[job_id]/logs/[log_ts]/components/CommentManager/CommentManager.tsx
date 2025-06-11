@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback, useMemo } from 'react'
-import {
-  // Box,
-  Button,
-  // Stack,
-  TextField,
-  // Typography,
-} from '@mui/material'
+import { Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import AddIcon from '@mui/icons-material/Add'
 // import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
@@ -17,9 +11,9 @@ import CloseIcon from '@mui/icons-material/Close'
 // import DeleteIcon from '@mui/icons-material/Delete'
 // import { useStyles } from './useStyles'
 import classes from './CommentManager.module.scss'
-import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import baseClasses from '~/App.module.scss'
+import { CustomizedTextField } from '~/shared/components/Input'
 
 type TProps<T> = {
   infoLabel: string;
@@ -28,27 +22,6 @@ type TProps<T> = {
   onDelete: ({ cleanup }: { cleanup: () => void }) => void;
   isEditable: boolean;
 }
-
-const CustomizedTextField = styled(TextField)({
-  // '& label.Mui-focused': {
-  //   color: 'green',
-  // },
-  // '& .MuiInput-underline:after': {
-  //   borderBottomColor: 'green',
-  // },
-  '& .MuiOutlinedInput-root': {
-    // '& fieldset': {
-    //   borderColor: 'red',
-    // },
-    // '&:hover fieldset': {
-    //   borderColor: 'yellow',
-    // },
-    // '&.Mui-focused fieldset': {
-    //   borderColor: 'green',
-    // },
-    borderRadius: '8px',
-  },
-});
 
 // type TLogLink = {
 //   id: number;

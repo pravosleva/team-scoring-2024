@@ -14,7 +14,7 @@ import {
 // import StarIcon from '@mui/icons-material/Star'
 // import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components/JobResultReviewShort'
 // import { getJobStatusText } from '~/pages/jobs/[job_id]/utils'
-import { CopyToClipboardWrapper, ResponsiveBlock } from '~/shared/components'
+import { CopyToClipboardWrapper, ResponsiveBlock, SimpleCheckList } from '~/shared/components'
 import baseClasses from '~/App.module.scss'
 import { Link, useSearchParams } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -92,6 +92,8 @@ export const LastActivityPage = memo(() => {
 
   const [urlSearchParams] = useSearchParams()
   const urlSearchParamLastSeenLog = useMemo(() => urlSearchParams.get('lastSeenLog'), [urlSearchParams])
+
+  const jobsActorRef = TopLevelContext.useActorRef()
 
   return (
     <Grid container spacing={2}>
@@ -214,6 +216,38 @@ export const LastActivityPage = memo(() => {
                         ))
                       )
                     }
+                    
+                    {
+                      !!log.checklist && log.checklist?.length > 0 && (
+                        <SimpleCheckList
+                          // _additionalInfo={{ message: 'No helpful info' }}
+                          isMiniVariant
+                          items={log.checklist || []}
+                          infoLabel='Checklist'
+                          createBtnLabel='Create checklist'
+                          isCreatable={false}
+                          isDeletable={false}
+                          isEditable={true}
+                          // onDeleteChecklist={console.info}
+                          onCreateNewChecklistItem={({ state }) => {
+                            jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
+                          }}
+                          onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                            jobsActorRef.send({
+                              type: 'todo.editChecklistItemInLog',
+                              value: {
+                                jobId: log.jobId,
+                                logTs: log.ts,
+                                checklistItemId,
+                                state,
+                              },
+                            })
+                            cleanup()
+                          }}
+                        />
+                      )
+                    }
+
                     <Link
                       to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLog=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
                       style={{

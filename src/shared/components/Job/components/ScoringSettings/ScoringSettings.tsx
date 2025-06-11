@@ -30,7 +30,7 @@ import { useTheme } from '@mui/material/styles'
 
 type TProps = {
   isActive: boolean;
-  onToggleDrawer: (isDrawlerOpened: boolean) => ({ job }: { job: TJob }) => void;
+  onToggleDrawer: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
   job: TJob;
   onSave: (ps: {
     state: TJob | null;
@@ -179,8 +179,8 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
   const handleToggle = useCallback(() => setIsOpened((s) => !s), [setIsOpened])
   
   useLayoutEffect(() => {
-    if (isOpened) onToggleDrawer(false)({ job })
-  }, [isOpened, onToggleDrawer, job])
+    if (isOpened) onToggleDrawer(false)({ jobId: job.id })
+  }, [isOpened, onToggleDrawer, job.id])
   const handleCloseModal = useCallback(() => {
     setIsOpened(false)
     return Promise.resolve({ ok: true })
@@ -494,7 +494,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           className={clsx(classes.toggler, classes.blue, { [classes.active]: isActive })}
           onClick={() => {
             // navigate(`/jobs/${job.id}`)
-            onToggleDrawer(true)({ job })
+            onToggleDrawer(true)({ jobId: job.id })
           }}
         >
           <TroubleshootIcon />

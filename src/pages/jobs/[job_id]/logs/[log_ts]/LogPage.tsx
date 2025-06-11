@@ -185,7 +185,49 @@ export const LogPage = () => {
                   handleEditLog({ text: state.text })
                 }}
               />
-              <SimpleCheckList items={[]} />
+              {
+                !!targetJob && !!targetLog && (
+                  <SimpleCheckList
+                    // _additionalInfo={{ message: 'No helpful info' }}
+                    isMiniVariant
+                    items={targetLog.checklist || []}
+                    infoLabel='Checklist'
+                    createBtnLabel='Create checklist'
+                    isCreatable
+                    isDeletable
+                    isEditable
+                    onDeleteChecklist={() => {
+                      jobsActorRef.send({ type: 'todo.deleteChecklistFromLog', value: { jobId: targetJob.id, logTs: targetLog.ts } })
+                    }}
+                    onCreateNewChecklistItem={({ state }) => {
+                      jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: targetJob.id, logTs: targetLog.ts, state } })
+                    }}
+                    onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                      jobsActorRef.send({
+                        type: 'todo.editChecklistItemInLog',
+                        value: {
+                          jobId: targetJob.id,
+                          logTs: targetLog.ts,
+                          checklistItemId,
+                          state,
+                        },
+                      })
+                      cleanup()
+                    }}
+                    onDeleteChecklistItem={({ checklistItemId, cleanup }) => {
+                      jobsActorRef.send({
+                        type: 'todo.deleteChecklistItemFromLog',
+                        value: {
+                          jobId: targetJob.id,
+                          logTs: targetLog.ts,
+                          checklistItemId,
+                        },
+                      })
+                      cleanup()
+                    }}
+                  />
+                )
+              }
             </Box>
           </Grid>
         )
