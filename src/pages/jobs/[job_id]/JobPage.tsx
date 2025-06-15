@@ -29,6 +29,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 import { TotalJobChecklist } from './components'
+import { getIsNumeric } from '~/shared/utils/number-ops'
 
 export const JobPage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -185,9 +186,16 @@ export const JobPage = memo(() => {
         </Box>
       </Grid> */}
 
-      <Grid size={12}>
-        <TotalJobChecklist key={targetJob?.ts.update} />
-      </Grid>
+      {
+        !!params.job_id && getIsNumeric(params.job_id) && (
+          <Grid size={12}>
+            <TotalJobChecklist
+              job_id={Number(params.job_id)}
+              key={targetJob?.ts.update}
+            />
+          </Grid>
+        )
+      }
 
       <Grid size={12}>
         <pre

@@ -1,15 +1,17 @@
 import { memo, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { TJob, TLogChecklistItem, TopLevelContext } from '~/shared/xstate'
 // import baseClasses from '~/App.module.scss'
 import { SimpleCheckList } from '~/shared/components'
 import dayjs from 'dayjs'
 
-export const TotalJobChecklist = memo(() => {
-  const params = useParams()
+type TProps = {
+  job_id: number;
+}
+
+export const TotalJobChecklist = memo(({ job_id }: TProps) => {
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetJob = useMemo<TJob | null>(() => jobs
-    .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
+    .filter((j) => j.id === job_id)?.[0] || null, [jobs, job_id])
 
   const targetJobTotalChecklistMaping = useMemo<{ [key: string]: { c: TLogChecklistItem[], logTs: number }}>(() =>
     !!targetJob && targetJob?.logs.items.length > 0

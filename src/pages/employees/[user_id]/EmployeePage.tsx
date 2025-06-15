@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState, useEffect, memo } from 'react'
+import { useCallback, useMemo, useState, useEffect, memo, Fragment } from 'react'
 import { useParams, useLocation, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { EJobsStatusFilter, TopLevelContext, TUser } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
-import { Box, Button, List, ListItem, ListItemButton, ListItemText, ListItemAvatar } from '@mui/material'
+import { Box, Button, ListItem, ListItemButton, ListItemText, ListItemAvatar } from '@mui/material'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import baseClasses from '~/App.module.scss'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -11,7 +11,7 @@ import { UserAva } from '~/shared/components/Job/components'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
-import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components'
+import { JobResultReviewShort, TotalJobChecklist } from '~/pages/jobs/[job_id]/components'
 import {
   SpeedsFunctionGraph,
 } from '~/shared/components'
@@ -295,47 +295,67 @@ export const EmployeePage = memo(() => {
               </Grid>
             </>
           ) : (
-            <Grid size={12}>
+            <Grid
+              size={12}
+            >
               <h2>[ Jobs ]</h2>
-              <List>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+              >
+              {/* <List
+                sx={{
+                  border: '1px solid red',
+                  gap: 1,
+                }}
+              > */}
                 {
                   targetJobs.map((job) => {
                     return (
-                      <ListItem
-                        key={job.id}
-                        disablePadding
-                        id={`job_list_item_${job.id}`}
-                      >
-                        <ListItemButton
-                          onClick={goJobPage({ id: job.id })}
-                          sx={{
-                            outline: lastSeenJobId === job.id
-                              ? '1px dashed lightgray'
-                              : 'none',
-                          }}
+                      <Fragment key={job.id}>
+                        <ListItem
+                          disablePadding
+                          id={`job_list_item_${job.id}`}
                         >
-                          <ListItemAvatar>
-                            <AutoRefreshedJobMuiAva job={job} delay={1000} />
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={
-                              <span
-                                className={baseClasses.truncate}
-                                style={{
-                                  display: 'block',
-                                }}
-                              >
-                                {job.title}
-                              </span>
-                            }
-                            secondary={<JobResultReviewShort job={job} />}
-                          />
-                        </ListItemButton>
-                      </ListItem>
+                          <ListItemButton
+                            onClick={goJobPage({ id: job.id })}
+                            sx={{
+                              outline: lastSeenJobId === job.id
+                                ? '1px dashed lightgray'
+                                : 'none',
+                            }}
+                          >
+                            <ListItemAvatar>
+                              <AutoRefreshedJobMuiAva job={job} delay={1000} />
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={
+                                <span
+                                  className={baseClasses.truncate}
+                                  style={{
+                                    display: 'block',
+                                  }}
+                                >
+                                  {job.title}
+                                </span>
+                              }
+                              secondary={<JobResultReviewShort job={job} />}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                        <TotalJobChecklist
+                          job_id={job.id}
+                          key={job?.ts.update}
+                        />
+                      </Fragment>
                     )
                   })
                 }
-              </List>
+              {/* </List> */}
+              </Box>
               {/* <pre className={baseClasses.preNormalized}>
                 {JSON.stringify({ targetJobs }, null, 2)}
               </pre> */}
