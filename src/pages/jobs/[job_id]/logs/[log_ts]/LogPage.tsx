@@ -188,6 +188,7 @@ export const LogPage = () => {
               {
                 !!targetJob && !!targetLog && (
                   <SimpleCheckList
+                    key={targetJob.ts.update}
                     // _additionalInfo={{ message: 'No helpful info' }}
                     isMiniVariant
                     items={targetLog.checklist || []}

@@ -43,7 +43,7 @@ export const LastActivityPage = memo(() => {
   // const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const allLogs = useMemo(() => sort(
-    jobs.reduce((jobsAcc: (TLogsItem & { jobId: number; jobTitle: string; logType: TLogType; jobType: TJobType; logUniqueKey: string })[], curJob: TJob) => {
+    jobs.reduce((jobsAcc: (TLogsItem & { jobId: number; jobTitle: string; logType: TLogType; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number })[], curJob: TJob) => {
       let jobType: TJobType = 'default'
       switch (true) {
         case getMatchedByAnyString({
@@ -80,7 +80,7 @@ export const LastActivityPage = memo(() => {
           default:
             break
         }
-        jobsAcc.push({ ...log, jobId: curJob.id, jobTitle: curJob.title, logType, jobType, logUniqueKey: `job-${curJob.id}-log-${log.ts}` })
+        jobsAcc.push({ ...log, jobId: curJob.id, jobTitle: curJob.title, logType, jobType, logUniqueKey: `job-${curJob.id}-log-${log.ts}`, jobTsUpdate: curJob.ts.update })
       }
       return jobsAcc
     }, []),
@@ -220,6 +220,7 @@ export const LastActivityPage = memo(() => {
                     {
                       !!log.checklist && log.checklist?.length > 0 && (
                         <SimpleCheckList
+                          key={log.jobTsUpdate}
                           // _additionalInfo={{ message: 'No helpful info' }}
                           isMiniVariant
                           items={log.checklist || []}

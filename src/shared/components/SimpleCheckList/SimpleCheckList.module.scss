@@ -75,13 +75,10 @@
 }
 
 .commentBox {
-  // height: 100%;
-  // border: 2px solid rgba(203,213,225,1);
-  border: 2px solid #959eaa;
-  // border-left-width: 4px;
-  
+  .default {
+    border: 2px solid #959eaa;
+  }
   padding: 24px 16px 16px 16px;
-
   display: flex;
   flex-direction: column;
   min-height: 52px;
@@ -90,13 +87,12 @@
   font-size: small;
 }
 .commentBoxMini {
-  // height: 100%;
-  // border: 2px solid rgba(203,213,225,1);
-  border: 2px solid #959eaa;
-  // border-left-width: 4px;
-  
-  // padding: 8px 8px 16px 8px;
-
+  &.default {
+    border: 2px solid #959eaa;
+  }
+  &.success {
+    border: 2px solid #7fd1ae;
+  }
   display: flex;
   flex-direction: column;
   min-height: 52px;
@@ -115,7 +111,8 @@
   & > .absoluteBadgeTopRight {
     border-radius: 0 10px 0 16px;
   }
-  & > .absoluteBadgeBottomLeft {
+  & > .absoluteBadgeBottomLeft,
+  & > .absoluteBadgeBottomLeftSuccess {
     border-radius: 0 16px 0 10px;
   }
 }
@@ -144,7 +141,12 @@
   bottom: 0px;
   left: 0px;
   // background-color: rgb(203, 213, 225);
-  background-color: #959eaa;
+  &.default {
+    background-color: #959eaa;
+  }
+  &.success {
+    background-color: #7fd1ae;
+  }
   color: #fff;
   // ...
   padding: 2px 16px 0px 16px;

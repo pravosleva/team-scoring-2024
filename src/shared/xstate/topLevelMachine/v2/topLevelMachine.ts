@@ -247,7 +247,7 @@ export const topLevelMachine = setup({
             return context.jobs
           }
 
-          const updateTs = new Date().getTime()
+          const tsUpdate = new Date().getTime()
           
           return {
             ...context.jobs,
@@ -299,8 +299,8 @@ export const topLevelMachine = setup({
 
                           // console.log(`UPD: checklistItem.isDone -> ${checklistItem.isDone} (event.value.state.isDone === ${event.value.state.isDone})`)
 
-                          checklistItem.ts.updatedAt = updateTs
-                          todo.ts.update = updateTs
+                          checklistItem.ts.updatedAt = tsUpdate
+                          todo.ts.update = tsUpdate
 
                           return checklistItem
                         }
@@ -325,6 +325,8 @@ export const topLevelMachine = setup({
           if (!targetJob) {
             return context.jobs
           }
+
+          const tsUpdate = new Date().getTime()
           
           return {
             ...context.jobs,
@@ -364,8 +366,7 @@ export const topLevelMachine = setup({
                     // if (!log.checklist) log.checklist = []
                     delete log.checklist
 
-                    const updateTs = new Date().getTime()
-                    todo.ts.update = updateTs
+                    todo.ts.update = tsUpdate
                   }
                   return log
                 })
@@ -383,6 +384,8 @@ export const topLevelMachine = setup({
           if (!targetJob) {
             return context.jobs
           }
+
+          const tsUpdate = new Date().getTime()
           
           return {
             ...context.jobs,
@@ -393,8 +396,7 @@ export const topLevelMachine = setup({
                     log.checklist = log.checklist?.filter(({ id }) => id !== event.value.checklistItemId) || []
                     if (log.checklist.length === 0) delete log.checklist
 
-                    const updateTs = new Date().getTime()
-                    todo.ts.update = updateTs
+                    todo.ts.update = tsUpdate
                   }
                   return log
                 })

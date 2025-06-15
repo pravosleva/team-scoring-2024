@@ -96,8 +96,9 @@ export const JobPage = memo(() => {
     <Grid container spacing={2}>
       <Grid
         size={12}
+        className={baseClasses.boxShadowBottom}
         sx={{
-          borderBottom: '1px solid lightgray',
+          // borderBottom: '1px solid lightgray',
           position: 'sticky',
           top: 0,
           backgroundColor: '#fff',
@@ -185,7 +186,7 @@ export const JobPage = memo(() => {
       </Grid> */}
 
       <Grid size={12}>
-        <TotalJobChecklist />
+        <TotalJobChecklist key={targetJob?.ts.update} />
       </Grid>
 
       <Grid size={12}>

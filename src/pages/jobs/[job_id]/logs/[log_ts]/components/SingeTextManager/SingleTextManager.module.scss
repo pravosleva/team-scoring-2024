@@ -13,22 +13,29 @@
   position: relative;
   font-weight: bold;
   font-size: small;
+
+  .absoluteBadgeRight {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    // background-color: rgb(203, 213, 225);
+    background-color: #959eaa;
+    color: #fff;
+    border-radius: 0 10px 0 16px;
+    padding: 0px 16px 2px 16px;
+    font-size: 12px;
+    line-height: 1.5em;
+    font-weight: bold;
+  }
+}
+.isDoneChecklist {
+  border: 2px solid #7fd1ae;
+  .absoluteBadgeRight {
+    background-color: #7fd1ae;
+  }
 }
 .editableCommentBox {
   padding: 24px 16px 48px 16px;
-}
-.absoluteBadgeRight {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  // background-color: rgb(203, 213, 225);
-  background-color: #959eaa;
-  color: #fff;
-  border-radius: 0 10px 0 16px;
-  padding: 0px 16px 2px 16px;
-  font-size: 12px;
-  line-height: 1.5em;
-  font-weight: bold;
 }
 .absoluteControls {
   position: absolute;

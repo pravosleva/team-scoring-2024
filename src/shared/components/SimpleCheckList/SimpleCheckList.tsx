@@ -220,6 +220,10 @@ function SimpleCheckListFn<TAddInfo>({
     }
   }, [handleCleanup, onDeleteChecklistItem, _additionalInfo])
 
+  const hasNotActiveItems = useMemo(() => {
+    return !items.some(({ isDone, isDisabled }) => !isDone && !isDisabled)
+  }, [items])
+
   return (
     <>
       {
@@ -285,6 +289,8 @@ function SimpleCheckListFn<TAddInfo>({
                     {
                       [classes.commentBox]: !isMiniVariant,
                       [classes.commentBoxMini]: isMiniVariant,
+                      [classes.default]: !hasNotActiveItems,
+                      [classes.success]: hasNotActiveItems,
                       [classes.editableCommentBox]: isEditable && !isMiniVariant,
                       [classes.editableCommentBoxMini]: isEditable && isMiniVariant,
                       [classes.rounded]: !connectedOnThe,
@@ -295,6 +301,8 @@ function SimpleCheckListFn<TAddInfo>({
                   <div className={clsx({
                     [classes.absoluteBadgeTopRight]: !isMiniVariant,
                     [classes.absoluteBadgeBottomLeft]: isMiniVariant,
+                    [classes.default]: !hasNotActiveItems,
+                    [classes.success]: hasNotActiveItems,
                   })}>
                     {infoLabel}
                   </div>
@@ -332,10 +340,10 @@ function SimpleCheckListFn<TAddInfo>({
                               })}
                             >
                               {
-                                checklistItem.isDone && <CheckBoxIcon htmlColor='#959eaa' />
+                                checklistItem.isDone && <CheckBoxIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#7fd1ae'} />
                               }
                               {
-                                !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor='#959eaa' />
+                                !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#7fd1ae'} />
                               }
                             </button>
 
