@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo, useState, useEffect, memo } from 'react'
 import { useParams, useLocation, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { EJobsStatusFilter, TopLevelContext, TUser } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
@@ -21,7 +21,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 
-export const EmployeePage = () => {
+export const EmployeePage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
   // const { send } = todosActorRef
   const [urlSearchParams] = useSearchParams()
@@ -367,4 +367,4 @@ export const EmployeePage = () => {
       </Grid>
     </>
   )
-}
+})

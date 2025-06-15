@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { memo, useState, useCallback, useMemo } from 'react'
+import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import classes from './SimpleCheckList.module.scss'
 import { TLogChecklistItem } from '~/shared/xstate';
 import { Button } from '@mui/material'
@@ -62,34 +62,22 @@ function SimpleCheckListFn<TAddInfo>({
   onDeleteChecklistItem,
   _additionalInfo,
 }: TProps<{ title: string; descr: string }, TAddInfo>) {
-  // return (
-  //   <div className={classes.wrapper}>
-  //     <div className={classes.itemWrapper}>
-  //       [ Add check list item btn ]
-  //     </div>
-  //     {
-  //       items.length > 0 && (
-  //         items.map((item) => (
-  //           <div className={classes.itemWrapper}>
-  //             Item {item.label}
-  //           </div>
-  //         ))
-  //       )
-  //     }
-  //     {
-  //       items.length === 0 && (
-  //         <div>
-  //           No items yet
-  //         </div>
-  //       )
-  //     }
-  //   </div>
-  // )
-
+  const editFormRef = useRef<HTMLDivElement>(null)
+  const scrollIntoViewFnRef = useRef(() => {
+    if (!!editFormRef?.current) editFormRef?.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  })
+  
   const [newLabel, setNewLabel] = useState<string>('')
   const [newDescr, setNewDescr] = useState<string>('')
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
+  useEffect(() => {
+    if (isEditMode)
+      setTimeout(scrollIntoViewFnRef.current, 500)
+  }, [isEditMode])
   const handleEditToggle = useCallback(() => {
     setIsEditMode((s) => !s)
   }, [])
@@ -228,7 +216,7 @@ function SimpleCheckListFn<TAddInfo>({
     <>
       {
         isEditMode ? (
-          <Grid container spacing={2}>
+          <Grid container spacing={2} ref={editFormRef}>
             <Grid size={12}>
               <CustomizedTextField
                 size='small'
