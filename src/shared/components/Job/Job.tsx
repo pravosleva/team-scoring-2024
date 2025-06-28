@@ -9,7 +9,7 @@ import { TopLevelContext, TJob } from '~/shared/xstate'
 import { ScoringSettings } from './components'
 import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Rating } from '@mui/material'
 import { AutoRefreshedJobMuiAva } from './utils'
-import classes from './Job.module.scss'
+// import classes from './Job.module.scss'
 import clsx from 'clsx'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
@@ -139,15 +139,14 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
               onClick={handleToggleOpenProject}
               sx={{
                 borderRadius: 2,
-                outline: isActive
-                ? '1px solid #c9d4e2'
-                : isLastSeen
-                  ? '1px dashed lightgray'
-                  : 'none',
-                backgroundColor: isActive
+                // outline: isActive
+                // ? '1px solid #c9d4e2'
+                // : isLastSeen
+                //   ? '1px dashed lightgray'
+                //   : 'none',
+                backgroundColor: isLastSeen
                   ? '#f7f5fa'
                   : 'inherit',
-
                 // ':active': {
                 //   // outline: '2px solid black',
                 //   transform: 'rotate(1deg)',
@@ -158,8 +157,9 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                 // },
               }}
               className={clsx({
-                [classes.isLastSeen]: isLastSeen,
-                [classes.isActive]: isActive,
+                // [classes.isLastSeen]: isLastSeen,
+                // [classes.isActive]: isActive,
+                [baseClasses.stripedGrayLite]: isActive,
               })}
             >
               <ListItemAvatar>
@@ -173,6 +173,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                     className={baseClasses.truncate}
                     style={{
                       display: 'block',
+                      fontSize: 'small',
                     }}
                   >
                     {job.title}

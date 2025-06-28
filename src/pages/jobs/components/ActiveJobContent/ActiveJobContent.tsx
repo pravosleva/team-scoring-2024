@@ -406,53 +406,6 @@ export const ActiveJobContent = memo(({
           <h2>[ Active job info ]</h2>
         </ResponsiveBlock>
 
-        {/*
-          Object.keys(allChecklistItems).length > 0 && (
-            <ResponsiveBlock
-              style={{
-                padding: '16px 16px 16px 16px',
-              }}
-            >
-              <h3 id='linkBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                <span>[ All checklist items: {Object.keys(allChecklistItems).length}</span>
-                <ChecklistIcon />
-                <span>]</span>
-              </h3>
-              <SimpleCheckList
-                key={job.ts.update}
-                _additionalInfo={{
-                  _message: 'Helpful info example',
-                  jobId: job.id,
-                  // logTsToChecklistIdMapping,
-                }}
-                items={allChecklistItems}
-                infoLabel='Checklist'
-                createBtnLabel='Create checklist'
-                isCreatable={false}
-                isDeletable={false}
-                isEditable={true}
-                // onDeleteChecklist={console.info}
-                // onCreateNewChecklistItem={({ state }) => {
-                //   console.log('- wip CREATE: ActiveJobContent')
-                //   console.log(state)
-                //   // jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
-                // }}
-                onEditChecklistItem={handleEditChecklistItem}
-              />
-
-              <pre
-                key={job.ts.update}
-                style={{
-                  // fontSize: '13px',
-                  // maxHeight: '150px',
-                  // backgroundColor: 'lightgray',
-                }}
-                className={baseClasses.preNormalized}
-              >{JSON.stringify(allChecklistItems, null, 2)}</pre>
-            </ResponsiveBlock>
-          )
-        */}
-
         {
           linksFromLogs.length > 0 && (
             <ResponsiveBlock
@@ -519,7 +472,16 @@ export const ActiveJobContent = memo(({
         {
           !!job.forecast.assignedTo && (
             <Link
-              to={`/employees/${job.forecast.assignedTo}?lastSeenJob=${job.id}`}
+              to={
+                [
+                  `/employees/${job.forecast.assignedTo}`,
+                  '?',
+                  [
+                    `lastSeenJob=${job.id}`,
+                    `from=${encodeURIComponent(`/jobs?lastSeenJob=${job.id}&backActionUiText=Jobs`)}`
+                  ].join('&'),
+                ].join('')
+              }
               target='_self'
             >
               <Button
@@ -528,7 +490,7 @@ export const ActiveJobContent = memo(({
                 fullWidth
                 // className={baseClasses.truncate}
               >
-                {getTruncated(activeJobEmployee?.displayName || 'Employee', 10)}
+                {getTruncated(activeJobEmployee?.displayName || 'Employee', 11)}
               </Button>
             </Link>
           )

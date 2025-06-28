@@ -36,7 +36,7 @@ import lastActivityPageClasses from './LastActivityPage.module.scss'
 // --
 
 type TJobType = 'default' | 'globalTag'
-type TLogType = 'default' | 'forSpeech' | 'hasLocalSuccess'
+type TLogType = 'default' | 'forSpeech' | 'hasLocalSuccess' | 'hasLocalImportant'
 
 export const LastActivityPage = memo(() => {
   // const params = useParams()
@@ -77,6 +77,12 @@ export const LastActivityPage = memo(() => {
             }):
             logType = 'hasLocalSuccess'
             break
+          case getMatchedByAnyString({
+              tested: log.text,
+              expected: ['☝️'],
+            }):
+            logType = 'hasLocalImportant'
+            break
           default:
             break
         }
@@ -91,7 +97,8 @@ export const LastActivityPage = memo(() => {
   // const jobsActorRef = TopLevelContext.useActorRef()
 
   const [urlSearchParams] = useSearchParams()
-  const urlSearchParamLastSeenLog = useMemo(() => urlSearchParams.get('lastSeenLog'), [urlSearchParams])
+  const urlSearchParamLastSeenLog = useMemo(() => urlSearchParams.get('lastSeenLogKey'), [urlSearchParams])
+  const urlSearchParamLastSeenJob = useMemo(() => urlSearchParams.get('lastSeenJob'), [urlSearchParams])
 
   const jobsActorRef = TopLevelContext.useActorRef()
 
@@ -150,8 +157,12 @@ export const LastActivityPage = memo(() => {
                         // NOTE: LOG TYPE
                         // bg
                         // [baseClasses.stripedYellow]: log.logType === 'forSpeech',
-                        [lastActivityPageClasses.whiteColor]: log.logType === 'hasLocalSuccess' || log.jobType === 'globalTag',
+                        [lastActivityPageClasses.whiteColor]:
+                          log.logType === 'hasLocalSuccess'
+                          || log.jobType === 'globalTag'
+                          || log.logType === 'hasLocalImportant',
                         [baseClasses.stripedGreenHard]: log.logType === 'hasLocalSuccess',
+                        [baseClasses.stripedYellowLite4]: log.logType === 'hasLocalImportant',
                         // outline, color
                         [lastActivityPageClasses.redSolidBorder]: log.logType === 'forSpeech',
 
@@ -190,8 +201,26 @@ export const LastActivityPage = memo(() => {
                         <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a> */}
                         {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
                         <Link
-                          to={`/jobs/${log.jobId}/logs/${log.ts}?from=${encodeURIComponent(`/last-activity?lastSeenLog=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
-                        >LOG PAGE ➡️</Link>
+                          to={
+                            [
+                              `/jobs/${log.jobId}/logs/${log.ts}`,
+                              '?',
+                              [
+                                `from=${encodeURIComponent(
+                                  [
+                                    '/last-activity',
+                                    '?',
+                                    [
+                                      `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                      `lastSeenJob=${log.jobId}`,
+                                    ].join('&')
+                                  ].join('')
+                                )}`,
+                                `backActionUiText=${encodeURIComponent('Last activity')}`,
+                              ].join('&')
+                            ].join('')
+                          }
+                        >EDIT LOG ➡️</Link>
                       </span>
                     </em>
                     <div
@@ -250,7 +279,26 @@ export const LastActivityPage = memo(() => {
                     }
 
                     <Link
-                      to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLog=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
+                      // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
+                      to={
+                        [
+                          `/jobs/${log.jobId}`,
+                          '?',
+                          [
+                            `from=${encodeURIComponent(
+                              [
+                                '/last-activity',
+                                '?',
+                                [
+                                  `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                  `lastSeenJob=${log.jobId}`,
+                                ].join('&')
+                              ].join('')
+                            )}`,
+                            `backActionUiText=${encodeURIComponent('Last activity')}`,
+                          ].join('&')
+                        ].join('')
+                      }
                       style={{
                         wordBreak: 'break-word',
                         fontSize: 'small',
@@ -325,13 +373,14 @@ export const LastActivityPage = memo(() => {
         size={12}
         sx={{
           position: 'sticky',
-          bottom: 0,
+          bottom: '16px',
           backgroundColor: '#fff',
           zIndex: 3,
           marginTop: 'auto',
-          borderRadius: '16px 16px 0px 0px',
+          borderRadius: '16px',
           // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
           boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+          marginBottom: '16px',
         }}
       >
         <ResponsiveBlock
@@ -355,16 +404,21 @@ export const LastActivityPage = memo(() => {
                   fullWidth
                   // className={baseClasses.truncate}
                 >
-                  {getTruncated(targetUser?.displayName || 'Employee', 10)}
+                  {getTruncated(targetUser?.displayName || 'Employee', 11)}
                 </Button>
               </Link>
             )
           */}
           <Link
-            to='/jobs'
+            to={`/jobs${!!urlSearchParamLastSeenJob ? `?lastSeenJob=${urlSearchParamLastSeenJob}` : ''}`}
             target='_self'
           >
-            <Button color='gray' variant='outlined' startIcon={<ArrowBack />} fullWidth>
+            <Button
+              color={!!urlSearchParamLastSeenJob ? 'primary' : 'gray'}
+              variant='outlined'
+              startIcon={<ArrowBack />}
+              fullWidth
+            >
               Jobs
             </Button>
           </Link>

@@ -255,7 +255,7 @@ export const BusinessTime = () => {
                     top: '0px',
                     bgcolor: 'background.paper',
                     borderBottom: '1px solid lightgray',
-                    zIndex: 1,
+                    zIndex: 2,
                   }}
                 >
                   {

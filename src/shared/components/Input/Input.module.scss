@@ -1,5 +1,5 @@
-@import '~/shared/components/scss-vars/colors.scss';
-@import '~/shared/components/scss-vars/common.scss';
+@use '~/shared/components/scss-vars/colors.scss' as *;
+@use '~/shared/components/scss-vars/common.scss' as *;
 
 .spInput {
   // &[type="date"]:invalid + span::after

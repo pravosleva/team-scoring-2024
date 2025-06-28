@@ -52,7 +52,7 @@ export const LogPage = () => {
   const jobsActorRef = TopLevelContext.useActorRef()
 
   const handleEditLog = useCallback(({ text }: { text: string; }) => {
-    if (!!targetJob && !!targetLog) {
+    if (!!targetJob?.id && !!targetLog) {
       jobsActorRef.send({
         type: 'todo.editLog',
         value: {
@@ -73,7 +73,7 @@ export const LogPage = () => {
           position: 'sticky',
           top: 0,
           backgroundColor: '#fff',
-          zIndex: 1,
+          zIndex: 2,
           pt: 2,
           pb: 2,
         }}
@@ -248,8 +248,6 @@ export const LogPage = () => {
                 descr: '',
               }}
               onSuccess={(arg) => {
-                // console.log(`-> save first link for log ${params.log_ts} in job ${params.job_id}`)
-                // console.log(arg)
                 jobsActorRef.send({ type: 'todo.addLinkToLog', value: { jobId: targetJob.id, logTs: targetLog.ts, state: arg.state } })
                 arg.cleanup()
               }}
@@ -298,8 +296,6 @@ export const LogPage = () => {
                     descr: link.descr,
                   }}
                   onSuccess={({ state }) => {
-                    // console.log(`-> save target link id=${link.id} for log ts=${params.log_ts} in job id=${params.job_id}`)
-                    // console.log(arg)
                     jobsActorRef.send({ type: 'todo.editLinkInLog', value: { jobId: targetJob.id, logTs: targetLog.ts, linkId: link.id, state } })
                   }}
                   onDelete={() => {
@@ -315,11 +311,6 @@ export const LogPage = () => {
 
       <Grid size={12}>
         <pre
-          style={{
-            // fontSize: '13px',
-            // maxHeight: '150px',
-            // backgroundColor: 'lightgray',
-          }}
           className={baseClasses.preNormalized}
         >{JSON.stringify({ userRouteControls, params }, null, 2)}</pre>
       </Grid>
@@ -366,7 +357,8 @@ export const LogPage = () => {
                 )
               */}
               {
-                !!userRouteControls.from && (
+                !!userRouteControls.from
+                ? (
                   <Link
                     to={userRouteControls.from.value}
                     target='_self'
@@ -376,14 +368,12 @@ export const LogPage = () => {
                     </Button>
                   </Link>
                 )
-              }
-              {
-                !userRouteControls.from && (
+                : (
                   <Link
                     to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
                     target='_self'
                   >
-                    <Button variant='outlined' startIcon={<ArrowBack />} fullWidth>
+                    <Button color={!!targetJob ? 'primary' : 'gray'} variant='outlined' startIcon={<ArrowBack />} fullWidth>
                       Jobs
                     </Button>
                   </Link>
@@ -395,7 +385,10 @@ export const LogPage = () => {
                   <Link
                     to={
                       `/jobs/${targetJob.id}?from=${
-                        encodeURIComponent(`/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenLog=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`)
+                        encodeURIComponent(
+                          `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
+                          // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
+                        )
                       }&backActionUiText=${
                         encodeURIComponent('Log page')
                       }`
@@ -404,7 +397,7 @@ export const LogPage = () => {
                   >
                     <Button
                       variant='outlined'
-                      color='primary'
+                      color='salmon'
                       endIcon={<ArrowForwardIcon />}
                       fullWidth
                     >

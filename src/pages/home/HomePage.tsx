@@ -7,6 +7,11 @@ import baseClasses from '~/App.module.scss'
 import { ResponsiveBlock } from '~/shared/components'
 import classes from './HomePage.module.scss'
 import clsx from 'clsx'
+import ConstructionIcon from '@mui/icons-material/Construction'
+import GroupIcon from '@mui/icons-material/Group'
+import InfoIcon from '@mui/icons-material/Info'
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
+import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 
 export const HomePage = () => {
   return (
@@ -25,14 +30,16 @@ export const HomePage = () => {
             )}
           >
             <Link
-              to='/jobs'
+              to='/last-activity'
               style={{
                 display: 'block',
               }}
             >
               <div className={classes.gridItem}>
-                <div className={classes.title}>Jobs</div>
-                <em className={classes.descr}>You can create jobs and take timing analysis</em>
+                <SportsBasketballIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Last activity</div>
+                </div>
               </div>
             </Link>
             <Link
@@ -42,8 +49,25 @@ export const HomePage = () => {
               }}
             >
               <div className={classes.gridItem}>
-                <div className={classes.title}>Employees</div>
-                <em className={classes.descr}>All users</em>
+                <GroupIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Employees</div>
+                  <em className={classes.descr}>All users</em>
+                </div>
+              </div>
+            </Link>
+            <Link
+              to='/jobs'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <ConstructionIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Jobs</div>
+                  <em className={classes.descr}>You can create jobs and take timing analysis</em>
+                </div>
               </div>
             </Link>
             <Link
@@ -53,7 +77,10 @@ export const HomePage = () => {
               }}
             >
               <div className={classes.gridItem}>
-                <div className={classes.title}>About</div>
+                <InfoIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>About</div>
+                </div>
               </div>
             </Link>
             <Link
@@ -63,18 +90,11 @@ export const HomePage = () => {
               }}
             >
               <div className={classes.gridItem}>
-                <div className={classes.title}>⚙️ Business time</div>
-                <em className={classes.descr}>Local settings (experimental)</em>
-              </div>
-            </Link>
-            <Link
-              to='/last-activity'
-              style={{
-                display: 'block',
-              }}
-            >
-              <div className={classes.gridItem}>
-                <div className={classes.title}>Last activity</div>
+                <WorkHistoryIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Business time</div>
+                  <em className={classes.descr}>Local settings (experimental)</em>
+                </div>
               </div>
             </Link>
           </ResponsiveBlock>

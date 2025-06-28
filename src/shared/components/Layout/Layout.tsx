@@ -4,7 +4,7 @@ import SpeedDial from '@mui/material/SpeedDial'
 import SpeedDialAction from '@mui/material/SpeedDialAction'
 import { Link } from 'react-router-dom'
 // import PlaylistAddCheckCircleIcon from '@mui/icons-material/PlaylistAddCheckCircle'
-import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay'
+// import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay'
 import PeopleIcon from '@mui/icons-material/People'
 import classes from './Layout.module.scss'
 import { useLocation } from 'react-router-dom'
@@ -28,19 +28,19 @@ type TSpeedDialMenuItem = {
 
 const allActions: TSpeedDialMenuItem[] = [
   {
-    to: '/jobs',
-    _Icon: <PlaylistPlayIcon color='primary' />,
-    name: 'Jobs',
+    to: '/',
+    _Icon: <AppsIcon color='primary' />,
+    name: 'Home',
   },
+  // {
+  //   to: '/jobs',
+  //   _Icon: <PlaylistPlayIcon color='primary' />,
+  //   name: 'Jobs',
+  // },
   {
     to: '/employees',
     _Icon: <PeopleIcon color='primary' />,
     name: 'Employees',
-  },
-  {
-    to: '/',
-    _Icon: <AppsIcon color='primary' />,
-    name: 'Home',
   },
   {
     to: '/last-activity',

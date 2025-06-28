@@ -2,24 +2,13 @@ import React, { memo, useMemo } from 'react'
 import Grid from '@mui/material/Grid2'
 import baseClasses from '~/App.module.scss'
 import { TJob } from '~/shared/xstate'
-import { linear } from 'math-interpolate'
+import { getPercentage } from '~/shared/utils/number-ops'
 import { getDoneTimeDiff } from '~/shared/components/Job/utils/getDoneTimeDiff'
 import { Link } from 'react-router-dom'
 import { getJobStatus } from '~/shared/components/Job/utils/getJobStatus'
 // import { getModifiedJobLogText } from '~/pages/jobs/[id]/utils/getModifiedJobLogText'
 import { JobTimingInfo } from './components'
 import dayjs from 'dayjs'
-
-const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
-  const result = linear({
-    x1: 0,
-    y1: 0,
-    x2: sum,
-    y2: 100,
-    x: x,
-  })
-  return Number(result.toFixed(0))
-}
 
 type TProps = {
   jobs: TJob[];

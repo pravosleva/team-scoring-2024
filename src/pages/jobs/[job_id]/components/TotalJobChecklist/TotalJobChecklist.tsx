@@ -42,7 +42,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       {
         !!targetJob && Object.keys(targetJobTotalChecklistMaping).map((checklistKey, i) => (
           <SimpleCheckList
-            key={`${checklistKey}-${i}`}
+            key={`${checklistKey}-${i}-${targetJob?.ts.update || 'no_target_job'}`}
             // _additionalInfo={{ message: 'No helpful info' }}
             isMiniVariant
             items={targetJobTotalChecklistMaping[checklistKey].c}

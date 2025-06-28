@@ -81,7 +81,7 @@ export const JobList = memo(({ onToggleDrawer, activeJobId }: TProps) => {
           position: 'sticky',
           top: 0,
           backgroundColor: '#fff',
-          zIndex: 1,
+          zIndex: 2,
           pb: 2,
         }}
       >

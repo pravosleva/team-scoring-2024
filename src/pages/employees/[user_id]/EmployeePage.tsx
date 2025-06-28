@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, memo, Fragment } from 'react'
 import { useParams, useLocation, useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { EJobsStatusFilter, TopLevelContext, TUser } from '~/shared/xstate'
+import { EJobsStatusFilter, TJob, TopLevelContext, TUser } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
 import { Box, Button, ListItem, ListItemButton, ListItemText, ListItemAvatar } from '@mui/material'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
@@ -11,8 +11,9 @@ import { UserAva } from '~/shared/components/Job/components'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
-import { JobResultReviewShort, TotalJobChecklist } from '~/pages/jobs/[job_id]/components'
+import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components'
 import {
+  ResponsiveBlock,
   SpeedsFunctionGraph,
 } from '~/shared/components'
 import HiveIcon from '@mui/icons-material/Hive'
@@ -20,6 +21,11 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
+import { sort } from '~/shared/utils/object-ops/sort-array-objects@3.0.0'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+// import { CollapsibleJobInfoAndButton } from './components'
+import { getTruncated } from '~/shared/utils/string-ops'
 
 export const EmployeePage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -41,24 +47,62 @@ export const EmployeePage = memo(() => {
   // const targetJobs = useMemo(() => {
   //   return !!targetUser ? jobs.filter(({ forecast }) => forecast.assignedTo === targetUser.id) : []
   // }, [jobs, targetUser])
-  const [targetJobs] = useParamsInspectorContextStore((ctx) => ctx.filteredJobs)
-  const jobsForAnalysis = useMemo(() => targetJobs
+  const [filteredJobs] = useParamsInspectorContextStore((ctx) => ctx.filteredJobs)
+  const sortedJobs = useMemo<(TJob & { tsUpdate: number })[]>(() => {
+    return sort(
+      filteredJobs.map((job) => ({ ...job, tsUpdate: job.ts.update })),
+      ['tsUpdate'],
+      -1
+    )
+  }, [filteredJobs])
+  const jobsForAnalysis = useMemo(() => sortedJobs
     .filter(({ forecast }) =>
       forecast.estimate
       && forecast.start
       && forecast.finish
-    ), [targetJobs])
+    ), [sortedJobs])
   const navigate = useNavigate()
-  const goJobPage = useCallback(({ id }: { id: number }) => () => {
-    navigate(`/jobs/${id}`)
-  }, [navigate])
+  const goJobPage = useCallback(({ id }: { id: number; }) => () => {
+    // navigate(`/jobs/${id}?from=${
+    //   encodeURIComponent(`/employees${!!targetUser ? `/${targetUser.id}` : ''}?to=/jobs/${id}&lastSeenJob=${id}&forwardActionUiText=Job&from=/jobs&backActionUiText=Jobs&lastSeenJob=${id}`)
+    // }&backActionUiText=${
+    //   encodeURIComponent(!!targetUser ? targetUser.displayName : 'Employees')
+    // }`)
+    navigate([
+      `/jobs/${id}`,
+      '?',
+      [
+        `from=${encodeURIComponent(
+          [
+            '/employees',
+            !!targetUser ? `/${targetUser.id}` : '',
+            '?',
+            [
+              `to=/jobs/${id}`,
+              'forwardActionUiText=Job',
+              // 'from=/jobs',
+              // 'backActionUiText=Jobs',
+              `lastSeenJob=${id}`,
+            ].join('&')
+          ].join('')
+        )}`,
+        `backActionUiText=${encodeURIComponent(
+          !!targetUser
+          ? targetUser.displayName
+          : 'Employees'
+        )}`
+      ].join('&')
+    ].join(''))
+  }, [navigate, targetUser])
   const goUserPage = useCallback(() => {
     navigate(`/employees/${targetUser?.id}`)
   }, [navigate, targetUser])
+
   const [employeesCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.employees)
   const targetUserCounters = useMemo(() => !!targetUser ? employeesCounters[String(targetUser.id)] : null, [targetUser, employeesCounters])
   const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
 
+  const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
   return (
     <>
       <Grid
@@ -75,7 +119,7 @@ export const EmployeePage = memo(() => {
             position: 'sticky',
             top: 0,
             backgroundColor: '#fff',
-            zIndex: 1,
+            zIndex: 2,
             pt: 2,
             pb: 2,
           }}
@@ -282,7 +326,7 @@ export const EmployeePage = memo(() => {
         }
 
         {
-          targetJobs.length === 0
+          sortedJobs.length === 0
           ? (
             <>
               <Grid size={12}>
@@ -290,7 +334,7 @@ export const EmployeePage = memo(() => {
               </Grid>
               <Grid size={12}>
                 <pre className={baseClasses.preNormalized}>
-                  {JSON.stringify({ jobs, targetJobs }, null, 2)}
+                  {JSON.stringify({ jobs, sortedJobs }, null, 2)}
                 </pre>
               </Grid>
             </>
@@ -313,7 +357,7 @@ export const EmployeePage = memo(() => {
                 }}
               > */}
                 {
-                  targetJobs.map((job) => {
+                  sortedJobs.map((job) => {
                     return (
                       <Fragment key={job.id}>
                         <ListItem
@@ -323,9 +367,10 @@ export const EmployeePage = memo(() => {
                           <ListItemButton
                             onClick={goJobPage({ id: job.id })}
                             sx={{
-                              outline: lastSeenJobId === job.id
-                                ? '1px dashed lightgray'
-                                : 'none',
+                              borderRadius: 2,
+                              backgroundColor: lastSeenJobId === job.id
+                                ? '#f7f5fa'
+                                : 'inherit',
                             }}
                           >
                             <ListItemAvatar>
@@ -334,9 +379,10 @@ export const EmployeePage = memo(() => {
                             <ListItemText
                               primary={
                                 <span
-                                  className={baseClasses.truncate}
+                                  // className={baseClasses.truncate}
                                   style={{
                                     display: 'block',
+                                    fontSize: 'small',
                                   }}
                                 >
                                   {job.title}
@@ -346,10 +392,9 @@ export const EmployeePage = memo(() => {
                             />
                           </ListItemButton>
                         </ListItem>
-                        <TotalJobChecklist
-                          job_id={job.id}
-                          key={job?.ts.update}
-                        />
+                        {/* <CollapsibleJobInfoAndButton
+                          jobId={job.id}
+                        /> */}
                       </Fragment>
                     )
                   })
@@ -385,6 +430,60 @@ export const EmployeePage = memo(() => {
           </pre>
         </Grid>
       </Grid>
+
+      {
+        (!!userRouteControls.from || !!userRouteControls.to) && (
+          <ResponsiveBlock
+            className={baseClasses.specialActionsGrid}
+            style={{
+              padding: '16px 0 16px 0',
+              position: 'sticky',
+              bottom: 0,
+              backgroundColor: '#fff',
+              zIndex: 1,
+              marginTop: 'auto',
+              boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+            }}
+          >
+            {
+              !!userRouteControls.from && (
+                <Link
+                  to={userRouteControls.from.value}
+                  target='_self'
+                >
+                  <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
+                    {getTruncated(userRouteControls.from.uiText, 11)}
+                  </Button>
+                </Link>
+              )
+            }
+            {
+              !userRouteControls.from && (
+                <Link
+                  to={`/jobs${!!lastSeenJobId ? `?lastSeenJob=${lastSeenJobId}` : ''}`}
+                  target='_self'
+                >
+                  <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
+                    Jobs
+                  </Button>
+                </Link>
+              )
+            }
+            {
+              !!userRouteControls.to && (
+                <Link
+                  to={userRouteControls.to.value}
+                  target='_self'
+                >
+                  <Button variant='outlined' endIcon={<ArrowForwardIcon />} fullWidth>
+                    {getTruncated(userRouteControls.to.uiText, 11)}
+                  </Button>
+                </Link>
+              )
+            }
+          </ResponsiveBlock>
+        )
+      }
     </>
   )
 })

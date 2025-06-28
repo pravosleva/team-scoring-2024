@@ -261,7 +261,7 @@ const Logic = ({ children }: TProps) => {
                 case 0:
                   activeFilters.values.estimateReached = normalizedValue
                   if (!isReached) jobIsReady.push(true)
-                    else jobIsReady.push(false)
+                  else jobIsReady.push(false)
                   break
                 default:
                   break

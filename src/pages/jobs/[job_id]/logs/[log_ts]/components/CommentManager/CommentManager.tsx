@@ -118,7 +118,7 @@ export const CommentManager: React.FC<TProps<{ url: string; descr: string; title
                 value={title}
                 fullWidth
                 variant='outlined'
-                label='Tttle'
+                label='Title'
                 type='text'
                 onChange={handleChangeTitle}
                 // multiline
@@ -139,7 +139,7 @@ export const CommentManager: React.FC<TProps<{ url: string; descr: string; title
                 type='text'
                 onChange={handleChangeDescr}
                 multiline
-                maxRows={5}
+                maxRows={7}
                 // sx={{
                 //   borderRadius: '8px',
                 // }}
@@ -150,7 +150,7 @@ export const CommentManager: React.FC<TProps<{ url: string; descr: string; title
               <Button
                 // size='small'
                 fullWidth
-                disabled={!hasUpdated || title.length > 200 || descr.length > 1000 || url.length > 1000}
+                disabled={!hasUpdated || title.length > 500 || descr.length > 2000 || url.length > 2000}
                 variant='contained'
                 onClick={handleSubmit}
                 color='primary'

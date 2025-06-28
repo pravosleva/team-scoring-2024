@@ -103,7 +103,7 @@ export const JobPage = memo(() => {
           position: 'sticky',
           top: 0,
           backgroundColor: '#fff',
-          zIndex: 1,
+          zIndex: 2,
           pt: 2,
           pb: 2,
         }}
@@ -185,6 +185,14 @@ export const JobPage = memo(() => {
           {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
         </Box>
       </Grid> */}
+
+      {
+        !!targetJob?.descr && (
+          <Grid size={12}>
+            <em style={{ color: 'gray' }}>{targetJob.descr}</em>
+          </Grid>
+        )
+      }
 
       {
         !!params.job_id && getIsNumeric(params.job_id) && (
@@ -322,14 +330,24 @@ export const JobPage = memo(() => {
               target='_self'
             >
               <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
-                {userRouteControls.from.uiText}
+                {getTruncated(userRouteControls.from.uiText, 11)}
               </Button>
             </Link>
           )
         }
         {
           !userRouteControls.from && !!targetJob && (
-            <Link to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}>
+            <Link
+              // to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
+              to={
+                [
+                  '/jobs',
+                  !!targetJob
+                    ? `?lastSeenJob=${targetJob.id}`
+                    : '',
+                ].join('')
+              }
+            >
               <Button fullWidth variant='outlined' startIcon={<ArrowBackIcon />}>
                 Jobs
               </Button>
@@ -337,15 +355,32 @@ export const JobPage = memo(() => {
           )
         }
         {
-          !!targetJob?.forecast.assignedTo && (
-            <Link to={`/employees/${targetJob.forecast.assignedTo}${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`} target='_self'>
+          !userRouteControls.from && !!targetJob?.forecast.assignedTo && (
+            <Link
+              // to={`/employees/${targetJob.forecast.assignedTo}${!!targetJob ? `?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job` : ''}`}
+              to={
+                [
+                  `/employees/${targetJob.forecast.assignedTo}`,
+                  !!targetJob
+                    ? '?'
+                    : '',
+                  !!targetJob
+                  ? [
+                    `lastSeenJob=${targetJob.id}`,
+                    `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job`
+                  ].join('&')
+                  : '',
+                ].join('')
+              }
+              target='_self'
+            >
               <Button
                 variant='outlined'
                 color='gray'
                 startIcon={<AccountCircleIcon />}
                 fullWidth
               >
-                {getTruncated(targetUser?.displayName || 'Employee', 10)}
+                {getTruncated(targetUser?.displayName || 'Employee', 11)}
               </Button>
             </Link>
           )

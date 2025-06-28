@@ -3,25 +3,15 @@
 import { useState, useRef, useLayoutEffect, useMemo, useCallback, memo } from 'react'
 import clsx from 'clsx'
 import classes from './ClientPerfWidget.module.scss'
-import { linear } from 'math-interpolate'
+import { getPercentage } from '~/shared/utils/number-ops'
 import { ProgressBar } from './components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import MemoryIcon from '@mui/icons-material/Memory'
 
 type TProps = {
   isOpenedByDefault?: boolean;
   position: 'top-center' | 'top-right';
-}
-
-const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
-  const result = linear({
-    x1: 0,
-    y1: 0,
-    x2: sum,
-    y2: 100,
-    x: x,
-  })
-  return result
 }
 
 type TMainStackItem = {
@@ -197,7 +187,7 @@ export const ClientPerfWidget = memo((ps: TProps) => {
         {
           isBrowserMemoryMonitorEnabled
           ? <ExpandLessIcon style={{ fontSize: '24px' }} />
-          : <ExpandMoreIcon style={{ fontSize: '24px' }} />
+          : <MemoryIcon style={{ fontSize: '24px' }} />
         }
         {/* <ExpandLessIcon style={{ fontSize: '16px' }} /> */}
         <span style={{ paddingRight: '8px' }}>Memory</span>

@@ -340,6 +340,72 @@
     #9b6f00 20px
   );
 }
+.stripedYellowLite {
+  background: repeating-linear-gradient(
+    45deg,
+    #f88f6f,
+    #f88f6f 10px,
+    #ffc6a3 10px,
+    #ffc6a3 20px
+  );
+}
+.stripedYellowLite2 {
+  background: repeating-linear-gradient(
+    45deg,
+    #ffa950,
+    #ffa950 10px,
+    #ffde76 10px,
+    #ffde76 20px
+  );
+}
+.stripedYellowLite3 {
+  background: repeating-linear-gradient(
+    45deg,
+    #7d3d00,
+    #7d3d00 10px,
+    #375f76 10px,
+    #000 20px
+  );
+}
+.stripedYellowLite4 {
+  background: repeating-linear-gradient(
+    45deg,
+    #9f5900,
+    #9f5900 10px,
+    #000 10px,
+    #000 20px
+  );
+}
+.stripedYellowLite5 {
+  background: repeating-linear-gradient(
+    45deg,
+    #ffc99b,
+    #ffc99b 10px,
+    #e8e8e8 10px,
+    #e8e8e8 20px
+  );
+}
+.stripedBlueHard {
+  background: repeating-linear-gradient(
+    45deg,
+    #006ecc,
+    #006ecc 10px,
+    #0056b0 10px,
+    #0056b0 20px
+  );
+}
+.stripedYellowLiteGradient {
+  background-image: linear-gradient(to right top, #ffe171, #ffcb6a, #ffb669, #ffa26b, #f88f6f);
+}
+.stripedGreenLite {
+  background: repeating-linear-gradient(
+    45deg,
+    #78fac5,
+    #78fac5 10px,
+    #f0faff 10px,
+    #f0faff 20px
+  );
+}
 .stripedGreen {
   background: repeating-linear-gradient(
     45deg,
@@ -365,6 +431,15 @@
     #005f1c 10px,
     #005411 10px,
     #005411 20px
+  );
+}
+.stripedGrayLite {
+  background: repeating-linear-gradient(
+    45deg,
+    #dedfe4,
+    #dedfe4 10px,
+    #f3f4f9 10px,
+    #f3f4f9 20px
   );
 }
 

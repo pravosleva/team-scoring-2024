@@ -12,6 +12,7 @@ import clsx from 'clsx';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 // import baseClasses from '~/App.module.scss'
+import { getPercentage } from '~/shared/utils/number-ops'
 
 type TProps<T, TAddInfo> = {
   connectedOnThe?: ('top')[];
@@ -76,7 +77,7 @@ function SimpleCheckListFn<TAddInfo>({
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
   useEffect(() => {
     if (isEditMode)
-      setTimeout(scrollIntoViewFnRef.current, 500)
+      setTimeout(scrollIntoViewFnRef.current, 200)
   }, [isEditMode])
   const handleEditToggle = useCallback(() => {
     setIsEditMode((s) => !s)
@@ -212,6 +213,8 @@ function SimpleCheckListFn<TAddInfo>({
     return !items.some(({ isDone, isDisabled }) => !isDone && !isDisabled)
   }, [items])
 
+  const currentPercentage = useMemo(() => getPercentage({ sum: items.length, x: items.filter(({ isDone, isDisabled }) => isDone || isDisabled).length }), [items])
+
   return (
     <>
       {
@@ -239,8 +242,8 @@ function SimpleCheckListFn<TAddInfo>({
                 label='Checklist item descr'
                 type='text'
                 onChange={handleChangeDescr}
-                // multiline
-                // maxRows={5}
+                multiline
+                maxRows={5}
                 // sx={{ borderRadius: '8px' }}
               />
             </Grid>
@@ -292,7 +295,7 @@ function SimpleCheckListFn<TAddInfo>({
                     [classes.default]: !hasNotActiveItems,
                     [classes.success]: hasNotActiveItems,
                   })}>
-                    {infoLabel}
+                    {infoLabel} | {currentPercentage.toFixed(0)}%
                   </div>
                   {/* <div className={classes.commentDescription}>
                     <pre
@@ -328,10 +331,10 @@ function SimpleCheckListFn<TAddInfo>({
                               })}
                             >
                               {
-                                checklistItem.isDone && <CheckBoxIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#7fd1ae'} />
+                                checklistItem.isDone && <CheckBoxIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
                               }
                               {
-                                !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#7fd1ae'} />
+                                !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
                               }
                             </button>
 

@@ -5,6 +5,7 @@ import classes from './FixedScrollTopBtn.module.scss'
 import { scrollTop, scrollTopExtra } from '~/shared/components/Layout/utils'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { useSearchParams } from 'react-router-dom'
+// import baseClasses from '~/App.module.scss'
 
 export const FixedScrollTopBtn = memo(() => {
   const [, isMoreThan2Screens]: [IWindowDims, boolean] = useScrollPosition()
@@ -18,19 +19,19 @@ export const FixedScrollTopBtn = memo(() => {
     scrollTopExtra()
 
     const jobIdToScroll = urlSearchParams.get('lastSeenJob')
-    const logKeyToScroll = urlSearchParams.get('lastSeenLog')
+    const logKeyToScroll = urlSearchParams.get('lastSeenLogKey')
     switch (true) {
-      case !!jobIdToScroll:
+      case !!logKeyToScroll:
         setTimeout(() => {
-          const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
+          const targetElm = document.getElementById(`log_list_item_${logKeyToScroll}`)
           if (!!targetElm) {
             targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
         }, 0)
         break
-      case !!logKeyToScroll:
+      case !!jobIdToScroll:
         setTimeout(() => {
-          const targetElm = document.getElementById(`log_list_item_${logKeyToScroll}`)
+          const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
           if (!!targetElm) {
             targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
@@ -48,7 +49,14 @@ export const FixedScrollTopBtn = memo(() => {
         <div
           ref={ref}
           onClick={handleClick}
-          className={clsx(classes.wrapper, classes.fixed, { [classes.isRequired]: isMoreThan2Screens })}
+          className={clsx(
+            classes.wrapper,
+            classes.fixed,
+            // baseClasses.backdropBlurLite,
+            {
+              [classes.isRequired]: isMoreThan2Screens,
+            }
+          )}
         >
           <KeyboardArrowUpIcon color='primary' />
         </div>

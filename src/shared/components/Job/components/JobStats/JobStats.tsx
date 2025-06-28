@@ -8,8 +8,7 @@ import {
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { JobLogProgressGraph } from './components'
-import { getRounded } from '~/shared/utils/number-ops';
-import { linear } from 'math-interpolate'
+import { getRounded } from '~/shared/utils/number-ops'
 import { SubjobsList } from './components'
 import { JobTimingInfo } from './components/SubjobsList/components'
 import { CollapsibleBox } from '~/shared/components'
@@ -18,17 +17,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import { useWorstCalcWebWorker } from '~/shared/hooks'
 import { groupLog } from '~/shared/utils'
 import CircularProgress from '@mui/material/CircularProgress'
-
-const getPercentage = ({ x, sum }: { x: number, sum: number }) => {
-  const result = linear({
-    x1: 0,
-    y1: 0,
-    x2: sum,
-    y2: 100,
-    x: x,
-  })
-  return result
-}
+import { getPercentage } from '~/shared/utils/number-ops'
 
 type TProps = {
   job: TJob;
