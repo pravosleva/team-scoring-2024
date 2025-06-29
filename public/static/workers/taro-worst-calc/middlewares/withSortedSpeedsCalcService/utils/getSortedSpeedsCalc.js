@@ -1,4 +1,4 @@
-importScripts('../middlewares/withSortedSpeedsCalcService/utils/getMedian.js')
+importScripts('./middlewares/withSortedSpeedsCalcService/utils/getMedian.js')
 
 class Probability {
   constructor({ theJobList, sensibility, ts }) {

@@ -25,9 +25,11 @@ import ArrowBack from '@mui/icons-material/ArrowBack'
 import { sort } from '~/shared/utils/object-ops/sort-array-objects@3.0.0'
 import dayjs from 'dayjs'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
-import { getMatchedByAnyString } from '~/shared/utils/string-ops'
+import { getMatchedByAnyString, getTruncated } from '~/shared/utils/string-ops'
 import clsx from 'clsx'
 import lastActivityPageClasses from './LastActivityPage.module.scss'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 // -- TODO: Perf exp
 // import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils/getModifiedJobLogText'
 // const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
@@ -47,9 +49,9 @@ export const LastActivityPage = memo(() => {
       let jobType: TJobType = 'default'
       switch (true) {
         case getMatchedByAnyString({
-            tested: curJob.title,
-            expected: ['#global'],
-          }):
+          tested: curJob.title,
+          expected: ['#global'],
+        }):
           jobType = 'globalTag'
           break
         // case getMatchedByAnyString({
@@ -66,21 +68,21 @@ export const LastActivityPage = memo(() => {
         let logType: TLogType = 'default'
         switch (true) {
           case getMatchedByAnyString({
-              tested: log.text,
-              expected: ['📣'],
-            }):
+            tested: log.text,
+            expected: ['📣'],
+          }):
             logType = 'forSpeech'
             break
           case getMatchedByAnyString({
-              tested: log.text,
-              expected: ['✅'],
-            }):
+            tested: log.text,
+            expected: ['✅'],
+          }):
             logType = 'hasLocalSuccess'
             break
           case getMatchedByAnyString({
-              tested: log.text,
-              expected: ['☝️'],
-            }):
+            tested: log.text,
+            expected: ['☝️'],
+          }):
             logType = 'hasLocalImportant'
             break
           default:
@@ -101,6 +103,8 @@ export const LastActivityPage = memo(() => {
   const urlSearchParamLastSeenJob = useMemo(() => urlSearchParams.get('lastSeenJob'), [urlSearchParams])
 
   const jobsActorRef = TopLevelContext.useActorRef()
+
+  const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
 
   return (
     <Grid container spacing={2}>
@@ -187,7 +191,7 @@ export const LastActivityPage = memo(() => {
                         // style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}
                         className={lastActivityPageClasses.date}
                       >
-                        {dayjs(log.ts).format('YYYY.MM.DD HH:mm')}
+                        {dayjs(log.ts).format('DD.MM.YYYY HH:mm')}
                       </em>
                       <span
                         style={{
@@ -224,7 +228,7 @@ export const LastActivityPage = memo(() => {
                       </span>
                     </em>
                     <div
-                      style={{ fontSize: '14px'}}
+                      style={{ fontSize: '14px' }}
                     >{log.text}</div>
                     {
                       Array.isArray(log.links) && log.links?.length > 0 && (
@@ -245,7 +249,7 @@ export const LastActivityPage = memo(() => {
                         ))
                       )
                     }
-                    
+
                     {
                       !!log.checklist && log.checklist?.length > 0 && (
                         <SimpleCheckList
@@ -388,7 +392,7 @@ export const LastActivityPage = memo(() => {
           style={{
             padding: '16px 16px 16px 16px',
             // border: '1px dashed red',
-            
+
             // borderRadius: '16px 16px 0px 0px',
           }}
         >
@@ -409,19 +413,36 @@ export const LastActivityPage = memo(() => {
               </Link>
             )
           */}
-          <Link
-            to={`/jobs${!!urlSearchParamLastSeenJob ? `?lastSeenJob=${urlSearchParamLastSeenJob}` : ''}`}
-            target='_self'
-          >
-            <Button
-              color={!!urlSearchParamLastSeenJob ? 'primary' : 'gray'}
-              variant='outlined'
-              startIcon={<ArrowBack />}
-              fullWidth
-            >
-              Jobs
-            </Button>
-          </Link>
+
+          {
+            !!userRouteControls.from && (
+              <Link
+                to={userRouteControls.from.value}
+                target='_self'
+              >
+                <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
+                  {getTruncated(userRouteControls.from.uiText, 11)}
+                </Button>
+              </Link>
+            )
+          }
+          {
+            !userRouteControls.from && (
+              <Link
+                to={`/jobs${!!urlSearchParamLastSeenJob ? `?lastSeenJob=${urlSearchParamLastSeenJob}` : ''}`}
+                target='_self'
+              >
+                <Button
+                  color={!!urlSearchParamLastSeenJob ? 'primary' : 'gray'}
+                  variant='outlined'
+                  startIcon={<ArrowBack />}
+                  fullWidth
+                >
+                  Jobs
+                </Button>
+              </Link>
+            )
+          }
         </ResponsiveBlock>
       </Grid>
 

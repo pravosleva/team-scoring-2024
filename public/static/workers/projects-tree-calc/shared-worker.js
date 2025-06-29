@@ -74,7 +74,7 @@ let port // TODO? var ports = new Map()
                   break
                 case (
                   !Object.values(NES.Common.WorkerService).includes(val)
-                  || !Object.values(NES.Common.ClientService.News.EClientToWorkerEvent).includes(val)
+                  || !Object.values(NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent).includes(val)
                 ):
                   result.ok = false
                   result.reason = `Double check the unknown __eType prop of your event. Received value: "${val}" (${typeof val})`
@@ -138,12 +138,12 @@ let port // TODO? var ports = new Map()
             withRootMW({
               eventData: e.data,
               cb: {
-                [NES.Common.ClientService.News.EClientToWorkerEvent.GET_WORST_CALC]: ({
+                [NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent.GET_PROJECTS_TREE_CALC]: ({
                   output,
                   input,
                   _service,
                 }) => {
-                  // console.log('Shared Worker -> withRootMW -> cb', NES.Common.ClientService.News.EClientToWorkerEvent.GET_NEWS)
+                  // console.log('Shared Worker -> withRootMW -> cb', NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent.GET_NEWS)
                   _perfInfo.tsList.push({
                     descr: `c->sw:listener:opsEventType->[cb]->client: ${input.opsEventType}`,
                     p: performance.now(),
@@ -154,7 +154,7 @@ let port // TODO? var ports = new Map()
 
                   const sendError = () => {
                     port.postMessage({
-                      __eType: NES.Common.ClientService.News.EWorkerToClientEvent.WORST_CALC_ERR,
+                      __eType: NES.Common.ClientService.ProjectsTreeCalc.EWorkerToClientEvent.PROJECTS_TREE_CALC_ERR,
                       data: {
                         output,
                         input,
@@ -167,7 +167,7 @@ let port // TODO? var ports = new Map()
                   }
                   const sendData = () => {
                     port.postMessage({
-                      __eType: NES.Common.ClientService.News.EWorkerToClientEvent.WORST_CALC_OK,
+                      __eType: NES.Common.ClientService.ProjectsTreeCalc.EWorkerToClientEvent.PROJECTS_TREE_CALC_OK,
                       data: {
                         output,
                         input,

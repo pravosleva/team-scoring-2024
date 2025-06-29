@@ -1,4 +1,4 @@
-importScripts('../middlewares/withSortedSpeedsCalcService/utils/getSortedSpeedsCalc.js')
+importScripts('./middlewares/withSortedSpeedsCalcService/utils/getSortedSpeedsCalc.js')
 
 const getWorstCalc = ({ theJobList, ts }) => {
   const result = {

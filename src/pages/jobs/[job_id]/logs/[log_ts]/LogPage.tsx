@@ -24,12 +24,12 @@ import { CommentManager, SingleTextManager } from './components'
 export const LogPage = () => {
   const params = useParams()
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
-  
+
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetJob = useMemo<TJob | null>(() => jobs
     .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
-  const targetUser =  useMemo<TUser | null>(() => {
+  const targetUser = useMemo<TUser | null>(() => {
     const userId = Number(targetJob?.forecast.assignedTo)
     return users?.find(({ id }) => id === userId) || null
   }, [users, targetJob])
@@ -92,11 +92,11 @@ export const LogPage = () => {
           >
             {
               !!targetJob
-              ? (
-                <AutoRefreshedJobMuiAva job={targetJob} delay={1000} />
-              ) : (
-                <ConstructionIcon />
-              )
+                ? (
+                  <AutoRefreshedJobMuiAva job={targetJob} delay={1000} />
+                ) : (
+                  <ConstructionIcon />
+                )
             }
             <div
               style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
@@ -123,7 +123,7 @@ export const LogPage = () => {
             </div>
           </Box>
           <em style={{ fontSize: 'small' }}>Status: {statusText}</em>
-          
+
           <div
             style={{
               fontSize: 'x-small',
@@ -158,7 +158,7 @@ export const LogPage = () => {
             )
           }
         </Box>
-      </Grid> 
+      </Grid>
 
       {/* NOTE: About log */}
       {
@@ -171,7 +171,7 @@ export const LogPage = () => {
                 gap: 2,
               }}
             >
-              <div style={{ fontWeight: 'bold' }}>Log #{params.log_ts}{Array.isArray(targetLog?.links) ? ` | ${targetLog?.links.length} links` : ''} | {dayjs(targetLog?.ts).format('YYYY.MM.DD HH:mm')}</div>
+              <div style={{ fontWeight: 'bold' }}>Log #{params.log_ts}{Array.isArray(targetLog?.links) ? ` | ${targetLog?.links.length} links` : ''} | {dayjs(targetLog?.ts).format('DD.MM.YYYY HH:mm')}</div>
               <SingleTextManager
                 infoLabel='Log text'
                 buttonText='Add log text'
@@ -236,7 +236,7 @@ export const LogPage = () => {
 
       {
         !!targetJob && !!targetLog && (
-          
+
           <Grid
             size={12}
           >
@@ -358,39 +358,37 @@ export const LogPage = () => {
               */}
               {
                 !!userRouteControls.from
-                ? (
-                  <Link
-                    to={userRouteControls.from.value}
-                    target='_self'
-                  >
-                    <Button variant='contained' startIcon={<ArrowBack />} fullWidth>
-                      {userRouteControls.from.uiText}
-                    </Button>
-                  </Link>
-                )
-                : (
-                  <Link
-                    to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
-                    target='_self'
-                  >
-                    <Button color={!!targetJob ? 'primary' : 'gray'} variant='outlined' startIcon={<ArrowBack />} fullWidth>
-                      Jobs
-                    </Button>
-                  </Link>
-                )
+                  ? (
+                    <Link
+                      to={userRouteControls.from.value}
+                      target='_self'
+                    >
+                      <Button variant='contained' startIcon={<ArrowBack />} fullWidth>
+                        {userRouteControls.from.uiText}
+                      </Button>
+                    </Link>
+                  )
+                  : (
+                    <Link
+                      to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
+                      target='_self'
+                    >
+                      <Button color={!!targetJob ? 'primary' : 'gray'} variant='outlined' startIcon={<ArrowBack />} fullWidth>
+                        Jobs
+                      </Button>
+                    </Link>
+                  )
               }
-              
+
               {
                 !!targetJob && !!targetLog && (
                   <Link
                     to={
-                      `/jobs/${targetJob.id}?from=${
-                        encodeURIComponent(
-                          `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
-                          // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
-                        )
-                      }&backActionUiText=${
-                        encodeURIComponent('Log page')
+                      `/jobs/${targetJob.id}?from=${encodeURIComponent(
+                        `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
+                        // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
+                      )
+                      }&backActionUiText=${encodeURIComponent('Log page')
                       }`
                     }
                     target='_self'
@@ -406,7 +404,7 @@ export const LogPage = () => {
                   </Link>
                 )
               }
-              
+
             </ResponsiveBlock>
           </Grid>
         )

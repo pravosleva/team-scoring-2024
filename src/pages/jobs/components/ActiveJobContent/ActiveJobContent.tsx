@@ -273,16 +273,16 @@ export const ActiveJobContent = memo(({
             }}>
             {
               !job.forecast.finish
-              ? <>
-                <span>[ Scenario variants</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center' }}>{ratingIcons[expressAppraiserStars].icon}</span>
-                <span>]</span>
-              </>
-              : '[ Details ]'
+                ? <>
+                  <span>[ Scenario variants</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center' }}>{ratingIcons[expressAppraiserStars].icon}</span>
+                  <span>]</span>
+                </>
+                : '[ Details ]'
             }
           </h2>
         </ResponsiveBlock>
-      
+
         <ResponsiveBlock
           style={{
             padding: '16px 16px 16px 16px',
@@ -425,7 +425,7 @@ export const ActiveJobContent = memo(({
                       key={link.id}
                       style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
                     >
-                      <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('YYYY.MM.DD HH:mm')}</em>
+                      <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('DD.MM.YYYY HH:mm')}</em>
                       <div style={{ fontSize: 'small' }}>
                         <CopyToClipboardWrapper
                           text={link.url}
@@ -454,7 +454,7 @@ export const ActiveJobContent = memo(({
           )
         }
       </ResponsiveBlock>
-      
+
       <ResponsiveBlock
         className={baseClasses.specialActionsGrid}
         style={{
@@ -488,7 +488,7 @@ export const ActiveJobContent = memo(({
                 variant='outlined'
                 startIcon={<AccountCircleIcon />}
                 fullWidth
-                // className={baseClasses.truncate}
+              // className={baseClasses.truncate}
               >
                 {getTruncated(activeJobEmployee?.displayName || 'Employee', 11)}
               </Button>

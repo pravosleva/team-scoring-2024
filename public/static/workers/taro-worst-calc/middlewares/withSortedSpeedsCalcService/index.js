@@ -1,4 +1,5 @@
-importScripts('../middlewares/withSortedSpeedsCalcService/getWorstCalc.js')
+// importScripts('../middlewares/withSortedSpeedsCalcService/getWorstCalc.js')
+importScripts('./middlewares/withSortedSpeedsCalcService/getWorstCalc.js')
 
 // const delay = (ms = 1000) => new Promise((res, _rej) => {
 //   setTimeout(res, ms)

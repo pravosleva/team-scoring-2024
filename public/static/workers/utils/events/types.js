@@ -7,19 +7,27 @@ const NES = {
       CLIENT_TO_WORKER_MESSAGE: 'c-w:message',
     },
     ClientService: {
-      // NOTE: Should be sync with NFT in ~/types/NFT.ts
+      // -- NOTE: Should be sync with NWService in ~/shared/utils/wws/types.ts
       News: {
         EClientToWorkerEvent: {
-          // GET_NEWS: 'c-w:news:get-items',
           GET_WORST_CALC: 'c-w:news:get-sorted-speeds-calc',
         },
         EWorkerToClientEvent: {
-          // ITEM_RECEIVED: 'w-c:news:item-received',
-          // ITEM_ERRORED: 'w-c:news:item-errored',
-          WORST_CALC_OK: 'c-w:news:sorted-speeds-calc-ok',
-          WORST_CALC_ERR: 'c-w:news:sorted-speeds-calc-err',
+          WORST_CALC_OK: 'w-c:news:sorted-speeds-calc-ok',
+          WORST_CALC_ERR: 'w-c:news:sorted-speeds-calc-err',
         },
       },
+      ProjectsTreeCalc: {
+        EClientToWorkerEvent: {
+          GET_PROJECTS_TREE_CALC: 'c-w:news:get-projects-tree-calc',
+        },
+        EWorkerToClientEvent: {
+          PROJECTS_TREE_CALC_OK: 'w-c:news:projects-tree-calc-ok',
+          PROJECTS_TREE_CALC_ERR: 'w-c:news:projects-tree-calc-err',
+        },
+      },
+      // Others...
+      // --
     }
   },
   SharedWorker: {

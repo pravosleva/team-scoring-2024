@@ -122,11 +122,11 @@ class Singleton {
 
     switch (true) {
       case this.workers[wName] instanceof Worker:
-        console.log('-- sbscr w')
+        console.log(`-- sbscr w:${wName}`)
         this.workers[wName].onmessage = cb.bind(this)
         break
       case typeof SharedWorker !== 'undefined' && this.workers[wName] instanceof SharedWorker:
-        console.log('-- sbscr sw')
+        console.log(`-- sbscr sw:${wName}`)
         this.workers[wName].port.onmessage = cb.bind(this)
         break
       default:

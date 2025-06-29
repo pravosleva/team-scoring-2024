@@ -1,5 +1,5 @@
-// importScripts('../middlewares/withNewsService.js')
-importScripts('../middlewares/withSortedSpeedsCalcService/index.js')
+// importScripts('./middlewares/withNewsService.js')
+importScripts('./middlewares/withSortedSpeedsCalcService/index.js')
 
 const compose = (fns, arg) => {
   return fns.reduce(

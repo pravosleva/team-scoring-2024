@@ -28,7 +28,7 @@ import { JobResultReviewShort } from './components'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
-import { TotalJobChecklist } from './components'
+import { TotalJobChecklist, ProjectsTree } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 
 export const JobPage = memo(() => {
@@ -39,7 +39,7 @@ export const JobPage = memo(() => {
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetJob = useMemo<TJob | null>(() => jobs
     .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
-  const targetUser =  useMemo<TUser | null>(() => {
+  const targetUser = useMemo<TUser | null>(() => {
     const userId = Number(targetJob?.forecast.assignedTo)
     return users?.find(({ id }) => id === userId) || null
   }, [users, targetJob])
@@ -60,16 +60,16 @@ export const JobPage = memo(() => {
   const isJobEstimated = useMemo(() => !!targetJob?.forecast.estimate, [targetJob])
   const isJobStartedAndEstimated = useMemo(() => !!targetJob?.forecast.start && !!targetJob.forecast.estimate, [targetJob])
   const targetUserNameUI = useMemo(() => getTargetUserNameUI({ user: targetUser }), [targetUser])
-  const worst100Date = useMemo<number | null>(() => 
+  const worst100Date = useMemo<number | null>(() =>
     !!targetJob && isJobStartedAndEstimated
-    ? getWorstCalc({
-      theJobList: otherUserJobsForAnalysis,
-      ts: {
-        testStart: targetJob.forecast.start as number,
-        testDiff: (targetJob.forecast.estimate as number) - (targetJob.forecast.start as number),
-      },
-    }).date100
-    : null, [targetJob, isJobStartedAndEstimated, otherUserJobsForAnalysis])
+      ? getWorstCalc({
+        theJobList: otherUserJobsForAnalysis,
+        ts: {
+          testStart: targetJob.forecast.start as number,
+          testDiff: (targetJob.forecast.estimate as number) - (targetJob.forecast.start as number),
+        },
+      }).date100
+      : null, [targetJob, isJobStartedAndEstimated, otherUserJobsForAnalysis])
 
   // const statusText = useMemo(() => getJobStatusText({
   //   job: targetJob,
@@ -122,11 +122,11 @@ export const JobPage = memo(() => {
           >
             {
               !!targetJob
-              ? (
-                <AutoRefreshedJobMuiAva job={targetJob} delay={1000} />
-              ) : (
-                <ConstructionIcon />
-              )
+                ? (
+                  <AutoRefreshedJobMuiAva job={targetJob} delay={1000} />
+                ) : (
+                  <ConstructionIcon />
+                )
             }
             <div
               style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
@@ -154,8 +154,13 @@ export const JobPage = memo(() => {
           </Box>
           {/* <em style={{ fontSize: 'small' }}>Status: {statusText}</em> */}
 
-          <div style={{ fontSize: 'small', fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.job_id}`}</div>
-          
+          <div
+            style={{ fontSize: 'small', fontWeight: 'bold' }}
+            className={baseClasses.truncate}
+          >
+            {targetJob?.title || `Not found #${params.job_id}`}
+          </div>
+
           <div
             style={{
               fontSize: 'x-small',
@@ -187,12 +192,18 @@ export const JobPage = memo(() => {
       </Grid> */}
 
       {
+        !!targetJob && (
+          <ProjectsTree jobId={targetJob.id} isDebugEnabled={false} />
+        )
+      }
+
+      {/*
         !!targetJob?.descr && (
           <Grid size={12}>
             <em style={{ color: 'gray' }}>{targetJob.descr}</em>
           </Grid>
         )
-      }
+      */}
 
       {
         !!params.job_id && getIsNumeric(params.job_id) && (
@@ -218,56 +229,56 @@ export const JobPage = memo(() => {
 
       {
         otherUserJobsForAnalysis.length > 0
-        ? (
-          <>
+          ? (
+            <>
+              <Grid size={12}>
+                <h2>[ Analysis ]</h2>
+              </Grid>
+              <Grid size={12}>
+                {
+                  !!targetJob?.forecast.estimate
+                    && !!targetJob?.forecast.start
+                    ? (
+                      <DistributionFunctionGraph
+                        targetJob={targetJob}
+                        targetJobs={otherUserJobsForAnalysis}
+                        ts={{
+                          testStart: targetJob?.forecast.start,
+                          testDiff: targetJob?.forecast.estimate - targetJob?.forecast.start,
+                        }}
+                      // title='Analysis'
+                      />
+                    ) : (
+                      <Alert
+                        severity='warning'
+                        variant='filled'
+                      >
+                        <em>Incorrect job forecast params</em>
+                      </Alert>
+                    )
+                }
+              </Grid>
+              <Grid size={12}>
+                <SpeedsFunctionGraph
+                  targetJob={targetJob || undefined}
+                  targetJobs={otherUserJobsForAnalysis}
+                />
+              </Grid>
+              <Grid size={12}>
+                <em style={{ fontSize: 'small' }}>Based on another completed jobs{!!targetUserNameUI ? ` assigned to ${targetUserNameUI}` : ''}</em>
+              </Grid>
+            </>
+          ) : (
             <Grid size={12}>
               <h2>[ Analysis ]</h2>
+              <Alert
+                severity='warning'
+                variant='filled'
+              >
+                <em>No other jobs for analysis</em>
+              </Alert>
             </Grid>
-            <Grid size={12}>
-              {
-                !!targetJob?.forecast.estimate
-                && !! targetJob?.forecast.start
-                ? (
-                  <DistributionFunctionGraph
-                    targetJob={targetJob}
-                    targetJobs={otherUserJobsForAnalysis}
-                    ts={{
-                      testStart: targetJob?.forecast.start,
-                      testDiff: targetJob?.forecast.estimate - targetJob?.forecast.start,
-                    }}
-                    // title='Analysis'
-                  />
-                ) : (
-                  <Alert
-                    severity='warning'
-                    variant='filled'
-                  >
-                    <em>Incorrect job forecast params</em>
-                  </Alert>
-                )
-              }
-            </Grid>
-            <Grid size={12}>
-              <SpeedsFunctionGraph
-                targetJob={targetJob || undefined}
-                targetJobs={otherUserJobsForAnalysis}
-              />
-            </Grid>
-            <Grid size={12}>
-              <em style={{ fontSize: 'small' }}>Based on another completed jobs{!!targetUserNameUI ? ` assigned to ${targetUserNameUI}` : ''}</em>
-            </Grid>
-          </>
-        ) : (
-          <Grid size={12}>
-            <h2>[ Analysis ]</h2>
-            <Alert
-              severity='warning'
-              variant='filled'
-            >
-              <em>No other jobs for analysis</em>
-            </Alert>
-          </Grid>
-        )
+          )
       }
 
       {
@@ -276,18 +287,18 @@ export const JobPage = memo(() => {
             <h2>[ Current stats ]</h2>
             {
               isJobStartedAndEstimated
-              && !!worst100Date
-              && !!targetJob?.forecast.start
-              ? (
-                <JobStats job={targetJob} />
-              ) : (
-                <Alert
-                  severity='warning'
-                  variant='filled'
-                >
-                  <em>Job {isJobStarted ? 'started' : 'not started'} and {isJobEstimated ? 'estimated' : 'not estimated'}</em>
-                </Alert>
-              )
+                && !!worst100Date
+                && !!targetJob?.forecast.start
+                ? (
+                  <JobStats job={targetJob} />
+                ) : (
+                  <Alert
+                    severity='warning'
+                    variant='filled'
+                  >
+                    <em>Job {isJobStarted ? 'started' : 'not started'} and {isJobEstimated ? 'estimated' : 'not estimated'}</em>
+                  </Alert>
+                )
             }
           </Grid>
         )
@@ -365,11 +376,11 @@ export const JobPage = memo(() => {
                     ? '?'
                     : '',
                   !!targetJob
-                  ? [
-                    `lastSeenJob=${targetJob.id}`,
-                    `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job`
-                  ].join('&')
-                  : '',
+                    ? [
+                      `lastSeenJob=${targetJob.id}`,
+                      `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job`
+                    ].join('&')
+                    : '',
                 ].join('')
               }
               target='_self'

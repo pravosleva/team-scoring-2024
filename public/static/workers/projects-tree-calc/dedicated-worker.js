@@ -61,7 +61,7 @@ var window = self;
                 break
               case (
                 !Object.values(NES.Common.WorkerService).includes(val)
-                || !Object.values(NES.Common.ClientService.News.EClientToWorkerEvent).includes(val)
+                || !Object.values(NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent).includes(val)
               ):
                 result.ok = false
                 result.reason = `Double check the unknown __eType prop of your event. Received value: "${val}" (${typeof val})`
@@ -84,7 +84,7 @@ var window = self;
     // --
 
     if (debugConfig.workerEvs.fromClient.isEnabled) log({
-      label: 'message received Dedicated Worker receive evt by client',
+      label: 'Dedicated Worker received event by client',
       msgs: [e.data],
     })
 
@@ -96,7 +96,7 @@ var window = self;
         const [loadReport] = _perfInfo.tsList
         _perfInfo.tsList = [
           loadReport, {
-            descr: 'c->[w]: Dedicated Worker history reset',
+            descr: 'c->[w]: Dedicated Worker history reset now',
             p: performance.now(),
             ts: new Date().getTime(),
             name: 'Сброс истории Dedicated Worker',
@@ -108,12 +108,15 @@ var window = self;
         })
         break
       default: {
+        // console.log('[DEBUG] Dedicated Worker: Default case')
         const {
           data: {
             // __eType,
             input,
           }
         } = e
+
+        // console.log(input?.opsEventType)
 
         if (!!input?.opsEventType) {
           _perfInfo.tsList.push({
@@ -124,15 +127,22 @@ var window = self;
             name: 'Dedicated Worker получил ивент для использования одного из сервисов',
           })
 
+          // console.log(NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent.GET_PROJECTS_TREE_CALC)
+
           // -- NOTE: Middlewares section
           withRootMW({
             eventData: e.data,
             cb: {
-              [NES.Common.ClientService.News.EClientToWorkerEvent.GET_WORST_CALC]: ({
+              [NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent.GET_PROJECTS_TREE_CALC]: ({
                 output,
                 input,
                 _service,
               }) => {
+                if (debugConfig.workerEvs.fromClient.isEnabled) log({
+                  label: `Dedicated Worker: Вызван обработчик withRootMW -> cb[${NES.Common.ClientService.ProjectsTreeCalc.EClientToWorkerEvent.GET_PROJECTS_TREE_CALC}]`,
+                  msgs: [input, output, _service],
+                })
+
                 _perfInfo.tsList.push({
                   descr: `c->w:listener:opsEventType->[cb]->client: ${input.opsEventType}`,
                   p: performance.now(),
@@ -143,7 +153,7 @@ var window = self;
 
                 const sendError = () => {
                   self.postMessage({
-                    __eType: NES.Common.ClientService.News.EWorkerToClientEvent.WORST_CALC_ERR,
+                    __eType: NES.Common.ClientService.ProjectsTreeCalc.EWorkerToClientEvent.PROJECTS_TREE_CALC_ERR,
                     data: {
                       _service: {
                         tsList: _perfInfo.tsList,
@@ -156,7 +166,7 @@ var window = self;
                 }
                 const sendData = () => {
                   self.postMessage({
-                    __eType: NES.Common.ClientService.News.EWorkerToClientEvent.WORST_CALC_OK,
+                    __eType: NES.Common.ClientService.ProjectsTreeCalc.EWorkerToClientEvent.PROJECTS_TREE_CALC_OK,
                     data: {
                       _service: {
                         tsList: _perfInfo.tsList,

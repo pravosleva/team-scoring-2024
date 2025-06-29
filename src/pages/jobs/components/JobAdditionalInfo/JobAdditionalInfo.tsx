@@ -20,7 +20,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
 
   const jobsActorRef = TopLevelContext.useActorRef()
   const handleDeleteLog = useCallback(({ logTs, text }: { logTs: number; text: string }) => () => {
-    const isConfirmed = window.confirm(`⛔ Удалить лог от ${dayjs(logTs).format('YYYY.MM.DD HH:mm')}?\n\n${text}`)
+    const isConfirmed = window.confirm(`⛔ Удалить лог от ${dayjs(logTs).format('DD.MM.YYYY HH:mm')}?\n\n${text}`)
     if (!isConfirmed)
       return
 
@@ -43,7 +43,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
     })
   }, [job.id])
   const handleOpenLogEditor = useCallback(({ logTs, text }: { logTs: number, text: string }) => () => {
-    const isConfirmed = window.confirm(`✒️ Редактировать лог от ${dayjs(logTs).format('YYYY.MM.DD HH:mm')}?\n\n${text}`)
+    const isConfirmed = window.confirm(`✒️ Редактировать лог от ${dayjs(logTs).format('DD.MM.YYYY HH:mm')}?\n\n${text}`)
     if (!isConfirmed)
       return
 
@@ -57,7 +57,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
   // const goToLogPage = useCallback(({ ts }: { ts: number }) => () => {
   //   // /jobs/:job_id/logs/:log_ts
   // }, [job.id])
-  
+
   return (
     <ResponsiveBlock>
       <pre
@@ -76,7 +76,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
               {job.logs.isEnabled ? <ToggleOnIcon /> : <ToggleOffIcon />}
               <span>]</span>
             </h3>
-            
+
             <ResponsiveBlock
               className={baseClasses.stack1}
             >
@@ -104,7 +104,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <span>{dayjs(ts).format('YYYY.MM.DD HH:mm')}</span>
+                      <span>{dayjs(ts).format('DD.MM.YYYY HH:mm')}</span>
                       <span
                         style={{
                           display: 'flex',
@@ -119,7 +119,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>
                       </span>
                     </em>
-                    
+
                     <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
 
                     {
@@ -154,7 +154,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         </div>
                       )
                     }
-                    
+
                     {
                       Array.isArray(links) && links.length > 0 && (
                         <span

@@ -2,10 +2,9 @@ import { useLayoutEffect, useCallback } from 'react'
 import { groupLog, wws } from '~/shared/utils'
 import { NWService } from '~/shared/utils/wws/types'
 // import { TNewsItemDetails } from '~/common/store/reducers/newsSlice'
-
-import pkg from '../../../package.json'
-import { NSWorstCalc } from '../utils/team-scoring'
-import { TJob } from '../xstate'
+import { NSWorstCalc } from '~/shared/utils/team-scoring'
+import { TJob } from '~/shared/xstate'
+import pkg from '../../../../../../../package.json'
 
 // const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 

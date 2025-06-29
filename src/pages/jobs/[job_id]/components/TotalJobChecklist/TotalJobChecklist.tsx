@@ -13,20 +13,20 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
   const targetJob = useMemo<TJob | null>(() => jobs
     .filter((j) => j.id === job_id)?.[0] || null, [jobs, job_id])
 
-  const targetJobTotalChecklistMaping = useMemo<{ [key: string]: { c: TLogChecklistItem[], logTs: number }}>(() =>
+  const targetJobTotalChecklistMaping = useMemo<{ [key: string]: { c: TLogChecklistItem[], logTs: number } }>(() =>
     !!targetJob && targetJob?.logs.items.length > 0
-    ? targetJob?.logs.items
-      .reduce((acc: { [key: string]: { c: TLogChecklistItem[], logTs: number } }, curLog) => {
-        if (!!curLog.checklist && curLog.checklist.length > 0) {
-          const uniqueKey = `${targetJob.id}-${curLog.ts}`
-          acc[uniqueKey] = { 
-            c: curLog.checklist,
-            logTs: curLog.ts,
+      ? targetJob?.logs.items
+        .reduce((acc: { [key: string]: { c: TLogChecklistItem[], logTs: number } }, curLog) => {
+          if (!!curLog.checklist && curLog.checklist.length > 0) {
+            const uniqueKey = `${targetJob.id}-${curLog.ts}`
+            acc[uniqueKey] = {
+              c: curLog.checklist,
+              logTs: curLog.ts,
+            }
           }
-        }
-        return acc
-      }, {})
-    : {},
+          return acc
+        }, {})
+      : {},
     [targetJob, targetJob?.ts.update]
   )
 
@@ -46,7 +46,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
             // _additionalInfo={{ message: 'No helpful info' }}
             isMiniVariant
             items={targetJobTotalChecklistMaping[checklistKey].c}
-            infoLabel={`Created ${dayjs(targetJobTotalChecklistMaping[checklistKey].logTs).format('YYYY.MM.DD HH:mm')}`}
+            infoLabel={`Created ${dayjs(targetJobTotalChecklistMaping[checklistKey].logTs).format('DD.MM.YYYY HH:mm')}`}
             createBtnLabel='Create checklist'
             isCreatable={false}
             isDeletable={false}
