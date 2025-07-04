@@ -1,4 +1,4 @@
-importScripts('./middlewares/for-ts-tree-lib/calc.v2.js')
+importScripts('./middlewares/for-ts-tree-lib/calc.v4.js')
 
 console.log('[LOADED] projects-tree-calc/middlewares/withRootMW')
 

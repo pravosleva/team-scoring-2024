@@ -1,4 +1,5 @@
-import { memo, useState, useMemo } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { memo, useState, useMemo, useEffect, useCallback } from 'react'
 import { useProjectsTreeCalcWorker } from './hooks/useProjectsTreeCalcWorker'
 import { groupLog } from '~/shared/utils'
 import { TJob, TopLevelContext } from '~/shared/xstate'
@@ -6,7 +7,10 @@ import { TJob, TopLevelContext } from '~/shared/xstate'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { TreeNode } from 'ts-tree-lib'
 import CircularProgress from '@mui/material/CircularProgress'
-import { ProjectNode } from './components'
+import { ProjectNode, FixedBackToNodeBtn } from './components'
+import { TEnchancedJobByWorker } from './types'
+import { scrollToIdFactory, blinkNodeIdFactory } from '~/shared/utils/web-api-ops'
+import { CSSProperties } from '@mui/material/styles/createMixins'
 
 export type TProject = {
   jobId: number;
@@ -40,11 +44,53 @@ const tree = new Tree<any>(treeData);
 console.log("Tree :>> ", tree);
 */
 
-// type TProjectsTreeNodeModel = TJob
-// type TProjectsTree = {
-//   model: TProjectsTreeModel;
-//   children: TProjectsTreeModel[];
-// }
+const specialScroll = scrollToIdFactory({
+  timeout: 200,
+  offsetTop: 16,
+  elementHeightCritery: 520,
+})
+const blinkNode = blinkNodeIdFactory({
+  timeout: 1000,
+  cb: {
+    onStart: ({ targetElm }) => {
+      const oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
+        borderColor: targetElm.style.borderColor,
+        backgroundColor: targetElm.style.borderColor
+      }
+      const tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
+        // borderColor: '#1565c0', // blue
+        borderColor: '#02c39a', // green
+        backgroundColor: '#c9fce9',
+      }
+      for (const prop in tmpCSS) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        targetElm.style[prop] = tmpCSS[prop]
+      }
+
+      return { oldCSS }
+    },
+    onEnd: ({ targetElm, specialData }) => {
+      const { oldCSS } = specialData
+      for (const prop in oldCSS) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        targetElm.style[prop] = oldCSS[prop]
+      }
+
+      // for (const [key, value] of Object.entries(oldCSS))
+      //   targetElm.style[key] = value
+
+      // Object.keys(oldCSS).forEach(prop => {
+      //   const value = oldCSS[prop]
+      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   // @ts-ignore
+      //   targetElm.style[prop] = value
+      // });
+    },
+    onError: console.warn,
+  },
+})
 
 export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
@@ -52,9 +98,16 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
     () => !!jobId ? jobs.find(({ id }) => id === jobId) : undefined,
     [jobs, jobId]
   )
-
-  const [calc, setCalc] = useState<TreeNode<TJob> | null>(null)
+  const [calc, setCalc] = useState<TreeNode<TEnchancedJobByWorker> | null>(null)
+  const isContentReady = !!calc
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
+  // const [calcDebugMsg, setCalcDebugMsg] = useState<string | null>(null)
+  useEffect(() => {
+    if (!!isContentReady) {
+      specialScroll({ id: `job_node_${jobId}` })
+      // blinkNode({ id: `job_node_${jobId}` })
+    }
+  }, [jobId, isContentReady])
 
   useProjectsTreeCalcWorker({
     isEnabled: true,
@@ -70,7 +123,10 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
           })
         if (!!data.originalResponse) {
           setCalcErrMsg(null)
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           setCalc(data.originalResponse)
+          // if (!!data.message) setCalcDebugMsg(data.message)
         }
       },
       onFinalError: ({ id, reason }) => {
@@ -90,26 +146,76 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
       jobs,
     },
   })
+
+  const [backToActiveJob, setBackToActiveJob] = useState<{ jobId: number; jobTitle?: string } | null>(null)
+
+  const handleNavigateToChecklistClick = useCallback(({ checklistUniqueKey, jobId, jobTitle }: {
+    checklistUniqueKey: string;
+    jobId: number;
+    jobTitle?: string;
+  }) => (e: any) => {
+    if (!!e?.preventDefault) e.preventDefault()
+    specialScroll({ id: checklistUniqueKey })
+    setBackToActiveJob({ jobId, jobTitle })
+  }, [])
+  const handleNavigateToActiveNode = useCallback(() => {
+    specialScroll({ id: `job_node_${backToActiveJob?.jobId}` })
+    blinkNode({ id: `job_node_${backToActiveJob?.jobId}` })
+    setBackToActiveJob(null)
+  }, [backToActiveJob?.jobId])
+  const handleNavigateToJobNode = useCallback(({ jobId, backToJobId, jobTitle }: {
+    jobId: number;
+    backToJobId?: number;
+    jobTitle?: string
+  }) => (e: any) => {
+    if (!!e?.preventDefault) e.preventDefault()
+    specialScroll({ id: `job_node_${jobId}` })
+    if (!!backToJobId) {
+      setBackToActiveJob({ jobId: backToJobId, jobTitle })
+    }
+    blinkNode({ id: `job_node_${jobId}` })
+  }, [])
+  useEffect(() => {
+    setBackToActiveJob(null)
+  }, [jobId])
+
   return (
     <div
       style={{
-        // border: '2px dashed red',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
-        // padding: '8px',
-        // borderRadius: '16px',
         width: '100%',
       }}
     >
       {/* !!calc && <pre className={baseClasses.preNormalized}>{JSON.stringify(calc, null, 2)}</pre> */}
 
+      {/*
+        !!calcDebugMsg && (
+          <Alert
+            severity='info'
+            variant='outlined'
+          >
+            {calcDebugMsg}
+          </Alert>
+        )
+      */}
+
+      <FixedBackToNodeBtn
+        onClick={handleNavigateToActiveNode}
+        isRequired={!!backToActiveJob}
+        label={backToActiveJob?.jobTitle}
+      />
+
       {
         !!calc ? (
           <ProjectNode
             projectsTree={calc}
-            currentJobId={jobId}
-            currentJobName={targetJob?.title}
+            activeJobId={jobId}
+            activeJobName={targetJob?.title}
+            level={1}
+            onNavigateToChecklistClick={handleNavigateToChecklistClick}
+            onNavigateToJobNode={handleNavigateToJobNode}
           />
         ) : (
           <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>

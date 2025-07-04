@@ -18,7 +18,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       ? targetJob?.logs.items
         .reduce((acc: { [key: string]: { c: TLogChecklistItem[], logTs: number } }, curLog) => {
           if (!!curLog.checklist && curLog.checklist.length > 0) {
-            const uniqueKey = `${targetJob.id}-${curLog.ts}`
+            const uniqueKey = `job-${targetJob.id}-log-${curLog.ts}-checklist`
             acc[uniqueKey] = {
               c: curLog.checklist,
               logTs: curLog.ts,
@@ -42,6 +42,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       {
         !!targetJob && Object.keys(targetJobTotalChecklistMaping).map((checklistKey, i) => (
           <SimpleCheckList
+            checklistUniqueKey={checklistKey}
             key={`${checklistKey}-${i}-${targetJob?.ts.update || 'no_target_job'}`}
             // _additionalInfo={{ message: 'No helpful info' }}
             isMiniVariant

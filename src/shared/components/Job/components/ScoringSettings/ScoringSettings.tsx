@@ -6,7 +6,7 @@ import { FullScreenDialog } from '~/shared/components/Dialog'
 // import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { TJob, TJobForm } from '~/shared/xstate'
-import { Box } from '@mui/material'
+import { Box, Grid2 as Grid } from '@mui/material'
 // import { DatesStepper } from './components'
 import SaveIcon from '@mui/icons-material/Save'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,7 +14,7 @@ import { TScheme } from '~/shared/components/Form/v2/types'
 import { TopLevelContext, TUser } from '~/shared/xstate/topLevelMachine/v2'
 // import SettingsIcon from '@mui/icons-material/Settings'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
-// import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { TOption } from '~/shared/components/Autocomplete'
 import { getJobStage } from '../../utils'
 import baseClasses from '~/App.module.scss'
@@ -27,6 +27,7 @@ import MoreTimeIcon from '@mui/icons-material/MoreTime'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 // import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
+import ConstructionIcon from '@mui/icons-material/Construction'
 
 type TProps = {
   isActive: boolean;
@@ -35,9 +36,9 @@ type TProps = {
   onSave: (ps: {
     state: TJob | null;
   }) => Promise<{
-      ok: boolean;
-      message?: string;
-    }>;
+    ok: boolean;
+    message?: string;
+  }>;
   onClearDates: (ps: { id: number; }) => void;
   onAddTimeToFinishDate?: (ps: {
     hours: number;
@@ -84,7 +85,10 @@ const getNormalizedState = ({ state, jobId }: {
   jobId: number;
 }): TJob => {
   const _state = state as TJobForm
-  const modifiedState: TJob = {
+  const modifiedState: (
+    Pick<TJob, 'id' | 'title' | 'completed' | 'forecast' | 'descr' | 'logs' | 'ts'>
+    & { relations?: { parent: number | null } }
+  ) = {
     id: jobId,
     title: '',
     completed: false,
@@ -177,7 +181,7 @@ const getNormalizedState = ({ state, jobId }: {
 export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, onClearDates, onDeleteJob, onAddTimeToFinishDate }: TProps) => {
   const [isOpened, setIsOpened] = useState(false)
   const handleToggle = useCallback(() => setIsOpened((s) => !s), [setIsOpened])
-  
+
   useLayoutEffect(() => {
     if (isOpened) onToggleDrawer(false)({ jobId: job.id })
   }, [isOpened, onToggleDrawer, job.id])
@@ -187,7 +191,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
   }, [setIsOpened])
   const [isTargetActionEnabled, setIsTargetActionEnabled] = useState(false)
   const [formState, setFormState] = useState<TJob | null>(null)
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   // const jobsActorRef = TopLevelContext.useActorRef()
   // const [filteredTodos] = useParamsInspectorContextStore((ctx) => ctx.filteredJobs)
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -296,10 +300,12 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             _id?: number;
           };
         }) => {
-          const res: { ok: boolean; message?: string; _isDisabled?: {
-            value: boolean;
-            reason?: string;
-          }; } = { ok: true }
+          const res: {
+            ok: boolean; message?: string; _isDisabled?: {
+              value: boolean;
+              reason?: string;
+            };
+          } = { ok: true }
 
           switch (true) {
             case !Number.isNaN(Number(value?._id)):
@@ -337,10 +343,12 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             _id?: number;
           };
         }) => {
-          const res: { ok: boolean; message?: string; _isDisabled?: {
-            value: boolean;
-            reason?: string;
-          }; } = { ok: true }
+          const res: {
+            ok: boolean; message?: string; _isDisabled?: {
+              value: boolean;
+              reason?: string;
+            };
+          } = { ok: true }
 
           switch (true) {
             case !Number.isNaN(Number(value?._id)):
@@ -415,9 +423,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                 && !!internalState.start
                 && internalState.start > value
               ) {
-                  res.ok = false
-                  res.message = `Should be more than start date (${new Date(internalState.start).toJSON()})` 
-                }
+                res.ok = false
+                res.message = `Should be more than start date (${new Date(internalState.start).toJSON()})`
+              }
               // else if (
               //   typeof internalState.finish === 'number'
               //   && !!internalState.finish
@@ -442,10 +450,12 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         gridSize: upSm ? 4 : 12,
         isRequired: false,
         validator: ({ value, internalState }: any) => {
-          const res: { ok: boolean; message?: string; _isDisabled?: {
-            value: boolean;
-            reason?: string;
-          }; } = { ok: true }
+          const res: {
+            ok: boolean; message?: string; _isDisabled?: {
+              value: boolean;
+              reason?: string;
+            };
+          } = { ok: true }
           if (!internalState.estimate) res._isDisabled = {
             value: true,
             reason: 'Estimate date should be set before',
@@ -519,6 +529,14 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           />
         </div>
         <div
+          className={clsx(classes.toggler, classes.blue, { [classes.active]: isActive })}
+          onClick={() => {
+            navigate(`/jobs/${job.id}`)
+          }}
+        >
+          <ConstructionIcon />
+        </div>
+        <div
           className={clsx(classes.toggler, classes.warn)}
           onClick={handleToggle}
         >
@@ -557,69 +575,69 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           }}
           optionalActions={
             !!job.forecast.estimate || !!job.forecast.start || !!job.forecast.finish
-            ? [
-              {
-                label: 'Clear dates & Close',
-                color: 'error',
-                variant: 'contained',
-                startIcon: <TimerOffIcon />,
-                isEnabled: true,
-                onClick: async () => {
-                  const isConfirmed = window.confirm('⚡ Sure? All dates will be removed!')
-                  if (isConfirmed) {
-                    onClearDates({ id: job.id });
-                    return Promise.resolve({ ok: true });
-                  } else {
-                    return Promise.reject({ ok: false, message: 'Canceled by user' });
-                  }
+              ? [
+                {
+                  label: 'Clear dates & Close',
+                  color: 'error',
+                  variant: 'contained',
+                  startIcon: <TimerOffIcon />,
+                  isEnabled: true,
+                  onClick: async () => {
+                    const isConfirmed = window.confirm('⚡ Sure? All dates will be removed!')
+                    if (isConfirmed) {
+                      onClearDates({ id: job.id });
+                      return Promise.resolve({ ok: true });
+                    } else {
+                      return Promise.reject({ ok: false, message: 'Canceled by user' });
+                    }
+                  },
+                  gridItemSize: 12,
                 },
-                gridItemSize: 12,
-              },
-              {
-                label: '+2h to finish',
-                color: 'error',
-                variant: 'outlined',
-                startIcon: <MoreTimeIcon />,
-                isEnabled: !!job.forecast.finish,
-                onClick: async () => {
-                  try {
-                    if (typeof onAddTimeToFinishDate === 'function') {
-                      const isConfirmed = window.confirm('⚡ Sure? +2h to finish date')
-                      if (isConfirmed) {
-                        onAddTimeToFinishDate({ hours: 2 });
-                        return Promise.resolve({ ok: true });
-                      }
-                      else throw new Error('Canceled by user')
-                    } else throw new Error('ERR1')
-                  } catch (err: any) {
-                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
-                  }
+                {
+                  label: '+2h to finish',
+                  color: 'error',
+                  variant: 'outlined',
+                  startIcon: <MoreTimeIcon />,
+                  isEnabled: !!job.forecast.finish,
+                  onClick: async () => {
+                    try {
+                      if (typeof onAddTimeToFinishDate === 'function') {
+                        const isConfirmed = window.confirm('⚡ Sure? +2h to finish date')
+                        if (isConfirmed) {
+                          onAddTimeToFinishDate({ hours: 2 });
+                          return Promise.resolve({ ok: true });
+                        }
+                        else throw new Error('Canceled by user')
+                      } else throw new Error('ERR1')
+                    } catch (err: any) {
+                      return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                    }
+                  },
+                  gridItemSize: 6,
                 },
-                gridItemSize: 6,
-              },
-              {
-                label: '+4h to finish',
-                color: 'error',
-                variant: 'outlined',
-                startIcon: <MoreTimeIcon />,
-                isEnabled: !!job.forecast.finish,
-                onClick: async () => {
-                  try {
-                    if (typeof onAddTimeToFinishDate === 'function') {
-                      const isConfirmed = window.confirm('⚡ Sure? +4h to finish date')
-                      if (isConfirmed) {
-                        onAddTimeToFinishDate({ hours: 4 });
-                        return Promise.resolve({ ok: true });
-                      }
-                      else throw new Error('Canceled by user')
-                    } else throw new Error('ERR2')
-                  } catch (err: any) {
-                    return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
-                  }
+                {
+                  label: '+4h to finish',
+                  color: 'error',
+                  variant: 'outlined',
+                  startIcon: <MoreTimeIcon />,
+                  isEnabled: !!job.forecast.finish,
+                  onClick: async () => {
+                    try {
+                      if (typeof onAddTimeToFinishDate === 'function') {
+                        const isConfirmed = window.confirm('⚡ Sure? +4h to finish date')
+                        if (isConfirmed) {
+                          onAddTimeToFinishDate({ hours: 4 });
+                          return Promise.resolve({ ok: true });
+                        }
+                        else throw new Error('Canceled by user')
+                      } else throw new Error('ERR2')
+                    } catch (err: any) {
+                      return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                    }
+                  },
+                  gridItemSize: 6,
                 },
-                gridItemSize: 6,
-              },
-            ] : undefined
+              ] : undefined
           }
           togglerRender={() => (
             <div className={classes.detailsPreviewWrapper}>
@@ -635,18 +653,18 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
               </div>
             </div>
           )}
-          // middleInfoRender={() => (
-          //   <Box sx={{ padding: 0 }}>
-          //     <Grid container spacing={1}>
-          //       <Grid size={12}>
-          //         <DatesStepper />
-          //       </Grid>
-          //       <Grid size={12}>
-          //         <em>[ Employee if assigned ]</em>
-          //       </Grid>
-          //     </Grid>
-          //   </Box>
-          // )}
+          middleInfoRender={() => (
+            <Box sx={{ pt: 1 }}>
+              <Grid container spacing={1}>
+                {/* <Grid size={12}>
+                <DatesStepper />
+              </Grid> */}
+                <Grid size={12}>
+                  <pre className={baseClasses.preNormalized}>{JSON.stringify(job.relations, null, 2)}</pre>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
         />
       )}
     </Box>

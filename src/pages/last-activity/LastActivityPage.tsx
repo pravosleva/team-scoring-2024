@@ -18,14 +18,16 @@ import { CopyToClipboardWrapper, ResponsiveBlock, SimpleCheckList } from '~/shar
 import baseClasses from '~/App.module.scss'
 import { Link, useSearchParams } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-// import { getTruncated } from '~/shared/utils/string-ops'
 // import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 // import { CommentManager } from './components'
 import { sort } from '~/shared/utils/object-ops/sort-array-objects@3.0.0'
 import dayjs from 'dayjs'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
-import { getMatchedByAnyString, getTruncated } from '~/shared/utils/string-ops'
+import {
+  getMatchedByAnyString,
+  // getTruncated,
+} from '~/shared/utils/string-ops'
 import clsx from 'clsx'
 import lastActivityPageClasses from './LastActivityPage.module.scss'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
@@ -38,15 +40,17 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 // --
 
 type TJobType = 'default' | 'globalTag'
-type TLogType = 'default' | 'forSpeech' | 'hasLocalSuccess' | 'hasLocalImportant'
+type TLogBorder = 'default' | 'red'
+type TLogBg = 'default' | 'green' | 'warn'
 
 export const LastActivityPage = memo(() => {
   // const params = useParams()
   // const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const allLogs = useMemo(() => sort(
-    jobs.reduce((jobsAcc: (TLogsItem & { jobId: number; jobTitle: string; logType: TLogType; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number })[], curJob: TJob) => {
+    jobs.reduce((jobsAcc: (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number })[], curJob: TJob) => {
       let jobType: TJobType = 'default'
+      // NOTE: 1. Job type
       switch (true) {
         case getMatchedByAnyString({
           tested: curJob.title,
@@ -54,41 +58,41 @@ export const LastActivityPage = memo(() => {
         }):
           jobType = 'globalTag'
           break
-        // case getMatchedByAnyString({
-        //     tested: curJob.title,
-        //     expected: ['📣'],
-        //   }):
-        //   logType = 'forSpeech'
-        //   break
         default:
           break
       }
-
       for (const log of curJob.logs.items) {
-        let logType: TLogType = 'default'
+        let logBorder: TLogBorder = 'default'
+        let logBg: TLogBg = 'default'
+        // NOTE 2: Log border
         switch (true) {
           case getMatchedByAnyString({
             tested: log.text,
             expected: ['📣'],
           }):
-            logType = 'forSpeech'
+            logBorder = 'red'
             break
+          default:
+            break
+        }
+        // NOTE 3: Log bg
+        switch (true) {
           case getMatchedByAnyString({
             tested: log.text,
             expected: ['✅'],
           }):
-            logType = 'hasLocalSuccess'
+            logBg = 'green'
             break
           case getMatchedByAnyString({
             tested: log.text,
             expected: ['☝️'],
           }):
-            logType = 'hasLocalImportant'
+            logBg = 'warn'
             break
           default:
             break
         }
-        jobsAcc.push({ ...log, jobId: curJob.id, jobTitle: curJob.title, logType, jobType, logUniqueKey: `job-${curJob.id}-log-${log.ts}`, jobTsUpdate: curJob.ts.update })
+        jobsAcc.push({ ...log, jobId: curJob.id, jobTitle: curJob.title, logBorder, logBg, jobType, logUniqueKey: `job-${curJob.id}-log-${log.ts}`, jobTsUpdate: curJob.ts.update })
       }
       return jobsAcc
     }, []),
@@ -96,14 +100,10 @@ export const LastActivityPage = memo(() => {
     -1
   ), [jobs])
 
-  // const jobsActorRef = TopLevelContext.useActorRef()
-
   const [urlSearchParams] = useSearchParams()
   const urlSearchParamLastSeenLog = useMemo(() => urlSearchParams.get('lastSeenLogKey'), [urlSearchParams])
   const urlSearchParamLastSeenJob = useMemo(() => urlSearchParams.get('lastSeenJob'), [urlSearchParams])
-
   const jobsActorRef = TopLevelContext.useActorRef()
-
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
 
   return (
@@ -158,17 +158,15 @@ export const LastActivityPage = memo(() => {
                         [baseClasses.stripedYellow]: log.jobType === 'globalTag',
                         [lastActivityPageClasses.warningDashedBorder]: log.jobType === 'globalTag',
 
-                        // NOTE: LOG TYPE
-                        // bg
-                        // [baseClasses.stripedYellow]: log.logType === 'forSpeech',
+                        // NOTE: LOG BG & BORDER
                         [lastActivityPageClasses.whiteColor]:
-                          log.logType === 'hasLocalSuccess'
+                          log.logBg === 'green'
                           || log.jobType === 'globalTag'
-                          || log.logType === 'hasLocalImportant',
-                        [baseClasses.stripedGreenHard]: log.logType === 'hasLocalSuccess',
-                        [baseClasses.stripedYellowLite4]: log.logType === 'hasLocalImportant',
+                          || log.logBg === 'warn',
+                        [baseClasses.stripedGreenHard]: log.logBg === 'green',
+                        [baseClasses.stripedYellowLite4]: log.logBg === 'warn',
                         // outline, color
-                        [lastActivityPageClasses.redSolidBorder]: log.logType === 'forSpeech',
+                        [lastActivityPageClasses.redSolidBorder]: log.logBorder === 'red',
 
                         // NOTE: Active (from url search params)
                         [lastActivityPageClasses.activeDashedBorder]: log.logUniqueKey === urlSearchParamLastSeenLog,
@@ -419,9 +417,15 @@ export const LastActivityPage = memo(() => {
               <Link
                 to={userRouteControls.from.value}
                 target='_self'
+                className={baseClasses.truncate}
               >
-                <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
-                  {getTruncated(userRouteControls.from.uiText, 11)}
+                <Button
+                  variant='contained'
+                  startIcon={<ArrowBackIcon />}
+                  fullWidth
+                  className={baseClasses.truncate}
+                >
+                  <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
                 </Button>
               </Link>
             )

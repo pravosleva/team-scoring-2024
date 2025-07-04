@@ -2,7 +2,7 @@ import { createActorContext } from '@xstate/react'
 import { topLevelMachine } from '~/shared/xstate/topLevelMachine/v2/topLevelMachine'
 import { TJob } from '../types'
 
-let initialStateFromLS 
+let initialStateFromLS
 try {
   initialStateFromLS = JSON.parse(
     localStorage.getItem('teamScoring2024:topLevel') as string
@@ -36,6 +36,19 @@ try {
       for (const log of job.logs.items) {
         if (!!log.progress && !log.progress.worst) log.progress.worst = log.progress.estimate
       }
+    }
+
+    if (!job.relations) {
+      job.relations = {
+        parent: null,
+        children: [],
+      }
+    }
+    if (typeof job.relations.parent === 'undefined') {
+      job.relations.parent = null
+    }
+    if (typeof job.relations.children === 'undefined') {
+      job.relations.children = []
     }
   }
 } catch (err) {

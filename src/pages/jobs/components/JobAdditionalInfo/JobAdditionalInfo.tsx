@@ -8,10 +8,19 @@ import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils/getModifiedJo
 import { TopLevelContext, TJob } from '~/shared/xstate'
 import { Link } from 'react-router-dom'
 import { CopyToClipboardWrapper } from '~/shared/components'
+import { FixedNavControlsSpace } from '../ActiveJobContent/components'
+import { useInView } from 'react-hook-inview'
+import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 
 type TPros = {
   job: TJob;
 }
+
+const specialScroll = scrollToIdFactory({
+  timeout: 200,
+  offsetTop: 100,
+  elementHeightCritery: 520,
+})
 
 export const JobAdditionalInfo = memo(({ job }: TPros) => {
   const { logs, ...withoutLogs } = job
@@ -58,188 +67,197 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
   //   // /jobs/:job_id/logs/:log_ts
   // }, [job.id])
 
-  return (
-    <ResponsiveBlock>
-      <pre
-        className={baseClasses.preNormalized}
-        style={{ borderRadius: 0, }}
-      >{JSON.stringify(withoutLogs, null, 2)}</pre>
-      {
-        logs.items.length > 0 && (
-          <ResponsiveBlock
-            style={{
-              padding: '16px 16px 0px 16px',
-            }}
-          >
-            <h3 id='logBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-              <span>[ Logs: {job.logs.isEnabled ? 'detailed' : 'minimal'}</span>
-              {job.logs.isEnabled ? <ToggleOnIcon /> : <ToggleOffIcon />}
-              <span>]</span>
-            </h3>
+  const [logsTopRef, inViewLogsTop] = useInView()
 
+  return (
+    <>
+      <FixedNavControlsSpace
+        isRequired={!inViewLogsTop}
+        onClick={() => specialScroll({ id: 'logBoxHeader' })}
+        label='LOGS'
+      />
+      <ResponsiveBlock>
+        <pre
+          className={baseClasses.preNormalized}
+          style={{ borderRadius: 0, }}
+        >{JSON.stringify(withoutLogs, null, 2)}</pre>
+        {
+          logs.items.length > 0 && (
             <ResponsiveBlock
-              className={baseClasses.stack1}
+              style={{
+                padding: '16px 16px 0px 16px',
+              }}
             >
-              <div>
-                {
-                  job.logs.isEnabled ? (
-                    <em style={{ fontSize: 'small' }}>Detailed logs with your comments</em>
-                  ) : (
-                    <em style={{ fontSize: 'small' }}>Minimal logs</em>
-                  )
-                }
-              </div>
-              <ul className={baseClasses.compactList2}>
-                {logs.items.map(({ ts, text, links, checklist }) => (
-                  <li key={ts}>
-                    <em
-                      style={{
-                        color: 'gray',
-                        // whiteSpace: 'pre-wrap',
-                        fontSize: 'x-small',
-                        fontWeight: 'bold',
-                        paddingTop: '3px',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <span>{dayjs(ts).format('DD.MM.YYYY HH:mm')}</span>
-                      <span
+              <h3 ref={logsTopRef} id='logBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                <span>[ Logs: {job.logs.isEnabled ? 'detailed' : 'minimal'}</span>
+                {job.logs.isEnabled ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                <span>]</span>
+              </h3>
+
+              <ResponsiveBlock
+                className={baseClasses.stack1}
+              >
+                <div>
+                  {
+                    job.logs.isEnabled ? (
+                      <em style={{ fontSize: 'small' }}>Detailed logs with your comments</em>
+                    ) : (
+                      <em style={{ fontSize: 'small' }}>Minimal logs</em>
+                    )
+                  }
+                </div>
+                <ul className={baseClasses.compactList2}>
+                  {logs.items.map(({ ts, text, links, checklist }) => (
+                    <li key={ts}>
+                      <em
                         style={{
+                          color: 'gray',
+                          // whiteSpace: 'pre-wrap',
+                          fontSize: 'x-small',
+                          fontWeight: 'bold',
+                          paddingTop: '3px',
                           display: 'flex',
                           flexDirection: 'row',
-                          gap: '8px',
-                          justifyContent: 'flex-start',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
-                        <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a>
-                        {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
-                        <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>
-                      </span>
-                    </em>
-
-                    <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
-
-                    {
-                      !!checklist && checklist?.length > 0 && (
-                        <div>
-                          <SimpleCheckList
-                            // connectedOnThe={['top']}
-                            isMiniVariant
-                            items={checklist || []}
-                            infoLabel='Checklist'
-                            createBtnLabel='Create checklist'
-                            isCreatable={false}
-                            isDeletable={false}
-                            isEditable={true}
-                            // onDeleteChecklist={console.info}
-                            onCreateNewChecklistItem={({ state }) => {
-                              jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: job.id, logTs: ts, state } })
-                            }}
-                            onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
-                              jobsActorRef.send({
-                                type: 'todo.editChecklistItemInLog',
-                                value: {
-                                  jobId: job.id,
-                                  logTs: ts,
-                                  checklistItemId,
-                                  state,
-                                },
-                              })
-                              cleanup()
-                            }}
-                          />
-                        </div>
-                      )
-                    }
-
-                    {
-                      Array.isArray(links) && links.length > 0 && (
+                        <span>{dayjs(ts).format('DD.MM.YYYY HH:mm')}</span>
                         <span
-                          className={baseClasses.truncate}
                           style={{
                             display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-end',
-                            gap: '4px',
+                            flexDirection: 'row',
+                            gap: '8px',
+                            justifyContent: 'flex-start',
                           }}
                         >
-                          {
-                            links.map((link) => (
-                              <span className={baseClasses.truncate} key={link.id}>
-                                {/* <a href={link.url} target='_blank'>{link.title}</a> */}
-                                <CopyToClipboardWrapper
-                                  text={link.url}
-                                  uiText={link.title}
-                                  showNotifOnCopy
-                                />
-                              </span>
-                            ))
-                          }
+                          <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
+                          <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a>
+                          {/* <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
+                          <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>
                         </span>
-                      )
-                    }
+                      </em>
 
-                    {/* {
-                      <DialogAsButton
-                        modal={{
-                          title: 'Edit log',
-                        }}
-                        btn={{
-                          label: 'Edit',
-                          // startIcon: <AddIcon />,
-                        }}
-                        targetAction={{
-                          label: 'Save',
-                          isEnabled: true,
-                          onClick: ({ form }) => {
-                            console.log(form)
-                            if (typeof form.text === 'string' && !!form.displayName) {
-                              // topLevelActorRef.send({ type: 'user.commit', value: { displayName: form.displayName } })
-                              handleEditLog({ text: form.text, logTs: ts })
-                              return Promise.resolve({ ok: true })
+                      <div style={{ fontWeight: 'bold' }}>{getModifiedJobLogText({ text, jobs, users: users.items })}</div>
+
+                      {
+                        !!checklist && checklist?.length > 0 && (
+                          <div>
+                            <SimpleCheckList
+                              // connectedOnThe={['top']}
+                              isMiniVariant
+                              items={checklist || []}
+                              infoLabel='Checklist'
+                              createBtnLabel='Create checklist'
+                              isCreatable={false}
+                              isDeletable={false}
+                              isEditable={true}
+                              // onDeleteChecklist={console.info}
+                              onCreateNewChecklistItem={({ state }) => {
+                                jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: job.id, logTs: ts, state } })
+                              }}
+                              onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                                jobsActorRef.send({
+                                  type: 'todo.editChecklistItemInLog',
+                                  value: {
+                                    jobId: job.id,
+                                    logTs: ts,
+                                    checklistItemId,
+                                    state,
+                                  },
+                                })
+                                cleanup()
+                              }}
+                            />
+                          </div>
+                        )
+                      }
+
+                      {
+                        Array.isArray(links) && links.length > 0 && (
+                          <span
+                            className={baseClasses.truncate}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'flex-end',
+                              gap: '4px',
+                            }}
+                          >
+                            {
+                              links.map((link) => (
+                                <span className={baseClasses.truncate} key={link.id}>
+                                  {/* <a href={link.url} target='_blank'>{link.title}</a> */}
+                                  <CopyToClipboardWrapper
+                                    text={link.url}
+                                    uiText={link.title}
+                                    showNotifOnCopy
+                                  />
+                                </span>
+                              ))
                             }
-                            return Promise.reject({ ok: false, message: 'Err' })
-                          },
-                        }}
-                        scheme={{
-                          text: {
-                            initValue: text,
-                            label: 'Text',
-                            type: 'string',
-                            gridSize: 12,
-                            isRequired: true,
-                            validator: ({ value }) => {
-                              const limit = 500
-                              const res: { ok: boolean; message?: string } = { ok: true }
-                              switch (true) {
-                                case typeof value !== 'string':
-                                case value.length === 0:
-                                  res.ok = false
-                                  res.message = `Expected not empty string (received ${typeof value}: "${String(value)}")`
-                                  break
-                                case value.length >= limit:
-                                  res.ok = false
-                                  res.message = `Limit ${limit} reached (${value.length})`
-                                  break
-                                default:
-                                  break
+                          </span>
+                        )
+                      }
+
+                      {/* {
+                        <DialogAsButton
+                          modal={{
+                            title: 'Edit log',
+                          }}
+                          btn={{
+                            label: 'Edit',
+                            // startIcon: <AddIcon />,
+                          }}
+                          targetAction={{
+                            label: 'Save',
+                            isEnabled: true,
+                            onClick: ({ form }) => {
+                              console.log(form)
+                              if (typeof form.text === 'string' && !!form.displayName) {
+                                // topLevelActorRef.send({ type: 'user.commit', value: { displayName: form.displayName } })
+                                handleEditLog({ text: form.text, logTs: ts })
+                                return Promise.resolve({ ok: true })
                               }
-                              return res
+                              return Promise.reject({ ok: false, message: 'Err' })
                             },
-                          },
-                        }}
-                      />
-                    } */}
-                  </li>
-                ))}
-              </ul>
+                          }}
+                          scheme={{
+                            text: {
+                              initValue: text,
+                              label: 'Text',
+                              type: 'string',
+                              gridSize: 12,
+                              isRequired: true,
+                              validator: ({ value }) => {
+                                const limit = 500
+                                const res: { ok: boolean; message?: string } = { ok: true }
+                                switch (true) {
+                                  case typeof value !== 'string':
+                                  case value.length === 0:
+                                    res.ok = false
+                                    res.message = `Expected not empty string (received ${typeof value}: "${String(value)}")`
+                                    break
+                                  case value.length >= limit:
+                                    res.ok = false
+                                    res.message = `Limit ${limit} reached (${value.length})`
+                                    break
+                                  default:
+                                    break
+                                }
+                                return res
+                              },
+                            },
+                          }}
+                        />
+                      } */}
+                    </li>
+                  ))}
+                </ul>
+              </ResponsiveBlock>
             </ResponsiveBlock>
-          </ResponsiveBlock>
-        )
-      }
-    </ResponsiveBlock>
+          )
+        }
+      </ResponsiveBlock>
+    </>
   )
 })

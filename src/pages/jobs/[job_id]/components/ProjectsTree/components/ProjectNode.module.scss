@@ -1,26 +1,102 @@
 .wrapper {
-  padding-left: 12px;
-  border-left: 4px solid gray;
+  padding: 8px 8px 8px 8px;
+  border-left: 4px solid #959eaa;
 
   display: flex;
   flex-direction: column;
   gap: 8px;
   // border: 1px solid lightgray;
+  border-radius: 0px;
+  transition: all 0.75s ease-in-out;
 
-  >a {
+  a {
     font-size: small;
     font-weight: bold;
+    // text-decoration: underline dashed;
   }
+
+  position: relative;
+}
+
+.borderRadiusLevel1 {
+  border-radius: 16px 16px 16px 16px;
+  // box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+}
+
+.borderRadiusLevel2 {
+  border-radius: 8px 8px 8px 8px;
 }
 
 .isActive {
   border-left: 4px solid red;
+  background-color: #ffecec;
 
-  >a {
-    color: red;
-  }
+  // a.lastActivityOfCurrentJobLink {
+  //   color: red;
+  // }
+}
+
+a.lastActivityOfCurrentJobLink {
+  color: red;
 }
 
 .isCompleted {
-  opacity: 0.5;
+  background-color: #EFF0F1;
+  // color: #FFF;
+
+  // >* {
+  //   text-decoration: line-through;
+  // }
+
+  // .descr,
+  // .lastLog {
+  //   text-decoration: none;
+  // }
+}
+
+.isntCompleted {
+  background-color: #FFF;
+  color: #000;
+
+  // >* {
+  //   text-decoration: line-through;
+  // }
+
+  // .descr,
+  // .lastLog {
+  //   text-decoration: none;
+  // }
+}
+
+.absoluteTopRightBadge {
+  position: absolute;
+  font-size: x-small;
+  font-weight: bold;
+  border-radius: 16px;
+  padding: 2px 6px;
+  top: -6px;
+  right: -6px;
+  // border: 2px solid red;
+
+  background-color: #fff;
+  border: 2px solid #EFF0F1;
+  // transform: rotate(5deg);
+  color: #959eaa;
+}
+
+.absoluteActiveBadgeRed {
+  position: absolute;
+  font-size: x-small;
+  font-weight: bold;
+  border-radius: 16px;
+  padding: 2px 6px;
+  bottom: -6px;
+  right: -6px;
+  // border: 2px solid red;
+  // transform: rotate(-5deg);
+  z-index: 1;
+
+  background-color: #fff;
+  border: 2px solid red;
+  color: red;
 }

@@ -21,7 +21,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import { CopyToClipboardWrapper } from '~/shared/components'
 import dayjs from 'dayjs'
-import LinkIcon from '@mui/icons-material/Link';
+import LinkIcon from '@mui/icons-material/Link'
 // import ChecklistIcon from '@mui/icons-material/Checklist';
 
 type TProps = {
@@ -145,362 +145,364 @@ export const ActiveJobContent = memo(({
   // }, [jobsActorRef])
 
   return (
-    <div
-      className={baseClasses.stack0}
-      style={{
-        minHeight: '100dvh',
-        maxHeight: '100dvh',
-      }}
-    >
-      <ResponsiveBlock>
-        <ResponsiveBlock
-          style={{
-            padding: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            gap: '16px',
-            // borderBottom: '1px solid lightgray',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: '#fff',
-            zIndex: 2,
-          }}
-          className={baseClasses.boxShadowBottom}
-          id='topBox'
-        >
-          <span
+    <>
+      <div
+        className={baseClasses.stack0}
+        style={{
+          minHeight: '100dvh',
+          maxHeight: '100dvh',
+        }}
+      >
+        <ResponsiveBlock>
+          <ResponsiveBlock
             style={{
+              padding: '16px',
               display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
-            <code><b>#{job.id}</b></code>
-            <StarIcon fontSize='inherit' />
-            <code>{job.forecast.complexity}</code>
-          </span>
-          <IconButton
-            color='inherit'
-            aria-label='Close drawer'
-            onClick={() => onToggleDrawer(false)({})}
-            edge='start'
-            sx={[
-              !isOpened && { display: 'none' },
-            ]}
-          >
-            <ChevronLeftIcon />
-          </IconButton>
-        </ResponsiveBlock>
-      </ResponsiveBlock>
-
-      <ResponsiveBlock>
-        <ResponsiveBlock
-          style={{
-            // padding: '16px 16px 16px 16px',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: '#fff',
-            zIndex: 2,
-            // borderBottom: '1px solid lightgray',
-            // border: '1px solid red',
-            height: '30px',
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '1px',
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: 'gray',
-              color: '#fff',
-              padding: '4px',
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '8px',
+              justifyContent: 'space-between',
               alignItems: 'center',
               width: '100%',
-              cursor: 'pointer',
-              fontSize: 'small',
+              gap: '16px',
+              // borderBottom: '1px solid lightgray',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: '#fff',
+              zIndex: 2,
             }}
-            onClick={scrollLog}
-            className={baseClasses.stripedBlue}
+            className={baseClasses.boxShadowBottom}
+            id='topBox'
           >
-            <span>LOGS</span>
-            <ArrowDownwardIcon fontSize='small' />
-          </div>
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <code><b>#{job.id}</b></code>
+              <StarIcon fontSize='inherit' />
+              <code>{job.forecast.complexity}</code>
+            </span>
+            <IconButton
+              color='inherit'
+              aria-label='Close drawer'
+              onClick={() => onToggleDrawer(false)({})}
+              edge='start'
+              sx={[
+                !isOpened && { display: 'none' },
+              ]}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+          </ResponsiveBlock>
+        </ResponsiveBlock>
+
+        <ResponsiveBlock>
+          <ResponsiveBlock
+            style={{
+              // padding: '16px 16px 16px 16px',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: '#fff',
+              zIndex: 2,
+              // borderBottom: '1px solid lightgray',
+              // border: '1px solid red',
+              height: '30px',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '1px',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'gray',
+                color: '#fff',
+                padding: '4px',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '8px',
+                alignItems: 'center',
+                width: '100%',
+                cursor: 'pointer',
+                fontSize: 'small',
+              }}
+              onClick={scrollLog}
+              className={baseClasses.stripedBlue}
+            >
+              <span>LOGS</span>
+              <ArrowDownwardIcon fontSize='small' />
+            </div>
+            {
+              linksFromLogs.length > 0 && (
+                <div
+                  style={{
+                    backgroundColor: 'gray',
+                    color: '#fff',
+                    padding: '4px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    alignItems: 'center',
+                    width: '100%',
+                    cursor: 'pointer',
+                    fontSize: 'small',
+                  }}
+                  onClick={scrollLinks}
+                  className={baseClasses.stripedBlue}
+                >
+                  <span>LINKS</span>
+                  <ArrowDownwardIcon fontSize='small' />
+                </div>
+              )
+            }
+          </ResponsiveBlock>
+
+          <ResponsiveBlock
+            style={{
+              padding: '16px 16px 16px 16px',
+              position: 'sticky',
+              top: '30px',
+              backgroundColor: '#fff',
+              zIndex: 2,
+              borderBottom: '1px solid lightgray',
+            }}
+          >
+            <h2
+              style={{
+                display: 'inline-flex',
+                gap: '6px',
+                alignItems: 'center',
+              }}>
+              {
+                !job.forecast.finish
+                  ? <>
+                    <span>[ Scenario variants</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>{ratingIcons[expressAppraiserStars].icon}</span>
+                    <span>]</span>
+                  </>
+                  : '[ Details ]'
+              }
+            </h2>
+          </ResponsiveBlock>
+
+          <ResponsiveBlock
+            style={{
+              padding: '16px 16px 16px 16px',
+            }}
+          >
+            <div className={baseClasses.stack2}>
+              <div
+                className={baseClasses.stack1}
+              >
+                <div
+                  style={{
+                    fontWeight: 'bold',
+                    // wordBreak: 'break-all',
+                    overflowWrap: 'break-word',
+                  }}
+                >{job.title}</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    minHeight: '32px',
+                  }}
+                >
+                  <RadioGroupRating
+                    size='large'
+                    name='rating-view'
+                    value={expressAppraiserStars}
+                    // icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
+                    // emptyIcon={<StarBorderIcon fontSize='inherit' />}
+                    // max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
+                    max={6}
+                    // disabled
+                    // aria-readonly
+                    // readOnly
+                    onChange={(_e, value) => {
+                      setExpressAppraiserStars(value || 0)
+                    }}
+                  />
+                  {
+                    isNeedToReset && (
+                      <Button
+                        color='error'
+                        variant='text'
+                        size='small'
+                        endIcon={<HistoryIcon />}
+                        // fullWidth
+                        // className={baseClasses.truncate}
+                        onClick={resetExpressAppraiserStars}
+                      >
+                        Reset
+                      </Button>
+                    )
+                  }
+                </div>
+                <div>Grade: {ratingIcons[expressAppraiserStars].label}</div>
+                {!!job.descr && <div style={{ color: 'gray', fontSize: 'small' }}>{job.descr}</div>}
+              </div>
+              <JobStats
+                job={{
+                  ...job,
+                  forecast: {
+                    ...job.forecast,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    complexity: expressAppraiserStars,
+                  },
+                }}
+              />
+            </div>
+          </ResponsiveBlock>
+        </ResponsiveBlock>
+
+        <ResponsiveBlock>
+          <ResponsiveBlock
+            style={{
+              // padding: '16px 16px 16px 16px',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: '#fff',
+              zIndex: 2,
+              // borderBottom: '1px solid lightgray',
+              // border: '1px solid red',
+              height: '30px',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '1px',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'black',
+                color: '#fff',
+                padding: '4px',
+                display: 'flex',
+                gap: '8px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                cursor: 'pointer',
+                fontSize: 'small',
+              }}
+              onClick={scrollTop}
+            >
+              <span>TOP</span>
+              <ArrowUpwardIcon fontSize='small' />
+            </div>
+          </ResponsiveBlock>
+
+          <ResponsiveBlock
+            style={{
+              padding: '16px 16px 16px 16px',
+              position: 'sticky',
+              top: '30px',
+              backgroundColor: '#fff',
+              zIndex: 2,
+              borderBottom: '1px solid lightgray',
+            }}
+          >
+            <h2>[ Active job info ]</h2>
+          </ResponsiveBlock>
+
           {
             linksFromLogs.length > 0 && (
-              <div
+              <ResponsiveBlock
                 style={{
-                  backgroundColor: 'gray',
-                  color: '#fff',
-                  padding: '4px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  alignItems: 'center',
-                  width: '100%',
-                  cursor: 'pointer',
-                  fontSize: 'small',
+                  padding: '16px 16px 16px 16px',
                 }}
-                onClick={scrollLinks}
-                className={baseClasses.stripedBlue}
               >
-                <span>LINKS</span>
-                <ArrowDownwardIcon fontSize='small' />
-              </div>
+                <h3 id='linkBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                  <span>[ All links: {linksFromLogs.length}</span>
+                  <LinkIcon />
+                  <span>]</span>
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {
+                    linksFromLogs.map((link) => (
+                      <div
+                        key={link.id}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                      >
+                        <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('DD.MM.YYYY HH:mm')}</em>
+                        <div style={{ fontSize: 'small' }}>
+                          <CopyToClipboardWrapper
+                            text={link.url}
+                            uiText={link.title}
+                            showNotifOnCopy
+                          />
+                        </div>
+                        {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
+                      </div>
+                    ))
+                  }
+                </div>
+              </ResponsiveBlock>
+            )
+          }
+
+          {
+            !!job && (
+              <ResponsiveBlock
+                style={{
+                  paddingBottom: '24px',
+                }}
+              >
+                <JobAdditionalInfo job={job} />
+              </ResponsiveBlock>
             )
           }
         </ResponsiveBlock>
 
         <ResponsiveBlock
+          className={baseClasses.specialActionsGrid}
           style={{
-            padding: '16px 16px 16px 16px',
+            padding: '16px',
+            // border: '1px dashed red',
+            boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
             position: 'sticky',
-            top: '30px',
+            bottom: 0,
             backgroundColor: '#fff',
-            zIndex: 2,
-            borderBottom: '1px solid lightgray',
+            zIndex: 3,
+            marginTop: 'auto',
+            borderRadius: '16px 16px 0px 0px',
           }}
         >
-          <h2
-            style={{
-              display: 'inline-flex',
-              gap: '6px',
-              alignItems: 'center',
-            }}>
-            {
-              !job.forecast.finish
-                ? <>
-                  <span>[ Scenario variants</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center' }}>{ratingIcons[expressAppraiserStars].icon}</span>
-                  <span>]</span>
-                </>
-                : '[ Details ]'
-            }
-          </h2>
-        </ResponsiveBlock>
-
-        <ResponsiveBlock
-          style={{
-            padding: '16px 16px 16px 16px',
-          }}
-        >
-          <div className={baseClasses.stack2}>
-            <div
-              className={baseClasses.stack1}
-            >
-              <div
-                style={{
-                  fontWeight: 'bold',
-                  // wordBreak: 'break-all',
-                  overflowWrap: 'break-word',
-                }}
-              >{job.title}</div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '100%',
-                  minHeight: '32px',
-                }}
-              >
-                <RadioGroupRating
-                  size='large'
-                  name='rating-view'
-                  value={expressAppraiserStars}
-                  // icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
-                  // emptyIcon={<StarBorderIcon fontSize='inherit' />}
-                  // max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
-                  max={6}
-                  // disabled
-                  // aria-readonly
-                  // readOnly
-                  onChange={(_e, value) => {
-                    setExpressAppraiserStars(value || 0)
-                  }}
-                />
-                {
-                  isNeedToReset && (
-                    <Button
-                      color='error'
-                      variant='text'
-                      size='small'
-                      endIcon={<HistoryIcon />}
-                      // fullWidth
-                      // className={baseClasses.truncate}
-                      onClick={resetExpressAppraiserStars}
-                    >
-                      Reset
-                    </Button>
-                  )
-                }
-              </div>
-              <div>Grade: {ratingIcons[expressAppraiserStars].label}</div>
-              {!!job.descr && <div style={{ color: 'gray', fontSize: 'small' }}>{job.descr}</div>}
-            </div>
-            <JobStats
-              job={{
-                ...job,
-                forecast: {
-                  ...job.forecast,
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  complexity: expressAppraiserStars,
-                },
-              }}
-            />
-          </div>
-        </ResponsiveBlock>
-      </ResponsiveBlock>
-
-      <ResponsiveBlock>
-        <ResponsiveBlock
-          style={{
-            // padding: '16px 16px 16px 16px',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: '#fff',
-            zIndex: 2,
-            // borderBottom: '1px solid lightgray',
-            // border: '1px solid red',
-            height: '30px',
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '1px',
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: 'black',
-              color: '#fff',
-              padding: '4px',
-              display: 'flex',
-              gap: '8px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-              cursor: 'pointer',
-              fontSize: 'small',
-            }}
-            onClick={scrollTop}
-          >
-            <span>TOP</span>
-            <ArrowUpwardIcon fontSize='small' />
-          </div>
-        </ResponsiveBlock>
-
-        <ResponsiveBlock
-          style={{
-            padding: '16px 16px 16px 16px',
-            position: 'sticky',
-            top: '30px',
-            backgroundColor: '#fff',
-            zIndex: 2,
-            borderBottom: '1px solid lightgray',
-          }}
-        >
-          <h2>[ Active job info ]</h2>
-        </ResponsiveBlock>
-
-        {
-          linksFromLogs.length > 0 && (
-            <ResponsiveBlock
-              style={{
-                padding: '16px 16px 16px 16px',
-              }}
-            >
-              <h3 id='linkBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                <span>[ All links: {linksFromLogs.length}</span>
-                <LinkIcon />
-                <span>]</span>
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {
-                  linksFromLogs.map((link) => (
-                    <div
-                      key={link.id}
-                      style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
-                    >
-                      <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('DD.MM.YYYY HH:mm')}</em>
-                      <div style={{ fontSize: 'small' }}>
-                        <CopyToClipboardWrapper
-                          text={link.url}
-                          uiText={link.title}
-                          showNotifOnCopy
-                        />
-                      </div>
-                      {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
-                    </div>
-                  ))
-                }
-              </div>
-            </ResponsiveBlock>
-          )
-        }
-
-        {
-          !!job && (
-            <ResponsiveBlock
-              style={{
-                paddingBottom: '24px',
-              }}
-            >
-              <JobAdditionalInfo job={job} />
-            </ResponsiveBlock>
-          )
-        }
-      </ResponsiveBlock>
-
-      <ResponsiveBlock
-        className={baseClasses.specialActionsGrid}
-        style={{
-          padding: '16px',
-          // border: '1px dashed red',
-          boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-          position: 'sticky',
-          bottom: 0,
-          backgroundColor: '#fff',
-          zIndex: 3,
-          marginTop: 'auto',
-          borderRadius: '16px 16px 0px 0px',
-        }}
-      >
-        {
-          !!job.forecast.assignedTo && (
-            <Link
-              to={
-                [
-                  `/employees/${job.forecast.assignedTo}`,
-                  '?',
+          {
+            !!job.forecast.assignedTo && (
+              <Link
+                to={
                   [
-                    `lastSeenJob=${job.id}`,
-                    `from=${encodeURIComponent(`/jobs?lastSeenJob=${job.id}&backActionUiText=Jobs`)}`
-                  ].join('&'),
-                ].join('')
-              }
-              target='_self'
-            >
-              <Button
-                variant='outlined'
-                startIcon={<AccountCircleIcon />}
-                fullWidth
-              // className={baseClasses.truncate}
+                    `/employees/${job.forecast.assignedTo}`,
+                    '?',
+                    [
+                      `lastSeenJob=${job.id}`,
+                      `from=${encodeURIComponent(`/jobs?lastSeenJob=${job.id}&backActionUiText=Jobs`)}`
+                    ].join('&'),
+                  ].join('')
+                }
+                target='_self'
               >
-                {getTruncated(activeJobEmployee?.displayName || 'Employee', 11)}
-              </Button>
-            </Link>
-          )
-        }
-        <Link to={`/jobs/${job.id}`} target='_self'>
-          <Button variant='contained' endIcon={<ArrowForwardIcon />} fullWidth>
-            Job
-          </Button>
-        </Link>
-      </ResponsiveBlock>
-    </div>
+                <Button
+                  variant='outlined'
+                  startIcon={<AccountCircleIcon />}
+                  fullWidth
+                // className={baseClasses.truncate}
+                >
+                  {getTruncated(activeJobEmployee?.displayName || 'Employee', 11)}
+                </Button>
+              </Link>
+            )
+          }
+          <Link to={`/jobs/${job.id}`} target='_self'>
+            <Button variant='contained' endIcon={<ArrowForwardIcon />} fullWidth>
+              Job
+            </Button>
+          </Link>
+        </ResponsiveBlock>
+      </div>
+    </>
   )
 })

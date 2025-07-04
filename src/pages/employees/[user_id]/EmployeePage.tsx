@@ -25,7 +25,7 @@ import { sort } from '~/shared/utils/object-ops/sort-array-objects@3.0.0'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 // import { CollapsibleJobInfoAndButton } from './components'
-import { getTruncated } from '~/shared/utils/string-ops'
+// import { getTruncated } from '~/shared/utils/string-ops'
 
 export const EmployeePage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -40,8 +40,8 @@ export const EmployeePage = memo(() => {
     else setLastSeenJobId(null)
   }, [setLastSeenJobId, urlSearchParams])
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
-  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
-  const targetUser =  useMemo<TUser | null>(() => {
+  // const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const targetUser = useMemo<TUser | null>(() => {
     return users?.find(({ id }) => id === Number(params.user_id)) || null
   }, [users, params.user_id])
   // const targetJobs = useMemo(() => {
@@ -88,8 +88,8 @@ export const EmployeePage = memo(() => {
         )}`,
         `backActionUiText=${encodeURIComponent(
           !!targetUser
-          ? targetUser.displayName
-          : 'Employees'
+            ? targetUser.displayName
+            : 'Employees'
         )}`
       ].join('&')
     ].join(''))
@@ -138,14 +138,14 @@ export const EmployeePage = memo(() => {
             >
               {
                 !!targetUser?.displayName
-                ? (
-                  <UserAva
-                    name={targetUser.displayName}
-                    size={40}
-                  />
-                ) : (
-                  <AccountCircleIcon />
-                )
+                  ? (
+                    <UserAva
+                      name={targetUser.displayName}
+                      size={40}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )
               }
               <div
                 style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0px' }}
@@ -195,7 +195,7 @@ export const EmployeePage = memo(() => {
                       <Button sx={{ borderRadius: 4 }} size='small'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
-                          ? 'contained' : 'outlined'}
+                            ? 'contained' : 'outlined'}
                         startIcon={<NewReleasesIcon />}>
                         New ({targetUserCounters.allNew})
                       </Button>
@@ -212,10 +212,10 @@ export const EmployeePage = memo(() => {
                         size='small'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                          && !activeFilters.estimateReached
-                          && activeFilters.assignedTo
-                          ? 'contained'
-                          : 'outlined'
+                            && !activeFilters.estimateReached
+                            && activeFilters.assignedTo
+                            ? 'contained'
+                            : 'outlined'
                         }
                         startIcon={<FilterAltIcon />}
                       >
@@ -235,9 +235,9 @@ export const EmployeePage = memo(() => {
                         color='gray'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
-                          && !activeFilters.estimateReached
-                          && activeFilters.assignedTo
-                          ? 'contained' : 'outlined'}
+                            && !activeFilters.estimateReached
+                            && activeFilters.assignedTo
+                            ? 'contained' : 'outlined'}
                         startIcon={<TaskAltIcon />}
                       >
                         Completed ({targetUserCounters.allCompleted})
@@ -256,9 +256,9 @@ export const EmployeePage = memo(() => {
                         color='success'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                          && activeFilters.values.estimateReached === 0
-                          && activeFilters.assignedTo
-                          ? 'contained' : 'outlined'
+                            && activeFilters.values.estimateReached === 0
+                            && activeFilters.assignedTo
+                            ? 'contained' : 'outlined'
                         }
                         startIcon={<ThumbUpIcon />}
                       >
@@ -278,9 +278,9 @@ export const EmployeePage = memo(() => {
                         color='error'
                         variant={
                           activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                          && activeFilters.values.estimateReached === 1
-                          && activeFilters.assignedTo
-                          ? 'contained' : 'outlined'
+                            && activeFilters.values.estimateReached === 1
+                            && activeFilters.assignedTo
+                            ? 'contained' : 'outlined'
                         }
                         startIcon={<ThumbDownIcon />}
                       >
@@ -296,7 +296,7 @@ export const EmployeePage = memo(() => {
                         sx={{ borderRadius: 4 }} size='small' color='info'
                         variant={
                           activeFilters.values.isProject === 1
-                          ? 'contained' : 'outlined'
+                            ? 'contained' : 'outlined'
                         }
                         startIcon={<HiveIcon />}
                       >
@@ -307,8 +307,8 @@ export const EmployeePage = memo(() => {
                 }
                 {
                   (activeFilters.estimateReached
-                  || activeFilters.jobStatusFilter
-                  || activeFilters.isProject) && (
+                    || activeFilters.jobStatusFilter
+                    || activeFilters.isProject) && (
                     <Button sx={{ borderRadius: 4 }}
                       size='small'
                       color='inherit'
@@ -327,102 +327,102 @@ export const EmployeePage = memo(() => {
 
         {
           sortedJobs.length === 0
-          ? (
-            <>
-              <Grid size={12}>
-                <em>No target jobs for this user</em>
-              </Grid>
-              <Grid size={12}>
-                <pre className={baseClasses.preNormalized}>
-                  {JSON.stringify({ jobs, sortedJobs }, null, 2)}
-                </pre>
-              </Grid>
-            </>
-          ) : (
-            <Grid
-              size={12}
-            >
-              <h2>[ Jobs ]</h2>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 1,
-                }}
+            ? (
+              <>
+                <Grid size={12}>
+                  <em>No target jobs for this user</em>
+                </Grid>
+                {/* <Grid size={12}>
+                  <pre className={baseClasses.preNormalized}>
+                    {JSON.stringify({ jobs, sortedJobs }, null, 2)}
+                  </pre>
+                </Grid> */}
+              </>
+            ) : (
+              <Grid
+                size={12}
               >
-              {/* <List
+                <h2>[ Jobs ]</h2>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                  }}
+                >
+                  {/* <List
                 sx={{
                   border: '1px solid red',
                   gap: 1,
                 }}
               > */}
-                {
-                  sortedJobs.map((job) => {
-                    return (
-                      <Fragment key={job.id}>
-                        <ListItem
-                          disablePadding
-                          id={`job_list_item_${job.id}`}
-                        >
-                          <ListItemButton
-                            onClick={goJobPage({ id: job.id })}
-                            sx={{
-                              borderRadius: 2,
-                              backgroundColor: lastSeenJobId === job.id
-                                ? '#f7f5fa'
-                                : 'inherit',
-                            }}
+                  {
+                    sortedJobs.map((job) => {
+                      return (
+                        <Fragment key={job.id}>
+                          <ListItem
+                            disablePadding
+                            id={`job_list_item_${job.id}`}
                           >
-                            <ListItemAvatar>
-                              <AutoRefreshedJobMuiAva job={job} delay={1000} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={
-                                <span
-                                  // className={baseClasses.truncate}
-                                  style={{
-                                    display: 'block',
-                                    fontSize: 'small',
-                                  }}
-                                >
-                                  {job.title}
-                                </span>
-                              }
-                              secondary={<JobResultReviewShort job={job} />}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                        {/* <CollapsibleJobInfoAndButton
+                            <ListItemButton
+                              onClick={goJobPage({ id: job.id })}
+                              sx={{
+                                borderRadius: 2,
+                                backgroundColor: lastSeenJobId === job.id
+                                  ? '#f7f5fa'
+                                  : 'inherit',
+                              }}
+                            >
+                              <ListItemAvatar>
+                                <AutoRefreshedJobMuiAva job={job} delay={1000} />
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={
+                                  <span
+                                    // className={baseClasses.truncate}
+                                    style={{
+                                      display: 'block',
+                                      fontSize: 'small',
+                                    }}
+                                  >
+                                    {job.title}
+                                  </span>
+                                }
+                                secondary={<JobResultReviewShort job={job} />}
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                          {/* <CollapsibleJobInfoAndButton
                           jobId={job.id}
                         /> */}
-                      </Fragment>
-                    )
-                  })
-                }
-              {/* </List> */}
-              </Box>
-              {/* <pre className={baseClasses.preNormalized}>
+                        </Fragment>
+                      )
+                    })
+                  }
+                  {/* </List> */}
+                </Box>
+                {/* <pre className={baseClasses.preNormalized}>
                 {JSON.stringify({ targetJobs }, null, 2)}
               </pre> */}
-            </Grid>
-          )
+              </Grid>
+            )
         }
 
         {
           jobsForAnalysis.length === 0
-          ? (
-            <Grid size={12}>
-              <em>No jobs for analysis this user</em>
-            </Grid>
-          ) : (
-            <Grid size={12}>
-              <h2>[ Jobs analysis: {jobsForAnalysis.length} ]</h2>
-              <SpeedsFunctionGraph targetJobs={jobsForAnalysis} />
-              {/* getSortedSpeedsCalc */}
-            </Grid>
-          )
+            ? (
+              <Grid size={12}>
+                <em>No jobs for analysis this user</em>
+              </Grid>
+            ) : (
+              <Grid size={12}>
+                <h2>[ Jobs analysis: {jobsForAnalysis.length} ]</h2>
+                <SpeedsFunctionGraph targetJobs={jobsForAnalysis} />
+                {/* getSortedSpeedsCalc */}
+              </Grid>
+            )
         }
-        
+
         <Grid size={12}>
           <h2>[ Debug ]</h2>
           <pre className={baseClasses.preNormalized}>
@@ -450,9 +450,11 @@ export const EmployeePage = memo(() => {
                 <Link
                   to={userRouteControls.from.value}
                   target='_self'
+                  className={baseClasses.truncate}
                 >
-                  <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
-                    {getTruncated(userRouteControls.from.uiText, 11)}
+                  <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
+                    {/* getTruncated(userRouteControls.from.uiText, 11) */}
+                    <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
                   </Button>
                 </Link>
               )
@@ -474,9 +476,11 @@ export const EmployeePage = memo(() => {
                 <Link
                   to={userRouteControls.to.value}
                   target='_self'
+                  className={baseClasses.truncate}
                 >
-                  <Button variant='outlined' endIcon={<ArrowForwardIcon />} fullWidth>
-                    {getTruncated(userRouteControls.to.uiText, 11)}
+                  <Button variant='outlined' endIcon={<ArrowForwardIcon />} fullWidth className={baseClasses.truncate}>
+                    {/* getTruncated(userRouteControls.to.uiText, 11) */}
+                    <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
                   </Button>
                 </Link>
               )

@@ -11,3 +11,10 @@ input, textarea {
   caret-shape: underscore !important;
   font-family: monospace;
 }
+
+a {
+  color: #0052b6;
+}
+a:hover, a:active, a:focus {
+  color: red;
+}

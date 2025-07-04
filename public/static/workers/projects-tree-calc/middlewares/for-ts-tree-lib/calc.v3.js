@@ -68,62 +68,78 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             })
 
             // -- NOTE: TARGET CALC SRC
-            const createNodeData = (job) => ({
-              model: {
-                id: job.id,
-                title: job.title,
-                ts: job.ts,
-                descr: job.descr,
-                completed: job.completed,
-                logs: job.logs,
-              },
-              children: []
-            })
-            const getTreePartById = (currentJob, existingChild) => {
-              let node = createNodeData(currentJob)
-              let existingChildId = existingChild?.model.id || 0;
+            const _jobsMap = new Map()
+            for (const job of input.jobs) _jobsMap.set(job.id, job)
+
+            let _c = 0
+
+            const getTreePartById = ({ currentJobData, existingChild }) => {
+              const getNodeDataStandart = (job) => {
+                return {
+                  model: {
+                    id: job.id,
+                    title: job.title,
+                    ts: job.ts,
+                    descr: job.descr,
+                    completed: job.completed,
+                    logs: job.logs,
+                    relations: job.relations,
+                    _service: {
+                      recursionCounter: ++_c,
+                      logs: ['Node created'],
+                    },
+                  },
+                  children: []
+                }
+              }
+              const node = getNodeDataStandart(currentJobData)
+              const hasExistingChild = !!existingChild
 
               // Добавляем существующего ребёнка
-              if (existingChildId !== 0) {
-                node.children.push(existingChild)
-              }
+              if (hasExistingChild) node.children.push(existingChild)
 
-              const findJobById = (id) => {
-                for (const job of input.jobs) {
-                  if (job.id === id) return (job)
-                }
-              }
+              const findJobById = (id) => _jobsMap.get(id)
 
-              const addAllChildrenToTheNode = (currentJob, node, existingChildId = 0) => {
+              const addAllChildrenToTheNode = (currentJobData, node, existingChildId) => {
                 // Добавляем всех детей
-                if (!!currentJob.relations?.children && currentJob.relations.children.length > 0) {
-                  for (const childId of currentJob.relations.children) {
-                    let job = findJobById(childId)
-                    if (job.id != existingChildId) {
-                      let childNode = createNodeData(job)
-                      node.children.push(childNode)
-                      addAllChildrenToTheNode(job, childNode)
+                if (Array.isArray(currentJobData.relations?.children) && currentJobData.relations.children.length > 0) {
+                  for (const childId of currentJobData.relations.children) {
+                    const childData = findJobById(childId)
+                    if (!childData) {
+                      throw new Error(`childData with id=${childId} не существует`)
+                    }
+                    const subChildNode = getNodeDataStandart(childData)
+                    if (!!existingChildId && childData.id !== existingChildId) {
+                      node.children.push(subChildNode)
+                      node.model._service.logs.unshift(`Child ${subChildNode.model.id} ADDED`)
+                      addAllChildrenToTheNode(childData, subChildNode)
+                    } else {
+                      node.model._service.logs.unshift(`Child ${subChildNode.model.id} IGNORED`)
                     }
                   }
-                  node.children.sort((a, b) => { return (b.model.ts.update - a.model.ts.update) })
+                  node.children = node.children.sort((a, b) => b.model.ts.update - a.model.ts.update)
+                } else {
+                  node.model._service.logs.unshift('Children is not added')
                 }
               }
-
-              addAllChildrenToTheNode(currentJob, node, existingChildId)
+              addAllChildrenToTheNode(currentJobData, node, existingChild?.model.id)
 
               // Выполняем процедуру для родителя
-              if (!!currentJob.relations?.parent) {
+              if (!!currentJobData.relations?.parent) {
                 // Находим элемент родителя в массиве jobs
-                let job = findJobById(currentJob.relations.parent)
-                if (job.id === currentJob.relations.parent) {
-                  return (getTreePartById(job, node))
+                const parentJob = findJobById(currentJobData.relations.parent)
+                if (!parentJob) {
+                  throw new Error(`parentJob with id=${currentJobData.relations.parent} не существует`)
+                }
+                if (parentJob.id === currentJobData.relations.parent) {
+                  return getTreePartById({ currentJobData: parentJob, existingChild: node })
                 }
               }
 
-              return (node);
+              return node;
             }
 
-            const calc = getTreePartById(input.job);
+            const calc = getTreePartById({ currentJobData: { ...input.job } });
             // --
 
             output.ok = true

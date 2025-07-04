@@ -43,15 +43,15 @@ export const JobsPage = memo(() => {
       >
         {
           !!activeJob
-          ? (
-            <ActiveJobContent
-              job={activeJob}
-              isOpened={isOpened}
-              onToggleDrawer={handleToggleDrawer}
-            />
-          ) : (
-            <em>No active job</em>
-          )
+            ? (
+              <ActiveJobContent
+                job={activeJob}
+                isOpened={isOpened}
+                onToggleDrawer={handleToggleDrawer}
+              />
+            ) : (
+              <em>No active job</em>
+            )
         }
       </Drawer>
     </Layout>

@@ -16,7 +16,6 @@ import { Link } from 'react-router-dom'
 import { Alert, Box, Button, Rating } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { JobStats } from '~/shared/components/Job/components'
-import { getTruncated } from '~/shared/utils/string-ops'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
@@ -76,17 +75,17 @@ export const JobPage = memo(() => {
   //   user: targetUser,
   // }), [targetJob, targetUser])
 
-  // const targetJobWithoutLogs = useMemo(() => {
-  //   try {
-  //     if (!targetJob) throw new Error('No targetJob')
-  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //     const { logs, ...rest } = targetJob
-  //     return rest
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   } catch (_err) {
-  //     return null
-  //   }
-  // }, [targetJob])
+  const targetJobWithoutLogs = useMemo(() => {
+    try {
+      if (!targetJob) throw new Error('No targetJob')
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { logs, ...rest } = targetJob
+      return rest
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_err) {
+      return null
+    }
+  }, [targetJob])
 
   // const [urlSearchParams] = useSearchParams()
   // const urlSearchParamFrom = useMemo(() => urlSearchParams.get('from'), [urlSearchParams])
@@ -97,11 +96,11 @@ export const JobPage = memo(() => {
     <Grid container spacing={2}>
       <Grid
         size={12}
-        className={baseClasses.boxShadowBottom}
+        // className={baseClasses.boxShadowBottom}
         sx={{
-          // borderBottom: '1px solid lightgray',
-          position: 'sticky',
-          top: 0,
+          borderBottom: '1px solid lightgray',
+          // position: 'sticky',
+          // top: 0,
           backgroundColor: '#fff',
           zIndex: 2,
           pt: 2,
@@ -312,15 +311,15 @@ export const JobPage = memo(() => {
 
       <Grid size={12}>
         <pre className={baseClasses.preNormalized}>
-          {JSON.stringify({ targetJob }, null, 2)}
+          {JSON.stringify({ targetJobWithoutLogs }, null, 2)}
         </pre>
       </Grid>
 
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <pre className={baseClasses.preNormalized}>
           {JSON.stringify({ otherUserJobsForAnalysis }, null, 2)}
         </pre>
-      </Grid>
+      </Grid> */}
 
       <ResponsiveBlock
         className={baseClasses.specialActionsGrid}
@@ -339,9 +338,10 @@ export const JobPage = memo(() => {
             <Link
               to={userRouteControls.from.value}
               target='_self'
+              className={baseClasses.truncate}
             >
-              <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth>
-                {getTruncated(userRouteControls.from.uiText, 11)}
+              <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
+                <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
               </Button>
             </Link>
           )
@@ -384,14 +384,16 @@ export const JobPage = memo(() => {
                 ].join('')
               }
               target='_self'
+              className={baseClasses.truncate}
             >
               <Button
                 variant='outlined'
                 color='gray'
                 startIcon={<AccountCircleIcon />}
                 fullWidth
+                className={baseClasses.truncate}
               >
-                {getTruncated(targetUser?.displayName || 'Employee', 11)}
+                <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
               </Button>
             </Link>
           )

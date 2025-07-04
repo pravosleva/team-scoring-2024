@@ -1,15 +1,20 @@
 .mainWrapper {
   // outline: 4px solid lightgray;
+  word-break: break-word;
 }
+
 .mainWrapper.whiteColor {
   color: #fff;
+
   & a {
     color: #fff;
   }
+
   .date {
     color: #fff !important;
   }
 }
+
 .mainWrapper.warningDashedBorder {
   // border: 2px solid lightgray;
   border: 2px solid #fff;
@@ -33,6 +38,7 @@
   border: 2px solid #fff;
   outline: 4px solid #e63946;
 }
+
 .mainWrapper.activeDashedBorder {
   border: 2px solid #fff;
   outline: 4px dashed #00b0ff;

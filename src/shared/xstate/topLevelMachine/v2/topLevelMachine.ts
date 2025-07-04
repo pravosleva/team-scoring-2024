@@ -12,8 +12,8 @@ const getSpeed = (job: TJob): number =>
     && typeof job.forecast.estimate === 'number'
     && typeof job.forecast.finish === 'number'
   )
-  ? getRounded((job.forecast.estimate / 1000 - job.forecast.start / 1000) / (job.forecast.finish / 1000 - job.forecast.start / 1000), 4)
-  : 0
+    ? getRounded((job.forecast.estimate / 1000 - job.forecast.start / 1000) / (job.forecast.finish / 1000 - job.forecast.start / 1000), 4)
+    : 0
 
 export const topLevelMachine = setup({
   types: {} as {
@@ -28,29 +28,29 @@ export const topLevelMachine = setup({
       };
     };
     events:
-      | { type: 'newTodo.change'; value: string }
-      | { type: 'newTodo.commit'; value: Pick<TJob, 'title'>; }
-      | { type: 'todo.commit'; job: TJob; comment?: string; }
-      | { type: 'todo.clearDates'; id: number }
-      | { type: 'todo.addTimeToFinishDate'; id: number; hours: number; comment?: string; }
-      | { type: 'todo.delete'; id: number }
-      // | { type: 'filter.jobStatus.change'; filter: EJobsStatusFilter }
-      // | { type: 'filter.assignedTo.change'; filter: number }
-      // | { type: 'filter.jobEstimateReached.change'; filter: 0 | 1 }
-      | { type: 'todo.mark'; id: number; mark: 'active' | 'completed' }
-      | { type: 'todo.markAll'; mark: 'active' | 'completed' }
-      | { type: 'todos.clearCompleted' }
-      | { type: 'user.commit'; value: { displayName: string; value?: number; } }
-      | { type: 'user.delete'; value: { id: number; } }
-      | { type: 'todo.editLog'; value: { jobId: number; logTs: number; text: string } }
-      | { type: 'todo.deleteLog'; value: { jobId: number; logTs: number } }
-      | { type: 'todo.addLinkToLog'; value: { jobId: number; logTs: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
-      | { type: 'todo.deleteLinkInLog'; value: { jobId: number; logTs: number; linkId: number } }
-      | { type: 'todo.editLinkInLog'; value: { jobId: number; logTs: number; linkId: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
-      | { type: 'todo.addChecklistItemInLog'; value: { jobId: number; logTs: number; state: Pick<TLogChecklistItem, 'title' | 'descr'> } }
-      | { type: 'todo.editChecklistItemInLog'; value: { jobId: number; logTs: number; checklistItemId: number; state: Pick<TLogChecklistItem, 'title' | 'descr' | 'isDisabled' | 'isDone'> } }
-      | { type: 'todo.deleteChecklistFromLog'; value: { jobId: number; logTs: number } }
-      | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
+    | { type: 'newTodo.change'; value: string }
+    | { type: 'newTodo.commit'; value: Pick<TJob, 'title'>; }
+    | { type: 'todo.commit'; job: TJob; comment?: string; }
+    | { type: 'todo.clearDates'; id: number }
+    | { type: 'todo.addTimeToFinishDate'; id: number; hours: number; comment?: string; }
+    | { type: 'todo.delete'; id: number }
+    // | { type: 'filter.jobStatus.change'; filter: EJobsStatusFilter }
+    // | { type: 'filter.assignedTo.change'; filter: number }
+    // | { type: 'filter.jobEstimateReached.change'; filter: 0 | 1 }
+    | { type: 'todo.mark'; id: number; mark: 'active' | 'completed' }
+    | { type: 'todo.markAll'; mark: 'active' | 'completed' }
+    | { type: 'todos.clearCompleted' }
+    | { type: 'user.commit'; value: { displayName: string; value?: number; } }
+    | { type: 'user.delete'; value: { id: number; } }
+    | { type: 'todo.editLog'; value: { jobId: number; logTs: number; text: string } }
+    | { type: 'todo.deleteLog'; value: { jobId: number; logTs: number } }
+    | { type: 'todo.addLinkToLog'; value: { jobId: number; logTs: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
+    | { type: 'todo.deleteLinkInLog'; value: { jobId: number; logTs: number; linkId: number } }
+    | { type: 'todo.editLinkInLog'; value: { jobId: number; logTs: number; linkId: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
+    | { type: 'todo.addChecklistItemInLog'; value: { jobId: number; logTs: number; state: Pick<TLogChecklistItem, 'title' | 'descr'> } }
+    | { type: 'todo.editChecklistItemInLog'; value: { jobId: number; logTs: number; checklistItemId: number; state: Pick<TLogChecklistItem, 'title' | 'descr' | 'isDisabled' | 'isDone'> } }
+    | { type: 'todo.deleteChecklistFromLog'; value: { jobId: number; logTs: number } }
+    | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
   }
 }).createMachine({
   id: 'topLevel',
@@ -78,7 +78,7 @@ export const topLevelMachine = setup({
           const createTime = new Date().getTime()
           const newTodo: TJob = {
             ...event.value,
-            title: event.value.title.trim().replace(/\s+/g,' '),
+            title: event.value.title.trim().replace(/\s+/g, ' '),
             completed: false,
             id: createTime,
             forecast: {
@@ -98,11 +98,15 @@ export const topLevelMachine = setup({
                 },
               ],
             },
+            relations: {
+              parent: null,
+              children: [],
+            },
           }
 
           // if (!!newTodo.descr) newTodo.descr = event.value.descr.trim().replace(/\s+/g,' ')
 
-          soundManager.playSound({ soundCode: 'plop-1' })
+          soundManager.playDelayedSound({ soundCode: 'plop-1' })
 
           return ({
             ...context.jobs,
@@ -193,7 +197,7 @@ export const topLevelMachine = setup({
           if (!targetJob) {
             return context.jobs
           }
-          
+
           const checklistItemsLimit = 100
           return {
             ...context.jobs,
@@ -218,15 +222,15 @@ export const topLevelMachine = setup({
                       isDone: false,
                       isDisabled: false,
                       links: [],
-                      title: event.value.state.title.trim().replace(/\s+/g,' '),
-                      descr: event.value.state.descr.trim().replace(/\s+/g,' '),
+                      title: event.value.state.title.trim().replace(/\s+/g, ' '),
+                      descr: event.value.state.descr.trim().replace(/\s+/g, ' '),
                       ts: {
                         createdAt: tsCreate,
                         updatedAt: tsCreate,
                       },
                     }
                     if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
-                    
+
                     log.checklist.unshift(newChecklistItem)
                     todo.ts.update = tsCreate
                   }
@@ -248,7 +252,7 @@ export const topLevelMachine = setup({
           }
 
           const tsUpdate = new Date().getTime()
-          
+
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
@@ -280,7 +284,7 @@ export const topLevelMachine = setup({
                     //   },
                     // }
                     // if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
-                    
+
                     // log.checklist.unshift(newChecklistItem)
 
                     // NOTE: Edit
@@ -327,7 +331,7 @@ export const topLevelMachine = setup({
           }
 
           const tsUpdate = new Date().getTime()
-          
+
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
@@ -359,7 +363,7 @@ export const topLevelMachine = setup({
                     //   },
                     // }
                     // if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
-                    
+
                     // log.checklist.unshift(newChecklistItem)
 
                     // NOTE: Edit
@@ -386,7 +390,7 @@ export const topLevelMachine = setup({
           }
 
           const tsUpdate = new Date().getTime()
-          
+
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
@@ -450,7 +454,7 @@ export const topLevelMachine = setup({
                   if (log.ts === event.value.logTs) {
                     // NOTE: Add link for log
                     if (!log.links) log.links = []
-                    
+
                     log.links = log.links.map((oldLink) => {
                       if (oldLink.id === event.value.linkId) {
                         return {
@@ -487,13 +491,13 @@ export const topLevelMachine = setup({
             const users = context.users
             const targetUser = users.items.find(({ id }) => id === jobToUpdate.forecast.assignedTo)
             if (!targetUser) {
-              soundManager.playSound({ soundCode: 'plop-3' })
+              soundManager.playDelayedSound({ soundCode: 'plop-3' })
               newUsers.unshift({
                 id: !Number.isNaN(Number(jobToUpdate.forecast.assignedTo))
                   ? Number(jobToUpdate.forecast.assignedTo)
                   : updateTime,
                 displayName: !!jobToUpdate.forecast._assignedToName
-                  ? jobToUpdate.forecast._assignedToName.trim().replace(/\s+/g,' ') : 'NoName',
+                  ? jobToUpdate.forecast._assignedToName.trim().replace(/\s+/g, ' ') : 'NoName',
                 ts: {
                   create: updateTime,
                   update: updateTime,
@@ -513,6 +517,8 @@ export const topLevelMachine = setup({
           const updateTime = new Date().getTime()
           jobToUpdate.ts.update = updateTime
 
+          // const targetJobIndex = context.jobs.items.findIndex(({ id }) => id)
+
           // if (!!jobToUpdate.forecast.employee) {
           //   if (!!jobToUpdate.forecast.employee._id) {
           //     jobToUpdate.forecast.employee.value = String(jobToUpdate.forecast.employee._id)
@@ -526,36 +532,34 @@ export const topLevelMachine = setup({
 
           // if (!jobToUpdate.title.trim().length) return context.todos.filter((todo) => todo.id !== jobToUpdate.id)
 
-          const parentId = jobToUpdate.relations?.parent
+          const newParentId = jobToUpdate.relations?.parent
           const _newMsgsForParent = new Set()
 
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo, i, a) => {
               switch (true) {
-                // -- NOTE: Update children list for parent job
-                case typeof parentId === 'number' && todo.id === parentId: {
-                  let childWasAlreadyAdded = false
+                case typeof newParentId === 'number' && todo.id === newParentId: {
+                  // NOTE: NEW PARENT JOB
+                  console.log('- /NEW PARENT JOB')
+
+                  // -- NOTE: Update children list for parent job
+                  todo.relations.children = [...new Set([jobToUpdate.id, ...(todo.relations.children || [])])]
+                  // console.log('Children updated: [1]')
+                  // console.log(todo.relations.children)
+                  soundManager.playDelayedSound({ soundCode: 'gong-6', _debug: { msg: 'Children list updated for parent job' } })
+                  // --- Info
+                  let _childWasAlreadyAdded = false
                   switch (true) {
-                    case !!todo.relations:
-                      if (Array.isArray(todo.relations.children)) {
-                        childWasAlreadyAdded = todo.relations?.children?.includes(jobToUpdate.id)
-                        todo.relations.children = [...new Set([jobToUpdate.id, ...todo.relations.children])]
-                      }
-                      else
-                        todo.relations.children = [jobToUpdate.id]
+                    case todo.relations.children.length > 0:
+                      _childWasAlreadyAdded = todo.relations?.children?.includes(jobToUpdate.id)
                       break
                     default:
-                      todo.relations = {
-                        children: [jobToUpdate.id]
-                      }
                       break
                   }
-
-                  if (!childWasAlreadyAdded) {
+                  if (!_childWasAlreadyAdded) {
                     _newMsgsForParent.add(`Child job added: [job=${jobToUpdate.id}]`)
                   }
-
                   if (_newMsgsForParent.size > 0) {
                     if (todo.logs.items.length >= todo.logs.limit) todo.logs.items.pop()
 
@@ -565,18 +569,28 @@ export const topLevelMachine = setup({
                     }
                     todo.logs.items.unshift(newLog)
                   }
-                  
+
+                  // if (targetJobIndex !== -1) {
+                  //   if (a[targetJobIndex].logs.items.length >= a[targetJobIndex].logs.limit)
+                  //     a[targetJobIndex].logs.items.pop()
+                  //   const _msgs = [
+                  //     `Parent set & updated: [job=${parentId}]`,
+                  //   ]
+                  //   a[targetJobIndex].logs.items.unshift({
+                  //     ts: updateTime + 1,
+                  //     text: _msgs.join(' // '),
+                  //   })
+                  // }
+                  // ---
+                  // --
+                  console.log('- /')
                   break
                 }
-                // --
                 case (todo.id === jobToUpdate.id): {
-                  if (!!todo.relations?.children) {
-                    if (!jobToUpdate.relations) {
-                      jobToUpdate.relations = {
-                        children: todo.relations?.children,
-                      }
-                    }
-                  }
+                  // NOTE: TARGET JOB
+                  console.log('- /TARGET JOB')
+                  // soundManager.playDelayedSound({ soundCode: 'plop-4', _debug: 'Target job detected' })
+
                   // console.log('-- jobToUpdate (1)')
                   // console.log(jobToUpdate)
                   // console.log('--')
@@ -589,54 +603,202 @@ export const topLevelMachine = setup({
                     doIt: false,
                     targetChildId: undefined,
                   }
-                  if (!!todo.relations?.parent && !jobToUpdate.relations?.parent) {
-                    // console.log('- [1] parent should be removed')
-                    shouldChildBeRemovedFromParent.doIt = true
-                    shouldChildBeRemovedFromParent.targetChildId = jobToUpdate.id
-                    if (shouldChildBeRemovedFromParent.doIt) {
-                      // console.log('- [1.1] parent should be removed')
-                      const parentIndex = a.findIndex(({ id }) => id === todo.relations?.parent)
-                      if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations?.children)) {
-                        // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
-                        a[parentIndex].relations.children = a[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
-                        
-                        if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
-                          a[parentIndex].logs.items.pop()
 
-                        a[parentIndex].logs.items.unshift({
-                          ts: updateTime + 1,
-                          text: `Child job removed: [job=${shouldChildBeRemovedFromParent.targetChildId}]`,
-                        })
-                        // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
-                      } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
-                    } // else console.log('- [2] parent should NOT be removed')
+                  const isParentRemoved = !!todo.relations?.parent && !jobToUpdate.relations?.parent
+                  const isParentSet = !!jobToUpdate.relations?.parent
+                  switch (true) {
+                    case isParentRemoved: {
+                      // NOTE: Parent removed!
+                      console.log('-- Parent removed!')
+
+                      // console.log('- [1] parent should be removed')
+                      shouldChildBeRemovedFromParent.doIt = true
+                      shouldChildBeRemovedFromParent.targetChildId = jobToUpdate.id
+                      if (shouldChildBeRemovedFromParent.doIt) {
+                        // console.log('- [1.1] parent should be removed')
+                        const parentIndex = a.findIndex(({ id }) => id === todo.relations?.parent)
+                        if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations?.children)) {
+                          console.log('--- OLD PARENT JOB')
+                          // console.log(todo.relations.parent)
+                          // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                          if (typeof a[parentIndex].relations === 'undefined') {
+                            a[parentIndex].relations = {
+                              parent: null,
+                              children: [],
+                            }
+                          }
+                          a[parentIndex].relations.children = a[parentIndex].relations?.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+                          // console.log(`--- children updated:`)
+                          // console.log(a[parentIndex].relations.children)
+                          soundManager.playDelayedSound({ soundCode: 'load-24', _debug: { msg: 'Children updated for parent job' } })
+
+                          if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
+                            a[parentIndex].logs.items.pop()
+
+                          a[parentIndex].logs.items.unshift({
+                            ts: updateTime + 1,
+                            text: `Child job removed (case 1): [job=${shouldChildBeRemovedFromParent.targetChildId}]`,
+                          })
+                          // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                        } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
+                      } // else console.log('- [2] parent should NOT be removed')
+
+                      // Remove parent
+                      if (!todo.relations) {
+                        todo.relations = {
+                          parent: null,
+                          children: [],
+                        }
+                      }
+                      todo.relations.parent = null
+                      // jobToUpdate.relations.children = todo.relations.children || []
+                      console.log('--')
+                      break
+                    }
+                    case isParentSet: {
+                      // NOTE: Set new parent!
+                      console.log('-- Set new parent!')
+                      soundManager.playDelayedSound({ soundCode: 'plop-1', _debug: { msg: 'New parent will be set' } })
+
+                      switch (true) {
+                        case !!todo.relations?.parent:
+                          // NOTE: Has old parent
+                          console.log('--- Has old parent')
+
+                          if (todo.relations.parent !== jobToUpdate.relations.parent) {
+                            // NOTE: Remove child from old parent
+                            shouldChildBeRemovedFromParent.doIt = true
+                            shouldChildBeRemovedFromParent.targetChildId = jobToUpdate.id
+                            const parentIndex = a.findIndex(({ id }) => id === todo.relations.parent)
+                            if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations.children)) {
+                              a[parentIndex].relations.children = a[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+                              soundManager.playDelayedSound({ soundCode: 'fail-116', _debug: { msg: 'Child removed from old parent' } })
+                            }
+                            if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
+                              a[parentIndex].logs.items.pop()
+
+                            a[parentIndex].logs.items.unshift({
+                              ts: updateTime + 1,
+                              text: `Child job removed (case 2): [job=${shouldChildBeRemovedFromParent.targetChildId}]`,
+                            })
+                          } else if (!!jobToUpdate.relations.parent && jobToUpdate.relations.parent === todo.relations.parent) {
+                            // NOTE: old parent already set (need to update info in parent)
+                            const parentIndex = a.findIndex(({ id }) => id === todo.relations.parent)
+                            if (parentIndex !== -1) {
+                              a[parentIndex].relations.children = [...new Set([jobToUpdate.id, ...(a[parentIndex].relations.children || [])])]
+                            }
+
+                            // a[targetJobIndex].relations.children = [...new Set([, ...(a[targetJobIndex].relations.children || [])])]
+                            // Nothing: Parent already set
+                            // if (targetJobIndex !== -1) {
+                            //   if (a[targetJobIndex].logs.items.length >= a[targetJobIndex].logs.limit)
+                            //     a[targetJobIndex].logs.items.pop()
+                            //   a[targetJobIndex].logs.items.unshift({
+                            //     ts: updateTime + 1,
+                            //     text: `SPECIAL LOG: Parent already set: [job=${parentId}]`,
+                            //   })
+                            // }
+                          }
+                          todo.relations.parent = jobToUpdate.relations.parent
+
+                          console.log('[1] CURRENT todo.relations.children')
+                          console.log(todo.relations.children)
+                          // jobToUpdate.relations.children = todo.relations.children || []
+                          console.log('---')
+                          break
+                        case !todo.relations?.parent: {
+                          // NOTE: Hasnt parent yet but will be set!
+                          console.log('--- Hasnt parent yet but will be set!')
+
+                          // Add child to parent
+                          const parentIndex = a.findIndex(({ id }) => id === jobToUpdate.relations.parent)
+                          if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations.children)) {
+                            a[parentIndex].relations.children = [...new Set([jobToUpdate.id, ...(a[parentIndex].relations.children || [])])]
+                            soundManager.playDelayedSound({ soundCode: 'click-8', _debug: { msg: 'Hasnt parent yet: Child added to parent' } })
+                            if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
+                              a[parentIndex].logs.items.pop()
+
+                            a[parentIndex].logs.items.unshift({
+                              ts: updateTime + 1,
+                              text: `Child job added (case 3): [job=${jobToUpdate.id}]`,
+                            })
+                          }
+
+                          // Add parent to child
+                          if (!todo.relations) {
+                            todo.relations = {
+                              parent: null,
+                              children: [],
+                            }
+                          }
+                          todo.relations.parent = jobToUpdate.relations.parent
+                          // todo.relations.children = 
+                          console.log('[2] CURRENT todo.relations.children')
+                          console.log(todo.relations.children)
+                          // jobToUpdate.relations.children = todo.relations.children || []
+                          console.log('---')
+                          break
+                        }
+                        default:
+                          console.log('--- Default')
+                          soundManager.playDelayedSound({ soundCode: 'fail-11', _debug: { msg: 'Unknown case' } })
+
+                          if (!todo.relations) {
+                            todo.relations = {
+                              parent: null,
+                              children: [],
+                            }
+                          }
+                          todo.relations.parent = jobToUpdate.relations.parent
+                          // jobToUpdate.relations.children = todo.relations.children || []
+                          console.log('---')
+                          break
+                      }
+                      // Nothing: Parent already set
+                      console.log('--')
+                      break
+                    }
+                    default:
+                      console.log('-- DEFAULT CASE!')
+                      console.log('--')
+                      break
                   }
                   // --
+                  console.log('- CURRENT: todo.relations')
+                  console.log(todo.relations) // { parent: null }
+
+                  // NOTE: Tested
+                  jobToUpdate.relations = todo.relations
+
+                  console.log('- NEW: jobToUpdate.relations')
+                  console.log(jobToUpdate.relations) // undefined?
+
+                  console.log('- /')
 
                   const { ts: { create } } = todo
                   jobToUpdate.ts.create = create
-  
-                  const normalizedTitle = jobToUpdate.title.trim().replace(/\s+/g,' ')
-                  const normalizedDescr = !!jobToUpdate.descr ? jobToUpdate.descr.trim().replace(/\s+/g,' ') : ''
-  
+
+                  const normalizedTitle = jobToUpdate.title.trim().replace(/\s+/g, ' ')
+                  const normalizedDescr = !!jobToUpdate.descr ? jobToUpdate.descr.trim().replace(/\s+/g, ' ') : ''
+
                   if (jobToUpdate.title !== normalizedTitle) jobToUpdate.title = normalizedTitle
                   if (jobToUpdate.descr !== normalizedDescr) jobToUpdate.descr = normalizedDescr
-  
+
                   delete jobToUpdate.forecast._assignedToName
-  
+
                   jobToUpdate.logs.items = todo.logs?.items || []
-  
+
                   const _newMsgs = new Set()
-  
+
                   switch (true) {
                     case !todo.logs.isEnabled && jobToUpdate.logs.isEnabled:
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
-                      
+
                       _newMsgs.add(`Logs enabled (detailed with your comments). ${comment || 'No comment'}`)
                       break
                     case todo.logs.isEnabled && !jobToUpdate.logs.isEnabled: {
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
-                      
+
                       _newMsgs.add('Logs disabled (minimal)')
                       break
                     }
@@ -646,15 +808,15 @@ export const topLevelMachine = setup({
                     ):
                       if (jobToUpdate.logs?.isEnabled) {
                         if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
-                        
-                        const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
+
+                        const normalizedComment = !!comment ? comment.trim().replace(/\s+/g, ' ') : ''
                         _newMsgs.add(normalizedComment || 'No comment')
                       }
                       break
                     default:
                       break
                   }
-  
+
                   // NOTE: Reassigned
                   const hasOldUser = !!todo.forecast.assignedTo
                   const hasNewUser = !!jobToUpdate.forecast.assignedTo
@@ -702,12 +864,12 @@ export const topLevelMachine = setup({
                     default:
                       break
                   }
-  
+
                   // NOTE: complexity updated
                   if (todo.forecast.complexity !== jobToUpdate.forecast.complexity) {
                     _newMsgs.add(`Complexity ${todo.forecast.complexity} -> ${jobToUpdate.forecast.complexity}`)
                   }
-  
+
                   // NOTE: completed flag
                   const wasCompleted = todo.completed
                   if (!wasCompleted) {
@@ -721,8 +883,7 @@ export const topLevelMachine = setup({
                     }
                   }
                   jobToUpdate.completed = !!jobToUpdate.forecast.finish
-  
-                  
+
                   let progress: null | TLogProgress = null
                   // -- NOTE: Progress
                   switch (true) {
@@ -739,51 +900,51 @@ export const topLevelMachine = setup({
                           jobToUpdate.forecast.estimate !== todo.forecast.estimate
                           || jobToUpdate.forecast.complexity !== todo.forecast.complexity
                         ): {
-                          // NOTE: 1.1.1 Estimate & start exists & job assigned
-                          if (
-                            !!jobToUpdate.forecast.estimate
-                            && !!jobToUpdate.forecast.start
-                            && !!jobToUpdate.forecast.assignedTo
-                          ) {
-                            const targetUserJobs = context.jobs.items
-                              .filter(({ forecast }) => forecast.assignedTo === jobToUpdate.forecast.assignedTo)
-                            const otherUserJobsForAnalysis = targetUserJobs
-                              .filter(({ forecast }) =>
-                                forecast.estimate
-                                && forecast.start
-                                && forecast.finish
-                                && forecast.assignedTo !== jobToUpdate.forecast.assignedTo
-                                && forecast.complexity === jobToUpdate.forecast.complexity
-                              )
-                            const worstDate = otherUserJobsForAnalysis.length > 0
-                              ? getWorstCalc({
-                                theJobList: otherUserJobsForAnalysis,
-                                ts: {
-                                  testStart: jobToUpdate.forecast.start,
-                                  testDiff: jobToUpdate.forecast.estimate - jobToUpdate.forecast.start,
-                                },
-                              }).date100
-                              : 0
-                            const worstProgress = getCurrentPercentage({
-                              targetDateTs: worstDate,
-                              startDateTs: jobToUpdate.forecast.start,
-                            })
-                            const estimateProgress = getCurrentPercentage({
-                              targetDateTs: jobToUpdate.forecast.estimate,
-                              startDateTs: jobToUpdate.forecast.start,
-                            })
-                            
-                            progress = {
-                              worst: otherUserJobsForAnalysis.length
-                                ? Math.round(worstProgress)
-                                : Math.round(estimateProgress),
-                              estimate: Math.round(estimateProgress),
+                            // NOTE: 1.1.1 Estimate & start exists & job assigned
+                            if (
+                              !!jobToUpdate.forecast.estimate
+                              && !!jobToUpdate.forecast.start
+                              && !!jobToUpdate.forecast.assignedTo
+                            ) {
+                              const targetUserJobs = context.jobs.items
+                                .filter(({ forecast }) => forecast.assignedTo === jobToUpdate.forecast.assignedTo)
+                              const otherUserJobsForAnalysis = targetUserJobs
+                                .filter(({ forecast }) =>
+                                  forecast.estimate
+                                  && forecast.start
+                                  && forecast.finish
+                                  && forecast.assignedTo !== jobToUpdate.forecast.assignedTo
+                                  && forecast.complexity === jobToUpdate.forecast.complexity
+                                )
+                              const worstDate = otherUserJobsForAnalysis.length > 0
+                                ? getWorstCalc({
+                                  theJobList: otherUserJobsForAnalysis,
+                                  ts: {
+                                    testStart: jobToUpdate.forecast.start,
+                                    testDiff: jobToUpdate.forecast.estimate - jobToUpdate.forecast.start,
+                                  },
+                                }).date100
+                                : 0
+                              const worstProgress = getCurrentPercentage({
+                                targetDateTs: worstDate,
+                                startDateTs: jobToUpdate.forecast.start,
+                              })
+                              const estimateProgress = getCurrentPercentage({
+                                targetDateTs: jobToUpdate.forecast.estimate,
+                                startDateTs: jobToUpdate.forecast.start,
+                              })
+
+                              progress = {
+                                worst: otherUserJobsForAnalysis.length
+                                  ? Math.round(worstProgress)
+                                  : Math.round(estimateProgress),
+                                estimate: Math.round(estimateProgress),
+                              }
+
+                              _newMsgs.add('Progress updated')
                             }
-  
-                            _newMsgs.add('Progress updated')
+                            break
                           }
-                          break
-                        }
                         default:
                           break
                       }
@@ -795,26 +956,23 @@ export const topLevelMachine = setup({
                     const v = getSpeed(jobToUpdate)
                     jobToUpdate.v = v
                     _newMsgs.add(`v= ${v}`)
-                    soundManager.playSound({ soundCode: 'mech-3' })
+                    soundManager.playDelayedSound({ soundCode: 'mech-3', _debug: { msg: 'Job completed' } })
                   } else {
                     delete jobToUpdate.v
-                    soundManager.playSound({ soundCode: 'click-1' })
+                    soundManager.playDelayedSound({ soundCode: 'click-1', _debug: { msg: 'Job not completed' } })
                   }
                   // --
-  
+
                   const newLog: TLogsItem = {
                     ts: updateTime,
                     text: _newMsgs.size > 0 ? [..._newMsgs].join(' // ') : 'Updated', // •
                   }
                   if (!!progress) newLog.progress = progress
-  
+
                   jobToUpdate.logs.items.unshift(newLog)
-  
-                  // console.log('-- jobToUpdate (2)')
-                  // console.log(jobToUpdate)
-                  // console.log('--')
-                  soundManager.playSound({ soundCode: 'click-12' })
-  
+
+                  soundManager.playDelayedSound({ soundCode: 'click-12', _debug: { msg: 'Done: updated jod will be saved.' } })
+
                   return jobToUpdate
                 }
                 default:
@@ -842,22 +1000,23 @@ export const topLevelMachine = setup({
               delete todo.forecast.finish
               delete todo.v
 
+              todo.completed = false
               todo.ts.update = updateTime
 
               if (todo.logs?.isEnabled) {
                 if (todo.logs.items.length >= todo.logs.limit) todo.logs.items.pop()
-                
+
                 todo.logs.items.unshift({ ts: updateTime, text: 'Dates cleared' })
               }
 
               // console.log('-- clearDates: updated')
               // console.log(todo)
               // console.log('--')
-              soundManager.playSound({ soundCode: 'click-27' })
+              soundManager.playDelayedSound({ soundCode: 'click-27' })
             }
             newTodos.push(todo)
           }
-          
+
           return {
             ...context.jobs,
             items: newTodos,
@@ -899,7 +1058,7 @@ export const topLevelMachine = setup({
                 if (todo.logs.items.length >= todo.logs.limit)
                   todo.logs.items.pop()
 
-                const normalizedComment = !!comment ? comment.trim().replace(/\s+/g,' ') : ''
+                const normalizedComment = !!comment ? comment.trim().replace(/\s+/g, ' ') : ''
                 msgs.push(normalizedComment || 'No comment')
               }
 
@@ -912,7 +1071,7 @@ export const topLevelMachine = setup({
             }
             newTodos.push(todo)
           }
-          
+
           return {
             ...context.jobs,
             items: newTodos,
@@ -925,54 +1084,96 @@ export const topLevelMachine = setup({
         jobs: ({ context, event }) => {
           const { id } = event
           const updateTime = new Date().getTime()
-
-          // -- NOTE: Remove child from parent if necessary
-          const shouldChildBeRemovedFromParent: {
-            doIt: boolean;
-            targetChildId?: number;
-            targetChildTitle?: string;
-          } = {
-            doIt: false,
-            targetChildId: undefined,
-            targetChildTitle: undefined,
-          }
           const targetJobIndex = context.jobs.items.findIndex(({ id }) => id)
-          const targetParentId = targetJobIndex !== -1
-            ? context.jobs.items[targetJobIndex].relations?.parent
-            : null
-          if (!!targetParentId) {
-            // console.log('- [1] parent should be removed')
-            shouldChildBeRemovedFromParent.doIt = true
-            shouldChildBeRemovedFromParent.targetChildId = id
-            if (shouldChildBeRemovedFromParent.doIt) {
-              // console.log('- [1.1] parent should be removed')
-              const parentIndex = context.jobs.items.findIndex(({ id }) => id === targetParentId)
-              if (parentIndex !== -1 && Array.isArray(context.jobs.items[parentIndex].relations?.children)) {
-                // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
-                context.jobs.items[parentIndex].relations.children = context.jobs.items[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
-                
-                if (context.jobs.items[parentIndex].logs.items.length >= context.jobs.items[parentIndex].logs.limit)
-                  context.jobs.items[parentIndex].logs.items.pop()
 
-                const targetChildTitle = context.jobs.items.find(({ id }) => id === shouldChildBeRemovedFromParent.targetChildId)?.title
-                const _parentMsgs = [`Child job deleted [job=${shouldChildBeRemovedFromParent.targetChildId}]`]
-                if (!!targetChildTitle) _parentMsgs.push(`(${targetChildTitle})`)
-                context.jobs.items[parentIndex].logs.items.unshift({
-                  ts: updateTime,
-                  text: _parentMsgs.join(' '),
-                })
-                // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
-              } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
-            } // else console.log('- [2] parent should NOT be removed')
-          }
-          // --
-
-          if (context.jobs.items.some((todo) => todo.id === id))
-            soundManager.playSound({ soundCode: 'fail-41' })
+          // if (context.jobs.items.some((todo) => todo.id === id))
+          //   soundManager.playDelayedSound({ soundCode: 'fail-41' })
 
           return {
             ...context.jobs,
-            items: context.jobs.items.filter((todo) => todo.id !== id),
+            items: context.jobs.items.map((todo, i, jobItems) => {
+              switch (true) {
+                case !!todo.relations.children && todo.relations.children.includes(id): {
+                  // NOTE: PARENT JOB
+                  // -- NOTE: Remove child from parent if necessary
+                  const shouldChildBeRemovedFromParent: {
+                    doIt: boolean;
+                    targetChildId?: number;
+                    targetChildTitle?: string;
+                  } = {
+                    doIt: false,
+                    targetChildId: undefined,
+                    targetChildTitle: undefined,
+                  }
+                  const parentId = targetJobIndex !== -1
+                    ? jobItems[targetJobIndex].relations.parent
+                    : null
+                  if (!!parentId) {
+                    // console.log('- [1] parent should be removed')
+                    shouldChildBeRemovedFromParent.doIt = true
+                    shouldChildBeRemovedFromParent.targetChildId = id
+                    if (shouldChildBeRemovedFromParent.doIt) {
+                      // console.log('- [1.1] parent should be removed')
+                      const parentIndex = i
+                      if (parentIndex !== -1 && Array.isArray(jobItems[parentIndex].relations?.children)) {
+                        // console.log(`- [1.1.1] old childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                        jobItems[parentIndex].relations.children = jobItems[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+
+                        if (jobItems[parentIndex].logs.items.length >= jobItems[parentIndex].logs.limit)
+                          jobItems[parentIndex].logs.items.pop()
+
+                        const targetChildTitle = jobItems.find(({ id }) => id === shouldChildBeRemovedFromParent.targetChildId)?.title
+                        const _parentMsgs = [`Child job deleted (affected) [job=${shouldChildBeRemovedFromParent.targetChildId}]`]
+                        if (!!targetChildTitle) _parentMsgs.push(`(${targetChildTitle})`)
+                        jobItems[parentIndex].logs.items.unshift({
+                          ts: updateTime,
+                          text: _parentMsgs.join(' '),
+                        })
+                        // console.log(`- [1.1.2] new childs arr: ${JSON.stringify(a[parentIndex].relations.children)}`)
+                      } // else console.log(`- [1.2] parentIndex=${parentIndex} NOT FOUND`)
+                    } // else console.log('- [2] parent should NOT be removed')
+                  }
+                  // --
+                  break
+                }
+                case todo.relations.parent === id: {
+                  // NOTE: CHILD JOB
+                  // -- NOTE: Remove parent from child if necessary
+                  // case typeof parentId === 'number' && todo.id === parentId: {
+                  const children = targetJobIndex !== -1
+                    ? jobItems[targetJobIndex].relations.children
+                    : []
+                  if (children.length > 0) {
+                    for (const childId of children) {
+                      const targetChildIndex = jobItems.findIndex(({ id }) => id === childId)
+                      if (targetChildIndex !== -1) {
+                        jobItems[targetChildIndex].relations.parent = null
+
+                        if (jobItems[targetChildIndex].logs.items.length >= jobItems[targetChildIndex].logs.limit)
+                          jobItems[targetChildIndex].logs.items.pop()
+
+                        jobItems[targetChildIndex].logs.items.unshift({
+                          ts: updateTime,
+                          text: `Parent job deleted (affected): [job=${id}]`,
+                        })
+                      }
+                    }
+                  }
+                  // --
+                  break
+                }
+                case todo.id === id: {
+                  // NOTE: TARGET JOB
+                  soundManager.playDelayedSound({ soundCode: 'fail-41' })
+                  // Nothing
+                  break
+                }
+                default:
+                  break
+              }
+
+              return todo
+            }).filter((todo) => todo.id !== id),
           }
         }
       })
@@ -991,7 +1192,7 @@ export const topLevelMachine = setup({
           const { mark } = event
           const isCompleted = mark === 'completed'
           const updateTime = new Date().getTime()
-          
+
           return {
             ...context.jobs,
             items: context.jobs.items.map((todo) => {
@@ -1013,7 +1214,7 @@ export const topLevelMachine = setup({
                 }
 
                 if (isCompleted) {
-                  soundManager.playSound({ soundCode: 'mech-3' })
+                  soundManager.playDelayedSound({ soundCode: 'mech-3' })
                   newTodo.forecast.finish = updateTime
                   _msgs.push('Finish date was set to update time')
 
@@ -1021,7 +1222,7 @@ export const topLevelMachine = setup({
                   newTodo.v = v
                   _msgs.push(`v= ${v}`)
                 } else if (!!newTodo.forecast?.finish) {
-                  soundManager.playSound({ soundCode: 'click-1' })
+                  soundManager.playDelayedSound({ soundCode: 'click-1' })
                   _msgs.push(`Finish date [${dayjs(newTodo.forecast.finish).format('DD.MM.YYYY HH:mm')}] removed`)
                   delete newTodo.forecast.finish
                   delete newTodo.v
@@ -1074,14 +1275,14 @@ export const topLevelMachine = setup({
           const createDate = new Date().getTime()
           const user: TUser = {
             id: event.value.value || createDate,
-            displayName: event.value.displayName.trim().replace(/\s+/g,' '),
+            displayName: event.value.displayName.trim().replace(/\s+/g, ' '),
             ts: {
               create: createDate,
               update: createDate,
             }
           }
 
-          soundManager.playSound({ soundCode: 'plop-1' })
+          soundManager.playDelayedSound({ soundCode: 'plop-1' })
 
           return {
             ...context.users,

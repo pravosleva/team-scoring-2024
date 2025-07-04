@@ -15,6 +15,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { getPercentage } from '~/shared/utils/number-ops'
 
 type TProps<T, TAddInfo> = {
+  checklistUniqueKey?: string;
   connectedOnThe?: ('top')[];
   isMiniVariant?: boolean;
   infoLabel: string;
@@ -49,6 +50,7 @@ const genericMemo: <T>(component: T) => T = memo
 // }
 
 function SimpleCheckListFn<TAddInfo>({
+  checklistUniqueKey,
   connectedOnThe,
   isMiniVariant,
   items,
@@ -70,7 +72,7 @@ function SimpleCheckListFn<TAddInfo>({
       block: 'center',
     })
   })
-  
+
   const [newLabel, setNewLabel] = useState<string>('')
   const [newDescr, setNewDescr] = useState<string>('')
 
@@ -104,8 +106,8 @@ function SimpleCheckListFn<TAddInfo>({
     handleClose()
   }, [handleReset, handleClose])
 
-  const normalizedTitle = useMemo(() => newLabel.trim().replace(/\s+/g,' '), [newLabel])
-  const normalizedDescr = useMemo(() => newDescr.trim().replace(/\s+/g,' '), [newDescr])
+  const normalizedTitle = useMemo(() => newLabel.trim().replace(/\s+/g, ' '), [newLabel])
+  const normalizedDescr = useMemo(() => newDescr.trim().replace(/\s+/g, ' '), [newDescr])
   const handleSubmit = useCallback(() => {
     switch (true) {
       case !!activeChecklistId: {
@@ -153,7 +155,7 @@ function SimpleCheckListFn<TAddInfo>({
   //   return url !== initialState.url || descr !== initialState.descr || title !== initialState.title
   // }, [url, descr, title, initialState.url, initialState.descr, initialState.title ])
 
-  const handleEditItem = useCallback(({ titleForEdit, descrForEdit, checklistId }: { checklistId: number; titleForEdit: string; descrForEdit: string }) => () =>  {
+  const handleEditItem = useCallback(({ titleForEdit, descrForEdit, checklistId }: { checklistId: number; titleForEdit: string; descrForEdit: string }) => () => {
     // console.log({ titleForEdit, descrForEdit })
     setNewLabel(titleForEdit)
     setNewDescr(descrForEdit)
@@ -244,7 +246,7 @@ function SimpleCheckListFn<TAddInfo>({
                 onChange={handleChangeDescr}
                 multiline
                 maxRows={5}
-                // sx={{ borderRadius: '8px' }}
+              // sx={{ borderRadius: '8px' }}
               />
             </Grid>
 
@@ -273,7 +275,7 @@ function SimpleCheckListFn<TAddInfo>({
           </Grid>
         ) : items.length > 0 && (
           <>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} id={checklistUniqueKey}>
               <Grid size={12}>
                 <div
                   className={clsx(
@@ -339,10 +341,10 @@ function SimpleCheckListFn<TAddInfo>({
                             </button>
 
                             <div className={classes.checklistItemControls}>
-                              
+
                               {
                                 !!onDeleteChecklistItem && (
-                                  <code className={classes.inlineControlBtn}  onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>[ Del ]</code>
+                                  <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>[ Del ]</code>
                                 )
                               }
                               <code className={classes.inlineControlBtn} onClick={handleDisabledToggle({
@@ -362,12 +364,12 @@ function SimpleCheckListFn<TAddInfo>({
                               {
                                 isEditable && (
                                   <code
-                                    className={classes.inlineControlBtn} 
+                                    className={classes.inlineControlBtn}
                                     onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
                                   >[ Edit ]</code>
                                 )
                               }
-                              
+
                             </div>
                           </div>
 
@@ -375,7 +377,7 @@ function SimpleCheckListFn<TAddInfo>({
                             <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>{checklistItem.title}</em>
                             {!!checklistItem.descr && <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>{checklistItem.descr}</code>}
                           </div>
-                          
+
                         </div>
                       ))
                     }

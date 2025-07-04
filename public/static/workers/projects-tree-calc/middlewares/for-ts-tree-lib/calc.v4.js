@@ -21,6 +21,8 @@ const treeData = {
 };
 */
 
+importScripts('./middlewares/for-ts-tree-lib/utils/getPercentage.js')
+
 const withTsTreeLibCalcService = async ({ eventData, cb }) => {
   const { __eType, input } = eventData
 
@@ -68,66 +70,90 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             })
 
             // -- NOTE: TARGET CALC SRC
-            const createNodeData = (job) => ({
-              model: {
-                id: job.id,
-                title: job.title,
-                ts: job.ts,
-                descr: job.descr,
-                completed: job.completed,
-                logs: job.logs,
-              },
-              children: []
-            })
-            const getTreePartById = (currentJob, existingChild) => {
-              let node = createNodeData(currentJob)
-              let existingChildId = existingChild?.model.id || 0;
+            const _jobsMap = new Map()
+            for (const job of input.jobs) _jobsMap.set(job.id, job)
 
-              // Добавляем существующего ребёнка
-              if (existingChildId !== 0) {
-                node.children.push(existingChild)
-              }
+            // console.log(Object.fromEntries(_jobsMap))
 
-              const findJobById = (id) => {
-                for (const job of input.jobs) {
-                  if (job.id === id) return (job)
+            let _c = 0
+            const getTreePartById = ({ currentJobData }) => {
+              const getNodeDataStandart = (job) => {
+                return {
+                  model: {
+                    id: job.id,
+                    title: job.title,
+                    ts: job.ts,
+                    descr: job.descr,
+                    completed: job.completed,
+                    logs: job.logs,
+                    relations: job.relations,
+                    _service: {
+                      aboutJob: {
+                        existingChildrenNodes: {
+                          nodesInfo: !!job.relations?.children
+                            ? job.relations?.children
+                              .map((id) => ({
+                                originalJob: {
+                                  id,
+                                  title: _jobsMap.get(id)?.title,
+                                  completed: _jobsMap.get(id)?.completed,
+                                },
+                                nodeId: `job_node_${id}`
+                              })) || []
+                            : []
+                        },
+                        existingChecklists: job.logs.items.reduce((acc, cur) => {
+                          if (cur.checklist?.length > 0) {
+                            acc.push({
+                              uniqueChecklistKey: `job-${job.id}-log-${cur.ts}-checklist`,
+                              jobId: job.id,
+                              logTs: cur.ts,
+                              completePercentage: getPercentage({
+                                x: cur.checklist
+                                  .reduce((acc, cur) => {
+                                    if (cur.isDone || cur.isDisabled) acc += 1
+                                    return acc
+                                  }, 0),
+                                sum: cur.checklist.length,
+                              }),
+                            })
+                          }
+
+                          return acc
+                        }, [])
+                      },
+                      recursionCounter: ++_c,
+                      logs: ['Node created'],
+                    },
+                  },
+                  children: !!job.relations.children
+                    ? job.relations?.children
+                      .map((id) => getNodeDataStandart(_jobsMap.get(id)))
+                      .sort((a, b) => b.model.ts.update - a.model.ts.update)
+                    : []
                 }
               }
-
-              const addAllChildrenToTheNode = (currentJob, node, existingChildId = 0) => {
-                // Добавляем всех детей
-                if (!!currentJob.relations?.children && currentJob.relations.children.length > 0) {
-                  for (const childId of currentJob.relations.children) {
-                    let job = findJobById(childId)
-                    if (job.id != existingChildId) {
-                      let childNode = createNodeData(job)
-                      node.children.push(childNode)
-                      addAllChildrenToTheNode(job, childNode)
-                    }
-                  }
-                  node.children.sort((a, b) => { return (b.model.ts.update - a.model.ts.update) })
-                }
+              switch (true) {
+                case !!currentJobData.relations?.parent:
+                  // Выполняем процедуру для родителя
+                  // Находим элемент родителя в массиве jobs
+                  const parentJob = _jobsMap.get(currentJobData.relations.parent)
+                  if (!parentJob)
+                    throw new Error(`parentJob with id=${currentJobData.relations.parent} не существует`)
+                  if (parentJob.id === currentJobData.relations.parent)
+                    return getTreePartById({ currentJobData: parentJob })
+                default:
+                  return getNodeDataStandart(currentJobData)
               }
-
-              addAllChildrenToTheNode(currentJob, node, existingChildId)
-
-              // Выполняем процедуру для родителя
-              if (!!currentJob.relations?.parent) {
-                // Находим элемент родителя в массиве jobs
-                let job = findJobById(currentJob.relations.parent)
-                if (job.id === currentJob.relations.parent) {
-                  return (getTreePartById(job, node))
-                }
-              }
-
-              return (node);
             }
-
-            const calc = getTreePartById(input.job);
+            const calc = getTreePartById({ currentJobData: { ...input.job } });
             // --
 
             output.ok = true
-            output.message = 'Calculated'
+            output.message = [
+              'Calculated',
+              `getNodeDataStandart called ${_c} times`
+            ].join('; ')
             output.originalResponse = calc
 
             if (typeof cb[eventData?.input?.opsEventType] === 'function') {

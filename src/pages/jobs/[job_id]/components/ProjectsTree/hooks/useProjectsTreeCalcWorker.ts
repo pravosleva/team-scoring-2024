@@ -76,7 +76,7 @@ export const useProjectsTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb 
               case NWService.EWorkerToClientEvent.PROJECTS_TREE_CALC_ERR:
                 if (
                   typeof cb?.onFinalError === 'function'
-                  && !!e.data.data.output.originalResponse
+                  // && !!e.data.data.output.originalResponse
                 ) cb?.onFinalError({ id: e.data.data._service.id, reason: e.data.data.output.message || 'No output.message' })
                 break
               default: {
