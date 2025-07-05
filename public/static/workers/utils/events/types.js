@@ -7,23 +7,32 @@ const NES = {
       CLIENT_TO_WORKER_MESSAGE: 'c-w:message',
     },
     ClientService: {
-      // -- NOTE: Should be sync with NWService in ~/shared/utils/wws/types.ts
+      // -- NOTE: [EVENTS 1/x] Should be sync with NWService in ~/shared/utils/wws/types.ts
       News: {
         EClientToWorkerEvent: {
-          GET_WORST_CALC: 'c-w:news:get-sorted-speeds-calc',
+          GET_WORST_CALC: 'c-w:taro-worst-calc:sorted-speeds:get',
         },
         EWorkerToClientEvent: {
-          WORST_CALC_OK: 'w-c:news:sorted-speeds-calc-ok',
-          WORST_CALC_ERR: 'w-c:news:sorted-speeds-calc-err',
+          WORST_CALC_OK: 'w-c:taro-worst-calc:sorted-speeds:ok',
+          WORST_CALC_ERR: 'w-c:taro-worst-calc:sorted-speeds:err',
         },
       },
       ProjectsTreeCalc: {
         EClientToWorkerEvent: {
-          GET_PROJECTS_TREE_CALC: 'c-w:news:get-projects-tree-calc',
+          GET_PROJECTS_TREE_CALC: 'c-w:projects-tree-calc:get',
         },
         EWorkerToClientEvent: {
-          PROJECTS_TREE_CALC_OK: 'w-c:news:projects-tree-calc-ok',
-          PROJECTS_TREE_CALC_ERR: 'w-c:news:projects-tree-calc-err',
+          PROJECTS_TREE_CALC_OK: 'w-c:projects-tree-calc:ok',
+          PROJECTS_TREE_CALC_ERR: 'w-c:projects-tree-calc:err',
+        },
+      },
+      Experimental: {
+        EClientToWorkerEvent: {
+          PING: 'c-w:experimental:ping',
+        },
+        EWorkerToClientEvent: {
+          PONG_OK: 'w-c:experimental:pong:ok',
+          PONG_ERR: 'w-c:experimental:pong:err',
         },
       },
       // Others...

@@ -19,7 +19,7 @@ type TPros = {
 const specialScroll = scrollToIdFactory({
   timeout: 200,
   offsetTop: 100,
-  elementHeightCritery: 520,
+  elementHeightCritery: 550,
 })
 
 export const JobAdditionalInfo = memo(({ job }: TPros) => {

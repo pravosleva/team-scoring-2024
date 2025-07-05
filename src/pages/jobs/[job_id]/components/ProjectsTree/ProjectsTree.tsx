@@ -47,7 +47,7 @@ console.log("Tree :>> ", tree);
 const specialScroll = scrollToIdFactory({
   timeout: 200,
   offsetTop: 16,
-  elementHeightCritery: 520,
+  elementHeightCritery: 550,
 })
 const blinkNode = blinkNodeIdFactory({
   timeout: 1000,
