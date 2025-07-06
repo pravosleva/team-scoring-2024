@@ -498,7 +498,7 @@ export const ActiveJobContent = memo(({
           }
           <Link to={`/jobs/${job.id}`} target='_self'>
             <Button variant='contained' endIcon={<ArrowForwardIcon />} fullWidth>
-              Job
+              <span className={baseClasses.truncate}>{`Job | ${job.title}`}</span>
             </Button>
           </Link>
         </ResponsiveBlock>

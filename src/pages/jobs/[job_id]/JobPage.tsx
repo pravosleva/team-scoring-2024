@@ -354,13 +354,18 @@ export const JobPage = memo(() => {
                 [
                   '/jobs',
                   !!targetJob
-                    ? `?lastSeenJob=${targetJob.id}`
+                    ? `?lastSeenJob=${targetJob.id}&openDrawer=1`
                     : '',
                 ].join('')
               }
             >
-              <Button fullWidth variant='outlined' startIcon={<ArrowBackIcon />}>
-                Jobs
+              <Button
+                fullWidth
+                variant='outlined'
+                startIcon={<ArrowBackIcon />}
+              // className={baseClasses.truncate}
+              >
+                <span className={baseClasses.truncate}>Open details | {targetJob.title || 'No title'}</span>
               </Button>
             </Link>
           )
@@ -378,7 +383,8 @@ export const JobPage = memo(() => {
                   !!targetJob
                     ? [
                       `lastSeenJob=${targetJob.id}`,
-                      `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job`
+                      `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
+                      // `backActionUiText=${encodeURIComponent(`Job // ${targetJob.title}`)}`,
                     ].join('&')
                     : '',
                 ].join('')

@@ -1,15 +1,23 @@
-import { memo, useState, useCallback, useMemo } from 'react'
+import { memo, useState, useCallback, useMemo, useEffect } from 'react'
 import { JobList } from '~/shared/components/JobList'
 import baseClasses from '~/App.module.scss'
 import { Layout } from '~/shared/components/Layout'
 import { Drawer } from '@mui/material'
 import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
+import { useSearchParams } from 'react-router-dom'
 
 export const JobsPage = memo(() => {
   const [isOpened, setIsOpened] = useState(false)
   const [activeJobId, setActiveJobId] = useState<number | null>(null)
-  // const [, SetURLSearchParams] = useSearchParams()
+  const [urlSearchParams] = useSearchParams()
+  const shouldDrawerBeOpened = useMemo(() => urlSearchParams.get('openDrawer') === '1', [urlSearchParams])
+  const lastSeenJobID = useMemo(() =>
+    !!urlSearchParams.get('lastSeenJob') && !Number.isNaN(Number(urlSearchParams.get('lastSeenJob')))
+      ? Number(urlSearchParams.get('lastSeenJob'))
+      : null,
+    [urlSearchParams]
+  )
 
   const handleToggleDrawer = useCallback((newValue?: boolean) => ({ jobId }: {
     jobId?: number;
@@ -20,6 +28,14 @@ export const JobsPage = memo(() => {
 
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? jobs.find(({ id }) => id === activeJobId) : undefined, [jobs, activeJobId])
+
+  const possibleDefaultActiveJobId = useMemo(
+    () => shouldDrawerBeOpened && lastSeenJobID ? lastSeenJobID : null,
+    [shouldDrawerBeOpened, lastSeenJobID]
+  )
+  useEffect(() => {
+    handleToggleDrawer(!!possibleDefaultActiveJobId)({ jobId: possibleDefaultActiveJobId || undefined });
+  }, [possibleDefaultActiveJobId, handleToggleDrawer])
 
   return (
     <Layout>

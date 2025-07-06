@@ -12,11 +12,12 @@ import GroupIcon from '@mui/icons-material/Group'
 import InfoIcon from '@mui/icons-material/Info'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
+import Brightness1Icon from '@mui/icons-material/Brightness1'
 
 export const HomePage = () => {
   return (
     <Layout>
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid size={12}>
           <h1>Estimate corrector</h1>
         </Grid>
@@ -94,6 +95,20 @@ export const HomePage = () => {
                 <div className={classes.internalWrapper}>
                   <div className={classes.title}>Business time</div>
                   <em className={classes.descr}>Local settings (experimental)</em>
+                </div>
+              </div>
+            </Link>
+            <Link
+              to='/worker-exp'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <Brightness1Icon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Worker Exp</div>
+                  <em className={classes.descr}>For example (experimental)</em>
                 </div>
               </div>
             </Link>

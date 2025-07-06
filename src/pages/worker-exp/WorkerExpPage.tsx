@@ -6,7 +6,14 @@ import { groupLog } from '~/shared/utils'
 // import { TJob, TopLevelContext } from '~/shared/xstate'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
+import clsx from 'clsx'
+import { ResponsiveBlock } from '~/shared/components'
+import { Link } from 'react-router-dom'
+// import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import AppsIcon from '@mui/icons-material/Apps'
 import { useExperimentalWorker } from './hooks'
+import classes from './WorkerExpPage.module.scss'
+
 // const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL || ''
 // const BUILD_DATE = import.meta.env.VITE_BUILD_DATE || ''
 
@@ -94,7 +101,7 @@ export const WorkerExpPage = memo(({ isDebugEnabled }: TProps) => {
               onClick={incCounter}
               variant='outlined'
             >
-              Inc counter & send msg
+              Inc counter ({counter}) & send msg to Worker
             </Button>
             <Button
               onClick={toggleWorker}
@@ -130,11 +137,38 @@ export const WorkerExpPage = memo(({ isDebugEnabled }: TProps) => {
 
           <Grid size={12}>
             <pre
-              className={baseClasses.preNormalized}
+              className={clsx(
+                baseClasses.preNormalized,
+                classes.resultWrapper,
+                {
+                  [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                  [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                }
+              )}
             >{JSON.stringify({ outputWorkerData }, null, 2)}</pre>
           </Grid>
         </Grid>
       </div>
+      <ResponsiveBlock
+        className={baseClasses.specialActionsGrid}
+        style={{
+          padding: '16px 0 16px 0',
+          // border: '1px dashed red',
+          boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+          position: 'sticky',
+          bottom: 0,
+          backgroundColor: '#fff',
+          zIndex: 3,
+          marginTop: 'auto',
+          // borderRadius: '16px 16px 0px 0px',
+        }}
+      >
+        <Link to='/' target='_self'>
+          <Button variant='contained' startIcon={<AppsIcon />} fullWidth>
+            Home
+          </Button>
+        </Link>
+      </ResponsiveBlock>
     </Layout>
   )
 })
