@@ -1,4 +1,5 @@
-import { delayedCallFactory } from '~/shared/utils/web-api-ops'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { delayedCallFactory, delayedCallFactoryConfigurableDelay } from '~/shared/utils/web-api-ops'
 
 const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL || ''
 const sounds = {
@@ -6,6 +7,20 @@ const sounds = {
   'click-8': '/click/click-8.mp3',
   'click-12': '/click/click-12.mp3',
   'click-27': '/click/click-27.mp3',
+  'electro-1-transformator': '/electro/electro-1-transformator.mp3',
+  'electro-2': '/electro/electro-2.mp3',
+  'electro-10-headphones-jh-808-2-c-1s': '/electro/electro-10-headphones-jh-808-2-c-1s.mp3',
+  'electro-11-hissing-signal-reception': '/electro/electro-11-hissing-signal-reception.mp3',
+  'electro-12-beep-short-melody-and-hiss': '/electro/electro-12-beep-short-melody-and-hiss.mp3',
+  'electro-13-static-noise': '/electro/electro-13-static-noise.mp3',
+  'electro-14.mp3': '/electro/electro-14.mp3',
+  'electro-15': '/electro/electro-15.mp3',
+  'electro-16-impulse-1': '/electro/electro-16-impulse-1.mp3',
+  'electro-17-impulse-2': '/electro/electro-17-impulse-2.mp3',
+  'electro-18-impulse-3': '/electro/electro-18-impulse-3.mp3',
+  'electro-19-hit-and-impulse-4': '/electro/electro-19-hit-and-impulse-4.mp3',
+  'electro-20-impulse-5': '/electro/electro-20-impulse-5.mp3',
+  'electro-21-quick': '/electro/electro-21-quick.mp3',
   'fail-11': '/fail/fail-11.mp3',
   'fail-41': '/fail/fail-41.mp3',
   'fail-116': '/fail/fail-116-sheep.mp3',
@@ -13,6 +28,18 @@ const sounds = {
   'gong-6': '/gong/gong-6.mp3',
   'load-24': '/load/load-24.mp3',
   'mech-3': '/mech/mech-3-energy-off.mp3',
+  'mech-50-end-of-work': '/mech/mech-50-end-of-work.mp3',
+  'mech-51-muted-noisy-short': '/mech/mech-51-muted-noisy-short.mp3',
+  'mech-52-noisy-short-end-of-work': '/mech/mech-52-noisy-short-end-of-work.mp3',
+  'mech-53-ringing-distant-short-hit': '/mech/mech-53-ringing-distant-short-hit.mp3',
+  'mech-54-short-far-single-hit': '/mech/mech-54-short-far-single-hit.mp3',
+  'mech-55-short-metal-single-hit': '/mech/mech-55-short-metal-single-hit.mp3',
+  'mech-56-single-short-hit-in-space': '/mech/mech-56-single-short-hit-in-space.mp3',
+
+  'mech-78-step': '/mech/mech-78-step.mp3',
+  'mech-81-step-hydraulic-robot': '/mech/mech-81-step-hydraulic-robot.mp3',
+
+  'ojing-eo-geim_player-excluded': '/click/ojing-eo-geim_player-excluded.mp3',
   'plop-1': '/plop/plop-1.mp3',
   'plop-3': '/plop/plop-3.mp3',
 }
@@ -54,8 +81,9 @@ class Singleton {
       value: ELoadStatus;
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   private _playDelayedSound: any;
+  private _playDelayedSoundConfigurable: any;
   constructor() {
     this._activeAudio = null
     this._sounds = sounds
@@ -64,6 +92,8 @@ class Singleton {
 
     const [delayedPlay] = delayedCallFactory(this.__playDelayedSound, 750)
     this._playDelayedSound = delayedPlay
+    const [delayedPlayConfigurable] = delayedCallFactoryConfigurableDelay(this.__playDelayedSound, 0)
+    this._playDelayedSoundConfigurable = delayedPlayConfigurable
   }
   public static getInstance(): Singleton {
     if (!Singleton.instance) Singleton.instance = new Singleton()
@@ -78,9 +108,15 @@ class Singleton {
       this._activeAudio = null
     }
   }
-  private __playDelayedSound({ soundCode, cb, _self, _debug }: TPlaySoundProps & { _self: Singleton }) {
+  private __playDelayedSound({ soundCode, cb, _self, _debug, delay }: TPlaySoundProps & { delay?: number; _self: Singleton }) {
     // this.stopCurrentSound()
-    console.log(`▶️ ${soundCode}${!!_debug ? ` ${_debug.msg}` : ''}`)
+    console.log([
+      `▶️ ${soundCode}`,
+      typeof delay === 'number'
+        ? `delay:${delay}`
+        : '',
+      !!_debug?.msg ? _debug.msg : '',
+    ].filter(Boolean).join(' '))
     try {
       if (!!_self._sounds[soundCode]) {
         const targetSrc = _self._sounds[soundCode]
@@ -141,6 +177,16 @@ class Singleton {
   // NOTE: See also https://github.com/martinstark/throttle-ts/tree/main
   public playDelayedSound({ soundCode, cb, _debug }: TPlaySoundProps) {
     this._playDelayedSound({ soundCode, cb, _self: this, _debug })
+  }
+  public playDelayedSoundConfigurable({ soundCode, cb, _debug, delay }:
+    TPlaySoundProps & {
+      delay: {
+        before: number;
+        after: number;
+      };
+    }
+  ) {
+    this._playDelayedSoundConfigurable({ soundCode, cb, _self: this, _debug })({ delay })
   }
 }
 

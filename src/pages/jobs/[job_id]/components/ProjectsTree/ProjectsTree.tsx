@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useState, useMemo, useEffect, useCallback } from 'react'
 import { useProjectsTreeCalcWorker } from './hooks/useProjectsTreeCalcWorker'
@@ -50,12 +51,12 @@ const specialScroll = scrollToIdFactory({
   elementHeightCritery: 550,
 })
 const blinkNode = blinkNodeIdFactory({
-  timeout: 1000,
+  timeout: 1500,
   cb: {
     onStart: ({ targetElm }) => {
       const oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
         borderColor: targetElm.style.borderColor,
-        backgroundColor: targetElm.style.borderColor
+        backgroundColor: targetElm.style.borderColor,
       }
       const tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
         // borderColor: '#1565c0', // blue
@@ -63,30 +64,39 @@ const blinkNode = blinkNodeIdFactory({
         backgroundColor: '#c9fce9',
       }
       for (const prop in tmpCSS) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         targetElm.style[prop] = tmpCSS[prop]
       }
 
-      return { oldCSS }
+      // NOTE: 1/2 Exp
+      const elms: HTMLCollectionOf<Element> = document.getElementsByClassName('node-blinker-disablable')
+      const switcher = {
+        on: () => {
+          for (let i = 0, max = elms.length; i < max; i++) {
+            const elm = elms.item(i)
+            // @ts-ignore
+            elm.style.visibility = 'hidden'
+          }
+        },
+        off: () => {
+          for (let i = 0, max = elms.length; i < max; i++) {
+            const elm = elms.item(i)
+            // @ts-ignore
+            elm.style.visibility = 'visible'
+          }
+        }
+      }
+      switcher.on()
+
+      return { oldCSS, cb: switcher.off }
     },
     onEnd: ({ targetElm, specialData }) => {
-      const { oldCSS } = specialData
-      for (const prop in oldCSS) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        targetElm.style[prop] = oldCSS[prop]
-      }
+      const { oldCSS, cb } = specialData
+      // @ts-ignore
+      for (const prop in oldCSS) targetElm.style[prop] = oldCSS[prop]
 
-      // for (const [key, value] of Object.entries(oldCSS))
-      //   targetElm.style[key] = value
-
-      // Object.keys(oldCSS).forEach(prop => {
-      //   const value = oldCSS[prop]
-      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //   // @ts-ignore
-      //   targetElm.style[prop] = value
-      // });
+      // NOTE: 2/2 Exp
+      cb()
     },
     onError: console.warn,
   },
@@ -123,7 +133,7 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
           })
         if (!!data.originalResponse) {
           setCalcErrMsg(null)
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
           // @ts-ignore
           setCalc(data.originalResponse)
           // if (!!data.message) setCalcDebugMsg(data.message)

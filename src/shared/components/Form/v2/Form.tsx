@@ -23,7 +23,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { Autocomplete, TOption } from '~/shared/components/Autocomplete'
 import baseClasses from '~/App.module.scss'
 
- 
+
 type TProps<Value> = {
   cb: {
     onSuccess: (values: any) => Promise<any>;
@@ -52,7 +52,7 @@ type TProps<Value> = {
 
 const genericMemo: <T>(component: T) => T = memo
 
-function GenericComponentForm<Value> ({
+function GenericComponentForm<Value>({
   cb,
   scheme,
   onChangeField,
@@ -102,7 +102,7 @@ function GenericComponentForm<Value> ({
         reset()
         resetAuxState()
       })
-      // .catch((err) => {})
+    // .catch((err) => {})
   }, [cb, reset, resetAuxState])
   const handleError = useCallback((arg: any) => {
     cb.onError(arg)
@@ -125,8 +125,8 @@ function GenericComponentForm<Value> ({
     return acc
   }, {}))
   const [__errsState, __setErrsState] = useState<{ [key: string]: string }>({})
-  const [__okState, __setOkState] = useState<{[key: string]: boolean}>({})
-  const [__auxControlledDatesState, __setAuxControlledDatesState] = useState<{[key: string]: dayjs.Dayjs | null}>({})
+  const [__okState, __setOkState] = useState<{ [key: string]: boolean }>({})
+  const [__auxControlledDatesState, __setAuxControlledDatesState] = useState<{ [key: string]: dayjs.Dayjs | null }>({})
   const rendersCounterRef = useRef<number>(0)
   useLayoutEffect(() => {
     if (rendersCounterRef.current === 0) {
@@ -137,7 +137,7 @@ function GenericComponentForm<Value> ({
         if (typeof scheme[cur]?.initValue !== 'undefined') acc.push(cur)
         return acc
       }, [])
-    
+
       const isAuxStateInitNeeded = fieldsToInit.length > 0
       if (isAuxStateInitNeeded) {
         __setAuxControlledDatesState((s) => ({
@@ -148,15 +148,15 @@ function GenericComponentForm<Value> ({
             switch (scheme[key].type) {
               case 'date-ts':
                 acc[key] = typeof scheme[key]?.initValue === 'number'
-                ? dayjs(scheme[key]?.initValue)
-                : dayjs()
+                  ? dayjs(scheme[key]?.initValue)
+                  : dayjs()
                 break
               default:
                 break
             }
-            
+
             return acc
-          } ,{}),
+          }, {}),
         }))
       }
     }
@@ -189,7 +189,7 @@ function GenericComponentForm<Value> ({
         // type,
       }
     ) => {
-      
+
       if (!!name) touchedMapRef.current[name] = true
 
       const errsObj: {
@@ -232,7 +232,7 @@ function GenericComponentForm<Value> ({
                 if (scheme[key].isRequired) {
                   okObj[key] = false
                 } else okObj[key] = true
-                
+
               } else {
                 okObj[key] = true
               }
@@ -282,7 +282,7 @@ function GenericComponentForm<Value> ({
   //       default:
   //         break
   //     }
-      
+
   //     return acc
   //   }, {})
   // })
@@ -520,8 +520,8 @@ function GenericComponentForm<Value> ({
                       <div>
                         {
                           typeof scheme[key].getLabel === 'function'
-                          ? scheme[key].getLabel({ value: auxState[key] })
-                          : scheme[key].label
+                            ? scheme[key].getLabel({ value: auxState[key] })
+                            : scheme[key].label
                         }
                       </div>
                     </div>
@@ -537,7 +537,7 @@ function GenericComponentForm<Value> ({
                       variant='outlined'
                       error={!!__errsState[key]}
                       helperText={__errsState[key] || undefined}
-                      // {...register(key, cfg[key].reactHookFormOptions || undefined)}
+                    // {...register(key, cfg[key].reactHookFormOptions || undefined)}
                     />
                   </Grid>
                 )
@@ -601,7 +601,7 @@ function GenericComponentForm<Value> ({
                       defaultValue={scheme[key].initValue as TOption}
                       isErrored={!!__errsState[key]}
                       helperText={__errsState[key]}
-                      // isCreatable
+                    // isCreatable
                     />
                     {/* <pre>{JSON.stringify({ list: scheme[key]._selectCustomOpts?.list, initValue: scheme[key].initValue }, null, 2)}</pre> */}
                   </Grid>
@@ -629,12 +629,17 @@ function GenericComponentForm<Value> ({
                           //       }
                           //     })
                           // } else {
-                            auxRef.current[key] = { value, label, _id }
-                            setValue(key, { value, label, _id })
+                          auxRef.current[key] = { value, label, _id }
+                          setValue(key, { value, label, _id })
                           // }
                           // setAuxState((s) => ({ ...s, [key]: item?.value }))
+                        } else {
+                          // NOTE: Deleted (null)
+                          auxRef.current[key] = null
+                          setValue(key, null)
                         }
                       }}
+                      // onDelete?
                       defaultValue={scheme[key].initValue as TOption}
                       isErrored={!!__errsState[key]}
                       helperText={__errsState[key]}
@@ -651,7 +656,7 @@ function GenericComponentForm<Value> ({
                       key={`${key}-${scheme[key].specialKey}`}
                       name={key}
                       control={control}
-                       
+
                       render={({ field: { value } }) => (
                         // NOTE: See also https://mui.com/x/react-date-pickers/date-time-picker/
                         <MobileDateTimePicker

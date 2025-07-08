@@ -72,19 +72,6 @@ export const HomePage = () => {
               </div>
             </Link>
             <Link
-              to='/about'
-              style={{
-                display: 'block',
-              }}
-            >
-              <div className={classes.gridItem}>
-                <InfoIcon />
-                <div className={classes.internalWrapper}>
-                  <div className={classes.title}>About</div>
-                </div>
-              </div>
-            </Link>
-            <Link
               to='/business-time'
               style={{
                 display: 'block',
@@ -109,6 +96,19 @@ export const HomePage = () => {
                 <div className={classes.internalWrapper}>
                   <div className={classes.title}>Worker Exp</div>
                   <em className={classes.descr}>For example (experimental)</em>
+                </div>
+              </div>
+            </Link>
+            <Link
+              to='/about'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <InfoIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>About</div>
                 </div>
               </div>
             </Link>

@@ -5,7 +5,7 @@ test('getWorstCalc: exp', () => {
   const expStart = new Date(2011, 0, 1, 0, 0, 0, 0).getTime()
   const expEstimate = new Date(2011, 0, 3, 0, 0, 0, 0).getTime()
   const expSuccessFinish = new Date(2011, 0, 2, 0, 0, 0, 0).getTime()
-  
+
   const testedStart = new Date(2025, 0, 1, 0, 0, 0, 0).getTime()
   const testedNowDate = new Date(2025, 0, 13, 0, 0, 0, 0).getTime()
   const testedEstimate = new Date(2025, 0, 15, 0, 0, 0, 0).getTime()
@@ -32,6 +32,10 @@ test('getWorstCalc: exp', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
     ],
     ts: {
@@ -72,7 +76,7 @@ test('getWorstCalc: exp', () => {
         counter: 1,
         speedValues: [
           2,
-        ], 
+        ],
       },
       sensibility: 4,
       sortedSpeeds: [

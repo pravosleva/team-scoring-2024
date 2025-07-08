@@ -177,13 +177,13 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             output.ok = false
             output.message = `Worker error: ${err?.message || 'No message'}; projects-tree-calc/middlewares/for-ts-tree-lib/calc`
           } finally {
-            setTimeout(() => {
-              cb[eventData.input.opsEventType]({
-                output,
-                input,
-                // _service,
-              })
-            }, 1000)
+            // setTimeout(() => {
+            cb[eventData.input.opsEventType]({
+              output,
+              input,
+              // _service,
+            })
+            // }, 1000)
           }
 
           break

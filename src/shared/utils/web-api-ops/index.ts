@@ -1,4 +1,5 @@
 export * from './blinkNodeIdFactory'
 export * from './delayedCallFactory'
+export * from './delayedCallFactoryConfigurableDelay'
 export * from './scrollToIdFactory'
 export * from './throttleFactory'

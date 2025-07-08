@@ -1,7 +1,7 @@
 import { assign, setup } from 'xstate'
 import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink, TLogChecklistItem } from './types'
-import { getCurrentPercentage } from '~/shared/utils'
-import { getWorstCalc } from '~/shared/utils/team-scoring'
+// import { getCurrentPercentage } from '~/shared/utils'
+// import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
 import dayjs from 'dayjs'
 import { soundManager } from '~/shared/soundManager'
@@ -130,6 +130,14 @@ export const topLevelMachine = setup({
                 const targetLogIndex = todo.logs.items.findIndex((log) => log.ts === event.value.logTs)
                 if (targetLogIndex !== -1) {
                   todo.logs.items[targetLogIndex].text = event.value.text
+                  soundManager.playDelayedSoundConfigurable({
+                    soundCode: 'mech-78-step',
+                    _debug: { msg: 'Log edited' },
+                    delay: {
+                      before: 0,
+                      after: 1000,
+                    },
+                  })
                 }
               }
               return todo
@@ -300,6 +308,24 @@ export const topLevelMachine = setup({
                           // console.log(`UPD before: checklistItem.isDone -> ${checklistItem.isDone} (event.value.state.isDone === ${event.value.state.isDone})`)
 
                           checklistItem.isDone = event.value.state.isDone
+
+                          // NOTE: Sound
+                          if (checklistItem.isDone) soundManager.playDelayedSoundConfigurable({
+                            soundCode: 'mech-56-single-short-hit-in-space',
+                            _debug: { msg: 'Checklist item isDone' },
+                            delay: {
+                              before: 0,
+                              after: 1000,
+                            },
+                          })
+                          else soundManager.playDelayedSoundConfigurable({
+                            soundCode: 'plop-1', // 'mech-54-short-far-single-hit',
+                            _debug: { msg: 'Checklist item !isDone' },
+                            delay: {
+                              before: 0,
+                              after: 1000,
+                            },
+                          })
 
                           // console.log(`UPD: checklistItem.isDone -> ${checklistItem.isDone} (event.value.state.isDone === ${event.value.state.isDone})`)
 
@@ -491,16 +517,26 @@ export const topLevelMachine = setup({
             const users = context.users
             const targetUser = users.items.find(({ id }) => id === jobToUpdate.forecast.assignedTo)
             if (!targetUser) {
-              soundManager.playDelayedSound({ soundCode: 'plop-3' })
+              const displayName = !!jobToUpdate.forecast._assignedToName
+                ? jobToUpdate.forecast._assignedToName.trim().replace(/\s+/g, ' ') : 'NoName'
               newUsers.unshift({
                 id: !Number.isNaN(Number(jobToUpdate.forecast.assignedTo))
                   ? Number(jobToUpdate.forecast.assignedTo)
                   : updateTime,
-                displayName: !!jobToUpdate.forecast._assignedToName
-                  ? jobToUpdate.forecast._assignedToName.trim().replace(/\s+/g, ' ') : 'NoName',
+                displayName,
                 ts: {
                   create: updateTime,
                   update: updateTime,
+                },
+              })
+              soundManager.playDelayedSoundConfigurable({
+                soundCode: 'plop-1',
+                _debug: {
+                  msg: `User [${displayName}] will be created`,
+                },
+                delay: {
+                  after: 500,
+                  before: 0,
                 },
               })
               delete jobToUpdate.forecast._assignedToName
@@ -546,8 +582,7 @@ export const topLevelMachine = setup({
                   // -- NOTE: Update children list for parent job
                   todo.relations.children = [...new Set([jobToUpdate.id, ...(todo.relations.children || [])])]
                   // console.log('Children updated: [1]')
-                  // console.log(todo.relations.children)
-                  soundManager.playDelayedSound({ soundCode: 'gong-6', _debug: { msg: 'Children list updated for parent job' } })
+
                   // --- Info
                   let _childWasAlreadyAdded = false
                   switch (true) {
@@ -589,7 +624,12 @@ export const topLevelMachine = setup({
                 case (todo.id === jobToUpdate.id): {
                   // NOTE: TARGET JOB
                   console.log('- /TARGET JOB')
-                  // soundManager.playDelayedSound({ soundCode: 'plop-4', _debug: 'Target job detected' })
+
+                  soundManager.playDelayedSoundConfigurable({
+                    soundCode: 'mech-81-step-hydraulic-robot',
+                    _debug: { msg: `Target job detected: ${jobToUpdate.id}` },
+                    delay: { before: 0, after: 1500 },
+                  })
 
                   // console.log('-- jobToUpdate (1)')
                   // console.log(jobToUpdate)
@@ -604,12 +644,18 @@ export const topLevelMachine = setup({
                     targetChildId: undefined,
                   }
 
-                  const isParentRemoved = !!todo.relations?.parent && !jobToUpdate.relations?.parent
-                  const isParentSet = !!jobToUpdate.relations?.parent
+                  // soundManager.playDelayedSound({ soundCode: 'gong-6', _debug: { msg: 'EXP' } })
+                  // console.log(`${todo.relations?.parent} -> ${jobToUpdate.relations?.parent}`)
+                  // console.log(`NEW PARENT: ${jobToUpdate.relations?.parent}`)
+
+                  const isParentJobRemoved = !!todo.relations?.parent && !jobToUpdate.relations?.parent
+                  const isParentJobSet = !!jobToUpdate.relations?.parent
+                  const hasOldParentJob = !!todo.relations?.parent
+
                   switch (true) {
-                    case isParentRemoved: {
-                      // NOTE: Parent removed!
-                      console.log('-- Parent removed!')
+                    case isParentJobRemoved: {
+                      // NOTE: Parent job removed!
+                      console.log('-- /Parent job removed!')
 
                       // console.log('- [1] parent should be removed')
                       shouldChildBeRemovedFromParent.doIt = true
@@ -627,10 +673,17 @@ export const topLevelMachine = setup({
                               children: [],
                             }
                           }
-                          a[parentIndex].relations.children = a[parentIndex].relations?.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+                          a[parentIndex].relations.children = a[parentIndex].relations?.children
+                            .filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
                           // console.log(`--- children updated:`)
                           // console.log(a[parentIndex].relations.children)
-                          soundManager.playDelayedSound({ soundCode: 'load-24', _debug: { msg: 'Children updated for parent job' } })
+                          soundManager.playDelayedSoundConfigurable({
+                            soundCode: 'ojing-eo-geim_player-excluded',
+                            _debug: {
+                              msg: '[1:isParentJobRemoved] Child job removed in old parent job (old parent affected)'
+                            },
+                            delay: { before: 0, after: 1200 },
+                          })
 
                           if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
                             a[parentIndex].logs.items.pop()
@@ -652,18 +705,21 @@ export const topLevelMachine = setup({
                       }
                       todo.relations.parent = null
                       // jobToUpdate.relations.children = todo.relations.children || []
-                      console.log('--')
+                      console.log('-- /')
                       break
                     }
-                    case isParentSet: {
+                    case isParentJobSet: {
                       // NOTE: Set new parent!
-                      console.log('-- Set new parent!')
-                      soundManager.playDelayedSound({ soundCode: 'plop-1', _debug: { msg: 'New parent will be set' } })
+                      console.log('-- /Set new parent!')
+                      // soundManager.playDelayedSound({
+                      //   soundCode: 'plop-1',
+                      //   _debug: { msg: 'New parent will be set' },
+                      // })
 
                       switch (true) {
-                        case !!todo.relations?.parent:
+                        case hasOldParentJob:
                           // NOTE: Has old parent
-                          console.log('--- Has old parent')
+                          console.log('--- /Has old parent')
 
                           if (todo.relations.parent !== jobToUpdate.relations.parent) {
                             // NOTE: Remove child from old parent
@@ -671,8 +727,19 @@ export const topLevelMachine = setup({
                             shouldChildBeRemovedFromParent.targetChildId = jobToUpdate.id
                             const parentIndex = a.findIndex(({ id }) => id === todo.relations.parent)
                             if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations.children)) {
-                              a[parentIndex].relations.children = a[parentIndex].relations.children.filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
-                              soundManager.playDelayedSound({ soundCode: 'fail-116', _debug: { msg: 'Child removed from old parent' } })
+                              a[parentIndex].relations.children = a[parentIndex].relations.children
+                                .filter((id) => id !== shouldChildBeRemovedFromParent.targetChildId)
+
+                              soundManager.playDelayedSoundConfigurable({
+                                soundCode: 'ojing-eo-geim_player-excluded',
+                                _debug: {
+                                  msg: [
+                                    '[2:isParentJobSet:hasOldParentJob]',
+                                    'Child job removed in old parent job (parent affected)',
+                                  ].join(' ')
+                                },
+                                delay: { before: 0, after: 1000 },
+                              })
                             }
                             if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
                               a[parentIndex].logs.items.pop()
@@ -704,17 +771,23 @@ export const topLevelMachine = setup({
                           console.log('[1] CURRENT todo.relations.children')
                           console.log(todo.relations.children)
                           // jobToUpdate.relations.children = todo.relations.children || []
-                          console.log('---')
+                          console.log('--- /')
                           break
                         case !todo.relations?.parent: {
                           // NOTE: Hasnt parent yet but will be set!
-                          console.log('--- Hasnt parent yet but will be set!')
+                          console.log('--- /Hasnt parent yet but will be set!')
 
                           // Add child to parent
                           const parentIndex = a.findIndex(({ id }) => id === jobToUpdate.relations.parent)
                           if (parentIndex !== -1 && Array.isArray(a[parentIndex].relations.children)) {
                             a[parentIndex].relations.children = [...new Set([jobToUpdate.id, ...(a[parentIndex].relations.children || [])])]
-                            soundManager.playDelayedSound({ soundCode: 'click-8', _debug: { msg: 'Hasnt parent yet: Child added to parent' } })
+                            soundManager.playDelayedSoundConfigurable({
+                              soundCode: 'click-8',
+                              _debug: {
+                                msg: 'Hasnt parent yet: Child added to parent',
+                              },
+                              delay: { before: 0, after: 1000 },
+                            })
                             if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
                               a[parentIndex].logs.items.pop()
 
@@ -733,15 +806,18 @@ export const topLevelMachine = setup({
                           }
                           todo.relations.parent = jobToUpdate.relations.parent
                           // todo.relations.children = 
-                          console.log('[2] CURRENT todo.relations.children')
-                          console.log(todo.relations.children)
+                          // console.log('[2] CURRENT todo.relations.children')
+                          // console.log(todo.relations.children)
                           // jobToUpdate.relations.children = todo.relations.children || []
-                          console.log('---')
+                          console.log('--- /')
                           break
                         }
                         default:
-                          console.log('--- Default')
-                          soundManager.playDelayedSound({ soundCode: 'fail-11', _debug: { msg: 'Unknown case' } })
+                          console.log('--- /Default')
+                          soundManager.playDelayedSound({
+                            soundCode: 'fail-11',
+                            _debug: { msg: 'Unknown case' },
+                          })
 
                           if (!todo.relations) {
                             todo.relations = {
@@ -751,27 +827,27 @@ export const topLevelMachine = setup({
                           }
                           todo.relations.parent = jobToUpdate.relations.parent
                           // jobToUpdate.relations.children = todo.relations.children || []
-                          console.log('---')
+                          console.log('--- /')
                           break
                       }
                       // Nothing: Parent already set
-                      console.log('--')
+                      console.log('-- /')
                       break
                     }
                     default:
-                      console.log('-- DEFAULT CASE!')
-                      console.log('--')
+                      console.log('-- /DEFAULT CASE!')
+                      console.log('-- /')
                       break
                   }
                   // --
-                  console.log('- CURRENT: todo.relations')
-                  console.log(todo.relations) // { parent: null }
+                  // console.log('- CURRENT: todo.relations')
+                  // console.log(todo.relations) // { parent: null }
 
                   // NOTE: Tested
                   jobToUpdate.relations = todo.relations
 
-                  console.log('- NEW: jobToUpdate.relations')
-                  console.log(jobToUpdate.relations) // undefined?
+                  // console.log('- NEW: jobToUpdate.relations')
+                  // console.log(jobToUpdate.relations) // undefined?
 
                   console.log('- /')
 
@@ -820,8 +896,9 @@ export const topLevelMachine = setup({
                   // NOTE: Reassigned
                   const hasOldUser = !!todo.forecast.assignedTo
                   const hasNewUser = !!jobToUpdate.forecast.assignedTo
+                  const hasAssignedToNobody = !hasNewUser
                   const hasReassigned = hasOldUser && hasNewUser && hasOldUser !== hasNewUser
-                  const hasReassignedToNobody = hasOldUser && !hasNewUser
+                  const hasReassignedToNobody = hasOldUser && hasAssignedToNobody
                   const hasAssignedFromNobody = !hasOldUser && hasNewUser
                   // let targetNewUser: TUser | undefined
                   // if (hasNewUser) {
@@ -831,6 +908,16 @@ export const topLevelMachine = setup({
                   // if (hasOldUser) {
                   //   targetOldUser = context.users.items.find((u) => u.id === todo.forecast.assignedTo)
                   // }
+
+                  if (hasAssignedToNobody) {
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'ojing-eo-geim_player-excluded',
+                      _debug: { msg: 'Job has assigned to nobody' },
+                      delay: { before: 0, after: 1000 },
+                    })
+                    // delete todo.forecast.assignedTo
+                  }
+
                   switch (true) {
                     case hasAssignedFromNobody:
                       _newMsgs.add(`Assigned: to [user=${jobToUpdate.forecast.assignedTo}]`)
@@ -884,8 +971,9 @@ export const topLevelMachine = setup({
                   }
                   jobToUpdate.completed = !!jobToUpdate.forecast.finish
 
-                  let progress: null | TLogProgress = null
+                  const progress: null | TLogProgress = null
                   // -- NOTE: Progress
+                  /*
                   switch (true) {
                     // NOTE: 1. (Finish date was removed | updated) | Estimate | complexity updated
                     case (
@@ -952,14 +1040,24 @@ export const topLevelMachine = setup({
                     default:
                       break
                   }
+                  */
                   if (jobToUpdate.completed) {
                     const v = getSpeed(jobToUpdate)
                     jobToUpdate.v = v
                     _newMsgs.add(`v= ${v}`)
-                    soundManager.playDelayedSound({ soundCode: 'mech-3', _debug: { msg: 'Job completed' } })
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'mech-3', _debug: { msg: 'Job completed' },
+                      delay: { before: 0, after: 750 },
+                    })
                   } else {
                     delete jobToUpdate.v
-                    soundManager.playDelayedSound({ soundCode: 'click-1', _debug: { msg: 'Job not completed' } })
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'click-1',
+                      _debug: {
+                        msg: 'Job not completed'
+                      },
+                      delay: { before: 0, after: 750 },
+                    })
                   }
                   // --
 
@@ -971,7 +1069,7 @@ export const topLevelMachine = setup({
 
                   jobToUpdate.logs.items.unshift(newLog)
 
-                  soundManager.playDelayedSound({ soundCode: 'click-12', _debug: { msg: 'Done: updated jod will be saved.' } })
+                  // soundManager.playDelayedSound({ soundCode: 'click-12', _debug: { msg: 'Done: updated jod will be saved.' } })
 
                   return jobToUpdate
                 }

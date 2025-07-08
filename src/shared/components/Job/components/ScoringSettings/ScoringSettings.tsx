@@ -28,6 +28,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 // import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 import ConstructionIcon from '@mui/icons-material/Construction'
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
+// import { soundManager } from '~/shared/soundManager'
 
 type TProps = {
   isActive: boolean;
@@ -80,6 +82,7 @@ const getJobValueOption = ({ jobId, jobs }: {
     : undefined
 }
 
+// NOTE: For form initialization (not for saving)
 const getNormalizedState = ({ state, jobId }: {
   state: unknown;
   jobId: number;
@@ -136,6 +139,7 @@ const getNormalizedState = ({ state, jobId }: {
         modifiedState[key] = _state[key]
         break
       case 'assignedTo':
+        // console.log(_state[key])
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (!!_state[key]?._id) {
@@ -311,10 +315,13 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             case !Number.isNaN(Number(value?._id)):
               // NOTE: Ok
               break
-            case Number.isNaN(Number(value?.value)):
-              res.ok = false
-              res.message = `Check value plz: "${String(value?.value)}" (${typeof value?.value})`
+            case typeof value === 'undefined':
+              // NOTE: Removed?
               break
+            // case Number.isNaN(Number(value?.value)):
+            //   res.ok = false
+            //   res.message = `Check value plz: "${String(value?.value)}" (${typeof value?.value})`
+            //   break
             default:
               break
           }
@@ -534,7 +541,11 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             navigate(`/jobs/${job.id}`)
           }}
         >
-          <ConstructionIcon />
+          {
+            !!job.relations?.parent || job.relations?.children.length > 0
+              ? <AccountTreeIcon />
+              : <ConstructionIcon />
+          }
         </div>
         <div
           className={clsx(classes.toggler, classes.warn)}
@@ -571,7 +582,18 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             label: 'Save',
             startIcon: <SaveIcon />,
             isEnabled: isTargetActionEnabled,
-            onClick: () => onSave({ state: formState }),
+            onClick: () => {
+              // soundManager.playDelayedSound({
+              //   soundCode: 'load-24',
+              //   _debug: {
+              //     msg: [
+              //       'EXP',
+              //     ].join(' // ')
+              //   },
+              // })
+              // console.log(formState)
+              return onSave({ state: formState })
+            },
           }}
           optionalActions={
             !!job.forecast.estimate || !!job.forecast.start || !!job.forecast.finish

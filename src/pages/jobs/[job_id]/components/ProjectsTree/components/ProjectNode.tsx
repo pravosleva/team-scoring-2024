@@ -74,7 +74,7 @@ export const ProjectNode = ({
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '16px',
+              gap: '8px',
             }}
             className={baseClasses.truncate}
           >
@@ -95,7 +95,7 @@ export const ProjectNode = ({
             {
               !!projectsTree.model.relations?.parent && (
                 <code
-                  className={clsx(baseClasses.noBreakWords)}
+                  className={clsx(baseClasses.noBreakWords, 'node-blinker-disablable')}
                   style={{ fontSize: 'x-small', fontWeight: 'bold', color: 'lightgray', cursor: 'pointer' }}
                   onClick={onNavigateToJobNode({
                     jobId: projectsTree.model.relations?.parent,
@@ -121,7 +121,7 @@ export const ProjectNode = ({
               {
                 !!projectsTree.model.relations?.parent && (
                   <code
-                    className={clsx(baseClasses.noBreakWords)}
+                    className={clsx(baseClasses.noBreakWords, 'node-blinker-disablable')}
                     style={{ display: 'block', fontSize: 'x-small', fontWeight: 'bold', color: '#02c39a', cursor: 'pointer', transform: 'rotate(7deg)' }}
                     onClick={onNavigateToJobNode({
                       jobId: projectsTree.model.relations?.parent,

@@ -25,6 +25,10 @@ test('getSortedSpeeds: sensibility 4', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
       {
         id: 1,
@@ -46,6 +50,10 @@ test('getSortedSpeeds: sensibility 4', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
       {
         id: 2,
@@ -67,6 +75,10 @@ test('getSortedSpeeds: sensibility 4', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
       {
         id: 3,
@@ -88,6 +100,10 @@ test('getSortedSpeeds: sensibility 4', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
       {
         id: 4,
@@ -109,6 +125,10 @@ test('getSortedSpeeds: sensibility 4', () => {
           items: [],
           isEnabled: false,
         },
+        relations: {
+          parent: null,
+          children: [],
+        }
       },
     ],
   })
@@ -136,7 +156,7 @@ test('getSortedSpeeds: sensibility 4', () => {
       },
     ],
     dates: null,
-    delta:{
+    delta: {
       items: [
         {
           next: 0.5883905013192612,
@@ -183,7 +203,7 @@ test('getSortedSpeeds: sensibility 4', () => {
       min: 0.03839050131926114,
     },
     sensed: {
-      averageSpeed: 0.6788985286883413,
+      averageSpeed: 0.5883905013192612,
       counter: 3,
       speedValues: [
         0.55,
