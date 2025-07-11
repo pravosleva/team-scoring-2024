@@ -1,4 +1,5 @@
 export * from './createFastContext'
+export * from './debugFactory'
 export * from './getValidateResult'
 export * from './getCurrentPercentage'
 export * from './groupLog'

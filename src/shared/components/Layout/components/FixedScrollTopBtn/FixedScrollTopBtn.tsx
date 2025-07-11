@@ -33,6 +33,7 @@ export const FixedScrollTopBtn = memo(() => {
         setTimeout(() => {
           const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
           if (!!targetElm) {
+            console.log(targetElm)
             targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
         }, 0)
@@ -40,7 +41,7 @@ export const FixedScrollTopBtn = memo(() => {
       default:
         break
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, urlSearchParams])
 
   return (

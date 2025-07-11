@@ -13,6 +13,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
+import WebIcon from '@mui/icons-material/Web'
 
 export const HomePage = () => {
   return (
@@ -72,6 +73,20 @@ export const HomePage = () => {
               </div>
             </Link>
             <Link
+              to='/jobs-pager-exp'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <WebIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Jobs Pager Exp</div>
+                  <em className={classes.descr}>Web Worker experience (experimental)</em>
+                </div>
+              </div>
+            </Link>
+            <Link
               to='/business-time'
               style={{
                 display: 'block',
@@ -95,7 +110,7 @@ export const HomePage = () => {
                 <Brightness1Icon />
                 <div className={classes.internalWrapper}>
                   <div className={classes.title}>Worker Exp</div>
-                  <em className={classes.descr}>For example (experimental)</em>
+                  <em className={classes.descr}>Web Worker experience (experimental)</em>
                 </div>
               </div>
             </Link>

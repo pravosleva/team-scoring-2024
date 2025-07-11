@@ -13,12 +13,13 @@ type TCountersPack = {
   allNew: number;
 };
 type TPICCounters = {
+  total: number;
   main: TCountersPack;
   employees: {
     [key: string]: TCountersPack;
   };
 };
-type TPICFilters = {
+export type TPICFilters = {
   isAnyFilterActive: boolean;
   jobStatusFilter: boolean;
   assignedTo: boolean;
@@ -41,12 +42,26 @@ type TUserRouteControls = {
   to?: TUserRouteControlsItem;
 };
 type TPICStore = {
+  queryParams: { [key: string]: string };
+  debug: {
+    filters: {
+      isEnabled: boolean;
+      level: number;
+    },
+  },
   activeFilters: TPICFilters;
   filteredJobs: TJob[];
   counters: TPICCounters;
   userRouteControls: TUserRouteControls;
 }
 const initialState: TPICStore = {
+  queryParams: {},
+  debug: {
+    filters: {
+      isEnabled: false,
+      level: 0,
+    },
+  },
   activeFilters: {
     isAnyFilterActive: false,
     jobStatusFilter: false,
@@ -63,6 +78,7 @@ const initialState: TPICStore = {
   },
   filteredJobs: [],
   counters: {
+    total: 0,
     main: {
       allProjects: 0,
       estimateReached: 0,
@@ -91,6 +107,8 @@ const getIsJobProject = ({ job }: { job: TJob }): boolean =>
 const getIsJobNew = ({ job }: { job: TJob }): boolean =>
   !job.forecast.estimate
 
+const debugFiltersLevels: string[] = ['1']
+
 const Logic = ({ children }: TProps) => {
   const todosActorRef = TopLevelContext.useActorRef()
   // const { send } = todosActorRef
@@ -103,6 +121,11 @@ const Logic = ({ children }: TProps) => {
   const [, setStore] = useStore((s) => s.filteredJobs)
 
   useEffect(() => {
+    const queryParams: { [key: string]: string } = {}
+    for (const [key, value] of urlSearchParams.entries()) {
+      queryParams[key] = value
+    }
+
     // NOTE: 1. Filters
     const isUserPage = location.pathname === `/employees/${params.user_id}`
     const jobStatusFilterValue = urlSearchParams.get('jobStatusFilter')
@@ -110,18 +133,34 @@ const Logic = ({ children }: TProps) => {
       && Object.values(EJobsStatusFilter).includes(jobStatusFilterValue as EJobsStatusFilter)
     const assignedToFilterValue =
       isUserPage
-      ? params?.user_id
-      : urlSearchParams.get('assignedTo')
+        ? params?.user_id
+        : urlSearchParams.get('assignedTo')
+    const isDebugFiltersEnabled =
+      typeof urlSearchParams.get('debugFiltersLevel') === 'string'
+        ? debugFiltersLevels.includes(urlSearchParams.get('debugFiltersLevel') || 'impossible-case-special-for-ts')
+        : false
+    const debugFiltersLevel = isDebugFiltersEnabled
+      ? Number(urlSearchParams.get('debugFiltersLevel'))
+      : 0
     const hasAssignedToFilter =
       (!!assignedToFilterValue && !Number.isNaN(Number(assignedToFilterValue)))
     const estimateReachedFilterValue = urlSearchParams.get('estimateReached')
     const hasEstimateReachedFilter = !!estimateReachedFilterValue && !Number.isNaN(Number(estimateReachedFilterValue))
-    
+
     const isProjectFilterValue = urlSearchParams.get('isProject')
     const hasIsProjectFilterValue = !!isProjectFilterValue && !Number.isNaN(Number(isProjectFilterValue))
 
     const isNewFilterValue = urlSearchParams.get('isNew')
     const hasIsNewFilterValue = !!isNewFilterValue && !Number.isNaN(Number(isNewFilterValue))
+
+    const auxSettings: Pick<TPICStore, 'debug'> = {
+      debug: {
+        filters: {
+          isEnabled: isDebugFiltersEnabled,
+          level: debugFiltersLevel,
+        }
+      }
+    }
 
     let filteredJobs: TJob[] = []
     const activeFilters: TPICFilters = {
@@ -139,6 +178,7 @@ const Logic = ({ children }: TProps) => {
       },
     }
     const counters: TPICCounters = {
+      total: allJobs.length,
       main: {
         allProjects: 0,
         estimateReached: 0,
@@ -189,7 +229,7 @@ const Logic = ({ children }: TProps) => {
           }
           break
       }
-      
+
       if (isStartedAndEstimated && !isCompleted) {
         const isEstimateReached = nowDate > (job.forecast.estimate as number)
         if (isEstimateReached) {
@@ -338,8 +378,8 @@ const Logic = ({ children }: TProps) => {
       uiText: toRouteUiText || 'Forward',
     }
 
-    setStore({ filteredJobs, activeFilters, counters, userRouteControls })
-    
+    setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })
+
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
   }, [urlSearchParams, location, users, allJobs, setStore, params.user_id])
 

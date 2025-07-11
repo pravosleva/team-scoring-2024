@@ -281,11 +281,13 @@ function SimpleCheckListFn<TAddInfo>({
                   className={clsx(
                     {
                       [classes.commentBox]: !isMiniVariant,
-                      [classes.commentBoxMini]: isMiniVariant,
+                      [classes.commentBoxMini]: isEditable && isMiniVariant,
+                      [classes.commentBoxMiniNoActions]: !isEditable && isMiniVariant,
                       [classes.default]: !hasNotActiveItems,
                       [classes.success]: hasNotActiveItems,
-                      [classes.editableCommentBox]: isEditable && !isMiniVariant,
+                      [classes.editableCommentBox]: !isMiniVariant,
                       [classes.editableCommentBoxMini]: isEditable && isMiniVariant,
+                      [classes.noActions]: !isEditable && isMiniVariant,
                       [classes.rounded]: !connectedOnThe,
                       [classes.connectedOnTheTop]: connectedOnThe?.includes('top'),
                     }

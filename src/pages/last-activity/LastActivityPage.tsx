@@ -21,7 +21,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 // import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 // import { CommentManager } from './components'
-import { sort } from '~/shared/utils/object-ops/sort-array-objects@3.0.0'
+import { sort } from '~/shared/utils/array-ops/sort-array-objects@3.0.0'
 import dayjs from 'dayjs'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import {
@@ -259,7 +259,7 @@ export const LastActivityPage = memo(() => {
                           createBtnLabel='Create checklist'
                           isCreatable={false}
                           isDeletable={false}
-                          isEditable={true}
+                          isEditable={false}
                           // onDeleteChecklist={console.info}
                           onCreateNewChecklistItem={({ state }) => {
                             jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })

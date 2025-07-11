@@ -171,7 +171,7 @@ export const LogPage = () => {
                 gap: 2,
               }}
             >
-              <div style={{ fontWeight: 'bold' }}>Log #{params.log_ts}{Array.isArray(targetLog?.links) ? ` | ${targetLog?.links.length} links` : ''} | {dayjs(targetLog?.ts).format('DD.MM.YYYY HH:mm')}</div>
+              <div style={{ fontWeight: 'bold' }}>Log #{params.log_ts} | {dayjs(targetLog?.ts).format('DD.MM.YYYY HH:mm')}</div>
               <SingleTextManager
                 infoLabel='Log text'
                 buttonText='Add log text'
@@ -384,7 +384,7 @@ export const LogPage = () => {
                 !!targetJob && !!targetLog && (
                   <Link
                     to={
-                      `/jobs/${targetJob.id}?from=${encodeURIComponent(
+                      `/jobs-pager-exp?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
                         `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
                         // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
                       )

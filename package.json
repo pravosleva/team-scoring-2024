@@ -1,7 +1,7 @@
 {
   "name": "team-scoring-2024",
   "private": true,
-  "version": "2.1.2-beta1",
+  "version": "2.1.2-beta3-jobs-pager",
   "type": "module",
   "engines": {
     "npm": ">=10.8.2",

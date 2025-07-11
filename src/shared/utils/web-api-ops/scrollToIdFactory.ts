@@ -10,6 +10,7 @@ export const scrollToIdFactory = ({ timeout, offsetTop, elementHeightCritery }: 
       const nodeId = id
       const targetElm = document.getElementById(nodeId)
       if (!!targetElm) {
+        console.log(targetElm)
         if (!!_timeout) clearTimeout(_timeout)
         _timeout = setTimeout(() => {
           const curHeight = targetElm.getBoundingClientRect().height

@@ -10,6 +10,8 @@ export namespace NWService {
 
     EXPERIMENTAL_PING = 'c-w:experimental:ping',
 
+    GET_JOBS_PAGER = 'c-w:jobs-pager:ping:get',
+
     // NOTE: 1/2 Others...
   }
   export enum EWorkerToClientEvent {
@@ -23,6 +25,9 @@ export namespace NWService {
 
     EXPERIMENTAL_PONG_OK = 'w-c:experimental:pong:ok',
     EXPERIMENTAL_PONG_ERR = 'w-c:experimental:pong:err',
+
+    JOBS_PAGER_OK = 'w-c:jobs-pager:pong:ok',
+    JOBS_PAGER_ERR = 'w-c:jobs-pager:pong:err',
 
     // NOTE: 2/2 Others...
   }

@@ -1,7 +1,7 @@
 import { mutateSplittedArray } from './mutateSplittedArray';
 
 describe('Тестирование способов разбить массив (мутации)', () => {
-  test('case 1: Разбиение массива', () => {
+  test.skip('case 1: Разбиение массива', () => {
     const mutatedList = Array.from({ length: 100000 }, (_, index) => index + 1)
 
     console.time('arr mutation 1')

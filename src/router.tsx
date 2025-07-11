@@ -3,7 +3,7 @@ import {
   AboutPage, BusinessTime, HomePage, EmployeePage, EmployeesPage,
   JobPage, JobsPage, LogPage, LastActivityPage, WorkerExpPage,
 } from '~/pages'
-import { Layout } from '~/shared/components/Layout'
+import { Layout, JobsPagerAbstracted } from '~/shared/components'
 
 export const router = createHashRouter(
   [
@@ -51,6 +51,10 @@ export const router = createHashRouter(
     {
       path: '/worker-exp',
       element: <WorkerExpPage />,
+    },
+    {
+      path: '/jobs-pager-exp',
+      element: <Layout noScrollTopBtn><JobsPagerAbstracted pagerControlsHardcodedPath='/jobs-pager-exp' /></Layout>,
     },
   ]
 )

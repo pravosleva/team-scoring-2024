@@ -140,6 +140,16 @@
   grid-auto-flow: dense;
 }
 
+.specialActionsAndPagerInfoGrid {
+  display: grid;
+  column-gap: #{$size-pad-2}px;
+  row-gap: #{$size-pad-1}px;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  // grid-auto-rows: 1fr;
+  // grid-template-rows: repeat(1fr);
+  grid-auto-flow: dense;
+}
+
 .pagesGrid {
   display: grid;
   column-gap: #{$size-pad-2}px;

@@ -19,6 +19,7 @@ import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v
 
 type TProps = {
   children: React.ReactNode;
+  noScrollTopBtn?: boolean;
 }
 type TSpeedDialMenuItem = {
   to: string;
@@ -54,7 +55,7 @@ const BRAND_NAME = import.meta.env.VITE_BRAND_NAME || 'No VITE_BRAND_NAME'
 const GIT_SHA1 = import.meta.env.VITE_GIT_SHA1 || 'No Git VITE_GIT_SHA1'
 const GIT_BRANCH_NAME = import.meta.env.VITE_GIT_BRANCH_NAME || 'No VITE_GIT_BRANCH_NAME'
 
-export const Layout = ({ children }: TProps) => {
+export const Layout = ({ children, noScrollTopBtn }: TProps) => {
   const location = useLocation()
   const currentYear = useMemo(() => new Date().getFullYear(), [])
   const createdYear = 2019
@@ -90,7 +91,7 @@ export const Layout = ({ children }: TProps) => {
           <div>GIT branch name <code className={classes.code}>{GIT_BRANCH_NAME}</code></div>
         </ResponsiveBlock>
       </div>
-      
+
       <SpeedDial
         ariaLabel='SpeedDial'
         sx={{
@@ -119,7 +120,11 @@ export const Layout = ({ children }: TProps) => {
           />
         ))}
       </SpeedDial>
-      <FixedScrollTopBtn />
+      {
+        !noScrollTopBtn && (
+          <FixedScrollTopBtn />
+        )
+      }
     </ParamsInspectorContextWrapper>
   )
 }

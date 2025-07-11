@@ -33,7 +33,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 type TProps = {
   isActive: boolean;
-  onToggleDrawer: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
+  onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
   job: TJob;
   onSave: (ps: {
     state: TJob | null;
@@ -187,7 +187,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
   const handleToggle = useCallback(() => setIsOpened((s) => !s), [setIsOpened])
 
   useLayoutEffect(() => {
-    if (isOpened) onToggleDrawer(false)({ jobId: job.id })
+    if (isOpened && typeof onToggleDrawer === 'function') onToggleDrawer(false)({ jobId: job.id })
   }, [isOpened, onToggleDrawer, job.id])
   const handleCloseModal = useCallback(() => {
     setIsOpened(false)
@@ -507,15 +507,21 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         <div className={clsx(classes.toggler, classes.red)} onClick={onDeleteJob}>
           <DeleteIcon />
         </div>
-        <div
-          className={clsx(classes.toggler, classes.blue, { [classes.active]: isActive })}
-          onClick={() => {
-            // navigate(`/jobs/${job.id}`)
-            onToggleDrawer(true)({ jobId: job.id })
-          }}
-        >
-          <TroubleshootIcon />
-        </div>
+
+        {
+          typeof onToggleDrawer === 'function' && (
+            <div
+              className={clsx(classes.toggler, classes.blue, { [classes.active]: isActive })}
+              onClick={() => {
+                // navigate(`/jobs/${job.id}`)
+                onToggleDrawer(true)({ jobId: job.id })
+              }}
+            >
+              <TroubleshootIcon />
+            </div>
+          )
+        }
+
         <div
           className={clsx(classes.descr, baseClasses.truncate)}
           style={{

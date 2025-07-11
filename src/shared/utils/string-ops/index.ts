@@ -1,4 +1,5 @@
 export * from './getCapitalizedFirstLetter'
+export * from './getFullUrl'
 export * from './getMatchedByAnyString'
 export * from './getMatchedByRegExp'
 export * from './getSplittedCamelCase'

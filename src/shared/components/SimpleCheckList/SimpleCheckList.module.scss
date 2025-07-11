@@ -10,9 +10,11 @@
 .activeChecklistItem {
   border: 1px solid red;
 }
+
 .inlineControlBtn {
   cursor: pointer;
 }
+
 .checklistItemWrapper {
   display: flex;
   flex-direction: column;
@@ -31,6 +33,7 @@
       border: none;
       cursor: pointer;
     }
+
     .actionIconWrapper {
       width: 24px;
       height: 24px;
@@ -55,6 +58,7 @@
     .descr {
       color: inherit;
     }
+
     .throughText {
       text-decoration: line-through;
     }
@@ -78,6 +82,7 @@
   .default {
     border: 2px solid #959eaa;
   }
+
   padding: 24px 16px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -86,14 +91,17 @@
   font-weight: bold;
   font-size: small;
 }
+
 .commentBoxMini {
   &.default {
     border: 2px solid #959eaa;
   }
+
   &.success {
     // border: 2px solid #7fd1ae;
     border: 2px solid #02c39a;
   }
+
   display: flex;
   flex-direction: column;
   min-height: 52px;
@@ -101,19 +109,41 @@
   font-weight: bold;
   font-size: small;
 }
+
+.commentBoxMiniNoActions {
+  &.default {
+    border: 2px solid #959eaa;
+  }
+
+  &.success {
+    // border: 2px solid #7fd1ae;
+    border: 2px solid #02c39a;
+  }
+
+  display: flex;
+  flex-direction: column;
+  min-height: 52px;
+  position: relative;
+  font-weight: bold;
+  font-size: small;
+}
+
 .connectedOnTheTop {
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
 }
+
 .rounded {
   border-radius: 16px;
-  & > .absoluteBadgeTopRight {
+
+  &>.absoluteBadgeTopRight {
     border-radius: 0 10px 0 16px;
   }
-  & > .absoluteBadgeBottomLeft,
-  & > .absoluteBadgeBottomLeftSuccess {
+
+  &>.absoluteBadgeBottomLeft,
+  &>.absoluteBadgeBottomLeftSuccess {
     border-radius: 0 16px 0 10px;
   }
 }
@@ -121,9 +151,15 @@
 .editableCommentBox {
   padding: 24px 16px 48px 16px;
 }
+
 .editableCommentBoxMini {
   padding: 8px 8px 48px 8px;
 }
+
+.noActions {
+  padding: 8px 8px 24px 8px;
+}
+
 .absoluteBadgeTopRight {
   position: absolute;
   top: 0px;
@@ -137,18 +173,22 @@
   line-height: 1.5em;
   font-weight: bold;
 }
+
 .absoluteBadgeBottomLeft {
   position: absolute;
   bottom: 0px;
   left: 0px;
+
   // background-color: rgb(203, 213, 225);
   &.default {
     background-color: #959eaa;
   }
+
   &.success {
     // background-color: #7fd1ae;
     background-color: #02c39a;
   }
+
   color: #fff;
   // ...
   padding: 2px 16px 0px 16px;
@@ -156,6 +196,7 @@
   line-height: 1.5em;
   font-weight: bold;
 }
+
 .absoluteControls {
   position: absolute;
   bottom: 8px;
@@ -176,31 +217,38 @@
   & button:first-child:not(:last-child) {
     border-radius: 8px 0px 0px 8px;
   }
+
   & button:last-child:not(:first-child) {
     border-radius: 0px 8px 8px 0px;
   }
 }
+
 .btnDelete {
   background-color: red;
   color: #fff;
+
   &:hover {
     background-color: red;
   }
 }
+
 .btnEdit {
   background-color: #1565c0;
   color: #fff;
+
   &:hover {
     background-color: #1565c0;
   }
 }
+
 .commentTitle {
   max-width: 100%;
 }
+
 .commentDescription {
   height: 100%;
 
-  & > pre {
+  &>pre {
     // border-radius: 16px 16px 0px 0px;
     margin-bottom: 0px;
     background-color: transparent;
@@ -209,10 +257,12 @@
     // border-radius: 0px;
   }
 }
+
 .commentAction {
   display: flex;
   align-items: center;
-  & > div {
+
+  &>div {
     margin-left: auto;
     display: flex;
     gap: 8px;

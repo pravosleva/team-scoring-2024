@@ -9,7 +9,7 @@ import { TopLevelContext, TJob } from '~/shared/xstate'
 import { ScoringSettings } from './components'
 import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Rating } from '@mui/material'
 import { AutoRefreshedJobMuiAva } from './utils'
-// import classes from './Job.module.scss'
+import classes from './Job.module.scss'
 import clsx from 'clsx'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
@@ -21,7 +21,7 @@ type TProps = {
   isLastSeen?: boolean;
   isActive?: boolean;
   job: TJob;
-  onToggleDrawer: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
+  onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
 }
 
 const FireNav = styled(List)<{ component?: React.ElementType }>({
@@ -91,7 +91,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
   }, [jobsActorRef])
   const isStartedAndEstimated = useMemo(() =>
     !!job.forecast?.start && !!job.forecast?.estimate,
-  [job.forecast?.start, job.forecast?.estimate])
+    [job.forecast?.start, job.forecast?.estimate])
 
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const assignedToName = useMemo<string | undefined>(() => !!job.forecast.assignedTo
@@ -101,7 +101,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
   )
 
   return (
-    <> 
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -157,9 +157,9 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                 // },
               }}
               className={clsx({
-                // [classes.isLastSeen]: isLastSeen,
-                // [classes.isActive]: isActive,
-                [baseClasses.stripedGrayLite]: isActive,
+                [classes.isLastSeen]: isLastSeen,
+                [classes.isActive]: isActive,
+                // [baseClasses.stripedGrayLite]: isActive,
               })}
             >
               <ListItemAvatar>
@@ -225,7 +225,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
               />
             </ListItemButton>
           </ListItem>
-          
+
         </FireNav>
 
         {/* <pre>{JSON.stringify(isLastSeen, null, 2)}</pre> */}
@@ -259,7 +259,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                     if (typeof commentByUser === 'string') comment = commentByUser
                     else return Promise.reject({ ok: false, message: 'Canceled' })
                   }
-                  
+
                   // send({
                   //   type: 'change',
                   //   value: state?.title,
