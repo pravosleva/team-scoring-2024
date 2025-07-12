@@ -81,6 +81,11 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
 
   return (
     <Grid container spacing={2}>
+      {/* <Grid
+        size={12}
+      >
+        <pre className={baseClasses.preNormalized}>{JSON.stringify(counters, null, 2)}</pre>
+      </Grid> */}
       <Grid
         size={12}
         sx={{
@@ -89,7 +94,7 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
           // top: 0,
           backgroundColor: '#fff',
           zIndex: 2,
-          pb: (activeFilters.isAnyFilterActive) ? 2 : 0,
+          pb: Object.values(counters).some((v) => v > 0) ? 2 : 0,
         }}
       >
         <div
@@ -111,192 +116,188 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
         </div>
 
         {
-          activeFilters.isAnyFilterActive && (
+          Object.values(counters).some((v) => v > 0) && (
             <div className={baseClasses.stack2}>
-              {
-                (activeFilters.isAnyFilterActive) && Object.values(counters).some((v) => v > 0) && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 1,
-                    }}
-                  >
-                    {
-                      counters.allNew > 0 && (
-                        <Link
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: {
-                              jobStatusFilter: 'new',
-                            },
-                            queryKeysToremove: activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
-                              ? ['jobStatusFilter', 'page']
-                              : ['page']
-                          })}
-                        // to={`${pagerControlsHardcodedPath}?jobStatusFilter=new${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
-                        >
-                          <Button sx={{ borderRadius: 4 }} size='small'
-                            variant={
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
-                                ? 'contained' : 'outlined'}
-                            startIcon={<NewReleasesIcon />}>
-                            New ({counters.allNew})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      counters.allActive > 0 && (
-                        <Link
-                          // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: { jobStatusFilter: 'active' },
-                            queryKeysToremove:
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                ? activeFilters.estimateReached
-                                  ? ['estimateReached', 'page']
-                                  : ['jobStatusFilter', 'estimateReached', 'page']
-                                : ['estimateReached', 'page']
-                          })}
-                        >
-                          <Button sx={{ borderRadius: 4 }} size='small'
-                            variant={
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                && !activeFilters.estimateReached
-                                ? 'contained' : 'outlined'}
-                            startIcon={<FilterAltIcon />}>
-                            Active ({counters.allActive})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      counters.allCompleted > 0 && (
-                        <Link
-                          // to={`${pagerControlsHardcodedPath}?jobStatusFilter=completed${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: { jobStatusFilter: 'completed' },
-                            queryKeysToremove: activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                }}
+              >
+                {
+                  counters.allNew > 0 && (
+                    <Link
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: {
+                          jobStatusFilter: 'new',
+                        },
+                        queryKeysToremove: activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
+                          ? ['jobStatusFilter', 'page']
+                          : ['page', 'estimateReached']
+                      })}
+                    // to={`${pagerControlsHardcodedPath}?jobStatusFilter=new${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
+                    >
+                      <Button sx={{ borderRadius: 4 }} size='small'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
+                            ? 'contained' : 'outlined'}
+                        startIcon={<NewReleasesIcon />}>
+                        New ({counters.allNew})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  counters.allActive > 0 && (
+                    <Link
+                      // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: { jobStatusFilter: 'active' },
+                        queryKeysToremove:
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            ? activeFilters.estimateReached
+                              ? ['estimateReached', 'page']
+                              : ['jobStatusFilter', 'estimateReached', 'page']
+                            : ['estimateReached', 'page']
+                      })}
+                    >
+                      <Button sx={{ borderRadius: 4 }} size='small'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            && !activeFilters.estimateReached
+                            ? 'contained' : 'outlined'}
+                        startIcon={<FilterAltIcon />}>
+                        Active ({counters.allActive})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  counters.allCompleted > 0 && (
+                    <Link
+                      // to={`${pagerControlsHardcodedPath}?jobStatusFilter=completed${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: { jobStatusFilter: 'completed' },
+                        queryKeysToremove: activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
+                          ? ['jobStatusFilter', 'estimateReached', 'page']
+                          : ['page', 'estimateReached'],
+                      })}
+                    >
+                      <Button
+                        sx={{ borderRadius: 4 }}
+                        size='small'
+                        color='gray'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
+                            && !activeFilters.estimateReached
+                            ? 'contained' : 'outlined'}
+                        startIcon={<TaskAltIcon />}
+                      >
+                        Completed ({counters.allCompleted})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  counters.estimateNotReached > 0 && (
+                    <Link
+                      // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=0${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: { jobStatusFilter: 'active', estimateReached: '0' },
+                        queryKeysToremove:
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            ? activeFilters.values.estimateReached === 0
                               ? ['jobStatusFilter', 'estimateReached', 'page']
-                              : ['page', 'estimateReached'],
-                          })}
-                        >
-                          <Button
-                            sx={{ borderRadius: 4 }}
-                            size='small'
-                            color='gray'
-                            variant={
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
-                                && !activeFilters.estimateReached
-                                ? 'contained' : 'outlined'}
-                            startIcon={<TaskAltIcon />}
-                          >
-                            Completed ({counters.allCompleted})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      counters.estimateNotReached > 0 && (
-                        <Link
-                          // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=0${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: { jobStatusFilter: 'active', estimateReached: '0' },
-                            queryKeysToremove:
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                ? activeFilters.values.estimateReached === 0
-                                  ? ['jobStatusFilter', 'estimateReached', 'page']
-                                  : ['page']
-                                : ['page']
-                          })}
-                        >
-                          <Button
-                            sx={{ borderRadius: 4 }}
-                            size='small'
-                            color='success'
-                            variant={
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                && activeFilters.values.estimateReached === 0
-                                ? 'contained' : 'outlined'}
-                            startIcon={<ThumbUpIcon />}
-                          >
-                            Active Forecast ({counters.estimateNotReached})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      counters.estimateReached > 0 && (
-                        <Link
-                          // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=1${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: { jobStatusFilter: 'active', estimateReached: '1' },
-                            queryKeysToremove:
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                ? activeFilters.values.estimateReached === 1
-                                  ? ['estimateReached', 'page']
-                                  : ['page']
-                                : ['page']
-                          })}
-                        >
-                          <Button sx={{ borderRadius: 4 }} size='small' color='error'
-                            variant={
-                              activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
-                                && activeFilters.values.estimateReached === 1
-                                ? 'contained' : 'outlined'} startIcon={<ThumbDownIcon />}>
-                            Active Fuckups ({counters.estimateReached})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      counters.allProjects > 0 && (
-                        <Link
-                          // to={`${pagerControlsHardcodedPath}?isProject=1`}
-                          to={getFullUrl({
-                            url: pagerControlsHardcodedPath,
-                            query: { isProject: '1' },
-                            queryKeysToremove:
-                              activeFilters.isProject
-                                ? ['isProject', 'page']
-                                : ['page']
-                          })}
-                        >
-                          <Button
-                            sx={{ borderRadius: 4 }} size='small' color='info'
-                            variant={
-                              activeFilters.values.isProject === 1
-                                ? 'contained' : 'outlined'
-                            }
-                            startIcon={<HiveIcon />}
-                          >
-                            Projects ({counters.allProjects})
-                          </Button>
-                        </Link>
-                      )
-                    }
-                    {
-                      activeFilters.isAnyFilterActive && !activeFilters.assignedTo && (
-                        <Button
-                          sx={{ borderRadius: 4 }}
-                          size='small'
-                          color='inherit'
-                          variant='outlined'
-                          startIcon={<FilterAltOffIcon />}
-                          onClick={goPage({ url: pagerControlsHardcodedPath, queryKeysToremove: ['isProject', 'jobStatusFilter', 'estimateReached'] })}
-                        >
-                          Reset
-                        </Button>
-                      )
-                    }
-                  </Box>
-                )
-              }
+                              : ['page']
+                            : ['page']
+                      })}
+                    >
+                      <Button
+                        sx={{ borderRadius: 4 }}
+                        size='small'
+                        color='success'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            && activeFilters.values.estimateReached === 0
+                            ? 'contained' : 'outlined'}
+                        startIcon={<ThumbUpIcon />}
+                      >
+                        Active Forecast ({counters.estimateNotReached})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  counters.estimateReached > 0 && (
+                    <Link
+                      // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=1${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: { jobStatusFilter: 'active', estimateReached: '1' },
+                        queryKeysToremove:
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            ? activeFilters.values.estimateReached === 1
+                              ? ['estimateReached', 'page']
+                              : ['page']
+                            : ['page']
+                      })}
+                    >
+                      <Button sx={{ borderRadius: 4 }} size='small' color='error'
+                        variant={
+                          activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
+                            && activeFilters.values.estimateReached === 1
+                            ? 'contained' : 'outlined'} startIcon={<ThumbDownIcon />}>
+                        Active Fuckups ({counters.estimateReached})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  counters.allProjects > 0 && (
+                    <Link
+                      // to={`${pagerControlsHardcodedPath}?isProject=1`}
+                      to={getFullUrl({
+                        url: pagerControlsHardcodedPath,
+                        query: { isProject: '1' },
+                        queryKeysToremove:
+                          activeFilters.isProject
+                            ? ['isProject', 'page']
+                            : ['page']
+                      })}
+                    >
+                      <Button
+                        sx={{ borderRadius: 4 }} size='small' color='info'
+                        variant={
+                          activeFilters.values.isProject === 1
+                            ? 'contained' : 'outlined'
+                        }
+                        startIcon={<HiveIcon />}
+                      >
+                        Projects ({counters.allProjects})
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  activeFilters.isAnyFilterActive && !activeFilters.assignedTo && (
+                    <Button
+                      sx={{ borderRadius: 4 }}
+                      size='small'
+                      color='inherit'
+                      variant='outlined'
+                      startIcon={<FilterAltOffIcon />}
+                      onClick={goPage({ url: pagerControlsHardcodedPath, queryKeysToremove: ['isProject', 'jobStatusFilter', 'estimateReached'] })}
+                    >
+                      Reset
+                    </Button>
+                  )
+                }
+              </Box>
             </div>
           )
         }

@@ -189,33 +189,44 @@ export const LastActivityPage = memo(() => {
             </Grid>
           )}
           {
-            !!outputWorkerData?.currentPage && (
+            <Grid size={12}>
+              <LastActivityPagerAbstracted
+                counters={mainCounters}
+                // activeLogTs?: number | null;
+                // onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
+                modifiedLogs={outputWorkerData?.currentPage || []}
+                // onCreateNew?: () => void;
+                subheader='Logs'
+                pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                pagerControlsHardcodedPath='/last-activity'
+                key={outputWorkerData?.pagination.currentPage}
+              // jobs={outputWorkerData?.currentPage || []}
+              // activeJobId={lastSeenJobID}
+              // onCreateNew={handleCreateNewCallback}
+              // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+              // subheader={targetUser.displayName}
+              />
+            </Grid>
+
+          }
+          {/*
+            !outputWorkerData?.currentPage && (
               <Grid size={12}>
-                <LastActivityPagerAbstracted
-                  counters={mainCounters}
-                  // activeLogTs?: number | null;
-                  // onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
-                  modifiedLogs={outputWorkerData.currentPage}
-                  // onCreateNew?: () => void;
-                  subheader='Logs'
-                  pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
-                  pagerControlsHardcodedPath='/last-actiity'
-                  key={outputWorkerData?.pagination.currentPage}
-                // jobs={outputWorkerData?.currentPage || []}
-                // activeJobId={lastSeenJobID}
-                // onCreateNew={handleCreateNewCallback}
-                // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
-                // subheader={targetUser.displayName}
-                />
+                <Alert severity='warning' variant='outlined'>
+                  <div className={baseClasses.stack1}>
+                    <b>Oops...</b>
+                    <span>Try another secrh settings</span>
+                    <Link to='/last-activity'>Reload</Link>
+                  </div>
+                </Alert>
               </Grid>
             )
-          }
-
+          */}
         </Grid>
       </div>
 
       {
-        !!outputWorkerData && outputWorkerData.pagination.totalPages > 1 && (
+        !!outputWorkerData?.currentPage && outputWorkerData.pagination.totalPages > 1 && (
           <ResponsiveBlock
             className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
             style={{

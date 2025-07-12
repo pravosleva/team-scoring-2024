@@ -191,7 +191,7 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
                             },
                             queryKeysToremove: activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
                               ? ['jobStatusFilter', 'page']
-                              : ['page']
+                              : ['page', 'estimateReached']
                           })}
                         // to={`${pagerControlsHardcodedPath}?jobStatusFilter=new${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
                         >
