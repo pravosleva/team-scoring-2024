@@ -137,9 +137,9 @@ export const LastActivityPage = memo(() => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid size={12}>
+          {/* <Grid size={12}>
             <h1><span style={{ display: 'inline-block', transform: 'rotate(-7deg)' }}>📟</span> LogsPager v2 exp</h1>
-          </Grid>
+          </Grid> */}
 
           {/* <Grid size={12}>
             <pre

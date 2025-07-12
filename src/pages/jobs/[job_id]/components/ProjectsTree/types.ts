@@ -13,7 +13,7 @@ export type TEnchancedJobByWorker = TJob & {
       }[];
       existingChildrenNodes: {
         nodesInfo: {
-          originalJob: Pick<TJob, 'title' | 'id' | 'completed'>;
+          originalJob: Pick<TJob, 'title' | 'id' | 'completed' | 'forecast'>;
           nodeId: string;
         }[];
       };

@@ -55,7 +55,7 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
   const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
   useEffect(() => {
     // console.log(`- EFF - page=${currentPage} | ${urlSearchParamLastSeenLogKey}`)
-    console.log(urlSearchParamLastSeenLogKey)
+    // console.log(urlSearchParamLastSeenLogKey)
     scrollTopExtra()
     if (!!urlSearchParamLastSeenLogKey) {
       specialScroll({ id: `log_list_item_${urlSearchParamLastSeenLogKey}` })

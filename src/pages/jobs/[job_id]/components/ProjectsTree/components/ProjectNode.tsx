@@ -8,10 +8,19 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 // import ArrowBack from '@mui/icons-material/ArrowBack'
 // import ConstructionIcon from '@mui/icons-material/Construction'
+// import TimelapseIcon from '@mui/icons-material/Timelapse'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+// import CheckIcon from '@mui/icons-material/Check'
+// import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import TimerIcon from '@mui/icons-material/Timer'
+import HardwareIcon from '@mui/icons-material/Hardware'
+// import NewReleasesIcon from '@mui/icons-material/NewReleases'
+import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye'
 import dayjs from 'dayjs'
 import baseClasses from '~/App.module.scss'
 import { TEnchancedJobByWorker } from '~/pages/jobs/[job_id]/components/ProjectsTree/types'
 import { getArithmeticalMean } from '~/shared/utils/number-ops'
+import { TJob } from '~/shared/xstate'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -29,6 +38,22 @@ type TProps = {
     backToJobId?: number;
     jobTitle?: string;
   }) => (e: any) => void
+}
+
+class JobAnalyzer {
+  job: TJob
+  constructor(job: TJob) {
+    this.job = job
+  }
+  get isDone() {
+    return this.job.completed
+  }
+  get isNew() {
+    return !this.job.forecast?.start
+  }
+  get isStartedAndEstimated() {
+    return !!this.job.forecast?.start && !!this.job.forecast?.estimate
+  }
 }
 
 export const ProjectNode = ({
@@ -228,36 +253,54 @@ export const ProjectNode = ({
                     projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length > 0 && (
                       <>
                         <b>Subjobs ({projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.reduce((acc, { originalJob }) => { if (originalJob.completed) acc += 1; return acc }, 0)} of {projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length})</b>
-                        <ul className={baseClasses.compactList}>
+                        <ul
+                          className={baseClasses.compactList}
+                          style={{ listStyle: 'none', paddingLeft: '0px' }}
+                        >
                           {
                             projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo
-                              .map(({ nodeId, originalJob }) => (
-                                <li key={nodeId}>
-                                  <a
-                                    className={clsx(
-                                      baseClasses.truncate,
+                              .map(({ nodeId, originalJob }) => {
+                                const analyzed = new JobAnalyzer(originalJob as any)
+                                return (
+                                  <li key={nodeId}>
+                                    <a
+                                      className={clsx(
+                                        baseClasses.truncate,
+                                        {
+                                          [classes.lastActivityOfCurrentJobLink]: activeJobId === originalJob.id,
+                                        },
+                                      )}
+                                      style={{
+                                        fontSize: 'small',
+                                        display: 'inline-flex',
+                                        // border: '1px solid red',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        cursor: 'pointer',
+                                        opacity: analyzed.isDone ? 0.5 : 1,
+                                      }}
+                                      onClick={onNavigateToJobNode({
+                                        jobId: originalJob.id,
+                                        backToJobId: projectsTree.model.id,
+                                        jobTitle: projectsTree.model.title,
+                                      })}
+                                    >
                                       {
-                                        [classes.lastActivityOfCurrentJobLink]: activeJobId === originalJob.id,
-                                      },
-                                    )}
-                                    style={{
-                                      fontSize: 'small',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '6px',
-                                      cursor: 'pointer',
-                                    }}
-                                    onClick={onNavigateToJobNode({
-                                      jobId: originalJob.id,
-                                      backToJobId: projectsTree.model.id,
-                                      jobTitle: projectsTree.model.title,
-                                    })}
-                                  >
-                                    <span className={baseClasses.truncate}>{originalJob.completed ? '✅ ' : '⏳ '}{originalJob.title}</span>
-                                    <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
-                                  </a>
-                                </li>
-                              ))
+                                        analyzed.isDone
+                                          ? <CheckCircleIcon sx={{ fontSize: 'inherit' }} />
+                                          : analyzed.isNew
+                                            ? <PanoramaFishEyeIcon sx={{ fontSize: 'inherit' }} />
+                                            : analyzed.isStartedAndEstimated
+                                              ? <TimerIcon sx={{ fontSize: 'inherit' }} />
+                                              : <HardwareIcon sx={{ fontSize: 'inherit' }} />
+                                      }
+                                      <span className={baseClasses.truncate}>{originalJob.title}</span>
+                                      <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                                    </a>
+                                  </li>
+                                )
+                              }
+                              )
                           }
                         </ul>
                       </>

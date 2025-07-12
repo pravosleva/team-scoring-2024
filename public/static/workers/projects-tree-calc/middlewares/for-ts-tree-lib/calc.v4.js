@@ -97,6 +97,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                                   id,
                                   title: _jobsMap.get(id)?.title,
                                   completed: _jobsMap.get(id)?.completed,
+                                  forecast: _jobsMap.get(id)?.forecast,
                                 },
                                 nodeId: `job_node_${id}`
                               })) || []

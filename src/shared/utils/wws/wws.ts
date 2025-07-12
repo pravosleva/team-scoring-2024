@@ -96,13 +96,13 @@ class Singleton {
         return Promise.resolve({ ok: true, message: 'Already exists' })
     }
   }
-  
+
   public static getInstance(props: TProps): Singleton {
     if (!Singleton.instance) Singleton.instance = new Singleton(props)
 
     return Singleton.instance
   }
-  private log ({ label, msgs }: {
+  private log({ label, msgs }: {
     label: string;
     msgs?: unknown[];
   }): void {
@@ -122,11 +122,11 @@ class Singleton {
 
     switch (true) {
       case this.workers[wName] instanceof Worker:
-        console.log(`-- sbscr w:${wName}`)
+        // console.log(`-- sbscr w:${wName}`)
         this.workers[wName].onmessage = cb.bind(this)
         break
       case typeof SharedWorker !== 'undefined' && this.workers[wName] instanceof SharedWorker:
-        console.log(`-- sbscr sw:${wName}`)
+        // console.log(`-- sbscr sw:${wName}`)
         this.workers[wName].port.onmessage = cb.bind(this)
         break
       default:
