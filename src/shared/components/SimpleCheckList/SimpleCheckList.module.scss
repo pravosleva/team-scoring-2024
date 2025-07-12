@@ -241,6 +241,20 @@
   }
 }
 
+.btnLink {
+  // background-color: #02c39a;
+  background-color: #959eaa;
+  color: #fff;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background-color: #02c39a;
+  }
+}
+
 .commentTitle {
   max-width: 100%;
 }

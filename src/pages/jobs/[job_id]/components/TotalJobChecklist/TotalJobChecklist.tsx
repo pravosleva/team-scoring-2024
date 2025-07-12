@@ -42,6 +42,21 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       {
         !!targetJob && Object.keys(targetJobTotalChecklistMaping).map((checklistKey, i) => (
           <SimpleCheckList
+            addLogLinkBtns={[
+              {
+                label: 'Log',
+                relativeUrl: [
+                  `/jobs/${targetJob.id}/logs/${targetJobTotalChecklistMaping[checklistKey].logTs}`,
+                  [
+                    '?',
+                    [
+                      `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
+                      `backActionUiText=${encodeURIComponent('Job page')}`,
+                    ].join('&')
+                  ].join('')
+                ].join(''),
+              }
+            ]}
             checklistUniqueKey={checklistKey}
             key={`${checklistKey}-${i}-${targetJob?.ts.update || 'no_target_job'}`}
             // _additionalInfo={{ message: 'No helpful info' }}

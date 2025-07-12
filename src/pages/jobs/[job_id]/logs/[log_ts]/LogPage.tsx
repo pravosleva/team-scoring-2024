@@ -150,7 +150,7 @@ export const LogPage = () => {
             gap: 2,
           }}
         >
-          <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Job not found #${params.job_id}`}</div>
+          <div style={{ fontWeight: 'bold' }} className={baseClasses.truncate}>{targetJob?.title || `Job not found #${params.job_id}`}</div>
           {
             !!targetJob && (
               // TODO: <SingleTextManager buttonText='Edit job description'
@@ -399,7 +399,7 @@ export const LogPage = () => {
                       endIcon={<ArrowForwardIcon />}
                       fullWidth
                     >
-                      Job
+                      Jobs pager
                     </Button>
                   </Link>
                 )

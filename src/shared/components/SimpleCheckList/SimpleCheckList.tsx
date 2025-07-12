@@ -13,8 +13,17 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 // import baseClasses from '~/App.module.scss'
 import { getPercentage } from '~/shared/utils/number-ops'
+import { useNavigate } from 'react-router-dom'
+// import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 
+type TLinkBtn = {
+  label: string;
+  relativeUrl: string;
+  arrowType?: 'forward';
+}
 type TProps<T, TAddInfo> = {
+  addLogLinkBtns?: TLinkBtn[];
   checklistUniqueKey?: string;
   connectedOnThe?: ('top')[];
   isMiniVariant?: boolean;
@@ -50,6 +59,7 @@ const genericMemo: <T>(component: T) => T = memo
 // }
 
 function SimpleCheckListFn<TAddInfo>({
+  addLogLinkBtns,
   checklistUniqueKey,
   connectedOnThe,
   isMiniVariant,
@@ -150,6 +160,9 @@ function SimpleCheckListFn<TAddInfo>({
       }
     }
   }, [handleCleanup, onDeleteChecklist])
+
+  const navigate = useNavigate()
+  const handleGoRelativeUrl = useCallback((url: string) => () => navigate(url), [navigate])
 
   // const hasUpdated = useMemo(() => {
   //   return url !== initialState.url || descr !== initialState.descr || title !== initialState.title
@@ -392,7 +405,7 @@ function SimpleCheckListFn<TAddInfo>({
                     }
                   </div>
                   {
-                    (isEditable || isDeletable) && (
+                    (isEditable || isDeletable || (!!addLogLinkBtns && Array.isArray(addLogLinkBtns) && addLogLinkBtns.length > 0)) && (
                       <div className={classes.absoluteControls}>
                         {
                           isEditable && (
@@ -402,6 +415,24 @@ function SimpleCheckListFn<TAddInfo>({
                         {
                           isDeletable && (
                             <button className={classes.btnDelete} onClick={handleRemove}>Del</button>
+                          )
+                        }
+                        {
+                          !!addLogLinkBtns && Array.isArray(addLogLinkBtns) && addLogLinkBtns.length > 0 && (
+                            <>
+                              {
+                                addLogLinkBtns.map(({ label, relativeUrl, arrowType }, i) => (
+                                  <button
+                                    key={`${relativeUrl}-${i}`}
+                                    className={classes.btnLink}
+                                    onClick={handleGoRelativeUrl(relativeUrl)}
+                                  >
+                                    {label}
+                                    {arrowType === 'forward' && <ArrowForwardIosIcon sx={{ fontSize: 'x-small' }} />}
+                                  </button>
+                                ))
+                              }
+                            </>
                           )
                         }
                       </div>
