@@ -20,6 +20,7 @@
   // border: 2px solid lightgray;
   border: 2px solid #fff;
   outline: 4px dashed #9b6f00;
+  // outline-offset: 4px;
   // .date {
   //   color: #fff;
   // }
@@ -28,19 +29,26 @@
 .mainWrapper.defaultWrapper {
   // outline: 4px solid lightgray;
   // border: 2px solid #fff;
+  background-color: #f7f7f7;
+  // box-shadow: 7px 7px 14px #d7e1e6,
+  //   -7px -7px 14px #ffffff;
 }
 
 .mainWrapper.warningSolidBorder {
   border: 2px solid #fff;
   outline: 4px solid #9b6f00;
+  // outline-offset: 4px;
 }
 
 .mainWrapper.redSolidBorder {
   border: 2px solid #fff;
   outline: 4px solid #e63946;
+  // outline-offset: 4px;
 }
 
 .mainWrapper.activeDashedBorder {
   border: 2px solid #fff;
   outline: 4px dashed #00b0ff;
+  // outline-offset: 4px;
+  box-shadow: none;
 }
