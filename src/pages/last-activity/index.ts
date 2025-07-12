@@ -1,1 +1,1 @@
-export * from './LastActivityPage'
+export * from './v2/LastActivityPage'

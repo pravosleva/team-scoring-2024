@@ -53,6 +53,15 @@ const NES = {
           PONG_ERR: 'w-c:sorted-jobs-pager:pong:err',
         },
       },
+      SortedLogsPager: {
+        EClientToWorkerEvent: {
+          PING_GET: 'c-w:sorted-logs-pager:ping:get',
+        },
+        EWorkerToClientEvent: {
+          PONG_OK: 'w-c:sorted-logs-pager:pong:ok',
+          PONG_ERR: 'w-c:sorted-logs-pager:pong:err',
+        },
+      },
       // Others...
       // --
     }

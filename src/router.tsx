@@ -46,7 +46,7 @@ export const router = createHashRouter(
     },
     {
       path: '/last-activity',
-      element: <Layout><LastActivityPage /></Layout>,
+      element: <Layout noScrollTopBtn><LastActivityPage /></Layout>,
     },
     {
       path: '/worker-exp',

@@ -381,7 +381,7 @@ const Logic = ({ children }: TProps) => {
     setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })
 
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
-  }, [urlSearchParams, location, users, allJobs, setStore, params.user_id])
+  }, [urlSearchParams, location.pathname, users, allJobs, setStore, params.user_id])
 
   // Persist todos
   useLayoutEffect(() => {

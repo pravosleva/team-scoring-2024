@@ -1,32 +1,22 @@
-import { memo, useState, useCallback, useMemo } from 'react'
+import { memo, useState, useMemo, useCallback } from 'react'
 import baseClasses from '~/App.module.scss'
-// import { Layout } from '~/shared/components/Layout'
-// import AppsIcon from '@mui/icons-material/Apps'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
-import { ResponsiveBlock } from '~/shared/components'
-import clsx from 'clsx'
-import { useNavigate, useParams } from 'react-router-dom'
-import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
-import { useSearchParams } from 'react-router-dom'
+import { LastActivityPagerAbstracted, ResponsiveBlock } from '~/shared/components'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useLogsPagerWorker } from './hooks'
 import { debugFactory } from '~/shared/utils'
-import { useSortedJobsPagerWorker } from './hooks'
-import classes from './EmployeePage2.module.scss'
+import { TLogsItem, TopLevelContext } from '~/shared/xstate'
 import { NWService } from '~/shared/utils/wws/types'
-// import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-// import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { getFullUrl } from '~/shared/utils/string-ops'
+import clsx from 'clsx'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-// import ConstructionIcon from '@mui/icons-material/Construction'
-import { JobList2 } from '~/shared/components'
-import CircularProgress from '@mui/material/CircularProgress'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
-import { getFullUrl } from '~/shared/utils/string-ops'
 
-const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null, { reason: string; } | null>({
-  label: '👉 EmployeePage2 EXP',
-})
-const getNormalizedPage = (index: number): number => index + 1
-
+type TJobType = 'default' | 'globalTag'
+type TLogBorder = 'default' | 'red'
+type TLogBg = 'default' | 'green' | 'warn'
+type TModifiedLog = (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number });
 type TTargetResultByWorker = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _partialInput: any;
@@ -45,57 +35,56 @@ type TTargetResultByWorker = {
     isCurrentPageFirst: boolean;
     isCurrentPageLast: boolean;
   };
-  currentPage: TJob[] | null;
-  nextPage: TJob[] | null;
-  prevPage: TJob[] | null;
+  currentPage: TModifiedLog[] | null;
+  nextPage: TModifiedLog[] | null;
+  prevPage: TModifiedLog[] | null;
 }
 type TWorkerServiceReport = {
   message?: string;
 }
+const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null, { reason: string; } | null>({
+  label: '👉 LastActivityPage v2 EXP',
+})
+const getNormalizedPage = (index: number): number => index + 1
 
-export const EmployeePage2 = memo(() => {
-  const params = useParams()
-  const pagerControlsHardcodedPath = useMemo(() => `/employees/${params.user_id}`, [params])
+export const LastActivityPage = memo(() => {
+  const [counter, setCounter] = useState<number>(0)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const incCounter = useCallback(() => {
+    setCounter((v) => v + 1)
+  }, [])
+  const [outputWorkerData, setOutputWorkerData] = useState<TTargetResultByWorker | null>(null)
+  const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
+  const [outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
+
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const [mainCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.main)
+  const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
+  const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
+  const [debugSettings] = useParamsInspectorContextStore((ctx) => ctx.debug)
+  const isDebugEnabled = debugSettings.filters.isEnabled && debugSettings.filters.level === 1
+
   const [urlSearchParams] = useSearchParams()
-  const lastSeenJobID = useMemo<number | null>(() =>
-    !!urlSearchParams.get('lastSeenJob') && !Number.isNaN(Number(urlSearchParams.get('lastSeenJob')))
-      ? Number(urlSearchParams.get('lastSeenJob'))
-      : null,
-    [urlSearchParams]
-  )
   const requiredPage = useMemo<number | undefined>(() =>
     !!urlSearchParams.get('page') && !Number.isNaN(Number(urlSearchParams.get('page')))
       ? Number(urlSearchParams.get('page'))
       : undefined,
     [urlSearchParams]
   )
-  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const urlSearchParamLastSeenLogTs = useMemo<number | null>(() => {
+    const lastSeenLogKey = urlSearchParams.get('lastSeenLogKey')
+    if (!!lastSeenLogKey) {
+      const splitted = lastSeenLogKey.split('-')
+      if (!!splitted[3] && !Number.isNaN(Number(splitted[3]))) {
+        return Number(splitted[3])
+      } else return null
+    } else return null
+  }, [urlSearchParams])
 
-  const [outputWorkerData, setOutputWorkerData] = useState<TTargetResultByWorker | null>(null)
-  const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
-  const [outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
-
-  const [isWorkerEnabled, setIsWorkerEnabled] = useState<boolean>(true)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const toggleWorker = () => setIsWorkerEnabled((v) => !v)
-
-  const [counter, setCounter] = useState<number>(0)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const incCounter = useCallback(() => {
-    setCounter((v) => v + 1)
-  }, [])
-  const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
-  const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
-  const [debugSettings] = useParamsInspectorContextStore((ctx) => ctx.debug)
-  const isDebugEnabled = debugSettings.filters.isEnabled && debugSettings.filters.level === 1
-
-  useSortedJobsPagerWorker<TTargetResultByWorker, TWorkerServiceReport>({
-    isEnabled: isWorkerEnabled,
+  useLogsPagerWorker<TTargetResultByWorker, TWorkerServiceReport>({
+    isEnabled: true,
     isDebugEnabled,
     cb: {
-      beforeEachPostMessage: () => {
-        // setOutputWorkerData(null)
-      },
       onEachSuccessItemData: (data) => {
         if (isDebugEnabled) {
           logger.log({
@@ -124,46 +113,59 @@ export const EmployeePage2 = memo(() => {
     deps: {
       counter,
       jobs,
-      activeJobId: lastSeenJobID,
+      activeLogTs: urlSearchParamLastSeenLogTs,
       requiredPage,
       activeFilters,
     },
   })
+
   const navigate = useNavigate()
   const handleNavigate = useCallback((relativeUrl: string) => () => navigate(relativeUrl), [navigate])
-  const handleCreateNewCallback = useCallback(() =>
-    handleNavigate(
-      getFullUrl({ url: pagerControlsHardcodedPath, query: { ...queryParams, page: '1' } })
-    ),
-    [handleNavigate, pagerControlsHardcodedPath, queryParams]
-  )
-
-  const users = TopLevelContext.useSelector((s) => s.context.users.items)
-  const targetUser = useMemo<TUser | null>(() => {
-    return users?.find(({ id }) => id === Number(params.user_id)) || null
-  }, [users, params.user_id])
-
-  const [employeesCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.employees)
-  const targetEmployeeCounters = useMemo(() =>
-    !!targetUser && !!employeesCounters[String(targetUser.id)]
-      ? employeesCounters[String(targetUser.id)]
-      : null,
-    [employeesCounters, targetUser]
-  )
+  // const handleCreateNewCallback = useCallback(() =>
+  //   handleNavigate(
+  //     getFullUrl({ url: '/last-activity', query: { ...queryParams, page: '1' } })
+  //   ),
+  //   [handleNavigate, queryParams]
+  // )
 
   return (
     <>
       <div
         className={baseClasses.stack1}
         style={{
-          marginBottom: '24px',
+          marginBottom: '16px',
         }}
       >
         <Grid container spacing={2}>
-
           <Grid size={12}>
-            <h1><span style={{ display: 'inline-block', transform: 'rotate(-7deg)' }}>📟</span> JobsPager exp</h1>
+            <h1><span style={{ display: 'inline-block', transform: 'rotate(-7deg)' }}>📟</span> LogsPager v2 exp</h1>
           </Grid>
+
+          {/* <Grid size={12}>
+            <pre
+              className={clsx(
+                baseClasses.preNormalized,
+              )}
+              style={{ maxHeight: '300px', overflowY: 'auto' }}
+            >
+              {JSON.stringify({
+                // targetEmployeeCounters,
+                _service: outputWorkerData?._partialInput || null,
+                // cur: {
+                //   pagCurrentPageIndex: outputWorkerData?.pagination.currentPageIndex,
+                //   pagCurrentPage: outputWorkerData?.pagination.currentPage,
+                // },
+                // prev: {
+                //   pagPrevPageIndex: outputWorkerData?.pagination.prevPageIndex,
+                //   pagPrevPage: outputWorkerData?.pagination.prevPage,
+                // },
+                // next: {
+                //   pagNextPageIndex: outputWorkerData?.pagination.nextPageIndex,
+                //   pagNextPage: outputWorkerData?.pagination.nextPage,
+                // }
+              }, null, 2)}
+            </pre>
+          </Grid> */}
 
           {!!outputWorkerErrMsg && (
             <Grid size={12}>
@@ -176,80 +178,6 @@ export const EmployeePage2 = memo(() => {
             </Grid>
           )}
 
-          {
-            isDebugEnabled && (
-              <Grid size={12}>
-                <pre
-                  className={clsx(
-                    baseClasses.preNormalized,
-                    classes.resultWrapper,
-                    {
-                      [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
-                      [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
-                    }
-                  )}
-                  style={{ maxHeight: '300px', overflowY: 'auto' }}
-                >
-                  {JSON.stringify({
-                    // targetEmployeeCounters,
-                    _service: outputWorkerData?._partialInput || null,
-                    // cur: {
-                    //   pagCurrentPageIndex: outputWorkerData?.pagination.currentPageIndex,
-                    //   pagCurrentPage: outputWorkerData?.pagination.currentPage,
-                    // },
-                    // prev: {
-                    //   pagPrevPageIndex: outputWorkerData?.pagination.prevPageIndex,
-                    //   pagPrevPage: outputWorkerData?.pagination.prevPage,
-                    // },
-                    // next: {
-                    //   pagNextPageIndex: outputWorkerData?.pagination.nextPageIndex,
-                    //   pagNextPage: outputWorkerData?.pagination.nextPage,
-                    // }
-                  }, null, 2)}
-                </pre>
-              </Grid>
-            )
-          }
-
-          {
-            !!outputWorkerData && !!targetUser && (
-              <Grid size={12}>
-                <JobList2
-                  counters={targetEmployeeCounters || undefined}
-                  pagerControlsHardcodedPath={pagerControlsHardcodedPath}
-                  // isCreatable
-                  key={outputWorkerData?.pagination.currentPage}
-                  jobs={outputWorkerData?.currentPage || []}
-                  activeJobId={lastSeenJobID}
-                  onCreateNew={handleCreateNewCallback}
-                  pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
-                  subheader={targetUser.displayName}
-                />
-              </Grid>
-            )
-          }
-
-          {
-            !!outputWorkerData && !targetUser && (
-              <Grid size={12}>
-                <Alert severity='error' variant='outlined'>
-                  <div className={baseClasses.stack1}>
-                    <b>ERR</b>
-                    User not found
-                  </div>
-                </Alert>
-              </Grid>
-            )
-          }
-
-          {
-            !outputWorkerData && (
-              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
-                <CircularProgress />
-              </Grid>
-            )
-          }
-
           {isDebugEnabled && !!outputWorkerDebugMsg && (
             <Grid size={12}>
               <Alert severity='info' variant='outlined'>
@@ -260,6 +188,28 @@ export const EmployeePage2 = memo(() => {
               </Alert>
             </Grid>
           )}
+          {
+            !!outputWorkerData?.currentPage && (
+              <Grid size={12}>
+                <LastActivityPagerAbstracted
+                  counters={mainCounters}
+                  // activeLogTs?: number | null;
+                  // onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
+                  modifiedLogs={outputWorkerData.currentPage}
+                  // onCreateNew?: () => void;
+                  subheader='Logs'
+                  pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                  pagerControlsHardcodedPath='/last-actiity'
+                  key={outputWorkerData?.pagination.currentPage}
+                // jobs={outputWorkerData?.currentPage || []}
+                // activeJobId={lastSeenJobID}
+                // onCreateNew={handleCreateNewCallback}
+                // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                // subheader={targetUser.displayName}
+                />
+              </Grid>
+            )
+          }
 
         </Grid>
       </div>
@@ -269,15 +219,19 @@ export const EmployeePage2 = memo(() => {
           <ResponsiveBlock
             className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
             style={{
-              padding: '16px 0 16px 0',
+              padding: '16px 16px 16px 16px',
               // border: '1px dashed red',
-              boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+              // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
               position: 'sticky',
-              bottom: 0,
+              bottom: '16px',
               backgroundColor: '#fff',
               zIndex: 3,
               marginTop: 'auto',
               // borderRadius: '16px 16px 0px 0px',
+              borderRadius: '32px',
+              // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+              boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+              marginBottom: '16px',
             }}
           >
             <ResponsiveBlock
@@ -292,7 +246,7 @@ export const EmployeePage2 = memo(() => {
                 onClick={
                   handleNavigate(
                     getFullUrl({
-                      url: pagerControlsHardcodedPath,
+                      url: '/last-activity',
                       query: {
                         ...queryParams,
                         page: outputWorkerData?.pagination.prevPage,
@@ -314,7 +268,7 @@ export const EmployeePage2 = memo(() => {
                 onClick={
                   handleNavigate(
                     getFullUrl({
-                      url: pagerControlsHardcodedPath,
+                      url: '/last-activity',
                       query: {
                         ...queryParams,
                         page: outputWorkerData?.pagination.nextPage,
