@@ -44,7 +44,7 @@ export default defineConfig({
     VitePWA({
       workbox: {
         sourcemap: true,
-        maximumFileSizeToCacheInBytes: 5 * 1024 ** 2, // NOTE: 5 MB or set to something else
+        maximumFileSizeToCacheInBytes: 10 * 1024 ** 2, // NOTE: 10 MB or set to something else
       },
       registerType: 'autoUpdate',
       minify: false,
