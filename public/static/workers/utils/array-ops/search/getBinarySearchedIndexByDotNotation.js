@@ -7,22 +7,21 @@ const getBinarySearchedIndexByDotNotation = ({ items, target, sorted }) => {
 
   while (left <= right) {
     mid = Math.round((right + left) / 2)
+    const _currentValue = getNestedValue({ obj: items[mid], path: propPath })
 
     switch (sorted) {
       case 'DESC':
-        if (value === getNestedValue({ obj: items[mid], path: propPath })) {
+        if (value === _currentValue) {
           result = mid
           return result
-        } else if (value > getNestedValue({ obj: items[mid], path: propPath }))
-          right = mid - 1
-        else
-          left = mid + 1
+        } else if (value > _currentValue) right = mid - 1
+        else left = mid + 1
         break
       case 'ASC':
-        if (value === getNestedValue({ obj: items[mid], path: propPath })) {
+        if (value === _currentValue) {
           result = mid
           return result
-        } else if (value < getNestedValue({ obj: items[mid], path: propPath }))
+        } else if (value < _currentValue)
           right = mid - 1
         else
           left = mid + 1

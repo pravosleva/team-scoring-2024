@@ -12,6 +12,8 @@ export namespace NWService {
 
     GET_JOBS_PAGER = 'c-w:jobs-pager:ping:get',
 
+    GET_SORTED_JOBS_PAGER = 'c-w:sorted-jobs-pager:ping:get',
+
     // NOTE: 1/2 Others...
   }
   export enum EWorkerToClientEvent {
@@ -28,6 +30,9 @@ export namespace NWService {
 
     JOBS_PAGER_OK = 'w-c:jobs-pager:pong:ok',
     JOBS_PAGER_ERR = 'w-c:jobs-pager:pong:err',
+
+    SORTED_JOBS_PAGER_OK = 'w-c:sorted-jobs-pager:pong:ok',
+    SORTED_JOBS_PAGER_ERR = 'w-c:sorted-jobs-pager:pong:err',
 
     // NOTE: 2/2 Others...
   }

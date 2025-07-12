@@ -49,7 +49,7 @@ const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
       break
     case typeof requiredCurrentIndex === 'number':
       // NOTE: 2.2 Target list item requested (_currentPageIndex is ready)
-      log(`Case 2.2: Target list item requested requiredCurrentIndex=${requiredCurrentIndex} requested`)
+      log(`Case 2.2: Target list item requested: requiredCurrentIndex=${requiredCurrentIndex}`)
       if (requiredCurrentIndex === -1) {
         log('Case 2.2.1')
         log('⛔ Target list item value is incorrect')

@@ -1,6 +1,6 @@
 // importScripts('./middlewares/for-ts-tree-lib/calc.v4.js')
 
-console.log('[LOADED] jobs-pager/middlewares/withRootMW')
+console.log('[LOADED] sorted-jobs-pager/middlewares/withRootMW')
 
 const compose = (fns, arg) => {
   return fns.reduce(
@@ -20,59 +20,58 @@ const withRootMW = (arg) => compose([
   ({ eventData, cb }) => {
     const { __eType, input } = eventData
 
-    if (debugConfig.workerEvs.mwsInternalLogs.isEnabled) log({
-      label: 'jobs-pager/middlewares/withRootMW [MW] exp',
-      msgs: [
-        'eventData:',
-        eventData,
-      ],
-    })
+    // if (debugConfig.workerEvs.mwsInternalLogs.isEnabled) log({
+    //   label: 'sorted-jobs-pager/middlewares/withRootMW [MW] exp',
+    //   msgs: [
+    //     'eventData:',
+    //     eventData,
+    //   ],
+    // })
 
     switch (__eType) {
       case NES.Common.WorkerService.CLIENT_TO_WORKER_MESSAGE: {
 
         // -- NOTE: Level 2: Different app event types
         switch (eventData?.input.opsEventType) {
-          case NES.Common.ClientService.JobsPager.EClientToWorkerEvent.PING_GET: {
+          case NES.Common.ClientService.SortedJobsPager.EClientToWorkerEvent.PING_GET: {
             const output = {
               ok: false,
               message: 'Output data not modified',
             }
 
             try {
-              // --- NOTE: Your code here
-              // const getMinimalData = (job) => ({
-              //   id: job.id,
-              //   ts: job.ts,
-              // })
-              // const modifiedJobs = eventData?.input?.jobs?.map(getMinimalData) || []
-              // console.log(eventData?.input?._activeFilters)
-              // console.log(eventData?.input?.jobs)
               const isFiltersRequired = !!eventData?.input?._activeFilters && eventData.input._activeFilters.isAnyFilterActive
-              // console.log(`isFiltersRequired=${isFiltersRequired}`)
               const filteredJobs = isFiltersRequired
                 ? getFilteredJobs({
                   jobs: eventData?.input?.jobs || [],
                   activeFilters: eventData?.input?._activeFilters,
-                }).items
-                : (eventData?.input?.jobs || [])
-              // console.log(filteredJobs)
+                })
+                : { items: (eventData?.input?.jobs || []) }
+              const sortedJobs = getSortedArray({
+                arr: filteredJobs.items.map((job) => ({ ...job, tsUpdate: job.ts.update })),
+                keys: ['tsUpdate'],
+                order: -1,
+              })
+              // console.log(sortedJobs)
+              const targetJob = !!eventData?.input?.activeJobId
+                ? filteredJobs.items.find(({ id }) => id === eventData?.input?.activeJobId)
+                : undefined
               const targetJobIndex = getBinarySearchedIndexByDotNotation({
-                items: filteredJobs,
-                sorted: 'DESC',
+                items: sortedJobs,
+                sorted: 'DESC', // ASC - по возр; DESC - по убыв
                 target: {
-                  value: eventData?.input?.activeJobId,
-                  propPath: 'ts.create',
+                  value: targetJob?.ts?.update || 0,
+                  propPath: 'ts.update',
                 },
               })
               const _pagerCalc = getSplittedArrayAsPager({
                 pageLimit: 10,
-                list: filteredJobs,
+                list: sortedJobs,
                 options: {
                   // NOTE: One of two options (requiredPage in main priority)
                   requiredPageIndex: eventData?.input?.requiredPage >= 1 ? eventData?.input?.requiredPage - 1 : undefined,
                   requiredCurrentIndex: targetJobIndex === -1 ? 0 : targetJobIndex,
-                  // First page by default
+                  // NOTE: First page will be taken by default
                 },
               })
               const pagerData = _pagerCalc.result
@@ -89,7 +88,9 @@ const withRootMW = (arg) => compose([
                   _pagerCalc.logs.join('\n')
                 ].join('\n'),
                 _partialInput: {
-                  _activeFilters: eventData?.input?._activeFilters,
+                  activeJobId: eventData?.input?.activeJobId,
+                  targetJobIndex,
+                  // _activeFilters: eventData?.input?._activeFilters,
                   /* NOTE: Example
                     {
                       "isAnyFilterActive": false,
@@ -128,7 +129,7 @@ const withRootMW = (arg) => compose([
               }
             } catch (err) {
               output.ok = false
-              output.message = `Worker error: ${err?.message || 'No message'}; jobs-pager/middlewares/withRootMW`
+              output.message = `Worker error: ${err?.message || 'No message'}; sorted-jobs-pager/middlewares/withRootMW`
 
               if (debugConfig.workerEvs.mwsInternalLogs.isEnabled) log({
                 label: `c->(worker):port:listener:opsEventType:${eventData?.input?.opsEventType}->[cb]`,

@@ -27,7 +27,9 @@ const getIsJobNew = ({ job }) => !job.forecast.estimate
 */
 
 const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
-  let filteredJobs = []
+  const result = {
+    items: [],
+  }
   const jobStatusFilterValue = activeFilters.values.jobStatusFilter
   const hasJobStatusFilter = !!jobStatusFilterValue
     && Object.values(EJobsStatusFilter).includes(jobStatusFilterValue)
@@ -62,16 +64,11 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
         if (hasJobStatusFilter) {
           switch (jobStatusFilterValue) {
             case EJobsStatusFilter.ACTIVE:
-              // console.log('-- ACTIVE')
               activeFilters.values.jobStatusFilter = jobStatusFilterValue
-              if (!job.completed && !isJobNew) {
-                // console.log(`JOB+OK: ${job.title}`)
+              if (!job.completed && !isJobNew)
                 jobIsReady.push(true)
-              }
-              else {
-                // console.log(`JOB!OK: ${job.title}`)
+              else
                 jobIsReady.push(false)
-              }
               break
             case EJobsStatusFilter.COMPLETED:
               activeFilters.values.jobStatusFilter = jobStatusFilterValue
@@ -94,15 +91,12 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
           const normalizedValue = Number(assignedToFilterValue)
           activeFilters.values.assignedTo = normalizedValue
           if (job.forecast.assignedTo === normalizedValue) jobIsReady.push(true)
-          else {
-            // console.log(`JOB!OK: ${job.title}`)
+          else
             jobIsReady.push(false)
-          }
         }
 
         // NOTE: 1.3. estimateReached filter
         if (hasEstimateReachedFilter) {
-          console.log(`!!! REACHED FILTER: ${job.title}`)
           if (!!job.forecast.start && !!job.forecast.estimate) {
             const isReached = nowDate > job.forecast.estimate
             const normalizedValue = Number(estimateReachedFilterValue)
@@ -110,28 +104,23 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
               case 1:
                 activeFilters.values.estimateReached = normalizedValue
                 if (isReached) jobIsReady.push(true)
-                else {
-                  // console.log(`JOB!OK: ${job.title}`)
+                else
                   jobIsReady.push(false)
-                }
                 break
               case 0:
                 activeFilters.values.estimateReached = normalizedValue
-                if (!isReached) jobIsReady.push(true)
-                else jobIsReady.push(false)
+                if (!isReached)
+                  jobIsReady.push(true)
+                else
+                  jobIsReady.push(false)
                 break
               default:
                 break
             }
-          } else {
-            // console.log(`JOB!OK: ${job.title}`)
+          } else
             jobIsReady.push(false)
-          }
-        } else {
-          // console.log(`JOB+OK: ${job.title}`)
-          console.log(`NO REACHED FILTER: ${job.title}`)
+        } else
           jobIsReady.push(true)
-        }
 
         // NOTE: 1.4. isProject filter
         if (
@@ -153,8 +142,6 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
             default:
               break
           }
-        } else {
-          console.log(`NO PROJECT FILTER: ${job.title}`)
         }
 
         // NOTE: 1.5. isNew filter
@@ -177,21 +164,16 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
             default:
               break
           }
-        } else {
-          console.log(`NO NEW FILTER: ${job.title}`)
         }
 
         if (jobIsReady.every(v => v === true))
-          filteredJobs.push(job)
-        else console.log(`--- NO PUSHED: ${job.title}`)
-        console.log(jobIsReady)
+          result.items.push(job)
         break
       }
       default:
-        // console.log(`DEFAULT CASE: NO FILTERS: ${job.title}`)
-        filteredJobs.push(job)
+        result.items.push(job)
         break
     }
   }
-  return filteredJobs
+  return result
 }

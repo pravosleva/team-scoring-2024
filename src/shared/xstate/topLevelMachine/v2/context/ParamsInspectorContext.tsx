@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useSearchParams, useLocation, useParams } from 'react-router-dom'
 import { EJobsStatusFilter, TJob, TopLevelContext } from '~/shared/xstate'
 import { createFastContext } from '~/shared/utils'
 
-type TCountersPack = {
+export type TCountersPack = {
   estimateReached: number;
   estimateNotReached: number;
   allActive: number;
@@ -120,7 +120,7 @@ const Logic = ({ children }: TProps) => {
   const allJobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const [, setStore] = useStore((s) => s.filteredJobs)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const queryParams: { [key: string]: string } = {}
     for (const [key, value] of urlSearchParams.entries()) {
       queryParams[key] = value
@@ -384,7 +384,7 @@ const Logic = ({ children }: TProps) => {
   }, [urlSearchParams, location, users, allJobs, setStore, params.user_id])
 
   // Persist todos
-  useEffect(() => {
+  useLayoutEffect(() => {
     todosActorRef.subscribe(() => {
       localStorage.setItem(
         'teamScoring2024:topLevel',

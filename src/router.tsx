@@ -1,6 +1,6 @@
 import { createHashRouter } from 'react-router-dom'
 import {
-  AboutPage, BusinessTime, HomePage, EmployeePage, EmployeesPage,
+  AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
   JobPage, JobsPage, LogPage, LastActivityPage, WorkerExpPage,
 } from '~/pages'
 import { Layout, JobsPagerAbstracted } from '~/shared/components'
@@ -34,7 +34,7 @@ export const router = createHashRouter(
     },
     {
       path: '/employees/:user_id',
-      element: <Layout><EmployeePage /></Layout>,
+      element: <Layout noScrollTopBtn><EmployeePage2 /></Layout>,
     },
     {
       path: '/about',

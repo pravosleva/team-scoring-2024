@@ -1,10 +1,10 @@
-import { memo, useLayoutEffect, useState, useEffect, useCallback } from 'react'
+import { memo, useLayoutEffect, useState, useEffect, useCallback, useMemo } from 'react'
 import { Job } from '~/shared/components/Job'
 import { TopLevelContext, TJob, EJobsStatusFilter } from '~/shared/xstate/topLevelMachine/v2'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button, TextField } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 import baseClasses from '~/App.module.scss'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { scrollTopExtra } from '~/shared/components/Layout/utils'
@@ -33,6 +33,7 @@ import { getFullUrl as _getFullUrl } from '~/shared/utils/string-ops'
 // }
 
 type TProps = {
+  counters?: TCountersPack;
   activeJobId?: number | null;
   onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
   jobs: TJob[];
@@ -48,7 +49,7 @@ const specialScroll = scrollToIdFactory({
   elementHeightCritery: 550,
 })
 
-export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatable, activeJobId, onToggleDrawer, jobs, onCreateNew, subheader }: TProps) => {
+export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHardcodedPath, isCreatable, activeJobId, onToggleDrawer, jobs, onCreateNew, subheader }: TProps) => {
   const topLevelActorRef = TopLevelContext.useActorRef()
   const { send } = topLevelActorRef
   const todo = TopLevelContext.useSelector((s) => s.context.todo)
@@ -73,15 +74,16 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
   // -- NOTE: 2/3 Совершенно необязательный механизм,
   // просто интуитивный UX
   // TODO: Можно перенести в отдельный контекст
-  const [lastSeenJobId, setLastSeenJob] = useState<number | null>(null)
+  const [lastSeenJobId, setLastSeenJobId] = useState<number | null>(null)
   const [urlSearchParams] = useSearchParams()
   useLayoutEffect(() => {
     const idToScroll = urlSearchParams.get('lastSeenJob')
-    if (!!idToScroll && !Number.isNaN(Number(idToScroll))) setLastSeenJob(Number(idToScroll))
-  }, [urlSearchParams, setLastSeenJob])
+    if (!!idToScroll && !Number.isNaN(Number(idToScroll))) setLastSeenJobId(Number(idToScroll))
+  }, [urlSearchParams, setLastSeenJobId])
   // --
-  const [mainCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.main)
-  const [totalJobsCounter] = useParamsInspectorContextStore((ctx) => ctx.counters.total)
+  const [_mainCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.main)
+  const counters = useMemo(() => _counters || _mainCounters, [_mainCounters, _counters])
+  // const [totalJobsCounter] = useParamsInspectorContextStore((ctx) => ctx.counters.total)
   const navigate = useNavigate()
   const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
 
@@ -116,7 +118,7 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
           top: 0,
           backgroundColor: '#fff',
           zIndex: 2,
-          pb: (isCreatable || totalJobsCounter > 0 || activeFilters.isAnyFilterActive) ? 2 : 0,
+          pb: (isCreatable || activeFilters.isAnyFilterActive) ? 2 : 0,
         }}
       >
         <div
@@ -138,7 +140,7 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
         </div>
 
         {
-          (isCreatable || totalJobsCounter > 0 || activeFilters.isAnyFilterActive) && (
+          (isCreatable || activeFilters.isAnyFilterActive) && (
             <div className={baseClasses.stack2}>
               {
                 isCreatable && !activeFilters.isAnyFilterActive && (
@@ -171,7 +173,7 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                 )
               }
               {
-                (totalJobsCounter > 0 || activeFilters.isAnyFilterActive) && Object.values(mainCounters).some((v) => v > 0) && (
+                (activeFilters.isAnyFilterActive) && Object.values(counters).some((v) => v > 0) && (
                   <Box
                     sx={{
                       display: 'flex',
@@ -180,7 +182,7 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                     }}
                   >
                     {
-                      mainCounters.allNew > 0 && (
+                      counters.allNew > 0 && (
                         <Link
                           to={getFullUrl({
                             url: pagerControlsHardcodedPath,
@@ -198,13 +200,13 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                               activeFilters.values.jobStatusFilter === EJobsStatusFilter.NEW
                                 ? 'contained' : 'outlined'}
                             startIcon={<NewReleasesIcon />}>
-                            New ({mainCounters.allNew})
+                            New ({counters.allNew})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      mainCounters.allActive > 0 && (
+                      counters.allActive > 0 && (
                         <Link
                           // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
                           to={getFullUrl({
@@ -222,16 +224,15 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                             variant={
                               activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
                                 && !activeFilters.estimateReached
-                                && !activeFilters.assignedTo
                                 ? 'contained' : 'outlined'}
                             startIcon={<FilterAltIcon />}>
-                            Active ({mainCounters.allActive})
+                            Active ({counters.allActive})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      mainCounters.allCompleted > 0 && (
+                      counters.allCompleted > 0 && (
                         <Link
                           // to={`${pagerControlsHardcodedPath}?jobStatusFilter=completed${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
                           to={getFullUrl({
@@ -249,17 +250,16 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                             variant={
                               activeFilters.values.jobStatusFilter === EJobsStatusFilter.COMPLETED
                                 && !activeFilters.estimateReached
-                                && !activeFilters.assignedTo
                                 ? 'contained' : 'outlined'}
                             startIcon={<TaskAltIcon />}
                           >
-                            Completed ({mainCounters.allCompleted})
+                            Completed ({counters.allCompleted})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      mainCounters.estimateNotReached > 0 && (
+                      counters.estimateNotReached > 0 && (
                         <Link
                           // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=0${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
                           to={getFullUrl({
@@ -280,17 +280,16 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                             variant={
                               activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
                                 && activeFilters.values.estimateReached === 0
-                                && !activeFilters.assignedTo
                                 ? 'contained' : 'outlined'}
                             startIcon={<ThumbUpIcon />}
                           >
-                            Active Forecast ({mainCounters.estimateNotReached})
+                            Active Forecast ({counters.estimateNotReached})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      mainCounters.estimateReached > 0 && (
+                      counters.estimateReached > 0 && (
                         <Link
                           // to={`${pagerControlsHardcodedPath}?jobStatusFilter=active&estimateReached=1${!!lastSeenJobId ? `&lastSeenJob=${lastSeenJobId}` : ''}`}
                           to={getFullUrl({
@@ -308,15 +307,14 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                             variant={
                               activeFilters.values.jobStatusFilter === EJobsStatusFilter.ACTIVE
                                 && activeFilters.values.estimateReached === 1
-                                && !activeFilters.assignedTo
                                 ? 'contained' : 'outlined'} startIcon={<ThumbDownIcon />}>
-                            Active Fuckups ({mainCounters.estimateReached})
+                            Active Fuckups ({counters.estimateReached})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      mainCounters.allProjects > 0 && (
+                      counters.allProjects > 0 && (
                         <Link
                           // to={`${pagerControlsHardcodedPath}?isProject=1`}
                           to={getFullUrl({
@@ -336,13 +334,13 @@ export const JobList2 = memo(({ pageInfo, pagerControlsHardcodedPath, isCreatabl
                             }
                             startIcon={<HiveIcon />}
                           >
-                            Projects ({mainCounters.allProjects})
+                            Projects ({counters.allProjects})
                           </Button>
                         </Link>
                       )
                     }
                     {
-                      activeFilters.isAnyFilterActive && (
+                      activeFilters.isAnyFilterActive && !activeFilters.assignedTo && (
                         <Button
                           sx={{ borderRadius: 4 }}
                           size='small'
