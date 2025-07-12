@@ -48,7 +48,6 @@
 
   .infoStack {
     padding-top: 2px;
-    // border: 1px solid red;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -65,7 +64,8 @@
   }
 
   .checklistItemControls {
-    min-width: 62px;
+    // border: 1px solid red;
+    min-width: 50px;
     margin-left: auto;
 
     display: flex;

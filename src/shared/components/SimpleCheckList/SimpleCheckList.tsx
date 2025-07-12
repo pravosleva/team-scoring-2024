@@ -343,10 +343,11 @@ function SimpleCheckListFn<TAddInfo>({
                             </button>
 
                             <div className={classes.checklistItemControls}>
-
                               {
                                 !!onDeleteChecklistItem && (
-                                  <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>[ Del ]</code>
+                                  <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>
+                                    [ Del ]
+                                  </code>
                                 )
                               }
                               <code className={classes.inlineControlBtn} onClick={handleDisabledToggle({
@@ -368,10 +369,11 @@ function SimpleCheckListFn<TAddInfo>({
                                   <code
                                     className={classes.inlineControlBtn}
                                     onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
-                                  >[ Edit ]</code>
+                                  >
+                                    [ Edit ]
+                                  </code>
                                 )
                               }
-
                             </div>
                           </div>
 
