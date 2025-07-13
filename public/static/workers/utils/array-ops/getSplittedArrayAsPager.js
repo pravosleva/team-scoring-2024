@@ -5,6 +5,17 @@ const loggerFactory = ({ label, cb }) => {
     return cb(`${c}. ${msg}`)
   }
 }
+const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) => {
+  return [
+    currentPageIndex * pageLimit + 1,
+    '-',
+    totalItems > pageLimit * (currentPageIndex + 1)
+      ? pageLimit * (currentPageIndex + 1)
+      : totalItems,
+    'of',
+    totalItems,
+  ].join(' ')
+}
 
 const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
   const _service = {
@@ -97,6 +108,12 @@ const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
   _service.result = {
     pager: finalPager,
     pagination: {
+      itemsRangeInfo: getRangeInfo({
+        currentPageIndex: _currentPageIndex,
+        pageLimit,
+        totalPages: finalPager.length,
+        totalItems: list.length,
+      }),
       pageLimit,
       totalItems: list.length,
       totalPages: finalPager.length,
@@ -106,7 +123,6 @@ const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
       nextPage: !!nextPage ? _currentPageIndex + 2 : null,
       prevPageIndex: !!prevPage ? _currentPageIndex - 1 : null,
       prevPage: !!prevPage ? _currentPageIndex : null,
-
       isCurrentPageFirst,
       isCurrentPageLast,
     },

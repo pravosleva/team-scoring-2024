@@ -13,7 +13,7 @@ export const router = createHashRouter(
     },
     {
       path: '/jobs',
-      element: <JobsPage />,
+      element: <Layout noScrollTopBtn><JobsPage /></Layout>,
     },
     {
       path: '/jobs/:job_id',

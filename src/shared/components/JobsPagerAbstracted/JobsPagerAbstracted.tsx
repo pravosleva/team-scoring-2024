@@ -30,6 +30,9 @@ const getNormalizedPage = (index: number): number => index + 1
 type TProps = {
   // isDebugEnabled?: boolean;
   pagerControlsHardcodedPath: string;
+  _onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
+  _isCreatable?: boolean;
+  _isSortable?: boolean;
 }
 type TTargetResultByWorker = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +51,7 @@ type TTargetResultByWorker = {
     prevPage: number | null;
     isCurrentPageFirst: boolean;
     isCurrentPageLast: boolean;
+    itemsRangeInfo: string;
   };
   currentPage: TJob[] | null;
   nextPage: TJob[] | null;
@@ -59,6 +63,9 @@ type TWorkerServiceReport = {
 
 export const JobsPagerAbstracted = memo(({
   pagerControlsHardcodedPath,
+  _onToggleDrawer,
+  _isCreatable,
+  _isSortable,
 }: TProps) => {
   const [urlSearchParams] = useSearchParams()
   const lastSeenJobID = useMemo<number | null>(() =>
@@ -132,11 +139,13 @@ export const JobsPagerAbstracted = memo(({
   })
   const navigate = useNavigate()
   const handleNavigate = useCallback((relativeUrl: string) => () => navigate(relativeUrl), [navigate])
-  const handleCreateNewCallback = useCallback(() =>
+  const handleCreateNewCallback = useCallback(() => {
     handleNavigate(
-      getFullUrl({ url: pagerControlsHardcodedPath, query: { ...queryParams, page: '1' } })
-    ),
-    [handleNavigate, pagerControlsHardcodedPath, queryParams]
+      getFullUrl({ url: pagerControlsHardcodedPath, query: { ...queryParams }, queryKeysToremove: ['page', 'lastSeenJob'] })
+    )()
+  },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleNavigate, pagerControlsHardcodedPath, queryParams.page]
   )
 
   return (
@@ -149,9 +158,9 @@ export const JobsPagerAbstracted = memo(({
       >
         <Grid container spacing={2}>
 
-          <Grid size={12}>
+          {/* <Grid size={12}>
             <h1><span style={{ display: 'inline-block', transform: 'rotate(-7deg)' }}>📟</span> JobsPager exp</h1>
-          </Grid>
+          </Grid> */}
 
           {!!outputWorkerErrMsg && (
             <Grid size={12}>
@@ -203,13 +212,16 @@ export const JobsPagerAbstracted = memo(({
               <Grid size={12}>
                 <JobList2
                   pagerControlsHardcodedPath={pagerControlsHardcodedPath}
-                  // isCreatable
+                  isCreatable={_isCreatable}
+                  isSortable={_isSortable}
                   key={outputWorkerData?.pagination.currentPage}
                   jobs={outputWorkerData?.currentPage || []}
                   // activeJobId={lastSeenJobID}
                   onCreateNew={handleCreateNewCallback}
-                  pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                  // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                  pageInfo={outputWorkerData?.pagination.itemsRangeInfo}
                   subheader='Jobs'
+                  onToggleDrawer={_onToggleDrawer}
                 />
               </Grid>
             )
@@ -238,7 +250,7 @@ export const JobsPagerAbstracted = memo(({
       </div>
 
       {
-        !!outputWorkerData && (
+        !!outputWorkerData?.currentPage && outputWorkerData.pagination.totalPages > 1 && (
           <ResponsiveBlock
             className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
             style={{
@@ -259,7 +271,8 @@ export const JobsPagerAbstracted = memo(({
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                // variant='outlined'
+                variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // startIcon={<ArrowBackIosIcon />}
                 onClick={
@@ -275,13 +288,13 @@ export const JobsPagerAbstracted = memo(({
                 disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
               >
                 {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowBackIosIcon />
+                <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // endIcon={<ArrowForwardIosIcon />}
                 onClick={
@@ -297,7 +310,7 @@ export const JobsPagerAbstracted = memo(({
                 disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
               >
                 {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowForwardIosIcon />
+                <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <div
@@ -305,7 +318,7 @@ export const JobsPagerAbstracted = memo(({
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                  color: 'gray',
+                  color: '#959eaa',
                   fontWeight: 'bold',
                 }}
               >

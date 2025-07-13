@@ -74,7 +74,8 @@ _theme = createTheme(_theme, {
     }),
     gray: _theme.palette.augmentColor({
       color: {
-        main: '#808080',
+        main: '#959eaa',
+        contrastText: '#FFF',
       },
       name: 'gray',
     }),

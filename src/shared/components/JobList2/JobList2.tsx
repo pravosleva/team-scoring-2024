@@ -16,6 +16,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import { getFullUrl as _getFullUrl } from '~/shared/utils/string-ops'
+// import clsx from 'clsx'
 
 // const { useStore: useParamsInspectorContextWrapper } = ParamsInspectoreContext
 
@@ -41,6 +42,7 @@ type TProps = {
   subheader: string;
   pageInfo?: string;
   isCreatable?: boolean;
+  isSortable?: boolean;
   pagerControlsHardcodedPath: string;
 }
 const specialScroll = scrollToIdFactory({
@@ -49,7 +51,7 @@ const specialScroll = scrollToIdFactory({
   elementHeightCritery: 550,
 })
 
-export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHardcodedPath, isCreatable, activeJobId, onToggleDrawer, jobs, onCreateNew, subheader }: TProps) => {
+export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHardcodedPath, isCreatable, isSortable, activeJobId, onToggleDrawer, jobs, onCreateNew, subheader }: TProps) => {
   const topLevelActorRef = TopLevelContext.useActorRef()
   const { send } = topLevelActorRef
   const todo = TopLevelContext.useSelector((s) => s.context.todo)
@@ -140,8 +142,18 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
         </div>
 
         {
-          (isCreatable || activeFilters.isAnyFilterActive) && (
+          (isCreatable || isSortable) && (
             <div className={baseClasses.stack2}>
+              {/* <pre
+                className={clsx(
+                  baseClasses.preNormalized,
+                )}
+                style={{ maxHeight: '300px', overflowY: 'auto' }}
+              >
+                {JSON.stringify({
+                  shouldTextFieldBeShowed: isCreatable && !activeFilters.isAnyFilterActive,
+                }, null, 2)}
+              </pre> */}
               {
                 isCreatable && !activeFilters.isAnyFilterActive && (
                   <TextField
@@ -173,7 +185,7 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
                 )
               }
               {
-                (activeFilters.isAnyFilterActive) && Object.values(counters).some((v) => v > 0) && (
+                isSortable && Object.values(counters).some((v) => v > 0) && (
                   <Box
                     sx={{
                       display: 'flex',

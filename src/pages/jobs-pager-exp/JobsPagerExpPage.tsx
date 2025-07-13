@@ -44,6 +44,7 @@ type TTargetResultByWorker = {
     prevPage: number | null;
     isCurrentPageFirst: boolean;
     isCurrentPageLast: boolean;
+    itemsRangeInfo: string;
   };
   currentPage: TJob[] | null;
   nextPage: TJob[] | null;
@@ -189,7 +190,8 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
                   jobs={outputWorkerData?.currentPage}
                   // activeJobId={lastSeenJobID}
                   onCreateNew={handleCreateNewCallback}
-                  pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                  // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                  pageInfo={outputWorkerData.pagination.itemsRangeInfo}
                   subheader='Jobs'
                 />
               </Grid>
@@ -236,7 +238,8 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                // variant='outlined'
+                variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // startIcon={<ArrowBackIosIcon />}
                 onClick={
@@ -252,13 +255,14 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
                 disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
               >
                 {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowBackIosIcon />
+                <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                // variant='outlined'
+                variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // endIcon={<ArrowForwardIosIcon />}
                 onClick={
@@ -274,7 +278,7 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
                 disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
               >
                 {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowForwardIosIcon />
+                <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <div

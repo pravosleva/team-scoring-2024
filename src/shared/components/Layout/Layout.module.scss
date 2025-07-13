@@ -12,13 +12,14 @@
   justify-content: center;
   align-items: center;
 }
+
 .inactive {
   opacity: 0.5;
   filter: grayscale(1);
 }
 
 .code {
-  background: gray;
+  background: #959eaa;
   color: #fff;
   padding: 2px 5px;
   border-radius: 4px;

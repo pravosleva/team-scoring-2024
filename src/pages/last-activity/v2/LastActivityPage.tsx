@@ -34,6 +34,7 @@ type TTargetResultByWorker = {
     prevPage: number | null;
     isCurrentPageFirst: boolean;
     isCurrentPageLast: boolean;
+    itemsRangeInfo: string;
   };
   currentPage: TModifiedLog[] | null;
   nextPage: TModifiedLog[] | null;
@@ -197,7 +198,8 @@ export const LastActivityPage = memo(() => {
                 modifiedLogs={outputWorkerData?.currentPage || []}
                 // onCreateNew?: () => void;
                 subheader='Logs'
-                pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
+                pageInfo={outputWorkerData?.pagination.itemsRangeInfo}
                 pagerControlsHardcodedPath='/last-activity'
                 key={outputWorkerData?.pagination.currentPage}
               // jobs={outputWorkerData?.currentPage || []}
@@ -251,7 +253,8 @@ export const LastActivityPage = memo(() => {
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                // variant='outlined'
+                variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // startIcon={<ArrowBackIosIcon />}
                 onClick={
@@ -267,13 +270,14 @@ export const LastActivityPage = memo(() => {
                 disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
               >
                 {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowBackIosIcon />
+                <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <Button
                 sx={{ borderRadius: 4 }}
                 size='small'
-                variant='outlined'
+                // variant='outlined'
+                variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
                 fullWidth
                 // endIcon={<ArrowForwardIosIcon />}
                 onClick={
@@ -289,7 +293,7 @@ export const LastActivityPage = memo(() => {
                 disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
               >
                 {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                <ArrowForwardIosIcon />
+                <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
               </Button>
 
               <div
@@ -297,7 +301,7 @@ export const LastActivityPage = memo(() => {
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                  color: 'gray',
+                  color: '#959eaa',
                   fontWeight: 'bold',
                 }}
               >

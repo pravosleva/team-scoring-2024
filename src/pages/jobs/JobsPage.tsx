@@ -1,7 +1,7 @@
 import { memo, useState, useCallback, useMemo, useEffect } from 'react'
-import { JobList } from '~/shared/components/JobList'
-import baseClasses from '~/App.module.scss'
-import { Layout } from '~/shared/components/Layout'
+import { JobsPagerAbstracted } from '~/shared/components'
+// import baseClasses from '~/App.module.scss'
+// import { Layout } from '~/shared/components/Layout'
 import { Drawer } from '@mui/material'
 import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
@@ -38,15 +38,13 @@ export const JobsPage = memo(() => {
   }, [possibleDefaultActiveJobId, handleToggleDrawer])
 
   return (
-    <Layout>
-      <div
-        className={baseClasses.stack1}
-        style={{
-          marginBottom: '24px',
-        }}
-      >
-        <JobList onToggleDrawer={handleToggleDrawer} activeJobId={activeJob?.id} />
-      </div>
+    <>
+      <JobsPagerAbstracted
+        pagerControlsHardcodedPath='/jobs'
+        _onToggleDrawer={handleToggleDrawer}
+        _isCreatable={true}
+        _isSortable={true}
+      />
       <Drawer
         open={isOpened}
         onClose={handleToggleDrawer(false)}
@@ -70,6 +68,6 @@ export const JobsPage = memo(() => {
             )
         }
       </Drawer>
-    </Layout>
+    </>
   )
 })
