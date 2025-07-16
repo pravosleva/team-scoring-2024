@@ -169,7 +169,10 @@ export const LastActivityPage = memo(() => {
           </Grid> */}
 
           {!!outputWorkerErrMsg && (
-            <Grid size={12}>
+            <Grid
+              size={12}
+              className={baseClasses.specialTopContent}
+            >
               <Alert severity='error' variant='filled'>
                 <div className={baseClasses.stack1}>
                   <b>Error message</b>

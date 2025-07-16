@@ -163,7 +163,7 @@ export const JobsPagerAbstracted = memo(({
           </Grid> */}
 
           {!!outputWorkerErrMsg && (
-            <Grid size={12}>
+            <Grid size={12} className={baseClasses.specialTopContent}>
               <Alert severity='error' variant='filled'>
                 <div className={baseClasses.stack1}>
                   <b>Error message</b>
@@ -229,7 +229,7 @@ export const JobsPagerAbstracted = memo(({
 
           {
             !outputWorkerData && (
-              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
+              <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
                 <CircularProgress />
               </Grid>
             )

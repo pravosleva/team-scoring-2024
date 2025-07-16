@@ -21,6 +21,9 @@ import baseClasses from '~/App.module.scss'
 import { TEnchancedJobByWorker } from '~/pages/jobs/[job_id]/components/ProjectsTree/types'
 import { getArithmeticalMean } from '~/shared/utils/number-ops'
 import { TJob } from '~/shared/xstate'
+import { getFullUrl } from '~/shared/utils/string-ops'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components/CollapsibleText'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -67,6 +70,7 @@ export const ProjectNode = ({
 }: TProps) => {
   const [isLastActivityOpened, setIsLastActivityOpened] = useState(false)
   const toggleLastActivity = () => setIsLastActivityOpened((s) => !s)
+  const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
 
   return (
     <div
@@ -104,15 +108,20 @@ export const ProjectNode = ({
             className={baseClasses.truncate}
           >
             <Link
-              to={
-                [
-                  '/jobs',
-                  `/${projectsTree.model.id}`,
-                  // !!activeJobId
-                  //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
-                  //   : '',
-                ].join('')
-              }
+              // to={
+              //   [
+              //     '/jobs',
+              //     `/${projectsTree.model.id}`,
+              //     // !!activeJobId
+              //     //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
+              //     //   : '',
+              //   ].join('')
+              // }
+              to={getFullUrl({
+                url: `/jobs/${projectsTree.model.id}`,
+                query: { ...queryParams },
+                // queryKeysToremove,
+              })}
               className={baseClasses.truncate}
             >
               {projectsTree.model.title}{projectsTree.model.relations?.children?.length > 0 ? ` (${projectsTree.model.relations?.children.length} subjobs)` : ''}
@@ -165,9 +174,17 @@ export const ProjectNode = ({
 
       {
         !!projectsTree.model.descr && (
-          <em style={{ fontSize: 'small', color: 'gray' }} className={classes.descr}>{projectsTree.model.descr}</em>
+          <CollapsibleText
+            briefText='Description'
+            targetText={projectsTree.model.descr}
+            contentRender={({ targetText }) => (
+              <div className={classes.descr}>{targetText}</div>
+            )}
+          />
+          // <em style={{ fontSize: 'small', color: 'gray' }} className={classes.descr}>{projectsTree.model.descr}</em>
         )
       }
+
       {
         projectsTree.model.logs.items.length > 0 && (
           <div
@@ -239,14 +256,18 @@ export const ProjectNode = ({
               }
               <code
                 className={baseClasses.noBreakWords}
-                style={{ fontSize: 'x-small', fontWeight: 'bold' }} onClick={toggleLastActivity}
+                style={{ fontSize: 'x-small', fontWeight: 'bold', cursor: 'pointer' }}
+                onClick={toggleLastActivity}
               >{isLastActivityOpened ? '[ close ]' : '[ open ]'}
               </code>
             </div>
             {
               isLastActivityOpened && (
                 <>
-                  <span style={{ fontSize: 'small' }} className={classes.lastLog}>
+                  <span
+                    style={{ fontSize: 'small' }}
+                    className={classes.lastLog}
+                  >
                     {projectsTree.model.logs.items[0].text}
                   </span>
                   {
@@ -265,16 +286,18 @@ export const ProjectNode = ({
                                   <li key={nodeId}>
                                     <a
                                       className={clsx(
-                                        baseClasses.truncate,
+                                        // baseClasses.truncate,
                                         {
                                           [classes.lastActivityOfCurrentJobLink]: activeJobId === originalJob.id,
                                         },
                                       )}
                                       style={{
                                         fontSize: 'small',
+                                        width: '100%',
                                         display: 'inline-flex',
+                                        flexDirection: 'row',
                                         // border: '1px solid red',
-                                        alignItems: 'center',
+                                        alignItems: 'flex-start',
                                         gap: '6px',
                                         cursor: 'pointer',
                                         opacity: analyzed.isDone ? 0.5 : 1,
@@ -285,17 +308,23 @@ export const ProjectNode = ({
                                         jobTitle: projectsTree.model.title,
                                       })}
                                     >
-                                      {
-                                        analyzed.isDone
-                                          ? <CheckCircleIcon sx={{ fontSize: 'inherit' }} />
-                                          : analyzed.isNew
-                                            ? <PanoramaFishEyeIcon sx={{ fontSize: 'inherit' }} />
-                                            : analyzed.isStartedAndEstimated
-                                              ? <TimerIcon sx={{ fontSize: 'inherit' }} />
-                                              : <HardwareIcon sx={{ fontSize: 'inherit' }} />
-                                      }
-                                      <span className={baseClasses.truncate}>{originalJob.title}</span>
-                                      <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                                      <span style={{ paddingTop: '2px' }}>
+                                        {
+                                          analyzed.isDone
+                                            ? <CheckCircleIcon sx={{ fontSize: 'inherit' }} />
+                                            : analyzed.isNew
+                                              ? <PanoramaFishEyeIcon sx={{ fontSize: 'inherit' }} />
+                                              : analyzed.isStartedAndEstimated
+                                                ? <TimerIcon sx={{ fontSize: 'inherit' }} />
+                                                : <HardwareIcon sx={{ fontSize: 'inherit' }} />
+                                        }
+                                      </span>
+                                      <span
+                                      // className={baseClasses.truncate}
+                                      >{originalJob.title}</span>
+                                      <span style={{ paddingTop: '2px', marginLeft: 'auto' }}>
+                                        <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                                      </span>
                                     </a>
                                   </li>
                                 )

@@ -13,7 +13,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
-import WebIcon from '@mui/icons-material/Web'
+// import WebIcon from '@mui/icons-material/Web'
 
 export const HomePage = () => {
   return (
@@ -72,7 +72,7 @@ export const HomePage = () => {
                 </div>
               </div>
             </Link>
-            <Link
+            {/* <Link
               to='/jobs-pager-exp'
               style={{
                 display: 'block',
@@ -85,7 +85,7 @@ export const HomePage = () => {
                   <em className={classes.descr}>Web Worker experience (experimental)</em>
                 </div>
               </div>
-            </Link>
+            </Link> */}
             <Link
               to='/business-time'
               style={{

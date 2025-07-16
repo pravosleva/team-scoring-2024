@@ -15,6 +15,25 @@ const compose = (fns, arg) => {
 
 const withRootMW = (arg) => compose([
   // NOTE: You can add your middlewares below...
+  // ({ eventData, cb }) => {
+  //   const { __eType, input } = eventData
+  //   const output = {
+  //     ok: false,
+  //     message: 'Output data not modified',
+  //   }
+  //   try {
+  //     throw new Error('ERR Test')
+  //   } catch (err) {
+  //     output.ok = false
+  //     output.message = err?.message || 'No message'
+  //   } finally {
+  //     cb[eventData.input.opsEventType]({
+  //       output,
+  //       input,
+  //       // _service,
+  //     })
+  //   }
+  // },
 
   // - NOTE: For example
   ({ eventData, cb }) => {

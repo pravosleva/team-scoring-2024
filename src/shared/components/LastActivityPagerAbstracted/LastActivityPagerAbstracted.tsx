@@ -398,6 +398,13 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
                                     ].join('')
                                   )}`,
                                   `backActionUiText=${encodeURIComponent('Last activity')}`,
+                                  // `to=${encodeURIComponent(
+                                  //   [
+                                  //     '/jobs',
+                                  //     `?lastSeenJob=${log.jobId}`,
+                                  //   ].join('')
+                                  // )}`,
+                                  // `forwardActionUiText=${encodeURIComponent('Joblist')}`,
                                 ].join('&')
                               ].join('')
                             }

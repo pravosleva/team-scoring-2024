@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom'
 // import { getTruncated } from '~/shared/utils/string-ops'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBack from '@mui/icons-material/ArrowBack'
+// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 import { CommentManager, SingleTextManager } from './components'
 
@@ -381,28 +382,39 @@ export const LogPage = () => {
               }
 
               {
-                !!targetJob && !!targetLog && (
+                !!userRouteControls.to ? (
                   <Link
-                    to={
-                      `/jobs-pager-exp?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
-                        `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
-                        // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
-                      )
-                      }&backActionUiText=${encodeURIComponent('Log page')
-                      }`
-                    }
+                    to={userRouteControls.to.value}
                     target='_self'
+                    className={baseClasses.truncate}
                   >
-                    <Button
-                      variant='outlined'
-                      color='salmon'
-                      endIcon={<ArrowForwardIcon />}
-                      fullWidth
-                    >
-                      Jobs pager
+                    <Button variant='contained' startIcon={<ArrowForwardIcon />} fullWidth className={baseClasses.truncate}>
+                      <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
                     </Button>
                   </Link>
                 )
+                  : !!targetJob && !!targetLog && (
+                    <Link
+                      to={
+                        `/jobs?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
+                          `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
+                          // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
+                        )
+                        }&backActionUiText=${encodeURIComponent('Log page')
+                        }`
+                      }
+                      target='_self'
+                    >
+                      <Button
+                        variant='outlined'
+                        color='salmon'
+                        endIcon={<ArrowForwardIcon />}
+                        fullWidth
+                      >
+                        Jobs pager
+                      </Button>
+                    </Link>
+                  )
               }
 
             </ResponsiveBlock>

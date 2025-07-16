@@ -426,7 +426,7 @@ export const ActiveJobContent = memo(({
                         key={link.id}
                         style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
                       >
-                        <em style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}>{dayjs(link.logTs).format('DD.MM.YYYY HH:mm')}</em>
+                        <em style={{ fontSize: 'small', color: '#959eaa', fontWeight: 'bold' }}>{dayjs(link.logTs).format('DD.MM.YYYY HH:mm')}</em>
                         <div style={{ fontSize: 'small' }}>
                           <CopyToClipboardWrapper
                             text={link.url}

@@ -167,7 +167,7 @@ export const EmployeePage2 = memo(() => {
           </Grid> */}
 
           {!!outputWorkerErrMsg && (
-            <Grid size={12}>
+            <Grid size={12} className={baseClasses.specialTopContent}>
               <Alert severity='error' variant='filled'>
                 <div className={baseClasses.stack1}>
                   <b>Error message</b>
@@ -227,6 +227,7 @@ export const EmployeePage2 = memo(() => {
                   // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}
                   pageInfo={outputWorkerData.pagination.itemsRangeInfo}
                   subheader={targetUser.displayName}
+                // onToggleDrawer={(val) => (arg) => console.log({ val, arg })}
                 />
               </Grid>
             )

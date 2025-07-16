@@ -267,7 +267,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         isRequired: false,
         validator: ({ value }: any) => {
           const res: { ok: boolean; message?: string } = { ok: true }
-          const limit = 200
+          const limit = 1000
           switch (true) {
             case typeof value !== 'string' || !value:
               res.ok = false

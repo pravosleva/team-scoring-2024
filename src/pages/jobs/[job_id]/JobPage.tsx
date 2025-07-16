@@ -15,6 +15,7 @@ import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 import { Alert, Box, Button, Rating } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+// import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { JobStats } from '~/shared/components/Job/components'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ConstructionIcon from '@mui/icons-material/Construction'
@@ -334,75 +335,110 @@ export const JobPage = memo(() => {
         }}
       >
         {
-          !!userRouteControls.from && (
-            <Link
-              to={userRouteControls.from.value}
-              target='_self'
-              className={baseClasses.truncate}
-            >
-              <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
-                <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
-              </Button>
-            </Link>
-          )
-        }
-        {
-          !userRouteControls.from && !!targetJob && (
-            <Link
-              // to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
-              to={
-                [
-                  '/jobs',
-                  !!targetJob
-                    ? `?lastSeenJob=${targetJob.id}&openDrawer=1`
-                    : '',
-                ].join('')
-              }
-            >
-              <Button
-                fullWidth
-                variant='outlined'
-                startIcon={<ArrowBackIcon />}
-              // className={baseClasses.truncate}
-              >
-                <span className={baseClasses.truncate}>Open details | {targetJob.title || 'No title'}</span>
-              </Button>
-            </Link>
-          )
-        }
-        {
-          !userRouteControls.from && !!targetJob?.forecast.assignedTo && (
-            <Link
-              // to={`/employees/${targetJob.forecast.assignedTo}${!!targetJob ? `?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(`/jobs/${targetJob.id}`)}&backActionUiText=Job` : ''}`}
-              to={
-                [
-                  `/employees/${targetJob.forecast.assignedTo}`,
-                  !!targetJob
-                    ? '?'
-                    : '',
-                  !!targetJob
-                    ? [
-                      `lastSeenJob=${targetJob.id}`,
-                      `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
-                      // `backActionUiText=${encodeURIComponent(`Job // ${targetJob.title}`)}`,
-                    ].join('&')
-                    : '',
-                ].join('')
-              }
-              target='_self'
-              className={baseClasses.truncate}
-            >
-              <Button
-                variant='outlined'
-                color='gray'
-                startIcon={<AccountCircleIcon />}
-                fullWidth
+          !!userRouteControls.from
+            ? (
+              <Link
+                to={userRouteControls.from.value}
+                target='_self'
                 className={baseClasses.truncate}
               >
-                <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
-              </Button>
-            </Link>
-          )
+                <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
+                  <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
+                </Button>
+              </Link>
+            )
+            : !!targetJob
+              ? (
+                <Link
+                  to={
+                    [
+                      '/jobs',
+                      !!targetJob
+                        ? `?lastSeenJob=${targetJob.id}&openDrawer=1`
+                        : '',
+                    ].join('')
+                  }
+                >
+                  <Button
+                    fullWidth
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                  // className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>Open details | {targetJob.title || 'No title'}</span>
+                  </Button>
+                </Link>
+              )
+              : null
+        }
+
+        {
+          !!userRouteControls.to
+            ? (
+              <Link
+                to={userRouteControls.to.value}
+                target='_self'
+                className={baseClasses.truncate}
+              >
+                <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
+                  <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
+                </Button>
+              </Link>
+            )
+            : !!targetJob?.forecast.assignedTo
+              ? (
+                <Link
+                  to={
+                    [
+                      `/employees/${targetJob.forecast.assignedTo}`,
+                      !!targetJob
+                        ? '?'
+                        : '',
+                      !!targetJob
+                        ? [
+                          `lastSeenJob=${targetJob.id}`,
+                          `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
+                          // `backActionUiText=${encodeURIComponent(`Job // ${targetJob.title}`)}`,
+                        ].join('&')
+                        : '',
+                    ].join('')
+                  }
+                  target='_self'
+                  className={baseClasses.truncate}
+                >
+                  <Button
+                    variant='outlined'
+                    // color='gray'
+                    startIcon={<AccountCircleIcon />}
+                    fullWidth
+                    className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
+                  </Button>
+                </Link>
+              )
+              : (
+                <Link
+                  to={
+                    [
+                      '/jobs',
+                      !!targetJob
+                        ? `?lastSeenJob=${targetJob.id}&openDrawer=1`
+                        : '',
+                    ].join('')
+                  }
+                >
+                  <Button
+                    fullWidth
+                    variant='outlined'
+                    color='gray'
+                    className={baseClasses.truncate}
+                  >
+                    {/* <span className={baseClasses.truncate}>{!!targetJob ? targetJob.title : 'Joblist'}</span> */}
+                    <span className={baseClasses.truncate}>Joblist</span>
+                  </Button>
+                </Link>
+              )
         }
       </ResponsiveBlock>
     </Grid>

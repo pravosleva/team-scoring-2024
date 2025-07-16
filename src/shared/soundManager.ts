@@ -42,6 +42,9 @@ const sounds = {
   'ojing-eo-geim_player-excluded': '/click/ojing-eo-geim_player-excluded.mp3',
   'plop-1': '/plop/plop-1.mp3',
   'plop-3': '/plop/plop-3.mp3',
+
+  'switch-2-between-cameras': '/switch/switch-2-between-cameras.mp3',
+  'switch-3-epic': '/switch/switch-3-epic.mp3',
 }
 
 enum ELoadStatus {

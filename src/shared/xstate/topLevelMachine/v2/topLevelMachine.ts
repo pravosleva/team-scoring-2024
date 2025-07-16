@@ -1,7 +1,7 @@
 import { assign, setup } from 'xstate'
 import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink, TLogChecklistItem } from './types'
-// import { getCurrentPercentage } from '~/shared/utils'
-// import { getWorstCalc } from '~/shared/utils/team-scoring'
+import { getCurrentPercentage } from '~/shared/utils'
+import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
 import dayjs from 'dayjs'
 import { soundManager } from '~/shared/soundManager'
@@ -159,6 +159,14 @@ export const topLevelMachine = setup({
             items: context.jobs.items.map((todo) => {
               if (todo.id === event.value.jobId) {
                 todo.logs.items = todo.logs.items.filter(({ ts }) => ts !== event.value.logTs)
+                soundManager.playDelayedSoundConfigurable({
+                  soundCode: 'switch-3-epic',
+                  _debug: { msg: 'Log deleted' },
+                  delay: {
+                    before: 0,
+                    after: 250,
+                  },
+                })
               }
               return todo
             })
@@ -396,6 +404,15 @@ export const topLevelMachine = setup({
                     // if (!log.checklist) log.checklist = []
                     delete log.checklist
 
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'switch-3-epic',
+                      _debug: { msg: 'Checklist deleted from log' },
+                      delay: {
+                        before: 0,
+                        after: 250,
+                      },
+                    })
+
                     todo.ts.update = tsUpdate
                   }
                   return log
@@ -535,7 +552,7 @@ export const topLevelMachine = setup({
                   msg: `User [${displayName}] will be created`,
                 },
                 delay: {
-                  after: 500,
+                  after: 250,
                   before: 0,
                 },
               })
@@ -682,7 +699,7 @@ export const topLevelMachine = setup({
                             _debug: {
                               msg: '[1:isParentJobRemoved] Child job removed in old parent job (old parent affected)'
                             },
-                            delay: { before: 0, after: 1200 },
+                            delay: { before: 0, after: 1000 },
                           })
 
                           if (a[parentIndex].logs.items.length >= a[parentIndex].logs.limit)
@@ -913,7 +930,7 @@ export const topLevelMachine = setup({
                     soundManager.playDelayedSoundConfigurable({
                       soundCode: 'ojing-eo-geim_player-excluded',
                       _debug: { msg: 'Job has assigned to nobody' },
-                      delay: { before: 0, after: 1000 },
+                      delay: { before: 0, after: 900 },
                     })
                     // delete todo.forecast.assignedTo
                   }
@@ -971,9 +988,14 @@ export const topLevelMachine = setup({
                   }
                   jobToUpdate.completed = !!jobToUpdate.forecast.finish
 
-                  const progress: null | TLogProgress = null
+                  let progress: null | TLogProgress = null
+
                   // -- NOTE: Progress
-                  /*
+                  soundManager.playDelayedSoundConfigurable({
+                    soundCode: 'electro-2',
+                    _debug: { msg: 'Experimental (progress)' },
+                    delay: { before: 0, after: 500 },
+                  })
                   switch (true) {
                     // NOTE: 1. (Finish date was removed | updated) | Estimate | complexity updated
                     case (
@@ -1040,7 +1062,7 @@ export const topLevelMachine = setup({
                     default:
                       break
                   }
-                  */
+
                   if (jobToUpdate.completed) {
                     const v = getSpeed(jobToUpdate)
                     jobToUpdate.v = v

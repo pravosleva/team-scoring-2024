@@ -41,7 +41,6 @@ const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
   }
 
   // NOTE: 2. Etc
-  let currentPage = null
   switch (true) {
     case typeof requiredPageIndex === 'number':
       // NOTE: 2.1 Target page index requested
