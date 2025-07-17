@@ -341,7 +341,19 @@ export const ActiveJobContent = memo(({
                   }
                 </div>
                 <div>Grade: {ratingIcons[expressAppraiserStars].label}</div>
-                {!!job.descr && <div style={{ color: 'gray', fontSize: 'small' }}>{job.descr}</div>}
+                {
+                  !!job.descr && (
+                    <div
+                      style={{
+                        color: 'gray',
+                        fontSize: 'small',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {job.descr}
+                    </div>
+                  )
+                }
               </div>
               <JobStats
                 job={{
@@ -467,7 +479,7 @@ export const ActiveJobContent = memo(({
             backgroundColor: '#fff',
             zIndex: 3,
             marginTop: 'auto',
-            borderRadius: '16px 16px 0px 0px',
+            // borderRadius: '16px 16px 0px 0px',
           }}
         >
           {

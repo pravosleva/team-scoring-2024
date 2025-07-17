@@ -7,11 +7,12 @@ import { useLogsPagerWorker } from './hooks'
 import { debugFactory } from '~/shared/utils'
 import { TLogsItem, TopLevelContext } from '~/shared/xstate'
 import { NWService } from '~/shared/utils/wws/types'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { getFullUrl } from '~/shared/utils/string-ops'
 import clsx from 'clsx'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
@@ -128,6 +129,7 @@ export const LastActivityPage = memo(() => {
   //   ),
   //   [handleNavigate, queryParams]
   // )
+  const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
 
   return (
     <>
@@ -250,6 +252,28 @@ export const LastActivityPage = memo(() => {
               marginBottom: '16px',
             }}
           >
+
+            {
+              !!userRouteControls.from && (
+                <Link
+                  to={userRouteControls.from.value}
+                  target='_self'
+                  className={baseClasses.truncate}
+                >
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                    fullWidth
+                    className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
+                  </Button>
+                </Link>
+              )
+            }
+
             <ResponsiveBlock
               className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
             >

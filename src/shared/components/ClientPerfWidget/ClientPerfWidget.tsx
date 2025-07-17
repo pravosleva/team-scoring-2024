@@ -5,13 +5,14 @@ import clsx from 'clsx'
 import classes from './ClientPerfWidget.module.scss'
 import { getPercentage } from '~/shared/utils/number-ops'
 import { ProgressBar } from './components/ProgressBar'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+// import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandLessIcon from '@mui/icons-material/ArrowRight'
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MemoryIcon from '@mui/icons-material/Memory'
 
 type TProps = {
   isOpenedByDefault?: boolean;
-  position: 'top-center' | 'top-right';
+  position: 'top-center' | 'top-right' | 'right-side-top' | 'right-side-center-bottom';
 }
 
 type TMainStackItem = {
@@ -141,6 +142,8 @@ export const ClientPerfWidget = memo((ps: TProps) => {
           // [classes.bottomCenter]: ps.position === 'bottom-center',
           [classes.topCenter]: ps.position === 'top-center',
           [classes.topRight]: ps.position === 'top-right',
+          [classes.rightSideTop]: ps.position === 'right-side-top',
+          [classes.rightSideCenterBottom]: ps.position === 'right-side-center-bottom',
           [classes.isClosed]: !isBrowserMemoryMonitorEnabled,
           [classes.isOpened]: isBrowserMemoryMonitorEnabled,
         },
@@ -160,7 +163,7 @@ export const ClientPerfWidget = memo((ps: TProps) => {
               </div>
               <ProgressBar value={usedOfTotal} label={`${used.toFixed(0)} MB`} />
             </div>
-            
+
             <div className={classes.stack0}>
               <div
                 style={{ display: 'flex', justifyContent: 'space-between' }}
@@ -186,11 +189,11 @@ export const ClientPerfWidget = memo((ps: TProps) => {
         <span>Memory</span> */}
         {
           isBrowserMemoryMonitorEnabled
-          ? <ExpandLessIcon style={{ fontSize: '24px' }} />
-          : <MemoryIcon style={{ fontSize: '24px' }} />
+            ? <ExpandLessIcon style={{ fontSize: '24px' }} />
+            : <MemoryIcon style={{ fontSize: '24px' }} />
         }
         {/* <ExpandLessIcon style={{ fontSize: '16px' }} /> */}
-        <span style={{ paddingRight: '8px' }}>Memory</span>
+        {/* <span style={{ paddingRight: '8px' }}>Memory</span> */}
       </button>
 
     </div>

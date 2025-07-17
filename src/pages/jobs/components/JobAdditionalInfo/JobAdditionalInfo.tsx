@@ -111,7 +111,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                     <li key={ts}>
                       <em
                         style={{
-                          color: 'gray',
+                          color: '#959eaa',
                           // whiteSpace: 'pre-wrap',
                           fontSize: 'x-small',
                           fontWeight: 'bold',

@@ -329,7 +329,7 @@ export const JobPage = memo(() => {
           position: 'sticky',
           bottom: 0,
           backgroundColor: '#fff',
-          zIndex: 1,
+          zIndex: 50, // NOTE: See ./components/ProjectTree/components/ProjectNode
           marginTop: 'auto',
           boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
         }}

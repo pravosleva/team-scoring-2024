@@ -1,13 +1,23 @@
 .wrapper {
-  padding: 8px 8px 8px 8px;
+  padding: 0px 8px 8px 8px;
   border-left: 4px solid #959eaa;
+
+  .stickyTop {
+    // border: 1px solid blue;
+    border-bottom: 1px solid #959eaa;
+    // transition: background-color 0.75s ease-in-out;
+  }
+
+  // .descr {
+  //   border: 1px solid red;
+  // }
 
   display: flex;
   flex-direction: column;
   gap: 8px;
   // border: 1px solid lightgray;
   border-radius: 0px;
-  transition: all 0.75s ease-in-out;
+  // transition: all 0.75s ease-in-out;
 
   a {
     font-size: small;
@@ -30,6 +40,11 @@
 .isActive {
   border-left: 4px solid red;
   background-color: #ffecec;
+
+  // EXP:
+  // border-top: 1px solid red;
+  // border-right: 1px solid red;
+  // border-bottom: 1px solid red;
 
   // a.lastActivityOfCurrentJobLink {
   //   color: red;

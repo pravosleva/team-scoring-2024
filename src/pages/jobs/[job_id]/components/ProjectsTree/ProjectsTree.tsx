@@ -12,6 +12,8 @@ import { ProjectNode, FixedBackToNodeBtn } from './components'
 import { TEnchancedJobByWorker } from './types'
 import { scrollToIdFactory, blinkNodeIdFactory } from '~/shared/utils/web-api-ops'
 import { CSSProperties } from '@mui/material/styles/createMixins'
+import { getMatchedByAnyString } from '~/shared/utils/string-ops'
+import { getIsNumeric } from '~/shared/utils/number-ops'
 
 export type TProject = {
   jobId: number;
@@ -45,28 +47,91 @@ const tree = new Tree<any>(treeData);
 console.log("Tree :>> ", tree);
 */
 
+const stickyElementHeight2 = 58
+const _specialNavigate = {
+  getOffsetTop: ({ targetElm }: { targetElm: HTMLElement }) => {
+    const classList = targetElm.className.split(' ')
+    const informativeClass = classList.find((val) => getMatchedByAnyString({ tested: val, expected: ['projects-tree-level_'] }))
+    // console.log('informativeClass', informativeClass)
+    if (!!informativeClass) {
+      const level = informativeClass.split('_')[1]
+      if (typeof level !== 'undefined' && getIsNumeric(level)) {
+        const normalizedLevel = Number(level)
+        // console.log(`normalizedLevel -> ${normalizedLevel} -> ${normalizedLevel === 1 ? 0 : (normalizedLevel - 1) * stickyElementHeight2}`)
+
+        return normalizedLevel === 1
+          ? 0 + 8
+          : normalizedLevel === 2
+            ? (normalizedLevel - 1) * stickyElementHeight2 + 8
+            : (normalizedLevel - 1) * stickyElementHeight2
+      }
+      return undefined
+    }
+  },
+}
 const specialScroll = scrollToIdFactory({
   timeout: 200,
-  offsetTop: 16,
+  offsetTop: 64,
   elementHeightCritery: 550,
 })
 const blinkNode = blinkNodeIdFactory({
   timeout: 1500,
   cb: {
     onStart: ({ targetElm }) => {
-      const oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
-        borderColor: targetElm.style.borderColor,
-        backgroundColor: targetElm.style.borderColor,
+      // console.log('- start')
+
+      const firstChildElm = targetElm.children[0]
+
+      // console.log(firstChildElm)
+
+      const state: {
+        target: {
+          oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'>;
+          tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'>;
+        };
+        // firstChild?: {
+        //   oldCSS: Pick<CSSProperties, 'backgroundColor'>;
+        //   tmpCSS: Pick<CSSProperties, 'backgroundColor'>;
+        // };
+      } = {
+        target: {
+          oldCSS: {
+            borderColor: targetElm.style.borderColor,
+            // backgroundColor: targetElm.style.backgroundColor,
+          },
+          tmpCSS: {
+            // borderColor: '#1565c0', // blue
+            borderColor: '#02c39a', // green
+            // backgroundColor: '#c9fce9',
+          },
+        },
+        // firstChild: !!firstChildElm
+        //   ? {
+        //     oldCSS: {
+        //       // @ts-ignore
+        //       backgroundColor: firstChildElm.style.backgroundColor,
+        //     },
+        //     tmpCSS: {
+        //       backgroundColor: '#c9fce9',
+        //     },
+        //   }
+        //   : undefined,
       }
-      const tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
-        // borderColor: '#1565c0', // blue
-        borderColor: '#02c39a', // green
-        backgroundColor: '#c9fce9',
-      }
-      for (const prop in tmpCSS) {
+
+      // const oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
+
+      // }
+      // const tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
+
+      // }
+      for (const prop in state.target.tmpCSS) {
         // @ts-ignore
-        targetElm.style[prop] = tmpCSS[prop]
+        targetElm.style[prop] = state.target.tmpCSS[prop]
       }
+      // if (!!firstChildElm && !!state.firstChild) {
+      //   // @ts-ignore
+      //   for (const prop in state.firstChild.tmpCSS) firstChildElm.style[prop] = state.firstChild.tmpCSS[prop]
+      // }
 
       // NOTE: 1/2 Exp
       const elms: HTMLCollectionOf<Element> = document.getElementsByClassName('node-blinker-disablable')
@@ -88,12 +153,20 @@ const blinkNode = blinkNodeIdFactory({
       }
       switcher.on()
 
-      return { oldCSS, cb: switcher.off }
+      return { state, cb: switcher.off, firstChildElm }
     },
     onEnd: ({ targetElm, specialData }) => {
-      const { oldCSS, cb } = specialData
+      const { state, cb } = specialData
+      // console.log('firstChildElm')
+      // console.log(firstChildElm)
+
       // @ts-ignore
-      for (const prop in oldCSS) targetElm.style[prop] = oldCSS[prop]
+      for (const prop in state.target.oldCSS) targetElm.style[prop] = state.target.oldCSS[prop]
+
+      // if (!!firstChildElm && !!state.firstChild) {
+      //   // @ts-ignore
+      //   for (const prop in state.firstChild.oldCSS) firstChildElm.style[prop] = state.firstChild.oldCSS[prop]
+      // }
 
       // NOTE: 2/2 Exp
       cb()
@@ -114,7 +187,10 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
   // const [calcDebugMsg, setCalcDebugMsg] = useState<string | null>(null)
   useEffect(() => {
     if (!!isContentReady) {
-      specialScroll({ id: `job_node_${jobId}` })
+      specialScroll({
+        id: `job_node_${jobId}`,
+        _cfg: _specialNavigate,
+      })
       // blinkNode({ id: `job_node_${jobId}` })
     }
   }, [jobId, isContentReady])
@@ -169,17 +245,23 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
     setBackToActiveJob({ jobId, jobTitle })
   }, [])
   const handleNavigateToActiveNode = useCallback(() => {
-    specialScroll({ id: `job_node_${backToActiveJob?.jobId}` })
+    specialScroll({
+      id: `job_node_${backToActiveJob?.jobId}`,
+      _cfg: _specialNavigate,
+    })
     blinkNode({ id: `job_node_${backToActiveJob?.jobId}` })
     setBackToActiveJob(null)
   }, [backToActiveJob?.jobId])
   const handleNavigateToJobNode = useCallback(({ jobId, backToJobId, jobTitle }: {
     jobId: number;
     backToJobId?: number;
-    jobTitle?: string
+    jobTitle?: string;
   }) => (e: any) => {
     if (!!e?.preventDefault) e.preventDefault()
-    specialScroll({ id: `job_node_${jobId}` })
+    specialScroll({
+      id: `job_node_${jobId}`,
+      _cfg: _specialNavigate,
+    })
     if (!!backToJobId) {
       setBackToActiveJob({ jobId: backToJobId, jobTitle })
     }

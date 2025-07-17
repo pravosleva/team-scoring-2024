@@ -87,6 +87,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                     completed: job.completed,
                     logs: job.logs,
                     relations: job.relations,
+                    forecast: job.forecast,
                     _service: {
                       aboutJob: {
                         existingChildrenNodes: {

@@ -86,7 +86,7 @@ export const CollapsibleBox = memo(({ icon, header, text, connectedOnThe }: TPro
           }
         </div>
       </div>
-      
+
       {isOpened && (
         <div
           className={clsx(classes.noMarginBottomForLastChild, classes.content)}

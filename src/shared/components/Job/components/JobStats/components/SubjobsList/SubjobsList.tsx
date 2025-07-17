@@ -65,7 +65,7 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
     //   // NOTE: v1
     //   // msgs.push(`Estimated Absolute: ${jobsTotalHoursTiming.estimated.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.estimated.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.estimated.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.estimated.business.s5w.toFixed(1)}h`)
     //   // msgs.push(`Realistic Absolute: ${jobsTotalHoursTiming.realistic.absolute.toFixed(1)}h; Business: MG ${jobsTotalHoursTiming.realistic.business.mg.toFixed(1)}h, MGEXP ${jobsTotalHoursTiming.realistic.business.mgExp.toFixed(1)}h, 5DW ${jobsTotalHoursTiming.realistic.business.s5w.toFixed(1)}h`)
-      
+
     //   // NOTE: v2
     //   msgs.push([
     //     `Estimated: Absolute -> ${jobsTotalHoursTiming.estimated.absolute.toFixed(1)}h`,
@@ -130,13 +130,13 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
         <Grid size={12}>
           <ul
             className={baseClasses.compactList}
-            // style={{ listStyleType: 'circle' }}
+          // style={{ listStyleType: 'circle' }}
           >
             {
               jobs.map((job) => (
                 <li
                   key={job.id}
-                  // style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}
+                // style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}
                 >
                   <Link to={`/jobs/${job.id}`}>
                     <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity})
@@ -147,11 +147,11 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
                         <br />
                         <span
                           style={{
-                            borderLeft: '4px solid lightgray',
+                            borderLeft: '4px solid #959eaa',
                             paddingLeft: '8px',
                           }}
                         >
-                          <span style={{ color: 'gray' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
+                          <span style={{ color: '#959eaa' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
                         </span>
                       </>
                     )

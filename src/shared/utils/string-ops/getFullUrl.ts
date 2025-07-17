@@ -10,7 +10,7 @@ export const getFullUrl = ({ url, query, queryKeysToremove }: {
       if (!!queryKeysToremove && queryKeysToremove.length > 0) {
         if (!queryKeysToremove.includes(key)) {
           if (typeof query[key] === 'string' || typeof query[key] === 'number') {
-            filteredQuery[key] = query[key]
+            filteredQuery[key] = encodeURIComponent(query[key])
           }
           // else {
           //   console.log(`key ${key} NOT ADDED -> ${typeof query[key]}`)
@@ -22,7 +22,7 @@ export const getFullUrl = ({ url, query, queryKeysToremove }: {
         // }
       } else {
         if (typeof query[key] === 'string' || typeof query[key] === 'number') {
-          filteredQuery[key] = query[key]
+          filteredQuery[key] = encodeURIComponent(query[key])
         }
         // else {
         //   console.log(`key ${key} NOT ADDED (3) -> ${typeof query[key]}`)

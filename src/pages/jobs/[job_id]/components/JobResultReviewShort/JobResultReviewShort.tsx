@@ -14,20 +14,22 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
 }) => {
   const isJobDone = !!job.forecast.finish
   const isJobStartedAndEstimated = !!job.forecast.start && !!job.forecast.estimate
+  const isStartedOnly = !!job.forecast.start && !job.forecast.estimate
+  const isNew = !job.forecast.start
 
   const [nowDate, setNowDate] = useState(dayjs())
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   useEffect(() => {
-    if (!!timeoutRef.current) clearTimeout(timeoutRef.current)
-    
-    timeoutRef.current = setTimeout(() => {
+    if (!!timeoutRef.current) clearInterval(timeoutRef.current)
+
+    timeoutRef.current = setInterval(() => {
       setNowDate(dayjs())
     }, 1000)
 
     return () => {
-      if (!!timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (!!timeoutRef.current) clearInterval(timeoutRef.current)
     }
-  }, [nowDate, setNowDate])
+  }, [])
 
   const Image = useMemo(() => {
     switch (true) {
@@ -51,8 +53,8 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
           >
             {
               isGood
-              ? <ThumbUpIcon style={{ fontSize: '16px' }} />
-              : <ThumbDownIcon style={{ fontSize: '16px' }} />
+                ? <ThumbUpIcon style={{ fontSize: '16px' }} />
+                : <ThumbDownIcon style={{ fontSize: '16px' }} />
             }
             <div>{!isGood ? '+' : ''}{hrsDiff}h</div>
             {
@@ -95,8 +97,8 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
           >
             {
               isGood
-              ? <ThumbUpIcon style={{ fontSize: '16px' }} />
-              : <ThumbDownIcon style={{ fontSize: '16px' }} />
+                ? <ThumbUpIcon style={{ fontSize: '16px' }} />
+                : <ThumbDownIcon style={{ fontSize: '16px' }} />
             }
             <div>{!isGood ? '+' : ''}{hrsDiff}h</div>
             {
@@ -116,10 +118,16 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
           </div>
         )
       }
+      case isNew:
+        return <span style={{ fontSize: 'small' }}>New</span>
+      case isStartedOnly:
+        return <span style={{ fontSize: 'small' }}>Started</span>
       default:
         return null
     }
   }, [
+    isNew,
+    isStartedOnly,
     nowDate,
     isJobDone,
     job.forecast.estimate,

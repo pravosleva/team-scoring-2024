@@ -19,7 +19,7 @@ export function blinkNodeIdFactory<T>({ timeout, cb }: {
   // let _timeout: NodeJS.Timeout | undefined = undefined
   // let _currentNodeId
 
-  return ({ id }: { id: string }) => {
+  return ({ id }: { id: string; }) => {
     try {
       const nodeId = id
       const targetElm = document.getElementById(nodeId)

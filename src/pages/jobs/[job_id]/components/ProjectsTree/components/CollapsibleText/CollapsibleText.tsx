@@ -3,7 +3,7 @@ import baseClasses from '~/App.module.scss'
 
 type TProps = {
   briefText: string;
-  targetText: string;
+  targetText?: string;
   contentRender: (ps: Pick<TProps, 'briefText' | 'targetText'>) => React.ReactNode;
 }
 

@@ -29,7 +29,7 @@ createRoot(document.getElementById('root')!).render(
     )}
   >
     <TopLevelContext.Provider>
-      <ClientPerfWidget position='top-right' />
+      <ClientPerfWidget position='right-side-center-bottom' />
       <App />
     </TopLevelContext.Provider>
   </SnackbarProvider>,
