@@ -73,8 +73,6 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             const _jobsMap = new Map()
             for (const job of input.jobs) _jobsMap.set(job.id, job)
 
-            // console.log(Object.fromEntries(_jobsMap))
-
             let _c = 0
             const getTreePartById = ({ currentJobData }) => {
               const getNodeDataStandart = (job) => {
@@ -97,6 +95,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                                 originalJob: {
                                   id,
                                   title: _jobsMap.get(id)?.title,
+                                  descr: _jobsMap.get(id)?.descr,
                                   completed: _jobsMap.get(id)?.completed,
                                   forecast: _jobsMap.get(id)?.forecast,
                                 },

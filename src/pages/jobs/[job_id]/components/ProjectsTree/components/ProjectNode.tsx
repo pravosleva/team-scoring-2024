@@ -20,13 +20,17 @@ import dayjs from 'dayjs'
 import baseClasses from '~/App.module.scss'
 import { TEnchancedJobByWorker } from '~/pages/jobs/[job_id]/components/ProjectsTree/types'
 import { getArithmeticalMean } from '~/shared/utils/number-ops'
-import { TJob } from '~/shared/xstate'
+import { TJob, TopLevelContext } from '~/shared/xstate'
 import { getFullUrl } from '~/shared/utils/string-ops'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components/CollapsibleText'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
+import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { JobResultReviewShort } from '../../JobResultReviewShort'
+import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCards'
+import { UserAva } from '~/shared/components/Job/components'
+import mainTreeClasses from '../ProjectsTree.module.scss'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -44,6 +48,7 @@ type TProps = {
     backToJobId?: number;
     jobTitle?: string;
     fromLevel?: number;
+    dontActualizeSubjob?: boolean;
   }) => (e: any) => void
 }
 
@@ -79,6 +84,9 @@ export const ProjectNode = ({
   const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
   const isActiveNode = activeJobId === projectsTree.model.id
   const isCompleted = projectsTree.model.completed
+
+  const users = TopLevelContext.useSelector((s) => s.context.users.items)
+  const getUserById = (_id: number) => users.find(({ id }) => id === _id)?.displayName || 'NoName'
 
   return (
     <div
@@ -118,11 +126,9 @@ export const ProjectNode = ({
               justifyContent: 'center',
               gap: '2px',
 
-              // border: '1px solid red',
-
               position: 'sticky',
-              height: `${stickyElementHeight}px`,
               top: `${level === 1 ? 0 : (level - 1) * stickyElementHeight}px`,
+              height: `${stickyElementHeight}px`,
 
               backgroundColor: isCompleted
                 ? '#EFF0F1'
@@ -131,7 +137,7 @@ export const ProjectNode = ({
                   : '#FFF',
               zIndex: 50 - level,
             }}
-            className={clsx(classes.stickyTop)}
+            className={clsx(classes.stickyTop, mainTreeClasses.indicator)}
           >
             <div
               style={{
@@ -216,7 +222,7 @@ export const ProjectNode = ({
                   : '#FFF',
               zIndex: 50 - level,
             }}
-            className={clsx(classes.stickyTop)}
+            className={clsx(classes.stickyTop, 'projects-tree-wrapper-sticky-part')}
           >
             <div
               style={{
@@ -226,7 +232,7 @@ export const ProjectNode = ({
                 alignItems: 'center',
                 gap: '8px',
               }}
-              className={baseClasses.truncate}
+              className={clsx(baseClasses.truncate, 'indicator')}
             >
               <b
                 style={{
@@ -252,7 +258,7 @@ export const ProjectNode = ({
                         fontWeight: 'bold',
                         color: '#02c39a',
                         cursor: 'pointer',
-                        // transform: 'rotate(7deg)',
+                        transform: 'rotate(7deg)',
                         // zIndex: 50 - level + 1,
                       }}
                       onClick={onNavigateToJobNode({
@@ -260,6 +266,7 @@ export const ProjectNode = ({
                         jobId: projectsTree.model.relations?.parent,
                         // backToJobId: projectsTree.model.id,
                         // jobTitle: projectsTree.model.title,
+                        dontActualizeSubjob: true,
                       })}
                     >[ parent ]
                     </code>
@@ -282,6 +289,7 @@ export const ProjectNode = ({
 
       <CollapsibleText
         briefText='Details'
+        isOpenedByDefault={true}
         targetText={projectsTree.model.descr}
         contentRender={({ targetText }) => (
           <>
@@ -383,125 +391,248 @@ export const ProjectNode = ({
                   >
                     {projectsTree.model.logs.items[0].text}
                   </span>
-                  {
-                    projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length > 0 && (
-                      <>
-                        <b>Subjobs ({projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.reduce((acc, { originalJob }) => { if (originalJob.completed) acc += 1; return acc }, 0)} of {projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length})</b>
-                        <ul
-                          className={baseClasses.compactList}
-                          style={{ listStyle: 'none', paddingLeft: '0px' }}
+                </>
+              )
+            }
+
+            {
+              projectsTree.model._service.aboutJob.existingChecklists.length > 0 && (
+                <CollapsibleText
+                  briefText={`Checklists (${projectsTree.model._service.aboutJob.existingChecklists.length}) | Completed ${getArithmeticalMean(projectsTree.model._service.aboutJob.existingChecklists.map(({ completePercentage }) => completePercentage)).toFixed(0)}%`}
+                  targetText='(render-props)'
+                  contentRender={() => (
+                    <ul className={baseClasses.compactList}>
+                      {
+                        projectsTree.model._service.aboutJob.existingChecklists
+                          .map(({ uniqueChecklistKey, logTs, completePercentage }) => (
+                            <li key={uniqueChecklistKey}>
+                              <span
+                                style={{
+                                  fontSize: 'small',
+                                  fontWeight: 'bold',
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
+                                {
+                                  activeJobId === projectsTree.model.id
+                                    ? (
+                                      <a
+                                        style={{
+                                          fontSize: 'small',
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          gap: '6px',
+                                          cursor: 'pointer',
+                                        }}
+                                        onClick={onNavigateToChecklistClick({
+                                          checklistUniqueKey: uniqueChecklistKey,
+                                          jobId: projectsTree.model.id,
+                                          jobTitle: projectsTree.model.title,
+                                        })}
+                                      >
+                                        <span>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
+                                        <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
+                                      </a>
+                                    ) : (
+                                      <span style={{ fontSize: 'small' }}>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
+                                    )
+                                }
+                                <b style={{ color: completePercentage === 0 ? 'red' : completePercentage < 100 ? 'black' : 'lightgray' }}>{completePercentage.toFixed(0)}%</b>
+                              </span>
+                            </li>
+                          ))
+                      }
+                    </ul>
+                  )}
+                />
+              )
+            }
+
+            {
+              projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length > 0 && (
+                <CollapsibleText
+                  briefText={`Subjobs (${projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.reduce((acc, { originalJob }) => { if (originalJob.completed) acc += 1; return acc }, 0)} of ${projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length})`}
+                  targetText='(render-props)'
+                  contentRender={() => (
+                    <ul
+                      className={baseClasses.compactList}
+                      style={{ listStyle: 'none', paddingLeft: '0px' }}
+                    >
+                      {
+                        projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo
+                          .map(({ nodeId, originalJob }) => {
+                            const analyzed = new JobAnalyzer(originalJob as any)
+                            return (
+                              <li key={nodeId}>
+                                <a
+                                  className={clsx(
+                                    // baseClasses.truncate,
+                                    {
+                                      [classes.lastActivityOfCurrentJobLink]: activeJobId === originalJob.id,
+                                    },
+                                  )}
+                                  style={{
+                                    fontSize: 'small',
+                                    width: '100%',
+                                    display: 'inline-flex',
+                                    flexDirection: 'row',
+                                    // border: '1px solid red',
+                                    alignItems: 'flex-start',
+                                    gap: '6px',
+                                    cursor: 'pointer',
+                                    opacity: analyzed.isDone ? 0.5 : 1,
+                                  }}
+                                  onClick={onNavigateToJobNode({
+                                    jobId: originalJob.id,
+                                    backToJobId: projectsTree.model.id,
+                                    jobTitle: projectsTree.model.title,
+                                  })}
+                                >
+                                  <span style={{ paddingTop: '2px' }}>
+                                    {
+                                      analyzed.isDone
+                                        ? <CheckCircleIcon sx={{ fontSize: 'inherit' }} />
+                                        : analyzed.isNew
+                                          ? <PanoramaFishEyeIcon sx={{ fontSize: 'inherit' }} />
+                                          : analyzed.isStartedAndEstimated
+                                            ? <TimerIcon sx={{ fontSize: 'inherit' }} />
+                                            : <HardwareIcon sx={{ fontSize: 'inherit' }} />
+                                    }
+                                  </span>
+                                  <span
+                                  // className={baseClasses.truncate}
+                                  >{originalJob.title}</span>
+                                  <span style={{ paddingTop: '2px', marginLeft: 'auto' }}>
+                                    <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                                  </span>
+                                </a>
+                              </li>
+                            )
+                          }
+                          )
+                      }
+                    </ul>
+                  )}
+                />
+              )
+            }
+            {
+              projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length > 0 && (
+                <SubjobsExperimentalCards
+                  // wrapperStyles={{
+                  //   // boxShadow: '0px 0px 4px 4px rgba(34, 60, 80, 0.2) inset',
+                  //   // boxShadow: projectsTree.model.completed
+                  //   //   ? '16px 0px 8px -8px rgba(239, 240, 241, 0.5) inset, -16px 0 8px -8px rgba(239, 240, 241, 0.5) inset'
+                  //   //   : '16px 0px 8px -8px rgba(255, 255, 255, 0.5) inset, -16px 0 8px -8px rgba(255, 255, 255, 0.5) inset',
+
+                  // }}
+                  items={projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo}
+                  cardRenderer={({ itemData }) => (
+                    <div
+                      id={`subjob-card_${itemData.originalJob.id}`}
+                      className={cardsClasses.card}
+                      style={{
+                        // boxShadow: itemData.originalJob.completed
+                        //   ? '0px 5px 10px 2px rgba(34, 60, 80, 0.2) inset'
+                        //   : '0px 5px 10px 2px rgba(34, 60, 80, 0.2) inset',
+                        backgroundColor: itemData.originalJob.completed
+                          ? '#EFF0F1'
+                          : '#FFF',
+                        // isActiveNode
+                        //   ? '#ffecec'
+                        //   : '#FFF',
+                        // border: '1px solid red',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 'x-small',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px',
+                          wordBreak: 'break-word',
+
+                          width: '100%',
+                          height: '100%',
+                          // border: '1px solid red',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: '8px',
+                            // height: '100%',
+                            // border: '1px solid red',
+                          }}
+                        >
+                          <AutoRefreshedJobMuiAva job={itemData.originalJob as TJob} delay={1000} />
+                          <b className={baseClasses.rowsLimited3}>{itemData.originalJob.title}</b>
+                          {
+                            !!itemData.originalJob.forecast.assignedTo && (
+                              <span
+                                style={{ marginLeft: 'auto', fontSize: '16px' }}
+                              >
+                                <UserAva name={getUserById(itemData.originalJob.forecast.assignedTo)} size={40} />
+                                {/* {itemData.originalJob.forecast.assignedTo} */}
+                              </span>
+                            )
+                          }
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: '8px',
+                            // height: '100%',
+                            // border: '1px solid red',
+                            marginTop: 'auto',
+                          }}
                         >
                           {
-                            projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo
-                              .map(({ nodeId, originalJob }) => {
-                                const analyzed = new JobAnalyzer(originalJob as any)
-                                return (
-                                  <li key={nodeId}>
-                                    <a
-                                      className={clsx(
-                                        // baseClasses.truncate,
-                                        {
-                                          [classes.lastActivityOfCurrentJobLink]: activeJobId === originalJob.id,
-                                        },
-                                      )}
-                                      style={{
-                                        fontSize: 'small',
-                                        width: '100%',
-                                        display: 'inline-flex',
-                                        flexDirection: 'row',
-                                        // border: '1px solid red',
-                                        alignItems: 'flex-start',
-                                        gap: '6px',
-                                        cursor: 'pointer',
-                                        opacity: analyzed.isDone ? 0.5 : 1,
-                                      }}
-                                      onClick={onNavigateToJobNode({
-                                        jobId: originalJob.id,
-                                        backToJobId: projectsTree.model.id,
-                                        jobTitle: projectsTree.model.title,
-                                      })}
-                                    >
-                                      <span style={{ paddingTop: '2px' }}>
-                                        {
-                                          analyzed.isDone
-                                            ? <CheckCircleIcon sx={{ fontSize: 'inherit' }} />
-                                            : analyzed.isNew
-                                              ? <PanoramaFishEyeIcon sx={{ fontSize: 'inherit' }} />
-                                              : analyzed.isStartedAndEstimated
-                                                ? <TimerIcon sx={{ fontSize: 'inherit' }} />
-                                                : <HardwareIcon sx={{ fontSize: 'inherit' }} />
-                                        }
-                                      </span>
-                                      <span
-                                      // className={baseClasses.truncate}
-                                      >{originalJob.title}</span>
-                                      <span style={{ paddingTop: '2px', marginLeft: 'auto' }}>
-                                        <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
-                                      </span>
-                                    </a>
-                                  </li>
-                                )
-                              }
-                              )
+                            !!itemData.originalJob.descr && (
+                              <span
+                                // style={{ border: '1px solid red' }}
+                                className={baseClasses.rowsLimited1}
+                              >
+                                {itemData.originalJob.descr}
+                              </span>
+                            )
                           }
-                        </ul>
-                      </>
-                    )
-                  }
-                  {
-                    projectsTree.model._service.aboutJob.existingChecklists.length > 0 && (
-                      <>
-                        <b>Checklists ({projectsTree.model._service.aboutJob.existingChecklists.length}) | Completed {getArithmeticalMean(projectsTree.model._service.aboutJob.existingChecklists.map(({ completePercentage }) => completePercentage)).toFixed(0)}%</b>
-                        <ul className={baseClasses.compactList}>
-                          {
-                            projectsTree.model._service.aboutJob.existingChecklists
-                              .map(({ uniqueChecklistKey, logTs, completePercentage }) => (
-                                <li key={uniqueChecklistKey}>
-                                  <span
-                                    style={{
-                                      // whiteSpace: 'pre-wrap',
-                                      fontSize: 'small',
-                                      fontWeight: 'bold',
-                                      // paddingTop: '3px',
-                                      display: 'flex',
-                                      flexDirection: 'row',
-                                      justifyContent: 'space-between',
-                                    }}
-                                  >
-                                    {
-                                      activeJobId === projectsTree.model.id
-                                        ? (
-                                          <a
-                                            style={{
-                                              fontSize: 'small',
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              gap: '6px',
-                                              cursor: 'pointer',
-                                            }}
-                                            onClick={onNavigateToChecklistClick({
-                                              checklistUniqueKey: uniqueChecklistKey,
-                                              jobId: projectsTree.model.id,
-                                              jobTitle: projectsTree.model.title,
-                                            })}
-                                          >
-                                            <span>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
-                                            <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
-                                          </a>
-                                        ) : (
-                                          <span style={{ fontSize: 'small' }}>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
-                                        )
-                                    }
-                                    <b style={{ color: completePercentage === 0 ? 'red' : completePercentage < 100 ? 'black' : 'lightgray' }}>{completePercentage.toFixed(0)}%</b>
-                                  </span>
-                                </li>
-                              ))
-                          }
-                        </ul>
-                      </>
-                    )
-                  }
-                </>
+                          <a
+                            style={{
+                              // border: '1px solid red',
+                              wordBreak: 'keep-all',
+                              display: 'inline-flex',
+                              flexDirection: 'row',
+
+                              marginLeft: 'auto',
+
+                              alignItems: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                            }}
+                            onClick={onNavigateToJobNode({
+                              jobId: itemData.originalJob.id,
+                              backToJobId: projectsTree.model.id,
+                              jobTitle: projectsTree.model.title,
+                              dontActualizeSubjob: true,
+                            })}
+                          >
+                            <span>Go</span>
+                            <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  getItemKey={(item) => String(item.originalJob.id)}
+                />
               )
             }
           </div>
@@ -538,6 +669,6 @@ export const ProjectNode = ({
           </>
         )
       }
-    </div>
+    </div >
   )
 }

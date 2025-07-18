@@ -24,7 +24,7 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
 
     timeoutRef.current = setInterval(() => {
       setNowDate(dayjs())
-    }, 1000)
+    }, 1000 * 10)
 
     return () => {
       if (!!timeoutRef.current) clearInterval(timeoutRef.current)

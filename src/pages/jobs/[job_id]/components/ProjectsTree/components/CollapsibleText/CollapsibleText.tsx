@@ -3,16 +3,18 @@ import baseClasses from '~/App.module.scss'
 
 type TProps = {
   briefText: string;
+  isOpenedByDefault?: boolean;
   targetText?: string;
   contentRender: (ps: Pick<TProps, 'briefText' | 'targetText'>) => React.ReactNode;
 }
 
 export const CollapsibleText = memo(({
+  isOpenedByDefault,
   briefText,
   targetText,
   contentRender,
 }: TProps) => {
-  const [isDescrOpened, setIsDescrOpened] = useState(false)
+  const [isDescrOpened, setIsDescrOpened] = useState(isOpenedByDefault)
   const descrToggle = () => setIsDescrOpened((v) => !v)
 
   return (

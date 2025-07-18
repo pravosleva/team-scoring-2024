@@ -1,36 +1,32 @@
 .wrapper {
+  container-type: scroll-state;
   padding: 0px 8px 8px 8px;
   border-left: 4px solid #959eaa;
-
-  .stickyTop {
-    // border: 1px solid blue;
-    border-bottom: 1px solid #959eaa;
-    // transition: background-color 0.75s ease-in-out;
-  }
-
-  // .descr {
-  //   border: 1px solid red;
-  // }
 
   display: flex;
   flex-direction: column;
   gap: 8px;
-  // border: 1px solid lightgray;
   border-radius: 0px;
-  // transition: all 0.75s ease-in-out;
 
   a {
     font-size: small;
     font-weight: bold;
-    // text-decoration: underline dashed;
+  }
+
+  a:focus,
+  a:active {
+    color: #00a47d;
   }
 
   position: relative;
 }
 
+.stickyTop {
+  border-bottom: 1px solid #959eaa;
+}
+
 .borderRadiusLevel1 {
   border-radius: 16px 16px 16px 16px;
-  // box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
 }
 
 .borderRadiusLevel2 {
@@ -40,15 +36,6 @@
 .isActive {
   border-left: 4px solid red;
   background-color: #ffecec;
-
-  // EXP:
-  // border-top: 1px solid red;
-  // border-right: 1px solid red;
-  // border-bottom: 1px solid red;
-
-  // a.lastActivityOfCurrentJobLink {
-  //   color: red;
-  // }
 }
 
 a.lastActivityOfCurrentJobLink {
@@ -57,30 +44,11 @@ a.lastActivityOfCurrentJobLink {
 
 .isCompleted {
   background-color: #EFF0F1;
-  // color: #FFF;
-
-  // >* {
-  //   text-decoration: line-through;
-  // }
-
-  // .descr,
-  // .lastLog {
-  //   text-decoration: none;
-  // }
 }
 
 .isntCompleted {
   background-color: #FFF;
   color: #000;
-
-  // >* {
-  //   text-decoration: line-through;
-  // }
-
-  // .descr,
-  // .lastLog {
-  //   text-decoration: none;
-  // }
 }
 
 .absoluteTopRightBadge {
@@ -91,11 +59,9 @@ a.lastActivityOfCurrentJobLink {
   padding: 2px 6px;
   top: -6px;
   right: -6px;
-  // border: 2px solid red;
 
   background-color: #fff;
   border: 2px solid #EFF0F1;
-  // transform: rotate(5deg);
   color: #959eaa;
 }
 
@@ -107,8 +73,6 @@ a.lastActivityOfCurrentJobLink {
   padding: 2px 6px;
   bottom: -6px;
   right: -6px;
-  // border: 2px solid red;
-  // transform: rotate(-5deg);
   z-index: 1;
 
   background-color: #fff;

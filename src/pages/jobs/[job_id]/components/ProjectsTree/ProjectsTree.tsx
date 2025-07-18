@@ -4,7 +4,6 @@ import { memo, useState, useMemo, useEffect, useCallback } from 'react'
 import { useProjectsTreeCalcWorker } from './hooks/useProjectsTreeCalcWorker'
 import { groupLog } from '~/shared/utils'
 import { TJob, TopLevelContext } from '~/shared/xstate'
-// import baseClasses from '~/App.module.scss'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { TreeNode } from 'ts-tree-lib'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -52,13 +51,10 @@ const _specialNavigate = {
   getOffsetTop: ({ targetElm }: { targetElm: HTMLElement }) => {
     const classList = targetElm.className.split(' ')
     const informativeClass = classList.find((val) => getMatchedByAnyString({ tested: val, expected: ['projects-tree-level_'] }))
-    // console.log('informativeClass', informativeClass)
     if (!!informativeClass) {
       const level = informativeClass.split('_')[1]
       if (typeof level !== 'undefined' && getIsNumeric(level)) {
         const normalizedLevel = Number(level)
-        // console.log(`normalizedLevel -> ${normalizedLevel} -> ${normalizedLevel === 1 ? 0 : (normalizedLevel - 1) * stickyElementHeight2}`)
-
         return normalizedLevel === 1
           ? 0 + 8
           : normalizedLevel === 2
@@ -70,29 +66,25 @@ const _specialNavigate = {
   },
 }
 const specialScroll = scrollToIdFactory({
-  timeout: 200,
-  offsetTop: 64,
+  timeout: 150,
+  offsetTop: 16,
+  elementHeightCritery: 550,
+})
+const specialScrollForSubjobCard = scrollToIdFactory({
+  timeout: 0,
+  offsetTop: 16,
   elementHeightCritery: 550,
 })
 const blinkNode = blinkNodeIdFactory({
   timeout: 1500,
   cb: {
     onStart: ({ targetElm }) => {
-      // console.log('- start')
-
       const firstChildElm = targetElm.children[0]
-
-      // console.log(firstChildElm)
-
       const state: {
         target: {
           oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'>;
           tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'>;
         };
-        // firstChild?: {
-        //   oldCSS: Pick<CSSProperties, 'backgroundColor'>;
-        //   tmpCSS: Pick<CSSProperties, 'backgroundColor'>;
-        // };
       } = {
         target: {
           oldCSS: {
@@ -105,33 +97,11 @@ const blinkNode = blinkNodeIdFactory({
             // backgroundColor: '#c9fce9',
           },
         },
-        // firstChild: !!firstChildElm
-        //   ? {
-        //     oldCSS: {
-        //       // @ts-ignore
-        //       backgroundColor: firstChildElm.style.backgroundColor,
-        //     },
-        //     tmpCSS: {
-        //       backgroundColor: '#c9fce9',
-        //     },
-        //   }
-        //   : undefined,
       }
-
-      // const oldCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
-
-      // }
-      // const tmpCSS: Pick<CSSProperties, 'borderColor' | 'backgroundColor'> = {
-
-      // }
       for (const prop in state.target.tmpCSS) {
         // @ts-ignore
         targetElm.style[prop] = state.target.tmpCSS[prop]
       }
-      // if (!!firstChildElm && !!state.firstChild) {
-      //   // @ts-ignore
-      //   for (const prop in state.firstChild.tmpCSS) firstChildElm.style[prop] = state.firstChild.tmpCSS[prop]
-      // }
 
       // NOTE: 1/2 Exp
       const elms: HTMLCollectionOf<Element> = document.getElementsByClassName('node-blinker-disablable')
@@ -157,16 +127,9 @@ const blinkNode = blinkNodeIdFactory({
     },
     onEnd: ({ targetElm, specialData }) => {
       const { state, cb } = specialData
-      // console.log('firstChildElm')
-      // console.log(firstChildElm)
 
       // @ts-ignore
       for (const prop in state.target.oldCSS) targetElm.style[prop] = state.target.oldCSS[prop]
-
-      // if (!!firstChildElm && !!state.firstChild) {
-      //   // @ts-ignore
-      //   for (const prop in state.firstChild.oldCSS) firstChildElm.style[prop] = state.firstChild.oldCSS[prop]
-      // }
 
       // NOTE: 2/2 Exp
       cb()
@@ -252,12 +215,16 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
     blinkNode({ id: `job_node_${backToActiveJob?.jobId}` })
     setBackToActiveJob(null)
   }, [backToActiveJob?.jobId])
-  const handleNavigateToJobNode = useCallback(({ jobId, backToJobId, jobTitle }: {
+  const handleNavigateToJobNode = useCallback(({ jobId, backToJobId, jobTitle, dontActualizeSubjob }: {
     jobId: number;
     backToJobId?: number;
     jobTitle?: string;
+    dontActualizeSubjob?: boolean;
   }) => (e: any) => {
     if (!!e?.preventDefault) e.preventDefault()
+    if (!dontActualizeSubjob) specialScrollForSubjobCard({
+      id: `subjob-card_${jobId}`,
+    })
     specialScroll({
       id: `job_node_${jobId}`,
       _cfg: _specialNavigate,

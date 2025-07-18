@@ -1,0 +1,33 @@
+.wrapper {
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+
+  // NOTE: [1/2] Если нужны первая и последняя по центру
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.cardWrapper {
+  scroll-snap-align: center;
+
+  // NOTE: [2/2] Если нужен хвост и перед, но [1/2] выключено
+  min-width: 100%;
+  width: 100%;
+}
+
+.card {
+  height: 100%;
+  padding: 8px 8px 8px 8px;
+  border-radius: 8px;
+  font-size: small;
+  border: 1px solid #959eaa;
+}
