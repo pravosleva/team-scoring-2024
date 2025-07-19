@@ -3,7 +3,7 @@ import { groupLog, wws } from '~/shared/utils'
 import { NWService } from '~/shared/utils/wws/types'
 import pkg from '../../../../../../package.json'
 import { TJob } from '~/shared/xstate'
-import { TPICFilters } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { TPICFilters } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 
 // const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 

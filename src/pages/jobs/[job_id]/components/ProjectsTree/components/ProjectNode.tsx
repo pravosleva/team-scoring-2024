@@ -22,7 +22,7 @@ import { TEnchancedJobByWorker } from '~/pages/jobs/[job_id]/components/Projects
 import { getArithmeticalMean } from '~/shared/utils/number-ops'
 import { TJob, TopLevelContext } from '~/shared/xstate'
 import { getFullUrl } from '~/shared/utils/string-ops'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components/CollapsibleText'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
@@ -30,7 +30,6 @@ import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { JobResultReviewShort } from '../../JobResultReviewShort'
 import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCards'
 import { UserAva } from '~/shared/components/Job/components'
-import mainTreeClasses from '../ProjectsTree.module.scss'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -137,7 +136,7 @@ export const ProjectNode = ({
                   : '#FFF',
               zIndex: 50 - level,
             }}
-            className={clsx(classes.stickyTop, mainTreeClasses.indicator)}
+            className={clsx(classes.stickyTop)}
           >
             <div
               style={{

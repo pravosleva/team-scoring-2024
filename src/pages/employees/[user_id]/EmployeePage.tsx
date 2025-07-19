@@ -10,7 +10,7 @@ import dayjs from 'dayjs'
 import { UserAva } from '~/shared/components/Job/components'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components'
 import {
   ResponsiveBlock,

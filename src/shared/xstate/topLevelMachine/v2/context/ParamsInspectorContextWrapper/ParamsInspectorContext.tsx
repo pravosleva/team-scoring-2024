@@ -126,7 +126,7 @@ const Logic = ({ children }: TProps) => {
       queryParams[key] = value
     }
 
-    // NOTE: 1. Filters
+    // NOTE: 1.1. Filters
     const isUserPage = location.pathname === `/employees/${params.user_id}`
     const jobStatusFilterValue = urlSearchParams.get('jobStatusFilter')
     const hasJobStatusFilter = !!jobStatusFilterValue
@@ -255,7 +255,7 @@ const Logic = ({ children }: TProps) => {
         case (activeFilters.isAnyFilterActive): {
           const jobIsReady: boolean[] = []
 
-          // NOTE: 1.1. Job status filter
+          // NOTE: 1.1.1. Job status filter
           if (hasJobStatusFilter) {
             switch (jobStatusFilterValue) {
               case EJobsStatusFilter.ACTIVE:
@@ -279,7 +279,7 @@ const Logic = ({ children }: TProps) => {
             }
           }
 
-          // NOTE: 1.2. assignedTo filter
+          // NOTE: 1.1.2. assignedTo filter
           if (hasAssignedToFilter) {
             const normalizedValue = Number(assignedToFilterValue)
             activeFilters.values.assignedTo = normalizedValue
@@ -287,7 +287,7 @@ const Logic = ({ children }: TProps) => {
             else jobIsReady.push(false)
           }
 
-          // NOTE: 1.3. estimateReached filter
+          // NOTE: 1.1.3. estimateReached filter
           if (hasEstimateReachedFilter) {
             if (!!job.forecast.start && !!job.forecast.estimate) {
               const isReached = nowDate > job.forecast.estimate
@@ -309,7 +309,7 @@ const Logic = ({ children }: TProps) => {
             } else jobIsReady.push(false)
           }
 
-          // NOTE: 1.4. isProject filter
+          // NOTE: 1.1.4. isProject filter
           if (
             hasIsProjectFilterValue
             && (Number(isProjectFilterValue) === 0 || Number(isProjectFilterValue) === 1)
@@ -331,7 +331,7 @@ const Logic = ({ children }: TProps) => {
             }
           }
 
-          // NOTE: 1.5. isNew filter
+          // NOTE: 1.1.5. isNew filter
           if (
             hasIsNewFilterValue
             && (Number(isNewFilterValue) === 0 || Number(isNewFilterValue) === 1)
@@ -363,7 +363,7 @@ const Logic = ({ children }: TProps) => {
     }
     if (!activeFilters.isAnyFilterActive) filteredJobs = allJobs
 
-    // NOTE: 2. Controls
+    // NOTE: 1.2. Controls
     const fromRouteValue = urlSearchParams.get('from')
     const fromRouteUiText = urlSearchParams.get('backActionUiText')
     const toRouteValue = urlSearchParams.get('to')
@@ -383,7 +383,7 @@ const Logic = ({ children }: TProps) => {
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
   }, [urlSearchParams, location.pathname, users, allJobs, setStore, params.user_id])
 
-  // Persist todos
+  // NOTE: 2. Persist todos
   useLayoutEffect(() => {
     todosActorRef.subscribe(() => {
       localStorage.setItem(
@@ -392,6 +392,8 @@ const Logic = ({ children }: TProps) => {
       )
     })
   }, [todosActorRef])
+
+  // TODO: 3. Users info
 
   return (
     <>

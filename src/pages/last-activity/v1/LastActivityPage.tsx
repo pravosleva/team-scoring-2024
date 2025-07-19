@@ -30,7 +30,7 @@ import {
 } from '~/shared/utils/string-ops'
 import clsx from 'clsx'
 import lastActivityPageClasses from './LastActivityPage.module.scss'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 // -- TODO: Perf exp
 // import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils/getModifiedJobLogText'

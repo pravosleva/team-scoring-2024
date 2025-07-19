@@ -4,7 +4,7 @@ import { TopLevelContext, TJob, EJobsStatusFilter } from '~/shared/xstate/topLev
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button, TextField } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import baseClasses from '~/App.module.scss'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { scrollTopExtra } from '~/shared/components/Layout/utils'

@@ -19,7 +19,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 // import ConstructionIcon from '@mui/icons-material/Construction'
 import { JobList2 } from '~/shared/components'
 import CircularProgress from '@mui/material/CircularProgress'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { getFullUrl } from '~/shared/utils/string-ops'
 
 const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null, { reason: string; } | null>({

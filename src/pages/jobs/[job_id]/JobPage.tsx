@@ -27,7 +27,7 @@ import {
 import { JobResultReviewShort } from './components'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { TotalJobChecklist, ProjectsTree } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 

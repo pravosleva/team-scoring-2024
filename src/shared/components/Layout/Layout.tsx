@@ -15,7 +15,7 @@ import { ResponsiveBlock } from '~/shared/components'
 import SegmentIcon from '@mui/icons-material/Segment'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedScrollTopBtn } from './components'
-import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 
 type TProps = {
   children: React.ReactNode;

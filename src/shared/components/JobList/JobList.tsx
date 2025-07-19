@@ -8,7 +8,7 @@ import {
   TextField,
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import baseClasses from '~/App.module.scss'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'

@@ -3,7 +3,7 @@ import { TLogsItem, EJobsStatusFilter } from '~/shared/xstate/topLevelMachine/v2
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContext'
+import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import baseClasses from '~/App.module.scss'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { CopyToClipboardWrapper, SimpleCheckList } from '~/shared/components'
