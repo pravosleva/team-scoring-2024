@@ -116,7 +116,7 @@ const Logic = ({ children }: TProps) => {
   const params = useParams() // NOTE: { id: string }
   // console.log(location)
   const [urlSearchParams] = useSearchParams()
-  const users = TopLevelContext.useSelector((s) => s.context.users.items)
+  // const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const allJobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const [, setStore] = useStore((s) => s.filteredJobs)
 
@@ -381,7 +381,7 @@ const Logic = ({ children }: TProps) => {
     setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })
 
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
-  }, [urlSearchParams, location.pathname, users, allJobs, setStore, params.user_id])
+  }, [urlSearchParams, location.pathname, allJobs, setStore, params.user_id])
 
   // NOTE: 2. Persist todos
   useLayoutEffect(() => {

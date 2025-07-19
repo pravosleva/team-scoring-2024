@@ -16,6 +16,11 @@ import SegmentIcon from '@mui/icons-material/Segment'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedScrollTopBtn } from './components'
 import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
+import { useLocalStorageState } from '~/shared/hooks'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import jsonSize from 'json-size'
+import { getHumanReadableSize } from '~/shared/utils/number-ops'
 
 type TProps = {
   children: React.ReactNode;
@@ -60,6 +65,15 @@ export const Layout = ({ children, noScrollTopBtn }: TProps) => {
   const currentYear = useMemo(() => new Date().getFullYear(), [])
   const createdYear = 2019
   const isCreactedCurrentYear = useMemo(() => currentYear === createdYear, [createdYear, currentYear])
+  const [fullMainLSState] = useLocalStorageState({
+    key: 'teamScoring2024:topLevel',
+    initialValue: null,
+    isReadOnly: true,
+  })
+  const sizeInfo = useMemo(
+    () => getHumanReadableSize({ bytes: jsonSize(fullMainLSState), decimals: 2 }),
+    [fullMainLSState]
+  )
 
   return (
     <ParamsInspectorContextWrapper>
@@ -89,6 +103,7 @@ export const Layout = ({ children, noScrollTopBtn }: TProps) => {
           <div>App version <code className={classes.code}>{APP_VERSION}</code></div>
           <div>GIT SHA-1 <code className={classes.code}>{GIT_SHA1}</code></div>
           <div>GIT branch name <code className={classes.code}>{GIT_BRANCH_NAME}</code></div>
+          {!!sizeInfo && <div>LS size used <code className={classes.code}>{sizeInfo}</code></div>}
         </ResponsiveBlock>
       </div>
 
@@ -103,6 +118,9 @@ export const Layout = ({ children, noScrollTopBtn }: TProps) => {
       >
         {allActions.map(({ to, name, _Icon }) => (
           <SpeedDialAction
+            FabProps={{
+              size: 'medium',
+            }}
             key={name}
             icon={
               <Link
@@ -115,7 +133,8 @@ export const Layout = ({ children, noScrollTopBtn }: TProps) => {
                 )}
               >
                 {_Icon}
-              </Link>}
+              </Link>
+            }
             tooltipTitle={name}
           />
         ))}

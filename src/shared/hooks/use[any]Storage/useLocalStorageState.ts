@@ -10,17 +10,18 @@ function isFunction(val: unknown): val is AnyFunction {
 }
 
 export function useLocalStorageState<T>({
-  key, initialValue,
+  key, initialValue, isReadOnly,
 }: {
   key: string,
-  initialValue: T | (() => T)
+  initialValue: T | (() => T);
+  isReadOnly?: boolean;
 }) {
   const [value, setValue] = useState(() => {
     const savedValue = localStorageWrapper.get<T>(key);
 
     if (typeof savedValue !== "undefined") {
       return savedValue;
-    } else if (typeof initialValue !== 'function') {
+    } else if (typeof initialValue !== 'function' && !isReadOnly) {
       localStorageWrapper.set(key, initialValue)
     }
 
@@ -37,9 +38,12 @@ export function useLocalStorageState<T>({
         ? newValue(latestValue.current)
         : newValue;
 
-      localStorageWrapper.set(key, actualValue);
+      if (!isReadOnly)
+        localStorageWrapper.set(key, actualValue)
+      else
+        throw new Error(`LS FIELD READ ONLY in hook! ${key}`)
     },
-    [key, latestValue]
+    [key, latestValue, isReadOnly]
   );
 
   return [value, updateValue] as const;
