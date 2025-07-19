@@ -2,7 +2,7 @@ import { memo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
 
 type TProps = {
-  briefText: string;
+  briefText: React.ReactNode | string;
   isOpenedByDefault?: boolean;
   targetText?: string;
   contentRender: (ps: Pick<TProps, 'briefText' | 'targetText'>) => React.ReactNode;
@@ -39,7 +39,7 @@ export const CollapsibleText = memo(({
           className={baseClasses.truncate}
           style={{
             fontWeight: 'bold',
-            textDecoration: 'underline dashed'
+            // textDecoration: 'underline dashed'
           }}
         >
           {briefText}

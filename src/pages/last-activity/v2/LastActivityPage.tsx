@@ -13,6 +13,7 @@ import clsx from 'clsx'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
@@ -131,6 +132,18 @@ export const LastActivityPage = memo(() => {
   // )
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
 
+  // -- NOTE: [PERF EXP] Modify log texts exp (perf should be tested)
+  const users = TopLevelContext.useSelector((s) => s.context.users)
+  const currentPageModified2 = useMemo(() => (
+    !!outputWorkerData?.currentPage
+      ? outputWorkerData?.currentPage.map((item) => ({
+        ...item,
+        text: getModifiedJobLogText({ text: item.text, jobs, users: users.items }),
+      }))
+      : []
+  ), [jobs, users.items, outputWorkerData?.currentPage])
+  // --
+
   return (
     <>
       <div
@@ -200,7 +213,7 @@ export const LastActivityPage = memo(() => {
                 counters={mainCounters}
                 // activeLogTs?: number | null;
                 // onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
-                modifiedLogs={outputWorkerData?.currentPage || []}
+                modifiedLogs={currentPageModified2}
                 // onCreateNew?: () => void;
                 subheader='Logs'
                 // pageInfo={!!outputWorkerData ? `${getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / ${outputWorkerData.pagination.totalPages}` : undefined}

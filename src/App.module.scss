@@ -351,6 +351,38 @@
   }
 }
 
+.compactList3 {
+  font-size: small;
+  // border-left: 2px solid lightgray;
+  // padding-inline-start: 20px;
+  padding-inline-start: 16px;
+  margin-top: 0;
+  margin-bottom: 0;
+
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+
+  // list-style: outside;
+  // list-style-type: '✪';
+  >li {
+    word-break: break-word;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &::before {
+      position: absolute;
+      top: 0px;
+      // transform: translateY(50%);
+      left: -16px;
+      content: '✪';
+      color: #959eaa;
+    }
+  }
+}
+
 .striped {
   background: repeating-linear-gradient(45deg,
       #606dbc,

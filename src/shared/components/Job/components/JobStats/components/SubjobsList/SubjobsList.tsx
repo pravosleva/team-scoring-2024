@@ -9,6 +9,7 @@ import { getJobStatus } from '~/shared/components/Job/utils/getJobStatus'
 // import { getModifiedJobLogText } from '~/pages/jobs/[id]/utils/getModifiedJobLogText'
 import { JobTimingInfo } from './components'
 import dayjs from 'dayjs'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 
 type TProps = {
   jobs: TJob[];
@@ -86,89 +87,106 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
 
   return (
     <Grid size={12}>
-      <Grid container spacing={1}>
-        <Grid size={12}>
-          {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage}% ({doneItems} of {jobs.length})</span>}
-        </Grid>
-        {
-          !!finalDescr && (
-            <Grid size={12}>
-              <div
-                style={{
-                  fontSize: 'small',
-                  fontStyle: 'italic',
-                  whiteSpace: 'pre-wrap',
-                  overflowWrap: 'break-word',
-                }}
-              >{finalDescr}</div>
-            </Grid>
-          )
+      <CollapsibleText
+        briefText={
+          <>
+            {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage.toFixed(0)}% ({doneItems} of {jobs.length})</span>}
+          </>
         }
-        {
-          (!!jobsTotalHoursTiming?.estimated?.absolute || !!jobsTotalHoursTiming?.estimated?.realistic) && (
-            <Grid size={12}>
-              <pre className={baseClasses.preNormalized}>{JSON.stringify(jobsTotalHoursTiming, null, 2)}</pre>
-            </Grid>
-          )
-        }
-        {/* <Grid size={12}>
-          <ul
-            className={baseClasses.compactList}
-            style={{ listStyleType: 'circle', gap: 0 }}
-          >
+        contentRender={() => (
+          <Grid container spacing={1}>
+            {/* <Grid size={12}>
+              {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage}% ({doneItems} of {jobs.length})</span>}
+            </Grid> */}
             {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              sections[reportName].items.map((report, i) => (
-                <li key={`${i}-${report}`}>
-                  {report}
-                </li>
-              ))
+              !!finalDescr && (
+                <Grid size={12}>
+                  <div
+                    style={{
+                      fontSize: 'small',
+                      fontStyle: 'italic',
+                      whiteSpace: 'pre-wrap',
+                      overflowWrap: 'break-word',
+                    }}
+                  >{finalDescr}</div>
+                </Grid>
+              )
             }
-          </ul>
-        </Grid> */}
-        <Grid size={12}>
-          <ul
-            className={baseClasses.compactList}
-          // style={{ listStyleType: 'circle' }}
-          >
             {
-              jobs.map((job) => (
-                <li
-                  key={job.id}
-                // style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}
-                >
-                  <Link to={`/jobs/${job.id}`}>
-                    <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity})
-                  </Link>
-                  {
-                    showLastLog && job.logs.items.length > 0 && (
-                      <>
-                        <br />
-                        <span
-                          style={{
-                            borderLeft: '4px solid #959eaa',
-                            paddingLeft: '8px',
-                          }}
-                        >
-                          <span style={{ color: '#959eaa' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
-                        </span>
-                      </>
-                    )
-                  }
-                  <br />
-                  <span>
-                    <JobTimingInfo
+              (!!jobsTotalHoursTiming?.estimated?.absolute || !!jobsTotalHoursTiming?.estimated?.realistic) && (
+                <Grid size={12}>
+                  <pre className={baseClasses.preNormalized}>{JSON.stringify(jobsTotalHoursTiming, null, 2)}</pre>
+                </Grid>
+              )
+            }
+            {/* <Grid size={12}>
+              <ul
+                className={baseClasses.compactList}
+                style={{ listStyleType: 'circle', gap: 0 }}
+              >
+                {
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  sections[reportName].items.map((report, i) => (
+                    <li key={`${i}-${report}`}>
+                      {report}
+                    </li>
+                  ))
+                }
+              </ul>
+            </Grid> */}
+            <Grid size={12}>
+              <ul
+                className={baseClasses.compactList3}
+              // style={{ listStyleType: 'circle' }}
+              >
+                {
+                  jobs.map((job) => (
+                    <li
                       key={job.id}
-                      job={job}
-                    />
-                  </span>
-                </li>
-              ))
-            }
-          </ul>
-        </Grid>
-      </Grid>
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        flexDirection: 'column',
+                        // border: '1px solid red'
+                      }}
+                    >
+                      <Link to={`/jobs/${job.id}`}>
+                        <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity})
+                      </Link>
+                      {
+                        showLastLog && job.logs.items.length > 0 && (
+                          <>
+                            <span
+                              style={{
+                                borderLeft: '4px solid #959eaa',
+                                paddingLeft: '8px',
+                              }}
+                            >
+                              <span style={{ color: '#959eaa' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
+                            </span>
+                          </>
+                        )
+                      }
+                      <CollapsibleText
+                        briefText='Timing'
+                        contentRender={() => (
+                          <span>
+                            <JobTimingInfo
+                              key={job.id}
+                              job={job}
+                            />
+                          </span>
+                        )}
+                      />
+                    </li>
+                  ))
+                }
+              </ul>
+            </Grid>
+          </Grid>
+        )}
+      />
     </Grid>
   )
 })

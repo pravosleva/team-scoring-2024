@@ -1,7 +1,7 @@
 {
   "name": "team-scoring-2024",
   "private": true,
-  "version": "2.1.2-beta9-ux-exp",
+  "version": "2.1.2-beta9-last-activity-perf-exp",
   "type": "module",
   "engines": {
     "npm": ">=10.8.2",
