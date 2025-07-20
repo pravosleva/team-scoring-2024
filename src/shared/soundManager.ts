@@ -95,7 +95,7 @@ class Singleton {
 
     const [delayedPlay] = delayedCallFactory(this.__playDelayedSound, 750)
     this._playDelayedSound = delayedPlay
-    const [delayedPlayConfigurable] = delayedCallFactoryConfigurableDelay(this.__playDelayedSound, 0)
+    const [delayedPlayConfigurable] = delayedCallFactoryConfigurableDelay(this.__playDelayedSound, 500)
     this._playDelayedSoundConfigurable = delayedPlayConfigurable
   }
   public static getInstance(): Singleton {
@@ -112,7 +112,11 @@ class Singleton {
     }
   }
   private __playDelayedSound({ soundCode, cb, _self, _debug, delay }: TPlaySoundProps & { delay?: number; _self: Singleton }) {
-    // this.stopCurrentSound()
+    // -- NOTE: Experimental
+    // BAD: Sound stopped
+    // GOOD: All sounds will be played
+    _self.stopCurrentSound()
+    // --
     console.log([
       `▶️ ${soundCode}`,
       typeof delay === 'number'
@@ -189,6 +193,7 @@ class Singleton {
       };
     }
   ) {
+    // this.stopCurrentSound()
     this._playDelayedSoundConfigurable({ soundCode, cb, _self: this, _debug })({ delay })
   }
 }

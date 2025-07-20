@@ -37,7 +37,7 @@
   animation-name: fadeInOpacity;
   animation-iteration-count: 1;
   animation-timing-function: ease-out;
-  animation-duration: 1s;
+  animation-duration: 0.5s;
   // animation-delay: 2s;
 }
 
@@ -46,7 +46,7 @@
     opacity: 0;
   }
 
-  75% {
+  50% {
     opacity: 0;
   }
 

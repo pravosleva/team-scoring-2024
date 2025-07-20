@@ -303,208 +303,210 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
         }
       </Grid>
 
-      {modifiedLogs.length > 0 ? (
-        <>
-          <Grid size={12}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-              }}
-            >
-              {
-                modifiedLogs.map((log, i) => {
-                  return (
-                    <div
-                      id={`log_list_item_job-${log.jobId}-log-${log.ts}`}
-                      key={`${log.ts}-${i}`}
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        padding: '8px',
-                        borderRadius: '16px',
-                      }}
-                      className={clsx(
-                        classes.mainWrapper,
-                        {
-                          // NOTE: JOB TYPE
-                          // bg
-                          // [baseClasses.stripedGrayLight]: log.jobType === 'globalTag',
-                          // border, outline, color
-                          [classes.defaultWrapper]: log.jobType === 'default',
-                          [baseClasses.stripedYellow]: log.jobType === 'globalTag',
-                          [classes.warningDashedBorder]: log.jobType === 'globalTag',
-
-                          // NOTE: LOG BG & BORDER
-                          [classes.whiteColor]:
-                            log.logBg === 'green'
-                            || log.jobType === 'globalTag'
-                            || log.logBg === 'warn',
-                          [baseClasses.stripedGreenHard]: log.logBg === 'green',
-                          [baseClasses.stripedYellowLite4]: log.logBg === 'warn',
-                          // outline, color
-                          [classes.redSolidBorder]: log.logBorder === 'red',
-
-                          // NOTE: Active (from url search params)
-                          [classes.activeDashedBorder]: log.logUniqueKey === urlSearchParamLastSeenLogKey,
-                        }
-                      )}
-                    >
-                      <em
+      {
+        modifiedLogs.length > 0 ? (
+          <>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
+                {
+                  modifiedLogs.map((log, i) => {
+                    return (
+                      <div
+                        id={`log_list_item_job-${log.jobId}-log-${log.ts}`}
+                        key={`${log.ts}-${i}`}
                         style={{
-                          color: 'gray',
-                          // whiteSpace: 'pre-wrap',
-                          fontSize: 'x-small',
-                          fontWeight: 'bold',
-                          // paddingTop: '3px',
                           display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          padding: '8px',
+                          borderRadius: '16px',
                         }}
+                        className={clsx(
+                          classes.mainWrapper,
+                          {
+                            // NOTE: JOB TYPE
+                            // bg
+                            // [baseClasses.stripedGrayLight]: log.jobType === 'globalTag',
+                            // border, outline, color
+                            [classes.defaultWrapper]: log.jobType === 'default',
+                            [baseClasses.stripedYellow]: log.jobType === 'globalTag',
+                            [classes.warningDashedBorder]: log.jobType === 'globalTag',
+
+                            // NOTE: LOG BG & BORDER
+                            [classes.whiteColor]:
+                              log.logBg === 'green'
+                              || log.jobType === 'globalTag'
+                              || log.logBg === 'warn',
+                            [baseClasses.stripedGreenHard]: log.logBg === 'green',
+                            [baseClasses.stripedYellowLite4]: log.logBg === 'warn',
+                            // outline, color
+                            [classes.redSolidBorder]: log.logBorder === 'red',
+
+                            // NOTE: Active (from url search params)
+                            [classes.activeDashedBorder]: log.logUniqueKey === urlSearchParamLastSeenLogKey,
+                          }
+                        )}
                       >
                         <em
-                          // style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}
-                          className={classes.date}
-                        >
-                          {dayjs(log.ts).format('DD.MM.YYYY HH:mm')}
-                        </em>
-                        <span
                           style={{
+                            color: 'gray',
+                            // whiteSpace: 'pre-wrap',
+                            fontSize: 'x-small',
+                            fontWeight: 'bold',
+                            // paddingTop: '3px',
                             display: 'flex',
                             flexDirection: 'row',
-                            gap: '8px',
-                            justifyContent: 'flex-start',
+                            justifyContent: 'space-between',
                           }}
                         >
-                          {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
+                          <em
+                            // style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}
+                            className={classes.date}
+                          >
+                            {dayjs(log.ts).format('DD.MM.YYYY HH:mm')}
+                          </em>
+                          <span
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              gap: '8px',
+                              justifyContent: 'flex-start',
+                            }}
+                          >
+                            {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
                           <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a> */}
-                          {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
-                          <Link
-                            to={
-                              [
-                                `/jobs/${log.jobId}/logs/${log.ts}`,
-                                '?',
+                            {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
+                            <Link
+                              to={
                                 [
-                                  `from=${encodeURIComponent(
-                                    [
-                                      '/last-activity',
-                                      '?',
-                                      [
-                                        `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
-                                        `lastSeenJob=${log.jobId}`,
-                                      ].join('&')
-                                    ].join('')
-                                  )}`,
-                                  `backActionUiText=${encodeURIComponent('Last activity')}`,
-                                  // `to=${encodeURIComponent(
-                                  //   [
-                                  //     '/jobs',
-                                  //     `?lastSeenJob=${log.jobId}`,
-                                  //   ].join('')
-                                  // )}`,
-                                  // `forwardActionUiText=${encodeURIComponent('Joblist')}`,
-                                ].join('&')
-                              ].join('')
-                            }
-                          >EDIT LOG ➡️</Link>
-                        </span>
-                      </em>
-                      <div
-                        style={{ fontSize: '14px' }}
-                      >{log.text}</div>
-                      {
-                        Array.isArray(log.links) && log.links?.length > 0 && (
-                          log.links.map((link) => (
-                            <div
-                              key={link.id}
-                              style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
-                            >
-                              <div style={{ fontSize: 'small' }}>
-                                <CopyToClipboardWrapper
-                                  text={link.url}
-                                  uiText={link.title}
-                                  showNotifOnCopy
-                                />
-                              </div>
-                              {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
-                            </div>
-                          ))
-                        )
-                      }
-
-                      {
-                        !!log.checklist && log.checklist?.length > 0 && (
-                          <SimpleCheckList
-                            key={log.jobTsUpdate}
-                            // _additionalInfo={{ message: 'No helpful info' }}
-                            isMiniVariant
-                            items={log.checklist || []}
-                            infoLabel='Checklist'
-                            createBtnLabel='Create checklist'
-                            isCreatable={false}
-                            isDeletable={false}
-                            isEditable={false}
-                          // onDeleteChecklist={console.info}
-                          // onCreateNewChecklistItem={({ state }) => {
-                          //   jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
-                          // }}
-                          // onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
-                          //   jobsActorRef.send({
-                          //     type: 'todo.editChecklistItemInLog',
-                          //     value: {
-                          //       jobId: log.jobId,
-                          //       logTs: log.ts,
-                          //       checklistItemId,
-                          //       state,
-                          //     },
-                          //   })
-                          //   cleanup()
-                          // }}
-                          />
-                        )
-                      }
-
-                      <Link
-                        // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
-                        to={
-                          [
-                            `/jobs/${log.jobId}`,
-                            '?',
-                            [
-                              `from=${encodeURIComponent(
-                                [
-                                  '/last-activity',
+                                  `/jobs/${log.jobId}/logs/${log.ts}`,
                                   '?',
                                   [
-                                    `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
-                                    `lastSeenJob=${log.jobId}`,
+                                    `from=${encodeURIComponent(
+                                      [
+                                        '/last-activity',
+                                        '?',
+                                        [
+                                          `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                          `lastSeenJob=${log.jobId}`,
+                                        ].join('&')
+                                      ].join('')
+                                    )}`,
+                                    `backActionUiText=${encodeURIComponent('Last activity')}`,
+                                    // `to=${encodeURIComponent(
+                                    //   [
+                                    //     '/jobs',
+                                    //     `?lastSeenJob=${log.jobId}`,
+                                    //   ].join('')
+                                    // )}`,
+                                    // `forwardActionUiText=${encodeURIComponent('Joblist')}`,
                                   ].join('&')
                                 ].join('')
-                              )}`,
-                              `backActionUiText=${encodeURIComponent('Last activity')}`,
-                            ].join('&')
-                          ].join('')
+                              }
+                            >EDIT LOG ➡️</Link>
+                          </span>
+                        </em>
+                        <div
+                          style={{ fontSize: '14px' }}
+                        >{log.text}</div>
+                        {
+                          Array.isArray(log.links) && log.links?.length > 0 && (
+                            log.links.map((link) => (
+                              <div
+                                key={link.id}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                              >
+                                <div style={{ fontSize: 'small' }}>
+                                  <CopyToClipboardWrapper
+                                    text={link.url}
+                                    uiText={link.title}
+                                    showNotifOnCopy
+                                  />
+                                </div>
+                                {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
+                              </div>
+                            ))
+                          )
                         }
-                        style={{
-                          wordBreak: 'break-word',
-                          fontSize: 'small',
-                          fontWeight: 'bold',
-                        }}
-                      >{log.jobTitle}</Link>
-                    </div>
-                  )
-                })
-              }
-            </Box>
+
+                        {
+                          !!log.checklist && log.checklist?.length > 0 && (
+                            <SimpleCheckList
+                              key={log.jobTsUpdate}
+                              // _additionalInfo={{ message: 'No helpful info' }}
+                              isMiniVariant
+                              items={log.checklist || []}
+                              infoLabel='Checklist'
+                              createBtnLabel='Create checklist'
+                              isCreatable={false}
+                              isDeletable={false}
+                              isEditable={false}
+                            // onDeleteChecklist={console.info}
+                            // onCreateNewChecklistItem={({ state }) => {
+                            //   jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
+                            // }}
+                            // onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                            //   jobsActorRef.send({
+                            //     type: 'todo.editChecklistItemInLog',
+                            //     value: {
+                            //       jobId: log.jobId,
+                            //       logTs: log.ts,
+                            //       checklistItemId,
+                            //       state,
+                            //     },
+                            //   })
+                            //   cleanup()
+                            // }}
+                            />
+                          )
+                        }
+
+                        <Link
+                          // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
+                          to={
+                            [
+                              `/jobs/${log.jobId}`,
+                              '?',
+                              [
+                                `from=${encodeURIComponent(
+                                  [
+                                    '/last-activity',
+                                    '?',
+                                    [
+                                      `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                      `lastSeenJob=${log.jobId}`,
+                                    ].join('&')
+                                  ].join('')
+                                )}`,
+                                `backActionUiText=${encodeURIComponent('Last activity')}`,
+                              ].join('&')
+                            ].join('')
+                          }
+                          style={{
+                            wordBreak: 'break-word',
+                            fontSize: 'small',
+                            fontWeight: 'bold',
+                          }}
+                        >{log.jobTitle}</Link>
+                      </div>
+                    )
+                  })
+                }
+              </Box>
+            </Grid>
+          </>
+        ) : (
+          <Grid size={12}>
+            <em>No items yet...</em>
           </Grid>
-        </>
-      ) : (
-        <Grid size={12}>
-          <em>No items yet</em>
-        </Grid>
-      )}
+        )
+      }
     </Grid>
   )
 })

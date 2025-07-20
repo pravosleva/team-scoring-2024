@@ -56,7 +56,7 @@ const _specialNavigate = {
       if (typeof level !== 'undefined' && getIsNumeric(level)) {
         const normalizedLevel = Number(level)
         return normalizedLevel === 1
-          ? 0 + 8
+          ? 0 + 16
           : normalizedLevel === 2
             ? (normalizedLevel - 1) * stickyElementHeight2 + 8
             : (normalizedLevel - 1) * stickyElementHeight2
@@ -66,7 +66,7 @@ const _specialNavigate = {
   },
 }
 const specialScroll = scrollToIdFactory({
-  timeout: 150,
+  timeout: 250,
   offsetTop: 16,
   elementHeightCritery: 550,
 })

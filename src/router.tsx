@@ -1,7 +1,7 @@
 import { createHashRouter } from 'react-router-dom'
 import {
   AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
-  JobPage, JobsPage, LogPage, LastActivityPage, WorkerExpPage,
+  JobPage, JobsPage, LogPage, LastActivityPage, SoundCheckPage, WorkerExpPage,
 } from '~/pages'
 import { Layout, JobsPagerAbstracted } from '~/shared/components'
 
@@ -55,6 +55,10 @@ export const router = createHashRouter(
     {
       path: '/jobs-pager-exp',
       element: <Layout noScrollTopBtn><JobsPagerAbstracted pagerControlsHardcodedPath='/jobs-pager-exp' /></Layout>,
+    },
+    {
+      path: '/sound-check',
+      element: <SoundCheckPage />,
     },
   ]
 )

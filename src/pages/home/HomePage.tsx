@@ -13,6 +13,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
+import SurroundSoundIcon from '@mui/icons-material/SurroundSound'
 // import WebIcon from '@mui/icons-material/Web'
 
 export const HomePage = () => {
@@ -111,6 +112,20 @@ export const HomePage = () => {
                 <div className={classes.internalWrapper}>
                   <div className={classes.title}>Worker Exp</div>
                   <em className={classes.descr}>Web Worker experience (experimental)</em>
+                </div>
+              </div>
+            </Link>
+            <Link
+              to='/sound-check'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <SurroundSoundIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Sound check</div>
+                  <em className={classes.descr}>Play sound (experimental)</em>
                 </div>
               </div>
             </Link>

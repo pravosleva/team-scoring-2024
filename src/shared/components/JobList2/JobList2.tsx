@@ -373,33 +373,35 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
         }
       </Grid>
 
-      {jobs.length > 0 ? (
-        <>
+      {
+        jobs.length > 0 ? (
+          <>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0,
+                }}
+              >
+                {jobs.map((job) =>
+                  <Job
+                    isLastSeen={lastSeenJobId === job.id}
+                    onToggleDrawer={onToggleDrawer}
+                    key={`${job.id}-${job.ts.update}`}
+                    job={job}
+                    isActive={activeJobId === job.id}
+                  />
+                )}
+              </Box>
+            </Grid>
+          </>
+        ) : (
           <Grid size={12}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 0,
-              }}
-            >
-              {jobs.map((job) =>
-                <Job
-                  isLastSeen={lastSeenJobId === job.id}
-                  onToggleDrawer={onToggleDrawer}
-                  key={`${job.id}-${job.ts.update}`}
-                  job={job}
-                  isActive={activeJobId === job.id}
-                />
-              )}
-            </Box>
+            <em>No items yet...</em>
           </Grid>
-        </>
-      ) : (
-        <Grid size={12}>
-          <em>No items yet</em>
-        </Grid>
-      )}
+        )
+      }
     </Grid>
   )
 })

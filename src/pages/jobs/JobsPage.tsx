@@ -1,8 +1,8 @@
 import { memo, useState, useCallback, useMemo, useEffect } from 'react'
-import { JobsPagerAbstracted } from '~/shared/components'
+import { JobsPagerAbstracted, ResponsiveBlock } from '~/shared/components'
 // import baseClasses from '~/App.module.scss'
 // import { Layout } from '~/shared/components/Layout'
-import { Drawer } from '@mui/material'
+import { Button, Drawer } from '@mui/material'
 import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
 import { useSearchParams } from 'react-router-dom'
@@ -24,6 +24,7 @@ export const JobsPage = memo(() => {
   }) => {
     setIsOpened((s) => typeof newValue === 'boolean' ? newValue : !s)
     if (!!jobId) setActiveJobId(jobId)
+    else setActiveJobId(null)
   }, [setIsOpened, setActiveJobId])
 
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
@@ -64,7 +65,25 @@ export const JobsPage = memo(() => {
                 onToggleDrawer={handleToggleDrawer}
               />
             ) : (
-              <em>No active job</em>
+              <ResponsiveBlock
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#fff',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <em>Job was removed or not found...</em>
+                <Button
+                  variant='outlined'
+                  color='error'
+                  fullWidth
+                  onClick={() => handleToggleDrawer(false)({ jobId: undefined })}
+                >
+                  Close
+                </Button>
+              </ResponsiveBlock>
             )
         }
       </Drawer>

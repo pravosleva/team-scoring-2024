@@ -112,13 +112,6 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
                 </Grid>
               )
             }
-            {
-              (!!jobsTotalHoursTiming?.estimated?.absolute || !!jobsTotalHoursTiming?.estimated?.realistic) && (
-                <Grid size={12}>
-                  <pre className={baseClasses.preNormalized}>{JSON.stringify(jobsTotalHoursTiming, null, 2)}</pre>
-                </Grid>
-              )
-            }
             {/* <Grid size={12}>
               <ul
                 className={baseClasses.compactList}
@@ -184,6 +177,13 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
                 }
               </ul>
             </Grid>
+            {
+              (!!jobsTotalHoursTiming?.estimated?.absolute || !!jobsTotalHoursTiming?.estimated?.realistic) && (
+                <Grid size={12}>
+                  <pre className={baseClasses.preNormalized}>{JSON.stringify(jobsTotalHoursTiming, null, 2)}</pre>
+                </Grid>
+              )
+            }
           </Grid>
         )}
       />
