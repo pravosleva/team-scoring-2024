@@ -51,6 +51,10 @@ try {
       job.relations.children = []
     }
   }
+
+  if (!initialStateFromLS.context.jobs.pinned) {
+    initialStateFromLS.context.jobs.pinned = []
+  }
 } catch (err) {
   console.error(err)
   initialStateFromLS = null

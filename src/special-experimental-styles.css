@@ -15,6 +15,12 @@ input, textarea {
 a {
   color: #0052b6;
 }
-a:hover, a:active, a:focus {
-  color: red;
+a:hover {
+  color: #00a47d;
+}
+a:focus {
+  color: #78fac5;
+}
+a:active {
+  color: #00a47d;
 }

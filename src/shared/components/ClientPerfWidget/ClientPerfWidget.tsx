@@ -9,6 +9,7 @@ import { ProgressBar } from './components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ArrowRight'
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MemoryIcon from '@mui/icons-material/Memory'
+import { soundManager } from '~/shared/soundManager'
 
 type TProps = {
   isOpenedByDefault?: boolean;
@@ -60,10 +61,28 @@ export const ClientPerfWidget = memo((ps: TProps) => {
   // const isBrowserMemoryMonitorEnabled = useSelector((state: IRootState) => state.customDevTools.browserMemoryMonitor.isEnabled)
   // const [isWidgetOpened, setIsWidgetOpened] = useState(false)
   const handleOpenToggle = useCallback(() => {
+    const wasOpened = isBrowserMemoryMonitorEnabled
+    if (wasOpened) {
+      soundManager.playDelayedSoundConfigurable({
+        soundCode: 'mech-78-step', // 'mech-73-robots-moving-2',
+        delay: {
+          before: 0,
+          after: 500,
+        },
+      })
+    } else {
+      soundManager.playDelayedSoundConfigurable({
+        soundCode: 'electro-12-beep-short-melody-and-hiss',
+        delay: {
+          before: 0,
+          after: 1000,
+        },
+      })
+    }
     // setIsWidgetOpened((s) => !s)
     // dispatch(toggleBrowserMemoryMonitor())
     setIsBrowserMemoryMonitorEnabled((s) => !s)
-  }, [setIsBrowserMemoryMonitorEnabled])
+  }, [setIsBrowserMemoryMonitorEnabled, isBrowserMemoryMonitorEnabled])
 
   const [state, setMemState] = useState<any>(null)
   const [counter, setCounter] = useState<number>(0)

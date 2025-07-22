@@ -30,6 +30,8 @@ import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { JobResultReviewShort } from '../../JobResultReviewShort'
 import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCards'
 import { UserAva } from '~/shared/components/Job/components'
+// import { Button } from '@mui/material'
+// import PushPinIcon from '@mui/icons-material/PushPin'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -86,6 +88,12 @@ export const ProjectNode = ({
 
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const getUserById = (_id: number) => users.find(({ id }) => id === _id)?.displayName || 'NoName'
+
+  const pinnedJobs = TopLevelContext.useSelector((s) => s.context.jobs.pinned)
+  const isPinned = pinnedJobs.includes(projectsTree.model.id)
+  const topLevelActorRef = TopLevelContext.useActorRef()
+  const { send } = topLevelActorRef
+  const handlePin = () => send({ type: 'todo.pin', value: { jobId: projectsTree.model.id } })
 
   return (
     <div
@@ -287,7 +295,14 @@ export const ProjectNode = ({
       }
 
       <CollapsibleText
-        briefText='Details'
+        briefText={
+          <span
+            style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}
+          >
+            <span>Details</span>
+            {!isPinned && <code style={{ fontSize: 'x-small', cursor: 'pointer' }} onClick={handlePin}>[ pin ]</code>}
+          </span>
+        }
         isOpenedByDefault={true}
         targetText={projectsTree.model.descr}
         contentRender={({ targetText }) => (
@@ -300,7 +315,18 @@ export const ProjectNode = ({
               className={baseClasses.specialText}
             >{projectsTree.model.title}</b>
             {!!projectsTree.model.descr && (<div className={classes.descr}>{targetText}</div>)}
-
+            {/*
+              !isPinned && (
+                <Button
+                  variant='outlined'
+                  onClick={handlePin}
+                  size='small'
+                  startIcon={<PushPinIcon />}
+                >
+                  Pin
+                </Button>
+              )
+            */}
           </>
         )}
       />

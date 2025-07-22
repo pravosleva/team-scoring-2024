@@ -20,6 +20,7 @@ export const topLevelMachine = setup({
     context: {
       todo: string;
       jobs: {
+        pinned: number[];
         items: TJob[];
         // filter: EJobsStatusFilter;
       };
@@ -51,12 +52,15 @@ export const topLevelMachine = setup({
     | { type: 'todo.editChecklistItemInLog'; value: { jobId: number; logTs: number; checklistItemId: number; state: Pick<TLogChecklistItem, 'title' | 'descr' | 'isDisabled' | 'isDone'> } }
     | { type: 'todo.deleteChecklistFromLog'; value: { jobId: number; logTs: number } }
     | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
+    | { type: 'todo.pin'; value: { jobId: number; } }
+    | { type: 'todo.unpin'; value: { jobId: number; } }
   }
 }).createMachine({
   id: 'topLevel',
   context: {
     todo: '',
     jobs: {
+      pinned: [],
       items: [],
       filter: EJobsStatusFilter.ALL,
     },
@@ -65,6 +69,37 @@ export const topLevelMachine = setup({
     },
   },
   on: {
+    'todo.pin': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
+          if (!targetJob) {
+            return context.jobs
+          }
+
+          const newPinnedList = [...context.jobs.pinned]
+          const limit = 5
+          if (newPinnedList.length >= limit) {
+            newPinnedList.pop()
+          }
+          newPinnedList.unshift(event.value.jobId)
+          return {
+            ...context.jobs,
+            pinned: [...new Set([...newPinnedList])],
+          }
+        },
+      }),
+    },
+    'todo.unpin': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          return {
+            ...context.jobs,
+            pinned: context.jobs.pinned.filter((id) => event.value.jobId !== id)
+          }
+        },
+      }),
+    },
     'newTodo.change': {
       actions: assign({
         todo: ({ event }) => event.value

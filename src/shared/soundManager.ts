@@ -36,6 +36,8 @@ const sounds = {
   'mech-55-short-metal-single-hit': '/mech/mech-55-short-metal-single-hit.mp3',
   'mech-56-single-short-hit-in-space': '/mech/mech-56-single-short-hit-in-space.mp3',
 
+  'mech-73-robots-moving-2': '/mech/mech-73-robots-moving-2.mp3',
+  'mech-74-robots-big-cyber-moving': '/mech/mech-74-robots-big-cyber-moving.mp3',
   'mech-78-step': '/mech/mech-78-step.mp3',
   'mech-81-step-hydraulic-robot': '/mech/mech-81-step-hydraulic-robot.mp3',
 

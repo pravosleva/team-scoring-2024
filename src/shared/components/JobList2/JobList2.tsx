@@ -398,7 +398,7 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
           </>
         ) : (
           <Grid size={12}>
-            <em>No items yet...</em>
+            <em className={baseClasses.fadeIn}>No items yet...</em>
           </Grid>
         )
       }

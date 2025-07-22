@@ -1,5 +1,5 @@
 import { memo, useEffect, useCallback, useMemo } from 'react'
-import { TLogsItem, EJobsStatusFilter } from '~/shared/xstate/topLevelMachine/v2'
+import { TLogsItem, EJobsStatusFilter, TopLevelContext } from '~/shared/xstate/topLevelMachine/v2'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
@@ -78,6 +78,8 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
     query?: { [key: string]: string | null | number; };
     queryKeysToremove?: string[];
   }) => () => navigate(getFullUrl({ url, query, queryKeysToremove })), [navigate, getFullUrl])
+
+  const jobsActorRef = TopLevelContext.useActorRef()
 
   return (
     <Grid container spacing={2}>
@@ -447,22 +449,22 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
                               isCreatable={false}
                               isDeletable={false}
                               isEditable={false}
-                            // onDeleteChecklist={console.info}
-                            // onCreateNewChecklistItem={({ state }) => {
-                            //   jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
-                            // }}
-                            // onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
-                            //   jobsActorRef.send({
-                            //     type: 'todo.editChecklistItemInLog',
-                            //     value: {
-                            //       jobId: log.jobId,
-                            //       logTs: log.ts,
-                            //       checklistItemId,
-                            //       state,
-                            //     },
-                            //   })
-                            //   cleanup()
-                            // }}
+                              // onDeleteChecklist={console.info}
+                              // onCreateNewChecklistItem={({ state }) => {
+                              //   jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })
+                              // }}
+                              onEditChecklistItem={({ state, checklistItemId, cleanup }) => {
+                                jobsActorRef.send({
+                                  type: 'todo.editChecklistItemInLog',
+                                  value: {
+                                    jobId: log.jobId,
+                                    logTs: log.ts,
+                                    checklistItemId,
+                                    state,
+                                  },
+                                })
+                                cleanup()
+                              }}
                             />
                           )
                         }
@@ -503,7 +505,7 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
           </>
         ) : (
           <Grid size={12}>
-            <em>No items yet...</em>
+            <em className={baseClasses.fadeIn}>No items yet...</em>
           </Grid>
         )
       }

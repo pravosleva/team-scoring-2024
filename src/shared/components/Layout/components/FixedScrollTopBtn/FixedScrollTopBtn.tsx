@@ -1,4 +1,4 @@
-import { useRef, useCallback, memo, useEffect } from 'react'
+import { useRef, memo, useEffect } from 'react'
 import { useScrollPosition, IWindowDims } from '~/shared/hooks/useScrollPosition'
 import clsx from 'clsx'
 import classes from './FixedScrollTopBtn.module.scss'
@@ -10,9 +10,7 @@ import { useSearchParams } from 'react-router-dom'
 export const FixedScrollTopBtn = memo(() => {
   const [, isMoreThan2Screens]: [IWindowDims, boolean] = useScrollPosition()
   const ref = useRef<HTMLDivElement>(null)
-  const handleClick = useCallback(() => {
-    scrollTop()
-  }, [])
+  const handleClick = () => scrollTop()
 
   const [urlSearchParams] = useSearchParams()
   useEffect(() => {
