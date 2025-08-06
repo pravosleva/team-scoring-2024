@@ -14,6 +14,7 @@ import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
 import SurroundSoundIcon from '@mui/icons-material/SurroundSound'
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 // import WebIcon from '@mui/icons-material/Web'
 
 export const HomePage = () => {
@@ -21,7 +22,10 @@ export const HomePage = () => {
     <Layout>
       <Grid container spacing={1} sx={{ mb: 2 }}>
         <Grid size={12}>
-          <h1>Estimate corrector</h1>
+          <h1 className={baseClasses.inlineH1}>
+            <AnalyticsIcon fontSize='inherit' />
+            <span>Estimate corrector</span>
+          </h1>
         </Grid>
         <Grid size={12}>
           <ResponsiveBlock
@@ -32,6 +36,7 @@ export const HomePage = () => {
               classes.grid,
             )}
           >
+            <h2 style={{ color: '#959eaa' }}>Main</h2>
             <Link
               to='/last-activity'
               style={{
@@ -42,20 +47,6 @@ export const HomePage = () => {
                 <SportsBasketballIcon />
                 <div className={classes.internalWrapper}>
                   <div className={classes.title}>Last activity</div>
-                </div>
-              </div>
-            </Link>
-            <Link
-              to='/employees'
-              style={{
-                display: 'block',
-              }}
-            >
-              <div className={classes.gridItem}>
-                <GroupIcon />
-                <div className={classes.internalWrapper}>
-                  <div className={classes.title}>Employees</div>
-                  <em className={classes.descr}>All users</em>
                 </div>
               </div>
             </Link>
@@ -73,6 +64,23 @@ export const HomePage = () => {
                 </div>
               </div>
             </Link>
+            <Link
+              to='/employees'
+              style={{
+                display: 'block',
+              }}
+            >
+              <div className={classes.gridItem}>
+                <GroupIcon />
+                <div className={classes.internalWrapper}>
+                  <div className={classes.title}>Employees</div>
+                  <em className={classes.descr}>All users</em>
+                </div>
+              </div>
+            </Link>
+
+            <h2 style={{ color: '#959eaa' }}>Experimental</h2>
+
             {/* <Link
               to='/jobs-pager-exp'
               style={{

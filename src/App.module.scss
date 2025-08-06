@@ -20,6 +20,13 @@
   border: 1px solid black;
 }
 
+.inlineH1 {
+  display: inline-flex;
+  gap: 16px;
+  flex-direction: row;
+  align-items: center;
+}
+
 .redBorder {
   border: 1px solid red;
 }
@@ -575,4 +582,22 @@
   /* number of lines to show */
   line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+.specialHeaderH2 {
+  color: green;
+  // border: 1px solid red;
+  padding: 3px 8px;
+  border-radius: 6px;
+  // margin: 0;
+  background-color: #ececec;
+  color: #000;
+
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  unicode-bidi: isolate;
 }

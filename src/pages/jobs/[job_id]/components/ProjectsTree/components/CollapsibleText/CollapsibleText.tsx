@@ -1,5 +1,8 @@
 import { memo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 
 type TProps = {
   briefText: React.ReactNode | string;
@@ -46,8 +49,29 @@ export const CollapsibleText = memo(({
         </div>
         <code
           className={baseClasses.noBreakWords}
-          style={{ cursor: 'pointer', fontSize: 'x-small', fontWeight: 'bold' }} onClick={descrToggle}
-        >{isDescrOpened ? '[ close ]' : '[ open ]'}
+          onClick={descrToggle}
+          style={{
+            cursor: 'pointer',
+            fontSize: 'x-small',
+            fontWeight: 'bold',
+            display: 'inline-flex',
+            flexDirection: 'row',
+            gap: '5px',
+            alignItems: 'center',
+            // border: '1px solid red'
+          }}
+        >
+          {/* <span>[</span> */}
+          {
+            isDescrOpened
+              ? (
+                <ExpandLessIcon sx={{ fontSize: '20px' }} />
+              )
+              : (
+                <ExpandCircleDownIcon sx={{ fontSize: '20px' }} />
+              )
+          }
+          {/* <span>]</span> */}
         </code>
       </div>
       {

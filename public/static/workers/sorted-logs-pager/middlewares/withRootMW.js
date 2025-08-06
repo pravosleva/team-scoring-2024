@@ -112,7 +112,7 @@ const withRootMW = (arg) => compose([
                         break
                       case getMatchedByAnyString({
                         tested: log.text,
-                        expected: ['☝️'],
+                        expected: ['☝️', '⚡'],
                       }):
                         logBg = 'warn'
                         break
@@ -168,7 +168,7 @@ const withRootMW = (arg) => compose([
                 _partialInput: {
                   activeLogTs: eventData?.input?.activeLogTs,
                   targetLogIndex,
-                  // _activeFilters: eventData?.input?._activeFilters,
+                  _activeFilters: eventData?.input?._activeFilters,
                   /* NOTE: Example
                     {
                       "isAnyFilterActive": false,

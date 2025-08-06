@@ -1,0 +1,494 @@
+import { memo, useState, useMemo, useCallback } from 'react'
+import baseClasses from '~/App.module.scss'
+import { Alert, Button, Grid2 as Grid } from '@mui/material'
+import { LastActivityPagerAbstracted, ResponsiveBlock } from '~/shared/components'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
+import { useLogsPagerWorker } from './hooks'
+import { debugFactory } from '~/shared/utils'
+import { TLogsItem, TopLevelContext } from '~/shared/xstate'
+import { NWService } from '~/shared/utils/wws/types'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { getFullUrl } from '~/shared/utils/string-ops'
+import clsx from 'clsx'
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils'
+import CloseIcon from '@mui/icons-material/Close'
+import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
+import { UserAvaAutoDetected } from '~/shared/components/Job/components'
+
+type TJobType = 'default' | 'globalTag'
+type TLogBorder = 'default' | 'red'
+type TLogBg = 'default' | 'green' | 'warn'
+type TModifiedLog = (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number });
+type TTargetResultByWorker = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _partialInput: any;
+  message?: string;
+  binarySearchedIndex: number;
+  pagination: {
+    pageLimit: number;
+    totalItems: number;
+    totalPages: number;
+    currentPageIndex: number;
+    currentPage: number;
+    nextPageIndex: number | null;
+    nextPage: number | null;
+    prevPageIndex: number | null;
+    prevPage: number | null;
+    isCurrentPageFirst: boolean;
+    isCurrentPageLast: boolean;
+    itemsRangeInfo: string;
+  };
+  currentPage: TModifiedLog[] | null;
+  nextPage: TModifiedLog[] | null;
+  prevPage: TModifiedLog[] | null;
+}
+type TWorkerServiceReport = {
+  message?: string;
+}
+const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null, { reason: string; } | null>({
+  label: '👉 LastActivityPage v2 EXP',
+})
+const getNormalizedPage = (index: number): number => index + 1
+
+export const LastJobActivityPage = memo(() => {
+  const [counter, setCounter] = useState<number>(0)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const incCounter = useCallback(() => {
+    setCounter((v) => v + 1)
+  }, [])
+  const [outputWorkerData, setOutputWorkerData] = useState<TTargetResultByWorker | null>(null)
+  const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
+  const [outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
+
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const [mainCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.main)
+  const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
+  const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
+  const [debugSettings] = useParamsInspectorContextStore((ctx) => ctx.debug)
+  const isDebugEnabled = debugSettings.filters.isEnabled && debugSettings.filters.level === 1
+
+  const [urlSearchParams] = useSearchParams()
+  const requiredPage = useMemo<number | undefined>(() =>
+    !!urlSearchParams.get('page') && !Number.isNaN(Number(urlSearchParams.get('page')))
+      ? Number(urlSearchParams.get('page'))
+      : undefined,
+    [urlSearchParams]
+  )
+  const urlSearchParamLastSeenLogTs = useMemo<number | null>(() => {
+    const lastSeenLogKey = urlSearchParams.get('lastSeenLogKey')
+    if (!!lastSeenLogKey) {
+      const splitted = lastSeenLogKey.split('-')
+      if (!!splitted[3] && !Number.isNaN(Number(splitted[3]))) {
+        return Number(splitted[3])
+      } else return null
+    } else return null
+  }, [urlSearchParams])
+
+  useLogsPagerWorker<TTargetResultByWorker, TWorkerServiceReport>({
+    isEnabled: true,
+    isDebugEnabled,
+    cb: {
+      onEachSuccessItemData: (data) => {
+        if (isDebugEnabled) {
+          logger.log({
+            label: '🟢 onEachSuccessItemData',
+            event: data,
+            err: null,
+          })
+        }
+        if (!!data.originalResponse) {
+          setOutputWorkerErrMsg(null)
+          setOutputWorkerData(data.originalResponse)
+          if (!!data.message) setOutputWorkerDebugMsg(data.message)
+        }
+      },
+      onFinalError: ({ reason }) => {
+        if (isDebugEnabled) {
+          logger.log({
+            label: '🔴 onFinalError',
+            event: null,
+            err: { reason },
+          })
+        }
+        setOutputWorkerErrMsg(reason)
+      },
+    },
+    deps: {
+      counter,
+      jobs,
+      activeLogTs: urlSearchParamLastSeenLogTs,
+      requiredPage,
+      activeFilters,
+    },
+  })
+
+  const navigate = useNavigate()
+  const handleNavigate = useCallback((relativeUrl: string) => () => navigate(relativeUrl), [navigate])
+  // const handleCreateNewCallback = useCallback(() =>
+  //   handleNavigate(
+  //     getFullUrl({ url: '/last-activity', query: { ...queryParams, page: '1' } })
+  //   ),
+  //   [handleNavigate, queryParams]
+  // )
+  const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
+
+  // -- NOTE: [PERF EXP] Modify log texts exp (perf should be tested)
+  const users = TopLevelContext.useSelector((s) => s.context.users)
+  const currentPageModified2 = useMemo(() => (
+    !!outputWorkerData?.currentPage
+      ? outputWorkerData?.currentPage.map((item) => ({
+        ...item,
+        text: getModifiedJobLogText({ text: item.text, jobs, users: users.items }),
+      }))
+      : []
+  ), [jobs, users.items, outputWorkerData?.currentPage])
+  // --
+
+  const targetJobs = useMemo(
+    () => jobs.filter(({ id }) => activeFilters.values.targetJobsRequested.includes(id)) || [],
+    [jobs, activeFilters.values.targetJobsRequested]
+  )
+
+  /*
+  ...new Set([
+    ...(params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id))).map((id) => Number(id))
+  ])
+  */
+
+  const params = useParams()
+  const memoizedCurrentPage = useMemo(
+    () => !!params.job_ids && (params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id))).length > 0
+      ? `/last-activity/${[
+        ...(params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id))).map((id) => Number(id))
+      ].join(',')}`
+      : '/last-activity',
+    [params.job_ids]
+  )
+  const getMemoizedCurrentPageWithoutJobId = ({ noJobId }: { noJobId: number }) => {
+    return !!params.job_ids && (params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id))).length > 0
+      ? `/last-activity/${[
+        ...(params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id)) && Number(id) !== noJobId).map((id) => Number(id))
+      ].join(',')}`
+      : '/last-activity'
+  }
+
+  return (
+    <>
+      <div
+        className={baseClasses.stack1}
+        style={{
+          marginBottom: '16px',
+        }}
+      >
+        <Grid container spacing={2}>
+
+          {/* <Grid size={12}>
+            <pre
+              className={clsx(
+                baseClasses.preNormalized,
+              )}
+              style={{ maxHeight: '300px', overflowY: 'auto' }}
+            >
+              {JSON.stringify({
+                // targetEmployeeCounters,
+                _service: outputWorkerData?._partialInput || null,
+                // cur: {
+                //   pagCurrentPageIndex: outputWorkerData?.pagination.currentPageIndex,
+                //   pagCurrentPage: outputWorkerData?.pagination.currentPage,
+                // },
+                // prev: {
+                //   pagPrevPageIndex: outputWorkerData?.pagination.prevPageIndex,
+                //   pagPrevPage: outputWorkerData?.pagination.prevPage,
+                // },
+                // next: {
+                //   pagNextPageIndex: outputWorkerData?.pagination.nextPageIndex,
+                //   pagNextPage: outputWorkerData?.pagination.nextPage,
+                // }
+              }, null, 2)}
+            </pre>
+          </Grid> */}
+
+          {!!outputWorkerErrMsg && (
+            <Grid
+              size={12}
+              className={baseClasses.specialTopContent}
+            >
+              <Alert severity='error' variant='filled'>
+                <div className={baseClasses.stack1}>
+                  <b>Error message</b>
+                  <span>{outputWorkerErrMsg}</span>
+                </div>
+              </Alert>
+            </Grid>
+          )}
+
+          {isDebugEnabled && !!outputWorkerDebugMsg && (
+            <Grid size={12}>
+              <Alert severity='info' variant='outlined'>
+                <div className={baseClasses.stack1}>
+                  <b>Debug message</b>
+                  <pre className={baseClasses.preNormalized}>{outputWorkerDebugMsg}</pre>
+                </div>
+              </Alert>
+            </Grid>
+          )}
+          {
+            <Grid size={12}>
+              <LastActivityPagerAbstracted
+                counters={mainCounters}
+                modifiedLogs={currentPageModified2}
+                subheader='History'
+                // contentDescription={
+                //   targetJobs.length > 0
+                //     ? targetJobs.length > 1
+                //       ? targetJobs.map(({ title }, i) => `${i + 1}. ${title}`).join('; ')
+                //       : targetJobs[0].title
+                //     : 'ERR: Jobs not found'}
+                contentDescription={
+                  targetJobs.length > 0
+                    ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '16px',
+                          // border: '1px solid red'
+                        }}
+                      >
+                        {targetJobs.map((job) => (
+                          <div
+                            key={job.id}
+                            style={{
+                              // border: '1px solid red',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              // alignItems: 'flex-start',
+                              gap: '4px',
+                              fontSize: 'small'
+                            }}
+                          >
+                            <div
+                              style={{
+                                // border: '1px solid red',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'flex-start',
+                                gap: '16px',
+                                fontSize: 'small'
+                              }}
+                            >
+                              <Link
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  display: 'inline-flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                }}
+                                to={getFullUrl({
+                                  url: `/jobs/${job.id}`,
+                                  query: {
+                                    ...queryParams,
+                                    from: memoizedCurrentPage,
+                                  },
+                                })}
+                              >
+                                <ArrowBackIcon sx={{ fontSize: '12px' }} />
+                                <span>Job</span>
+                              </Link>
+                              <Link
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  display: 'inline-flex',
+                                  // justifyContent: 'center',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  borderWidth: '1px',
+                                  borderColor: 'inherit',
+                                  borderStyle: 'solid',
+                                  borderRadius: '50%',
+                                  // alignSelf: 'center',
+                                  marginTop: '3px',
+                                }}
+                                to={getFullUrl({
+                                  url: getMemoizedCurrentPageWithoutJobId({ noJobId: job.id }), // `/jobs/${id}`,
+                                  query: {
+                                    ...queryParams,
+                                  },
+                                })}
+                              >
+                                <CloseIcon sx={{ fontSize: 'inherit' }} />
+                              </Link>
+                              <div style={{ color: '#000' }}>{job.title}</div>
+                              {
+                                !!job.forecast.assignedTo && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      flexDirection: 'row',
+                                      gap: '8px',
+                                      alignItems: 'center',
+                                      marginLeft: 'auto',
+                                    }}
+                                  >
+                                    <AutoRefreshedJobMuiAva job={job} delay={1000} size={35} />
+                                    <UserAvaAutoDetected userId={job.forecast.assignedTo} size={35} />
+                                  </div>
+                                )
+                              }
+                            </div>
+                            {!!job.descr && (
+                              <div style={{ fontSize: 'x-small' }}>{job.descr}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : 'ERR: Jobs not found'
+                }
+                pageInfo={outputWorkerData?.pagination.itemsRangeInfo}
+                pagerControlsHardcodedPath={memoizedCurrentPage}
+                key={outputWorkerData?.pagination.currentPage}
+                noFilters
+              />
+            </Grid>
+          }
+
+        </Grid>
+      </div>
+
+      {
+        !!outputWorkerData?.currentPage && (outputWorkerData.pagination.totalPages > 1 || !!userRouteControls.from) && (
+          <ResponsiveBlock
+            className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+            style={{
+              padding: '16px 16px 16px 16px',
+              // border: '1px dashed red',
+              // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+              position: 'sticky',
+              bottom: '16px',
+              backgroundColor: '#fff',
+              zIndex: 3,
+              marginTop: 'auto',
+              // borderRadius: '16px 16px 0px 0px',
+              borderRadius: '32px',
+              // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+              boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+              marginBottom: '16px',
+            }}
+          >
+
+            {
+              !!userRouteControls.from && (
+                <Link
+                  to={userRouteControls.from.value}
+                  target='_self'
+                  className={baseClasses.truncate}
+                >
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                    fullWidth
+                    className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
+                  </Button>
+                </Link>
+              )
+            }
+
+            {
+              outputWorkerData.pagination.totalPages > 1 && (
+                <ResponsiveBlock
+                  className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
+                >
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    // variant='outlined'
+                    variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                    fullWidth
+                    // startIcon={<ArrowBackIosIcon />}
+                    onClick={
+                      handleNavigate(
+                        getFullUrl({
+                          url: memoizedCurrentPage,
+                          query: {
+                            ...queryParams,
+                            page: outputWorkerData?.pagination.prevPage,
+                          },
+                        })
+                      )}
+                    disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
+                  >
+                    {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                    <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
+                  </Button>
+
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    // variant='outlined'
+                    variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                    fullWidth
+                    // endIcon={<ArrowForwardIosIcon />}
+                    onClick={
+                      handleNavigate(
+                        getFullUrl({
+                          url: memoizedCurrentPage,
+                          query: {
+                            ...queryParams,
+                            page: outputWorkerData?.pagination.nextPage,
+                          },
+                        })
+                      )}
+                    disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
+                  >
+                    {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                    <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
+                  </Button>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      color: '#959eaa',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / {outputWorkerData.pagination.totalPages}
+                  </div>
+
+                  {/* <Link to='/jobs' target='_self'>
+                    <Button variant='contained' startIcon={<ConstructionIcon />} fullWidth>
+                      All Jobs
+                    </Button>
+                  </Link>
+                  <Link to='/' target='_self'>
+                    <Button variant='contained' fullWidth endIcon={<AppsIcon />}>
+                      Home
+                    </Button>
+                  </Link> */}
+                </ResponsiveBlock>
+              )
+            }
+
+            {/* <Button
+              variant='outlined'
+              fullWidth
+              onClick={handleNavigate(pagerControlsHardcodedPath)}
+              disabled={outputWorkerData?.pagination.isCurrentPageFirst}
+            >
+              1st of {outputWorkerData.pagination.totalItems}
+            </Button> */}
+          </ResponsiveBlock>
+        )
+      }
+    </>
+  )
+})

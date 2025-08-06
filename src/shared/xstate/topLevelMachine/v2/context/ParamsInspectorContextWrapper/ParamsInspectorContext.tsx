@@ -25,7 +25,9 @@ export type TPICFilters = {
   assignedTo: boolean;
   estimateReached: boolean;
   isProject: boolean;
+  isTargetJobsRequested: boolean;
   values: {
+    targetJobsRequested: number[];
     jobStatusFilter: null | EJobsStatusFilter;
     assignedTo: null | number;
     estimateReached: null | 0 | 1;
@@ -68,7 +70,9 @@ const initialState: TPICStore = {
     assignedTo: false,
     estimateReached: false,
     isProject: false,
+    isTargetJobsRequested: false,
     values: {
+      targetJobsRequested: [],
       jobStatusFilter: null,
       assignedTo: null,
       estimateReached: null,
@@ -161,15 +165,27 @@ const Logic = ({ children }: TProps) => {
         }
       }
     }
+    // const isTargetJobsRequested = !!params.job_id && !Number.isNaN(Number(params.job_id))
+    const isTargetJobsRequested =
+      !!params.job_ids
+      && params.job_ids.split(',').filter((id) => !Number.isNaN(Number(id))).length > 0
 
     let filteredJobs: TJob[] = []
     const activeFilters: TPICFilters = {
-      isAnyFilterActive: hasJobStatusFilter || hasAssignedToFilter || hasEstimateReachedFilter || hasIsProjectFilterValue || hasIsNewFilterValue,
+      isAnyFilterActive: hasJobStatusFilter || hasAssignedToFilter || hasEstimateReachedFilter || hasIsProjectFilterValue || hasIsNewFilterValue || isTargetJobsRequested,
       jobStatusFilter: hasJobStatusFilter,
       assignedTo: hasAssignedToFilter,
       estimateReached: hasEstimateReachedFilter,
       isProject: hasIsProjectFilterValue,
+      isTargetJobsRequested: isTargetJobsRequested,
       values: {
+        targetJobsRequested: isTargetJobsRequested
+          ? [
+            ...new Set([
+              ...(params.job_ids as string).split(',').filter((id) => !Number.isNaN(Number(id))).map((id) => Number(id))
+            ])
+          ]
+          : [],
         isProject: null,
         jobStatusFilter: null,
         assignedTo: null,
@@ -381,7 +397,7 @@ const Logic = ({ children }: TProps) => {
     setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })
 
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
-  }, [urlSearchParams, location.pathname, allJobs, setStore, params.user_id])
+  }, [urlSearchParams, location.pathname, allJobs, setStore, params.user_id, params.job_ids])
 
   // NOTE: 2. Persist todos
   useLayoutEffect(() => {

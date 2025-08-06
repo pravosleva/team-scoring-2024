@@ -2,8 +2,10 @@ import { memo, useCallback } from 'react'
 import baseClasses from '~/App.module.scss'
 import { ResponsiveBlock, SimpleCheckList } from '~/shared/components'
 import dayjs from 'dayjs'
-import ToggleOnIcon from '@mui/icons-material/ToggleOn'
-import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+// import ToggleOnIcon from '@mui/icons-material/ToggleOn'
+// import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
+import SettingsIcon from '@mui/icons-material/Settings'
 import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils/getModifiedJobLogText'
 import { TopLevelContext, TJob } from '~/shared/xstate'
 import { Link } from 'react-router-dom'
@@ -23,7 +25,10 @@ const specialScroll = scrollToIdFactory({
 })
 
 export const JobAdditionalInfo = memo(({ job }: TPros) => {
-  const { logs, ...withoutLogs } = job
+  const {
+    logs,
+    // ...withoutLogs,
+  } = job
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const users = TopLevelContext.useSelector((s) => s.context.users)
 
@@ -77,20 +82,21 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
         label='LOGS'
       />
       <ResponsiveBlock>
-        <pre
+        {/* <pre
           className={baseClasses.preNormalized}
           style={{ borderRadius: 0, }}
-        >{JSON.stringify(withoutLogs, null, 2)}</pre>
+        >{JSON.stringify(withoutLogs, null, 2)}</pre> */}
         {
           logs.items.length > 0 && (
             <ResponsiveBlock
               style={{
-                padding: '16px 16px 0px 16px',
+                // padding: '16px 16px 0px 16px',
+                padding: '0px 16px 0px 16px',
               }}
             >
               <h3 ref={logsTopRef} id='logBoxHeader' style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                 <span>[ Logs: {job.logs.isEnabled ? 'detailed' : 'minimal'}</span>
-                {job.logs.isEnabled ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                {job.logs.isEnabled ? <SettingsIcon /> : <MonitorHeartIcon />}
                 <span>]</span>
               </h3>
 

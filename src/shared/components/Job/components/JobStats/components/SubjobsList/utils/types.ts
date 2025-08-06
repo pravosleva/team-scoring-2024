@@ -6,5 +6,9 @@ export type TSections = {
   realistic: {
     items: string[];
     comment?: string;
-  }
+  };
+  [key: string]: {
+    items: string[];
+    comment?: string;
+  };
 };

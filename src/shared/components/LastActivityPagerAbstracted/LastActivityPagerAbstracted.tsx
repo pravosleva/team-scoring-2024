@@ -31,8 +31,10 @@ type TProps = {
   modifiedLogs: (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number })[];
   // onCreateNew?: () => void;
   subheader: string;
+  contentDescription?: string | React.ReactNode;
   pageInfo?: string;
   pagerControlsHardcodedPath: string;
+  noFilters?: boolean;
 }
 const specialScroll = scrollToIdFactory({
   timeout: 200,
@@ -40,7 +42,15 @@ const specialScroll = scrollToIdFactory({
   elementHeightCritery: 550,
 })
 
-export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo, pagerControlsHardcodedPath, modifiedLogs, subheader }: TProps) => {
+export const LastActivityPagerAbstracted = memo(({
+  counters: _counters,
+  pageInfo,
+  pagerControlsHardcodedPath,
+  modifiedLogs,
+  subheader,
+  contentDescription,
+  noFilters,
+}: TProps) => {
   const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
 
   // -- NOTE: 2/3 Совершенно необязательный механизм
@@ -96,29 +106,59 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
           // top: 0,
           backgroundColor: '#fff',
           zIndex: 2,
-          pb: Object.values(counters).some((v) => v > 0) ? 2 : 0,
+          pb: !noFilters && Object.values(counters).some((v) => v > 0) ? 2 : 0,
         }}
       >
+
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             // justifyContent: 'space-between',
-            gap: '16px',
-            alignItems: 'center'
+            gap: '8px',
+            // alignItems: 'center'
+            marginBottom: '24px',
           }}
         >
-          <h2
-            className={baseClasses.truncate}
-            style={{ display: 'inline-flex', gap: '16px', alignItems: 'center' }}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              // justifyContent: 'space-between',
+              gap: '16px',
+              alignItems: 'center'
+            }}
           >
-            <span className={baseClasses.truncate}>{subheader}</span>
-            {!!pageInfo && <span style={{ color: '#959eaa', fontSize: 'small' }}>{pageInfo}</span>}
-          </h2>
+
+            <h2
+              className={baseClasses.truncate}
+              style={{
+                display: 'inline-flex',
+                gap: '16px',
+                alignItems: 'center',
+                marginBottom: '0px',
+              }}
+            >
+              <span className={baseClasses.truncate}>{subheader}</span>
+              {!!pageInfo && <span style={{ color: '#959eaa', fontSize: 'small' }}>{pageInfo}</span>}
+            </h2>
+
+          </div>
+          {!!contentDescription && (
+            <div
+              style={{
+                color: '#959eaa',
+                fontWeight: 'bold',
+                wordBreak: 'break-word',
+              }}
+            >
+              {contentDescription}
+            </div>
+          )}
         </div>
 
         {
-          Object.values(counters).some((v) => v > 0) && (
+          !noFilters && Object.values(counters).some((v) => v > 0) && (
             <div className={baseClasses.stack2}>
               <Box
                 sx={{
@@ -392,7 +432,7 @@ export const LastActivityPagerAbstracted = memo(({ counters: _counters, pageInfo
                                   [
                                     `from=${encodeURIComponent(
                                       [
-                                        '/last-activity',
+                                        pagerControlsHardcodedPath, // '/last-activity',
                                         '?',
                                         [
                                           `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,

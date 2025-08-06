@@ -1,11 +1,13 @@
 import { memo, useState, useCallback, useMemo } from 'react'
 import clsx from 'clsx'
 import baseClasses from '~/App.module.scss'
+import { Button } from '@mui/material'
+import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import TurnedInIcon from '@mui/icons-material/TurnedIn'
 import classes from './FixedPinnedJoblist.module.scss'
 import { TJob, TopLevelContext } from '~/shared/xstate'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getFullUrl, getMatchedByAnyString } from '~/shared/utils/string-ops'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
@@ -102,10 +104,10 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   const params = useParams()
   const navigate = useNavigate()
   const handleNavigate = useCallback(({ pinnedJobId, relativeUrl }: {
-    pinnedJobId: number;
+    pinnedJobId?: number;
     relativeUrl: string;
   }) => () => {
-    if (Number(params.job_id) === pinnedJobId) {
+    if (!!pinnedJobId && Number(params.job_id) === pinnedJobId) {
       specialScroll({
         id: `job_node_${pinnedJobId}`,
         _cfg: _specialNavigate,
@@ -118,6 +120,7 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
     }
   }, [navigate, params.job_id, handleOpenToggle])
   const hasPinnedCurrentJob = !!params.job_id && pinnedJobsIds.includes(Number(params.job_id))
+  const location = useLocation()
 
   return (
     <>
@@ -163,10 +166,10 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                 >
                   <code
                     style={{
-                      fontSize: 'x-small',
+                      fontSize: 'small',
                       // wordBreak: 'keep-all',
                       whiteSpace: 'nowrap',
-                      // paddingTop: '2px',
+                      paddingTop: '1px',
                     }}
                     onClick={handleUnpinJob({ jobId: Number(id) })}
                   >[ x ]</code>
@@ -191,14 +194,14 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '0px',
-                        fontSize: 'x-small',
+                        fontSize: 'small',
                       }}
                       className={clsx(baseClasses.rowsLimited2)}
                     >
                       <a
                         style={{
                           textDecoration: 'none',
-                          fontSize: 'x-small',
+                          fontSize: 'small',
                           color: Number(params.job_id) === Number(id)
                             ? 'red' // '#00a47d'
                             : undefined
@@ -218,7 +221,10 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                       >{modifiedPinnedJobs[id].title}</a>
                       {!!modifiedPinnedJobs[id].descr && (
                         <span
-                          style={{ fontSize: 'x-small' }}
+                          style={{
+                            fontSize: 'x-small',
+                            color: '#959eaa'
+                          }}
                           className={clsx(baseClasses.rowsLimited1)}
                         >{modifiedPinnedJobs[id].descr}</span>
                       )}
@@ -248,6 +254,29 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
 
               ))
             }
+
+            {
+              location.pathname !== `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}` && (
+                <Button
+                  size='small'
+                  onClick={handleNavigate({
+                    relativeUrl: getFullUrl({
+                      url: `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`,
+                      query: {
+                        ...queryParams,
+                        from: location.pathname,
+                      },
+                      // queryKeysToremove,
+                    }),
+                  })}
+                  fullWidth
+                  variant='outlined'
+                  startIcon={<SportsBasketballIcon />}
+                // sx={{ borderRadius: 4 }}
+                >Last activity</Button>
+              )
+            }
+
             <button
               className={clsx(
                 classes.absoluteToggler,

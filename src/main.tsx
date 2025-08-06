@@ -3,11 +3,8 @@ import { App } from './App.tsx'
 import { TopLevelContext } from './shared/xstate/topLevelMachine/v2'
 import { ClientPerfWidget } from '~/shared/components/ClientPerfWidget'
 import { SnackbarProvider, closeSnackbar } from 'notistack'
-import CloseIcon from '@mui/icons-material/Close';
-import './special-experimental-styles.css';
-
-// import 'todomvc-common/base.css'
-// import 'todomvc-app-css/index.css'
+import CloseIcon from '@mui/icons-material/Close'
+import './special-experimental-styles.css'
 
 createRoot(document.getElementById('root')!).render(
   <SnackbarProvider

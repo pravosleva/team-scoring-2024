@@ -65,12 +65,13 @@
 
   .checklistItemControls {
     // border: 1px solid red;
-    min-width: 50px;
+    min-width: 40px;
     margin-left: auto;
 
     display: flex;
     flex-direction: row;
     gap: 1px;
+    align-items: center;
   }
 }
 

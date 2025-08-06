@@ -46,9 +46,16 @@ const getFilteredLogs = ({ jobs: filteredJobs, activeFilters }) => {
   const isNewFilterValue = activeFilters.values.isNew
   const hasIsNewFilterValue = !!isNewFilterValue && !Number.isNaN(Number(isNewFilterValue))
 
+  const isTargetJobsRequested = activeFilters.isTargetJobsRequested
+  const targetJobsRequested = isTargetJobsRequested ? activeFilters.values.targetJobsRequested : []
+
+  const preFilteredJobs = isTargetJobsRequested && targetJobsRequested.length > 0
+    ? filteredJobs.filter((job) => targetJobsRequested.includes(job.id))
+    : filteredJobs
+
   const nowDate = new Date().getTime()
 
-  for (const job of filteredJobs) {
+  for (const job of preFilteredJobs) {
     // console.log(job.title)
     // const isCompleted = job.completed
     const isJobNew = getIsJobNew({ job })

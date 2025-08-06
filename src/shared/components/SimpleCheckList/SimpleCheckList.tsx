@@ -16,6 +16,8 @@ import { getPercentage } from '~/shared/utils/number-ops'
 import { useNavigate } from 'react-router-dom'
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ToggleOnIcon from '@mui/icons-material/ToggleOn'
+import ToggleOffIcon from '@mui/icons-material/ToggleOff'
 
 type TLinkBtn = {
   label: string;
@@ -363,19 +365,34 @@ function SimpleCheckListFn<TAddInfo>({
                                   </code>
                                 )
                               }
-                              <code className={classes.inlineControlBtn} onClick={handleDisabledToggle({
-                                checklistItemId: checklistItem.id,
-                                title: checklistItem.title,
-                                descr: checklistItem.descr,
-                                isDoneCurrentValue: checklistItem.isDone,
-                                isDisabledCurrentValue: checklistItem.isDisabled,
-                              })}>
+                              <code
+                                className={classes.inlineControlBtn}
+                                onClick={handleDisabledToggle({
+                                  checklistItemId: checklistItem.id,
+                                  title: checklistItem.title,
+                                  descr: checklistItem.descr,
+                                  isDoneCurrentValue: checklistItem.isDone,
+                                  isDisabledCurrentValue: checklistItem.isDisabled,
+                                })}
+                                style={{
+                                  display: 'inline-flex',
+                                  flexDirection: 'row',
+                                  gap: '5px',
+                                  alignItems: 'center',
+                                  // border: '1px solid red'
+                                }}
+                              >
+                                <span>[</span>
                                 {
-                                  !checklistItem.isDisabled && <>[ Off ]</>
+                                  checklistItem.isDisabled
+                                    ? (
+                                      <ToggleOffIcon sx={{ fontSize: '20px' }} />
+                                    )
+                                    : (
+                                      <ToggleOnIcon sx={{ fontSize: '20px' }} />
+                                    )
                                 }
-                                {
-                                  checklistItem.isDisabled && <>[ On ]</>
-                                }
+                                <span>]</span>
                               </code>
                               {
                                 isEditable && (

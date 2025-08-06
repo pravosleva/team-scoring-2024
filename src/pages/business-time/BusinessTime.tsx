@@ -10,7 +10,8 @@ import { useLocalStorageState } from '~/shared/hooks'
 import SaveIcon from '@mui/icons-material/Save'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ClearIcon from '@mui/icons-material/Clear'
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import ModeEditIcon from '@mui/icons-material/ModeEdit'
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import { JsonEditor } from './components'
 import { TBusinessTimeData, TWeekConfig, EDay } from './utils/types'
 import { theDayValidationObject } from './utils/theDayValidationObject'
@@ -78,7 +79,7 @@ export const BusinessTime = () => {
   }, [saveBusinessTimeConfig, businessTimeConfig])
 
   const topRef = useRef<HTMLDivElement>(null)
-  
+
   const [isEditModeEnabled, setIsEditModeEnabled] = useState<boolean>(false)
   const toggleEditMode = useCallback(() => {
     setIsEditModeEnabled((s) => !s)
@@ -125,7 +126,7 @@ export const BusinessTime = () => {
       return
     }
 
-    const newNormalizedValue = newName.trim().replace(/\s+/g,' ')
+    const newNormalizedValue = newName.trim().replace(/\s+/g, ' ')
     if (newNormalizedValue === activeTab) {
       setInfoMessage('Already named')
       return
@@ -156,8 +157,12 @@ export const BusinessTime = () => {
       >
         <Grid container spacing={2}>
           <Grid size={12}>
-            <h1>⚙️ Business time</h1>
-            <em>Local settings</em>
+            <h1 className={baseClasses.inlineH1}>
+              <WorkHistoryIcon fontSize='inherit' /><span>Business time</span>
+            </h1>
+          </Grid>
+          <Grid size={12}>
+            <em>Local settings for work time analysis</em>
           </Grid>
           {/* <Grid size={12}>
             <Alert
@@ -182,10 +187,10 @@ export const BusinessTime = () => {
                 onClick: ({ form }) => {
                   // console.log(form)
                   if (typeof form.displayName === 'string' && !!form.displayName) {
-                    const normalizedValue = form.displayName.trim().replace(/\s+/g,' ')
+                    const normalizedValue = form.displayName.trim().replace(/\s+/g, ' ')
                     if (typeof normalizedValue === 'string' && !!normalizedValue) {
                       // topLevelActorRef.send({ type: 'user.commit', value: { displayName: form.displayName } })
-                      
+
                       handleCreateTimeConfig({ name: normalizedValue })
                       return Promise.resolve({ ok: true })
                     }
@@ -202,7 +207,7 @@ export const BusinessTime = () => {
                   isRequired: true,
                   validator: ({ value }) => {
                     const lenLimit = 200
-                    const normalizedValue = value.trim().replace(/\s+/g,' ')
+                    const normalizedValue = value.trim().replace(/\s+/g, ' ')
                     const alreadyExists = !!Object.keys(businessTimeConfig).find((key) => normalizedValue === key)
                     const res: { ok: boolean; message?: string } = { ok: true }
                     switch (true) {

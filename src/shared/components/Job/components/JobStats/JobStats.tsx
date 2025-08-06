@@ -356,39 +356,34 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
                             startDate={job.forecast.start}
                             targetDate={calc?.dateSensed}
                             delay={5000}
-                            connectedOnThe={['bottom']}
-                          />
-                        </Grid>
-
-                        <Grid size={12}>
-                          <CollapsibleBox
-                            header={`${sensedDeltaAsPercentageText || 'No analysis for delta'} for ${targetUser.displayName}`}
-                            text={
-                              <>
-                                {
-                                  !!calc?.dateSensed && dayjs(calc?.dateSensed).diff(job.forecast.start, 'year') <= 5
-                                    ? (
-                                      <>
-                                        <em style={{ fontSize: 'small' }}>
-                                          <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed } }} />
-                                        </em>
-                                        <br />
-                                        <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
-                                        <br />
-                                        <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed } }} />
-                                      </>
-                                    )
-                                    : (
-                                      <em style={{ fontSize: 'small' }}>No stat</em>
-                                    )
-                                }
-
-                              </>
+                            connectedOnThe={
+                              !!calc?.dateSensed && dayjs(calc?.dateSensed).diff(job.forecast.start, 'year') <= 3
+                                ? ['bottom']
+                                : undefined
                             }
-                            connectedOnThe={['top']}
                           />
                         </Grid>
-
+                        {
+                          !!calc?.dateSensed && dayjs(calc?.dateSensed).diff(job.forecast.start, 'year') <= 3 && (
+                            <Grid size={12}>
+                              <CollapsibleBox
+                                header={`${sensedDeltaAsPercentageText || 'No analysis for delta'} for ${targetUser.displayName}`}
+                                text={
+                                  <>
+                                    <em style={{ fontSize: 'small' }}>
+                                      <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed } }} />
+                                    </em>
+                                    <br />
+                                    <em style={{ fontSize: 'small' }}>Based on sensed averageSpeed: <b>~{typeof calc.sortedSpeedsCalcOutput?.sensed.averageSpeed === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.sensed.averageSpeed, 2) : 'ERR'}</b> as average difference between speeds with <b>~{typeof calc.sortedSpeedsCalcOutput?.delta.min === 'number' ? getRounded(calc.sortedSpeedsCalcOutput?.delta.min, 2) : 'ERR'}</b> (minimal delta) & <b>{calc.sortedSpeedsCalcOutput?.sensibility || 'ERR'}</b> (sensibility coeff)</em>
+                                    <br />
+                                    <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.dateSensed } }} />
+                                  </>
+                                }
+                                connectedOnThe={['top']}
+                              />
+                            </Grid>
+                          )
+                        }
                       </Grid>
                     </Grid>
                   </Grid>
@@ -429,36 +424,34 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
                             startDate={job.forecast.start}
                             targetDate={calc?.date100}
                             delay={5000}
-                            connectedOnThe={['bottom']}
-                          />
-                        </Grid>
-                        <Grid size={12}>
-                          <CollapsibleBox
-                            header={`${worstDeltaAsPercentageText} for ${targetUser.displayName}`}
-                            text={
-                              <>
-                                {
-                                  !!calc?.date100 && dayjs(calc?.date100).diff(job.forecast.start, 'year') <= 5
-                                    ? (
-                                      <>
-                                        <em style={{ fontSize: 'small' }}>
-                                          <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 } }} />
-                                        </em>
-                                        <br />
-                                        <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
-                                        <br />
-                                        <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 } }} />
-                                      </>
-                                    )
-                                    : (
-                                      <em style={{ fontSize: 'small' }}>No stat</em>
-                                    )
-                                }
-                              </>
+                            connectedOnThe={
+                              !!calc?.date100 && dayjs(calc?.date100).diff(job.forecast.start, 'year') <= 3
+                                ? ['bottom']
+                                : undefined
                             }
-                            connectedOnThe={['top']}
                           />
                         </Grid>
+                        {
+                          !!calc?.date100 && dayjs(calc?.date100).diff(job.forecast.start, 'year') <= 3 && (
+                            <Grid size={12}>
+                              <CollapsibleBox
+                                header={`${worstDeltaAsPercentageText} for ${targetUser.displayName}`}
+                                text={
+                                  <>
+                                    <em style={{ fontSize: 'small' }}>
+                                      <JobTimingInfo job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 } }} />
+                                    </em>
+                                    <br />
+                                    <em style={{ fontSize: 'small' }}>Based on {targetUser.displayName}'s bad experience</em>
+                                    <br />
+                                    <JobResultReviewShort job={{ ...job, forecast: { ...job.forecast, estimate: calc?.date100 } }} />
+                                  </>
+                                }
+                                connectedOnThe={['top']}
+                              />
+                            </Grid>
+                          )
+                        }
                       </Grid>
                       {/*
                       job.forecast.estimate < worst100DateUI

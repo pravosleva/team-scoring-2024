@@ -30,8 +30,12 @@ import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { JobResultReviewShort } from '../../JobResultReviewShort'
 import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCards'
 import { UserAva } from '~/shared/components/Job/components'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 // import { Button } from '@mui/material'
 // import PushPinIcon from '@mui/icons-material/PushPin'
+// import LabelImportantIcon from '@mui/icons-material/LabelImportant'
+import BookmarkIcon from '@mui/icons-material/Bookmark'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -171,7 +175,9 @@ export const ProjectNode = ({
                 }}
                 to={getFullUrl({
                   url: `/jobs/${projectsTree.model.id}`,
-                  query: { ...queryParams },
+                  query: {
+                    ...queryParams,
+                  },
                   // queryKeysToremove,
                 })}
                 className={baseClasses.truncate}
@@ -300,10 +306,30 @@ export const ProjectNode = ({
             style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}
           >
             <span>Details</span>
-            {!isPinned && <code style={{ fontSize: 'x-small', cursor: 'pointer' }} onClick={handlePin}>[ pin ]</code>}
+            {!isPinned && (
+              <code
+                // style={{ fontSize: 'x-small', cursor: 'pointer' }}
+                style={{
+                  cursor: 'pointer',
+                  fontSize: 'x-small',
+                  fontWeight: 'bold',
+                  display: 'inline-flex',
+                  flexDirection: 'row',
+                  gap: '5px',
+                  alignItems: 'center',
+                  // border: '1px solid red'
+                }}
+                onClick={handlePin}
+              >
+                <span>[</span>
+                {/* <span>Pin</span> */}
+                <BookmarkIcon fontSize='small' />
+                <span>]</span>
+              </code>
+            )}
           </span>
         }
-        isOpenedByDefault={true}
+        // isOpenedByDefault={true}
         targetText={projectsTree.model.descr}
         contentRender={({ targetText }) => (
           <>
@@ -367,7 +393,7 @@ export const ProjectNode = ({
                       }}
                       to={
                         [
-                          '/last-activity',
+                          `/last-activity/${projectsTree.model.id}`,
                           // !!activeJobId
                           //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
                           //   : '',
@@ -402,9 +428,30 @@ export const ProjectNode = ({
               }
               <code
                 className={baseClasses.noBreakWords}
-                style={{ fontSize: 'x-small', fontWeight: 'bold', cursor: 'pointer' }}
+                // style={{ fontSize: 'x-small', fontWeight: 'bold', cursor: 'pointer' }}
+                style={{
+                  cursor: 'pointer',
+                  fontSize: 'x-small',
+                  fontWeight: 'bold',
+                  display: 'inline-flex',
+                  flexDirection: 'row',
+                  gap: '5px',
+                  alignItems: 'center',
+                  // border: '1px solid red'
+                }}
                 onClick={toggleLastActivity}
-              >{isLastActivityOpened ? '[ close ]' : '[ open ]'}
+              >
+                {/* <span>[</span> */}
+                {
+                  isLastActivityOpened
+                    ? (
+                      <ExpandLessIcon sx={{ fontSize: '20px' }} />
+                    )
+                    : (
+                      <ExpandMoreIcon sx={{ fontSize: '20px' }} />
+                    )
+                }
+                {/* <span>]</span> */}
               </code>
             </div>
             {

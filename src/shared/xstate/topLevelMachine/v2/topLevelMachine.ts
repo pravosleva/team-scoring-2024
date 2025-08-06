@@ -78,7 +78,7 @@ export const topLevelMachine = setup({
           }
 
           const newPinnedList = [...context.jobs.pinned]
-          const limit = 6
+          const limit = 5
           if (newPinnedList.length >= limit) {
             newPinnedList.pop()
           }

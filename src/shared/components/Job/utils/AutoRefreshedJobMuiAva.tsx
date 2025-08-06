@@ -8,9 +8,10 @@ import { getCurrentPercentage } from '~/shared/utils'
 type TProps = {
   job: TJob;
   delay: number;
+  size?: number;
 }
 
-export const AutoRefreshedJobMuiAva = memo(({ job, delay }: TProps) => {
+export const AutoRefreshedJobMuiAva = memo(({ job, delay, size }: TProps) => {
   const [percentageValue, setPercentageValue] = useState(
     getCurrentPercentage({
       targetDateTs: job.forecast.estimate || new Date().getTime(),
@@ -28,7 +29,7 @@ export const AutoRefreshedJobMuiAva = memo(({ job, delay }: TProps) => {
 
   useEffect(() => {
     if (!!timeout.current) clearTimeout(timeout.current)
-    
+
     timeout.current = setTimeout(updateValue, delay)
 
     return () => {
@@ -42,6 +43,8 @@ export const AutoRefreshedJobMuiAva = memo(({ job, delay }: TProps) => {
     <Avatar
       sx={{
         backgroundColor: jobColor,
+        width: !!size ? size : undefined,
+        height: !!size ? size : undefined,
       }}
     >
       {MemoizedIcon}
