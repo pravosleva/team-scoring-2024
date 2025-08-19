@@ -32,7 +32,8 @@ import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCar
 import { UserAva } from '~/shared/components/Job/components'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-// import { Button } from '@mui/material'
+import { Button } from '@mui/material'
+import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 // import PushPinIcon from '@mui/icons-material/PushPin'
 // import LabelImportantIcon from '@mui/icons-material/LabelImportant'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
@@ -382,14 +383,15 @@ export const ProjectNode = ({
                   ? (
                     <Link
                       className={clsx(
-                        classes.lastActivityOfCurrentJobLink,
-                        baseClasses.underlineSolid,
+                        // classes.lastActivityOfCurrentJobLink,
+                        // baseClasses.underlineSolid,
                         baseClasses.truncate,
                       )}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
+                        textDecoration: 'none'
                       }}
                       to={
                         [
@@ -419,8 +421,18 @@ export const ProjectNode = ({
                         ].join('')
                       }
                     >
-                      <span className={baseClasses.truncate}>Last activity {dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
-                      <ArrowForwardIcon sx={{ fontSize: '12px' }} />
+                      <Button
+                        size='small'
+                        endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+                        variant='outlined'
+                        sx={{
+                          borderRadius: 4,
+                        }}
+                        startIcon={<SportsBasketballIcon />}
+                      >
+                        <span className={baseClasses.truncate}>History from {dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
+                      </Button>
+
                     </Link>
                   ) : (
                     <b className={baseClasses.underlineDashed} style={{ fontSize: 'small' }}>Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>

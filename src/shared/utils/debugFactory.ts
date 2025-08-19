@@ -11,8 +11,8 @@ export const debugFactory = <TEvent, TError>({ label: header }: { label: string 
     }) => {
       counter += 1;
       console.groupCollapsed(`${header} [${counter}] | ${label}`);
-      console.dir({ event });
-      if (!!err) console.dir({ err });
+      console.log({ event });
+      if (!!err) console.log({ err });
       console.groupEnd();
     },
     counter,

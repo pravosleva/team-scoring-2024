@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import SpeedDial from '@mui/material/SpeedDial'
+import Backdrop from '@mui/material/Backdrop'
 // import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import SpeedDialAction from '@mui/material/SpeedDialAction'
 import { Link } from 'react-router-dom'
@@ -12,7 +13,7 @@ import AppsIcon from '@mui/icons-material/Apps'
 // import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import clsx from 'clsx'
 import { ResponsiveBlock } from '~/shared/components'
-import SegmentIcon from '@mui/icons-material/Segment'
+// import SegmentIcon from '@mui/icons-material/Segment'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedPinnedJoblist, FixedScrollTopBtn } from './components'
 import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
@@ -21,6 +22,10 @@ import { useLocalStorageState } from '~/shared/hooks'
 // @ts-ignore
 import jsonSize from 'json-size'
 import { getHumanReadableSize } from '~/shared/utils/number-ops'
+import { useSnapshot } from 'valtio/react'
+import { vi } from '~/shared/utils/vi'
+import LensBlurIcon from '@mui/icons-material/LensBlur'
+import LensIcon from '@mui/icons-material/Lens'
 
 type TProps = {
   children: React.ReactNode;
@@ -75,6 +80,10 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
     () => getHumanReadableSize({ bytes: jsonSize(fullMainLSState), decimals: 2 }),
     [fullMainLSState]
   )
+  const [speedDialOpened, setSpeedDialOpened] = useState(false)
+  const handleOpenSpeedDial = () => setSpeedDialOpened(true)
+  const handleCloseSpeedDial = () => setSpeedDialOpened(false)
+  const debugViSnap = useSnapshot(vi.common.devtools)
 
   return (
     <ParamsInspectorContextWrapper>
@@ -108,17 +117,27 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
         </ResponsiveBlock>
       </div>
 
+      <Backdrop
+        open={speedDialOpened}
+        sx={{
+          zIndex: 51,
+        }}
+      />
       <SpeedDial
+        open={speedDialOpened}
         ariaLabel='SpeedDial'
+        onOpen={handleOpenSpeedDial}
+        onClose={handleCloseSpeedDial}
         sx={{
           position: 'fixed',
           bottom: 32,
           right: 24,
         }}
-        icon={<SegmentIcon />}
+        icon={debugViSnap.network.socket.isConnected ? <LensIcon /> : <LensBlurIcon />}
       >
         {allActions.map(({ to, name, _Icon }) => (
           <SpeedDialAction
+            onClick={handleCloseSpeedDial}
             FabProps={{
               size: 'medium',
             }}

@@ -1,7 +1,7 @@
 {
-  "name": "team-scoring-2024",
+  "name": "taro-2024",
   "private": true,
-  "version": "2.1.2-beta11-last-activity-[job_ids]-exp",
+  "version": "2.1.3-socket-exp",
   "type": "module",
   "engines": {
     "npm": ">=10.8.2",
@@ -51,6 +51,7 @@
     "todomvc-app-css": "^2.4.3",
     "todomvc-common": "^1.0.5",
     "ts-tree-lib": "^1.0.3",
+    "valtio": "^2.1.5",
     "xstate": "^5.19.1"
   },
   "devDependencies": {

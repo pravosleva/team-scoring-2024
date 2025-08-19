@@ -5,6 +5,7 @@ import { TLogChecklistItem } from '~/shared/xstate';
 import { Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { CustomizedTextField } from '~/shared/components/Input'
+import { CopyToClipboardWrapperUniversal } from '~/shared/components/CopyToClipboardWrapper'
 import AddIcon from '@mui/icons-material/Add'
 import SaveIcon from '@mui/icons-material/Save'
 import CloseIcon from '@mui/icons-material/Close'
@@ -18,6 +19,9 @@ import { useNavigate } from 'react-router-dom'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper';
+import FaCopy from '@mui/icons-material/ContentCopy'
+import FaRegCopy from '@mui/icons-material/FileCopy'
 
 type TLinkBtn = {
   label: string;
@@ -31,6 +35,7 @@ type TProps<T, TAddInfo> = {
   isMiniVariant?: boolean;
   infoLabel: string;
   createBtnLabel: string;
+  isCopiable?: boolean;
   isEditable: boolean;
   isCreatable: boolean;
   isDeletable: boolean;
@@ -68,6 +73,7 @@ function SimpleCheckListFn<TAddInfo>({
   items,
   infoLabel,
   createBtnLabel,
+  isCopiable,
   isEditable,
   isCreatable,
   isDeletable,
@@ -232,6 +238,9 @@ function SimpleCheckListFn<TAddInfo>({
 
   const currentPercentage = useMemo(() => getPercentage({ sum: items.length, x: items.filter(({ isDone, isDisabled }) => isDone || isDisabled).length }), [items])
 
+  const [copiedText, setParamsInspectorContextStore] = useParamsInspectorContextStore((s) => s._auxState.copiedText)
+  const handleCopy = useCallback((text: string) => setParamsInspectorContextStore({ _auxState: { copiedText: text } }), [setParamsInspectorContextStore])
+
   return (
     <>
       {
@@ -260,7 +269,7 @@ function SimpleCheckListFn<TAddInfo>({
                 type='text'
                 onChange={handleChangeDescr}
                 multiline
-                maxRows={5}
+                maxRows={10}
               // sx={{ borderRadius: '8px' }}
               />
             </Grid>
@@ -358,6 +367,82 @@ function SimpleCheckListFn<TAddInfo>({
                             </button>
 
                             <div className={classes.checklistItemControls}>
+                              {
+                                isCopiable && (
+                                  <CopyToClipboardWrapperUniversal
+                                    showNotifOnCopy
+                                    onCopy={handleCopy}
+                                    text={clsx(checklistItem.title, {
+                                      [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                    })}
+                                    renderer={({ isCopied }) => (
+                                      <code
+                                        className={classes.inlineControlBtn}
+                                        style={{
+                                          color: isCopied && copiedText === clsx(checklistItem.title, {
+                                            [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                          })
+                                            ? '#02c39a'
+                                            : 'inherit',
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          gap: '5px',
+                                          alignItems: 'center',
+                                        }}
+                                      >
+                                        <span>[</span>
+                                        {
+                                          isCopied && copiedText === clsx(checklistItem.title, {
+                                            [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                          })
+                                            ? (
+                                              <FaRegCopy sx={{ fontSize: '18px' }} />
+                                            )
+                                            : (
+                                              <FaCopy sx={{ fontSize: '18px' }} />
+                                            )
+                                        }
+                                        <span>all</span>
+                                        <span>]</span>
+                                      </code>
+                                    )}
+                                  />
+                                )
+                              }
+                              {
+                                isCopiable && !!checklistItem.descr && (
+                                  <CopyToClipboardWrapperUniversal
+                                    showNotifOnCopy
+                                    onCopy={handleCopy}
+                                    text={checklistItem.descr}
+                                    renderer={({ isCopied }) => (
+                                      <code
+                                        className={classes.inlineControlBtn}
+                                        style={{
+                                          color: isCopied && copiedText === checklistItem.descr ? '#02c39a' : 'inherit',
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          gap: '5px',
+                                          alignItems: 'center',
+                                        }}
+                                      >
+                                        <span>[</span>
+                                        {
+                                          isCopied && copiedText === checklistItem.descr
+                                            ? (
+                                              <FaRegCopy sx={{ fontSize: '18px' }} />
+                                            )
+                                            : (
+                                              <FaCopy sx={{ fontSize: '18px' }} />
+                                            )
+                                        }
+                                        <span>descr</span>
+                                        <span>]</span>
+                                      </code>
+                                    )}
+                                  />
+                                )
+                              }
                               {
                                 !!onDeleteChecklistItem && (
                                   <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>

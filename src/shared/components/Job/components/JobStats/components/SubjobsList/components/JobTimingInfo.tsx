@@ -83,13 +83,13 @@ export const JobTimingInfo = memo(({ job }: {
           </div>
         ))
       }
-      {
+      {/*
         (!!job.forecast.estimate || !!job.forecast.finish) && (
           <>
             <em>* BT - Business Time standard name</em>
           </>
         )
-      }
+      */}
       {/* <br />
       <pre
         className={baseClasses.preNormalized}

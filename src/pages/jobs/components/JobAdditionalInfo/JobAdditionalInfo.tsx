@@ -149,6 +149,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                         !!checklist && checklist?.length > 0 && (
                           <div>
                             <SimpleCheckList
+                              isCopiable
                               // connectedOnThe={['top']}
                               isMiniVariant
                               items={checklist || []}

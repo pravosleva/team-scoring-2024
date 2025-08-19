@@ -18,6 +18,7 @@ import { useWorstCalcWebWorker } from '~/shared/components/Job/components/JobSta
 import { groupLog } from '~/shared/utils'
 import CircularProgress from '@mui/material/CircularProgress'
 import { getPercentage } from '~/shared/utils/number-ops'
+import { JobTimingStandartInfo } from './components/SubjobsList/components/JobTimingStandartInfo';
 
 type TProps = {
   job: TJob;
@@ -481,6 +482,33 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
           </>
         )
       }
+
+      <Grid size={12}>
+        <Grid container spacing={0} sx={{ border: 'none' }}>
+          <Grid container spacing={1} size={12} sx={{ border: 'none' }}>
+            <Grid size={12}>
+              <b>ℹ️ About your Business Time</b>
+            </Grid>
+            <Grid size={12}>
+              <CollapsibleBox
+                connectedOnThe={[]}
+                header={'Common Productivity Analysis'}
+                text={
+                  <>
+                    <em style={{ fontSize: 'small' }}>
+                      <JobTimingStandartInfo job={job} />
+                    </em>
+                    {/* <br />
+                      <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                      <br />
+                      <JobResultReviewShort job={job} /> */}
+                  </>
+                }
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
 
       {
         jobsChildren.length > 0 && (

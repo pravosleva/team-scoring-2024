@@ -42,6 +42,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       {
         !!targetJob && Object.keys(targetJobTotalChecklistMaping).map((checklistKey, i) => (
           <SimpleCheckList
+            isCopiable
             addLogLinkBtns={[
               {
                 label: 'Log',

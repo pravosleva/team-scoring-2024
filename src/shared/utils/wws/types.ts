@@ -40,6 +40,40 @@ export namespace NWService {
     SORTED_LOGS_PAGER_ERR = 'w-c:sorted-logs-pager:pong:err',
 
     // NOTE: 2/2 Others...
+
+    // NOTE: Online exp
+    UI_NOTIF = 'ui_notif',
+    ONLINE_INCOMING_DATA = 'w-c:online-data',
+    ONLINE_CONN_OK = 'w-c:online-conn-ok',
+    ONLINE_CONN_ERR = 'w-c:online-conn-err',
+    ONLINE_RECONN = 'w-c:online-reconn',
+    ONLINE_DISCONN = 'w-c:online-disconn',
+    ONLINE_TRY_TO_RECONN = 'w-c:online-trying-to-reconn',
+    ONLINE_FULL_HISTORY_REPORT_ANSWER_OK = 'w-c:online-history-report-ok',
+    ONLINE_FULL_HISTORY_REPORT_ANSWER_ERR = 'w-c:online-history-report-err',
+  }
+  export enum EUIMessage {
+    SOCKET_MUST_DIE = 'socket_must_die',
+    WARNING = 'ui_message_warning',
+    DEFAULT = 'ui_message_default',
+    DANGER = 'ui_message_danger',
+    SUCCESS = 'ui_message_success',
+    INFO = 'ui_message_info',
+  }
+
+  export enum EMetrixClientOutgoing {
+    EXPERIMENTAL_METRIX_PING = 'from-client:mx:experimental-metrix:ping',
+  }
+  export enum EMetrixClientIncoming {
+    EXPERIMENTAL_METRIX_PONG_OK = 'w-c:experimental-metrix:pong-ok',
+    EXPERIMENTAL_METRIX_PONG_ERR = 'w-c:experimental-metrix:pong-err',
+  }
+  export enum EReportType {
+    DEFAULT = 'default',
+    INFO = 'info',
+    WARNING = 'warning',
+    ERROR = 'error',
+    SUCCESS = 'success',
   }
   export type TDataResult<T> = {
     ok: boolean;

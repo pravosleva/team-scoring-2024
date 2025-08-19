@@ -38,6 +38,9 @@ const getBusinessDayAnalyze = ({ dayBusinessTime, criteries, day }: {
     optimalLunchDiffInMinutes: [number, number];
   };
 }): {
+  absoluteHours: number;
+  totalHours: number;
+  productiveHours: number;
   bigRangesCounter: number;
   ok: boolean;
   message?: string;
@@ -45,6 +48,9 @@ const getBusinessDayAnalyze = ({ dayBusinessTime, criteries, day }: {
 } => {
   const logs: string[] = []
   const res = {
+    absoluteHours: 0,
+    productiveHours: 0,
+    totalHours: 0,
     bigRangesCounter: 0,
     ok: true,
   }
@@ -52,11 +58,17 @@ const getBusinessDayAnalyze = ({ dayBusinessTime, criteries, day }: {
   if (!!dayBusinessTime) {
     let _c = 0
     let _prevEnd: Dayjs | null = null
-    const nextBusinessDay: string = testedBusinessWeekDays[day as EDayEnumValues] // testedBusinessDay.addBusinessHours(timeToAdd).format('YYYY-MM-DD')
+    const testedBusinessDay: string = testedBusinessWeekDays[day as EDayEnumValues] // testedBusinessDay.addBusinessHours(timeToAdd).format('YYYY-MM-DD')
+    // -- NOTE: absolute diff exp
+    const start: Dayjs = dayjs(`${testedBusinessDay} ${dayBusinessTime[0].start}`)
+    const end: Dayjs = dayjs(`${testedBusinessDay} ${dayBusinessTime[dayBusinessTime.length - 1].end}`)
+    res.absoluteHours = end.diff(start, 'hours') - 1 // NOTE: 1h for lunch
+    // --
 
     const _rangesInfo = dayBusinessTime.reduce((acc: {
       message: string;
       ok: boolean;
+      productiveHoursDiff: number;
       minsDiff: number;
       coffeBreakDiff: number;
     }[], timingItem) => {
@@ -67,13 +79,24 @@ const getBusinessDayAnalyze = ({ dayBusinessTime, criteries, day }: {
         ok: false,
         minsDiff: 0,
         coffeBreakDiff: 0,
+        productiveHoursDiff: 0,
       }
-      const start: Dayjs = dayjs(`${nextBusinessDay} ${timingItem.start}`)
-      const end: Dayjs = dayjs(`${nextBusinessDay} ${timingItem.end}`)
+      const start: Dayjs = dayjs(`${testedBusinessDay} ${timingItem.start}`)
+      const end: Dayjs = dayjs(`${testedBusinessDay} ${timingItem.end}`)
       const minutesDiff = start.businessTimeDiff(end, 'minutes')
+
       middleResult.minsDiff = minutesDiff
       middleResult.ok = minutesDiff >= criteries.goodDiffInMinutes
+
       const isProductiveRange = middleResult.ok
+
+      const hoursDiff = start.businessTimeDiff(end, 'hours')
+      res.totalHours += hoursDiff
+
+      if (isProductiveRange) {
+        middleResult.productiveHoursDiff += hoursDiff
+        res.productiveHours += hoursDiff
+      }
 
       if (isProductiveRange)
         _itemMsgs.push(`✅ ${timingItem.start} -> ${timingItem.end}\nProductive range (${minutesDiff}min)`)
@@ -144,9 +167,23 @@ export type TResult = {
     };
   } | null;
   commonBusinessAnalysis: {
-    [key: string]: {
-      [key in EDayEnumValues]: string[];
-    }
+    absoluteHours: {
+      [key: string]: number;
+    };
+    totalHours: {
+      [key: string]: number;
+    };
+    productiveHours: {
+      [key: string]: number;
+    };
+    all: {
+      [key: string]: {
+        [key in EDayEnumValues]: {
+          totalHours: number;
+          logs: string[];
+        }
+      };
+    };
   };
 }
 
@@ -156,7 +193,12 @@ export const getDoneTimeDiff = ({ job }: {
   const res: TResult = {
     finish: null,
     estimation: null,
-    commonBusinessAnalysis: {},
+    commonBusinessAnalysis: {
+      absoluteHours: {},
+      totalHours: {},
+      productiveHours: {},
+      all: {},
+    },
   }
 
   if (!!job.forecast.start && !!job.forecast.finish) {
@@ -194,17 +236,37 @@ export const getDoneTimeDiff = ({ job }: {
         totalHours: businessHours,
         uiText: businessMsgs.join('; '),
       }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+
       res.finish.business[businessType] = outputBusinessChunk
-      res.commonBusinessAnalysis[businessType] = {
-        sunday: [],
-        monday: [],
-        tuesday: [],
-        wednesday: [],
-        thursday: [],
-        friday: [],
-        saturday: [],
+      res.commonBusinessAnalysis.all[businessType] = {
+        sunday: {
+          totalHours: 0,
+          logs: [],
+        },
+        monday: {
+          totalHours: 0,
+          logs: [],
+        },
+        tuesday: {
+          totalHours: 0,
+          logs: [],
+        },
+        wednesday: {
+          totalHours: 0,
+          logs: [],
+        },
+        thursday: {
+          totalHours: 0,
+          logs: [],
+        },
+        friday: {
+          totalHours: 0,
+          logs: [],
+        },
+        saturday: {
+          totalHours: 0,
+          logs: [],
+        },
       }
     }
   }
@@ -230,15 +292,37 @@ export const getDoneTimeDiff = ({ job }: {
 
     const businessTimeConfig = getBusinessTimeConfig()
     for (const businessType in businessTimeConfig) {
-      res.commonBusinessAnalysis[businessType] = {
-        sunday: [],
-        monday: [],
-        tuesday: [],
-        wednesday: [],
-        thursday: [],
-        friday: [],
-        saturday: [],
+      res.commonBusinessAnalysis.all[businessType] = {
+        sunday: {
+          totalHours: 0,
+          logs: [],
+        },
+        monday: {
+          totalHours: 0,
+          logs: [],
+        },
+        tuesday: {
+          totalHours: 0,
+          logs: [],
+        },
+        wednesday: {
+          totalHours: 0,
+          logs: [],
+        },
+        thursday: {
+          totalHours: 0,
+          logs: [],
+        },
+        friday: {
+          totalHours: 0,
+          logs: [],
+        },
+        saturday: {
+          totalHours: 0,
+          logs: [],
+        },
       }
+
       // NOTE: 1. Set Business Times in dayjs
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -265,8 +349,27 @@ export const getDoneTimeDiff = ({ job }: {
             optimalLunchDiffInMinutes: [45, 59],
           },
         })
+        if (typeof res.commonBusinessAnalysis.totalHours[businessType] === 'undefined') {
+          res.commonBusinessAnalysis.totalHours[businessType] = analysis.totalHours
+        } else {
+          res.commonBusinessAnalysis.totalHours[businessType] += analysis.totalHours
+        }
+
+        if (typeof res.commonBusinessAnalysis.productiveHours[businessType] === 'undefined') {
+          res.commonBusinessAnalysis.productiveHours[businessType] = analysis.productiveHours
+        } else {
+          res.commonBusinessAnalysis.productiveHours[businessType] += analysis.productiveHours
+        }
+
+        if (typeof res.commonBusinessAnalysis.absoluteHours[businessType] === 'undefined') {
+          res.commonBusinessAnalysis.absoluteHours[businessType] = analysis.absoluteHours
+        } else {
+          res.commonBusinessAnalysis.absoluteHours[businessType] += analysis.absoluteHours
+        }
+
+        res.commonBusinessAnalysis.all[businessType][day as EDayEnumValues].totalHours = analysis.totalHours
         if (analysis.logs.length > 0) {
-          res.commonBusinessAnalysis[businessType][day as EDayEnumValues] = analysis.logs
+          res.commonBusinessAnalysis.all[businessType][day as EDayEnumValues].logs = analysis.logs
         }
       }
 

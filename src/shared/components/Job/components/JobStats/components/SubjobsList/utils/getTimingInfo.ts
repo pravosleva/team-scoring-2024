@@ -2,7 +2,8 @@ import { TResult } from '~/shared/components/Job/utils/getDoneTimeDiff'
 import { TJob } from '~/shared/xstate'
 import { TSections } from './types'
 import { getSectionMsgs } from './getSectionMsgs';
-import { EDayEnumValues } from '~/pages/business-time/utils/types';
+// import { EDayEnumValues } from '~/pages/business-time/utils/types';
+// import { getPercentage } from '~/shared/utils/number-ops';
 
 export const getTimingInfo = ({ timing, job }: {
   timing: TResult;
@@ -17,13 +18,13 @@ export const getTimingInfo = ({ timing, job }: {
     },
   }
 
-  for (const businessTimeCode in timing.commonBusinessAnalysis) {
-    res[`BT analysis for ${businessTimeCode}`] = {
-      items: Object.keys(timing.commonBusinessAnalysis[businessTimeCode])
-        .filter((day) => timing.commonBusinessAnalysis[businessTimeCode][day as EDayEnumValues].length > 0)
-        .map((day) => `${day}:\n${timing.commonBusinessAnalysis[businessTimeCode][day as EDayEnumValues].join('; ')}`)
-    }
-  }
+  // for (const businessTimeCode in timing.commonBusinessAnalysis.all) {
+  //   res[`BT analysis for "${businessTimeCode}" // Total: ${timing.commonBusinessAnalysis.totalHours[businessTimeCode].toFixed(1)}h, Productive: ${timing.commonBusinessAnalysis.productiveHours[businessTimeCode].toFixed(1)}h (${getPercentage({ x: timing.commonBusinessAnalysis.productiveHours[businessTimeCode], sum: timing.commonBusinessAnalysis.totalHours[businessTimeCode] }).toFixed(1)}%)`] = {
+  //     items: Object.keys(timing.commonBusinessAnalysis.all[businessTimeCode])
+  //       .filter((day) => timing.commonBusinessAnalysis.all[businessTimeCode][day as EDayEnumValues].logs.length > 0)
+  //       .map((day) => `${day} (${timing.commonBusinessAnalysis.all[businessTimeCode][day as EDayEnumValues].totalHours.toFixed(1)}h):\n${timing.commonBusinessAnalysis.all[businessTimeCode][day as EDayEnumValues].logs.join('; ')}`)
+  //   }
+  // }
 
   switch (true) {
     case !!job.forecast.estimate:

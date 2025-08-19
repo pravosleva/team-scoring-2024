@@ -1,7 +1,8 @@
 import { createHashRouter } from 'react-router-dom'
 import {
   AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
-  JobPage, JobsPage, LogPage, LastActivityPage, LastJobActivityPage, SoundCheckPage, WorkerExpPage,
+  JobPage, JobsPage, LogPage, LastActivityPage, LastJobActivityPage,
+  OnlineExpPage, SoundCheckPage, WorkerExpPage,
 } from '~/pages'
 import { Layout, JobsPagerAbstracted } from '~/shared/components'
 
@@ -63,6 +64,10 @@ export const router = createHashRouter(
     {
       path: '/sound-check',
       element: <SoundCheckPage />,
+    },
+    {
+      path: '/online-exp',
+      element: <OnlineExpPage />,
     },
   ]
 )

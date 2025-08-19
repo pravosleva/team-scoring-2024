@@ -257,6 +257,7 @@ export const LastActivityPage = memo(() => {
                           items={log.checklist || []}
                           infoLabel='Checklist'
                           createBtnLabel='Create checklist'
+                          isCopiable
                           isCreatable={false}
                           isDeletable={false}
                           isEditable={false}

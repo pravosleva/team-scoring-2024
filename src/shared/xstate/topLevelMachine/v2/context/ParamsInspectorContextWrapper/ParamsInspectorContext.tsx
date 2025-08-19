@@ -44,6 +44,9 @@ type TUserRouteControls = {
   to?: TUserRouteControlsItem;
 };
 type TPICStore = {
+  _auxState: {
+    copiedText: string | null;
+  };
   queryParams: { [key: string]: string };
   debug: {
     filters: {
@@ -57,6 +60,9 @@ type TPICStore = {
   userRouteControls: TUserRouteControls;
 }
 const initialState: TPICStore = {
+  _auxState: {
+    copiedText: null,
+  },
   queryParams: {},
   debug: {
     filters: {

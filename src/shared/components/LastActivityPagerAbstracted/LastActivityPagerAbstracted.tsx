@@ -480,6 +480,7 @@ export const LastActivityPagerAbstracted = memo(({
                         {
                           !!log.checklist && log.checklist?.length > 0 && (
                             <SimpleCheckList
+                              isCopiable
                               key={log.jobTsUpdate}
                               // _additionalInfo={{ message: 'No helpful info' }}
                               isMiniVariant

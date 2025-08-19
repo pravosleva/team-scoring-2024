@@ -11,7 +11,8 @@ import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemBu
 import { AutoRefreshedJobMuiAva } from './utils'
 import classes from './Job.module.scss'
 import clsx from 'clsx'
-import ToggleOnIcon from '@mui/icons-material/ToggleOn'
+// import ToggleOnIcon from '@mui/icons-material/ToggleOn'
+import SettingsIcon from '@mui/icons-material/Settings'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import baseClasses from '~/App.module.scss'
@@ -191,7 +192,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                       <div
                         style={{
                           display: 'flex',
-                          gap: '8px',
+                          gap: '16px',
                           alignItems: 'center',
                         }}
                       >
@@ -207,19 +208,9 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                         {assignedToName && (
                           <span className={baseClasses.truncate}>{assignedToName}</span>
                         )}
+                        {job.logs.isEnabled && <SettingsIcon fontSize='small' htmlColor='gray' />}
                       </div>
                     }
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '8px',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {/* <JobResultReviewShort job={job} /> */}
-                      {job.logs.isEnabled && <ToggleOnIcon htmlColor='gray' />}
-                    </div>
                   </div>
                 }
               />

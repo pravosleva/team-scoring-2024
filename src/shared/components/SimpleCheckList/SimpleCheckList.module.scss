@@ -25,7 +25,7 @@
     // border-radius: 50%;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: start;
     gap: 8px;
 
     button {
@@ -67,8 +67,11 @@
     // border: 1px solid red;
     min-width: 40px;
     margin-left: auto;
+    padding-top: 2px;
 
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     flex-direction: row;
     gap: 1px;
     align-items: center;

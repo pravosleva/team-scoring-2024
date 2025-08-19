@@ -1,10 +1,10 @@
- 
+
 import { useCallback, memo, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import baseClasses from '~/App.module.scss'
 // import { FaCopy, FaRegCopy } from 'react-icons/fa'
-import FaCopy from '@mui/icons-material/ContentCopy';
-import FaRegCopy from '@mui/icons-material/FileCopy';
+import FaCopy from '@mui/icons-material/ContentCopy'
+import FaRegCopy from '@mui/icons-material/FileCopy'
 import clsx from 'clsx'
 import {
   useSnackbar,
@@ -48,7 +48,7 @@ export const CopyToClipboardWrapper = memo(({ onCopy, text, uiText, showNotifOnC
   const handleCopy = useCallback(() => {
     if (showNotifOnCopy) showInfo({ message: `Скопировано ${text}` })
     if (!!onCopy) onCopy()
-    
+
     setIsCopied(true)
   }, [showNotifOnCopy, setIsCopied, onCopy, showInfo, text])
 
@@ -88,12 +88,12 @@ export const CopyToClipboardWrapper = memo(({ onCopy, text, uiText, showNotifOnC
         >
           {!isCopied ? (
             <span className={classes.copyIcon}>
-              <FaRegCopy fontSize='inherit' />
+              <FaCopy fontSize='inherit' />
             </span>
           ) : (
             // <span className={classes.copyInfo}>Скопировано</span>
             <span className={classes.copyIcon}>
-              <FaCopy fontSize='inherit' />
+              <FaRegCopy fontSize='inherit' />
             </span>
           )}
         </span>

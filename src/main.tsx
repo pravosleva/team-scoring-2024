@@ -8,7 +8,7 @@ import './special-experimental-styles.css'
 
 createRoot(document.getElementById('root')!).render(
   <SnackbarProvider
-    maxSnack={4}
+    maxSnack={3}
     autoHideDuration={60000}
     // preventDuplicate
     anchorOrigin={{
@@ -18,9 +18,24 @@ createRoot(document.getElementById('root')!).render(
     style={{
       borderRadius: '8px',
       maxWidth: '430px',
+      whiteSpace: 'pre-wrap',
     }}
     action={(snackbarId) => (
-      <button onClick={() => closeSnackbar(snackbarId)}>
+      <button
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: '50%',
+          border: '2px solid #FFF',
+          backgroundColor: 'transparent',
+          color: '#FFF',
+          width: '32px',
+          height: '32px',
+          cursor: 'pointer',
+        }}
+        onClick={() => closeSnackbar(snackbarId)}
+      >
         <CloseIcon fontSize='small' />
       </button>
     )}

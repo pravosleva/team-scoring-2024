@@ -1,3 +1,10 @@
+export type TStandartSections = {
+  [key: string]: {
+    items: string[];
+    comment?: string;
+  };
+};
+
 export type TSections = {
   estimated: {
     items: string[];

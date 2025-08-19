@@ -1,0 +1,11 @@
+.resultWrapper {
+  transition: all 0.75s ease-in-out;
+}
+
+.resultWhenWorkerDisabled {
+  background-color: #ffecec;
+}
+
+.resultWhenWorkerEnabled {
+  background-color: #c9fce9;
+}

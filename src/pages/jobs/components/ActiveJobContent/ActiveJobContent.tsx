@@ -22,6 +22,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import { CopyToClipboardWrapper } from '~/shared/components'
 import dayjs from 'dayjs'
 import LinkIcon from '@mui/icons-material/Link'
+import { CollapsibleText } from '../../[job_id]/components/ProjectsTree/components'
 // import ChecklistIcon from '@mui/icons-material/Checklist';
 
 type TProps = {
@@ -244,122 +245,140 @@ export const ActiveJobContent = memo(({
               }
             </div>
 
-            <div
-              className={baseClasses.stack1}
-            >
-              {/* <div
-                style={{
-                  fontWeight: 'bold',
-                  // wordBreak: 'break-all',
-                  overflowWrap: 'break-word',
-                }}
-              >{job.title}</div> */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '100%',
-                  minHeight: '32px',
-                }}
-              >
-                <RadioGroupRating
-                  size='large'
-                  name='rating-view'
-                  value={expressAppraiserStars}
-                  // icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
-                  // emptyIcon={<StarBorderIcon fontSize='inherit' />}
-                  // max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
-                  max={6}
-                  // disabled
-                  // aria-readonly
-                  // readOnly
-                  onChange={(_e, value) => {
-                    setExpressAppraiserStars(value || 0)
-                  }}
-                />
-                {
-                  isNeedToReset && (
-                    <Button
-                      color='error'
-                      variant='text'
-                      size='small'
-                      endIcon={<HistoryIcon />}
-                      // fullWidth
-                      // className={baseClasses.truncate}
-                      onClick={resetExpressAppraiserStars}
-                    >
-                      Reset
-                    </Button>
-                  )
-                }
-              </div>
-              <div style={{ fontSize: 'small' }}>
-                Grade: {ratingIcons[expressAppraiserStars].label}
-              </div>
-            </div>
-            <ResponsiveBlock
-              style={{
-                // padding: '16px 16px 16px 16px',
-                // position: 'sticky',
-                // top: 0,
-                backgroundColor: '#fff',
-                // zIndex: 2,
-                // borderBottom: '1px solid lightgray',
-                // border: '1px solid red',
-                height: '30px',
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '8px',
-              }}
-            >
-              <div
-                style={{
-                  border: '1px solid #959eaa',
-                  // backgroundColor: 'gray',
-                  // color: '#fff',
-                  padding: '4px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  alignItems: 'center',
-                  width: '100%',
-                  cursor: 'pointer',
-                  fontSize: 'small',
-                }}
-                onClick={scrollLog}
-                // className={baseClasses.stripedBlue}
-                className={baseClasses.stripedGrayLight}
-              >
-                <span>LOGS</span>
-                <ArrowDownwardIcon fontSize='small' />
-              </div>
-              {
-                linksFromLogs.length > 0 && (
+            <CollapsibleText
+              briefText='Details'
+              contentRender={() => (
+                <div
+                  className={baseClasses.stack1}
+                >
+                  {/* <div
+                    style={{
+                      fontWeight: 'bold',
+                      // wordBreak: 'break-all',
+                      overflowWrap: 'break-word',
+                    }}
+                  >{job.title}</div> */}
+                  {
+                    !!job.descr && (
+                      <div
+                        style={{
+                          color: 'gray',
+                          fontSize: 'small',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {job.descr}
+                      </div>
+                    )
+                  }
                   <div
                     style={{
-                      border: '1px solid #959eaa',
-                      // backgroundColor: 'gray',
-                      // color: '#fff',
-                      padding: '4px',
                       display: 'flex',
-                      justifyContent: 'center',
-                      gap: '8px',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                       width: '100%',
-                      cursor: 'pointer',
-                      fontSize: 'small',
+                      minHeight: '32px',
                     }}
-                    onClick={scrollLinks}
-                    // className={baseClasses.stripedBlue}
-                    className={baseClasses.stripedGrayLight}
                   >
-                    <span>LINKS</span>
-                    <ArrowDownwardIcon fontSize='small' />
+                    <RadioGroupRating
+                      size='large'
+                      name='rating-view'
+                      value={expressAppraiserStars}
+                      // icon={<StarIcon htmlColor='gray' fontSize='inherit' />}
+                      // emptyIcon={<StarBorderIcon fontSize='inherit' />}
+                      // max={job.forecast.complexity > 5 ? job.forecast.complexity : 5}
+                      max={6}
+                      // disabled
+                      // aria-readonly
+                      // readOnly
+                      onChange={(_e, value) => {
+                        setExpressAppraiserStars(value || 0)
+                      }}
+                    />
+                    {
+                      isNeedToReset && (
+                        <Button
+                          color='error'
+                          variant='text'
+                          size='small'
+                          endIcon={<HistoryIcon />}
+                          // fullWidth
+                          // className={baseClasses.truncate}
+                          onClick={resetExpressAppraiserStars}
+                        >
+                          Reset
+                        </Button>
+                      )
+                    }
                   </div>
-                )
-              }
-            </ResponsiveBlock>
+                  <div style={{ fontSize: 'small' }}>
+                    Grade: {ratingIcons[expressAppraiserStars].label}
+                  </div>
+
+                  <ResponsiveBlock
+                    style={{
+                      // padding: '16px 16px 16px 16px',
+                      // position: 'sticky',
+                      // top: 0,
+                      backgroundColor: '#fff',
+                      // zIndex: 2,
+                      // borderBottom: '1px solid lightgray',
+                      // border: '1px solid red',
+                      height: '30px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '8px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        border: '1px solid #959eaa',
+                        // backgroundColor: 'gray',
+                        // color: '#fff',
+                        padding: '4px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        alignItems: 'center',
+                        width: '100%',
+                        cursor: 'pointer',
+                        fontSize: 'small',
+                      }}
+                      onClick={scrollLog}
+                      // className={baseClasses.stripedBlue}
+                      className={baseClasses.stripedGrayLight}
+                    >
+                      <span>LOGS</span>
+                      <ArrowDownwardIcon fontSize='small' />
+                    </div>
+                    {linksFromLogs.length > 0 && (
+                      <div
+                        style={{
+                          border: '1px solid #959eaa',
+                          // backgroundColor: 'gray',
+                          // color: '#fff',
+                          padding: '4px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          alignItems: 'center',
+                          width: '100%',
+                          cursor: 'pointer',
+                          fontSize: 'small',
+                        }}
+                        onClick={scrollLinks}
+                        // className={baseClasses.stripedBlue}
+                        className={baseClasses.stripedGrayLight}
+                      >
+                        <span>LINKS</span>
+                        <ArrowDownwardIcon fontSize='small' />
+                      </div>
+                    )}
+                  </ResponsiveBlock>
+
+                </div>
+              )}
+            />
           </ResponsiveBlock>
 
           <ResponsiveBlock
@@ -368,19 +387,6 @@ export const ActiveJobContent = memo(({
             }}
           >
             <div className={baseClasses.stack2}>
-              {
-                !!job.descr && (
-                  <div
-                    style={{
-                      color: 'gray',
-                      fontSize: 'small',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    {job.descr}
-                  </div>
-                )
-              }
               <JobStats
                 job={{
                   ...job,
