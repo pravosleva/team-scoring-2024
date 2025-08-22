@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { Layout } from '~/shared/components/Layout'
 import baseClasses from '~/App.module.scss'
 import Grid from '@mui/material/Grid2'
-import { Box, Button, Tabs, Tab } from '@mui/material'
+import { Alert, Box, Button, Tabs, Tab } from '@mui/material'
 import { TabContext, TabPanel } from '@mui/lab'
 import { DialogAsButton } from '~/shared/components/Dialog/DialogAsButton'
 import AddIcon from '@mui/icons-material/Add'
@@ -315,7 +315,12 @@ export const BusinessTime = () => {
                   }}
                 >
                   {!!infoMessage && (
-                    <b style={{ fontSize: 'x-small' }}>{infoMessage}</b>
+                    <Alert
+                      severity='error'
+                      variant='filled'
+                    >
+                      {infoMessage}
+                    </Alert>
                   )}
                   <Box
                     sx={{

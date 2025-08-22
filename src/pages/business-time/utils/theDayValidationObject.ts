@@ -1,8 +1,63 @@
-import { getValidateResult, NValidate } from '~/shared/utils/getValidateResult'
+import { getValidateResult, NValidate } from '~/shared/utils'
+import { getIsNumeric } from '~/shared/utils/number-ops'
 import { TDayConfig, TDayFormat } from './types'
+import clsx from 'clsx'
 
-// TODO: Is time format correct? hh:mm:ss
-// const isTimeFormatCorrect = () =>
+// -- NOTE: Is time format correct? hh:mm:ss
+const getTimeChunkAnalysis = ({ errorPrefix, tested }: {
+  errorPrefix?: string;
+  tested: string
+}): NValidate.TResult => {
+  const res: NValidate.TResult = { ok: true }
+  const splittedInput = tested.split(':')
+  const errMsgs = [errorPrefix]
+
+  switch (true) {
+    case typeof tested !== 'string':
+      errMsgs.push(`Значение должно быть строкой (получено "${typeof tested}")`)
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    case splittedInput.length === 0:
+      errMsgs.push('Значение должно быть непустой строкой (example: 13:00:00)')
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    case splittedInput.length !== 3:
+      errMsgs.push('Expected: HH:MM:SS (example: 13:00:00)')
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    case !getIsNumeric(splittedInput[0]):
+      errMsgs.push([
+        `Expected: [this errored <- ${splittedInput[0] || `empty (${typeof splittedInput[0]})`}]:MM:SS`,
+        '(example: 13:00:00)',
+      ].join(' '))
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    case !getIsNumeric(splittedInput[1]):
+      errMsgs.push([
+        `Expected: HH:[this errored <- ${splittedInput[1] || `empty (${typeof splittedInput[1]})`}]:SS`,
+        '(example: 13:00:00)',
+      ].join(' '))
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    case !getIsNumeric(splittedInput[2]):
+      errMsgs.push([
+        `Expected: HH:MM:[this errored <- ${splittedInput[2] || `empty (${typeof splittedInput[2]})`}]`,
+        '(example: 13:00:00)',
+      ].join(' '))
+      res.ok = false
+      res.message = clsx(errMsgs)
+      break
+    default:
+      break
+  }
+  return res
+}
+// --
 
 export const theDayValidationObject: NValidate.TRule = {
   isRequired: false,
@@ -34,16 +89,17 @@ export const theDayValidationObject: NValidate.TRule = {
                 validate: ({ key: _key, value: _value }) => {
                   const res: NValidate.TResult = { ok: true }
                   switch (true) {
-                    case typeof _value !== 'string':
-                      res.ok = false
-                      res.message = `${key}[${i}][${_key}]=${_value} должно быть строкой (получено ${typeof _value})`
+                    default: {
+                      const formatAnalysis = getTimeChunkAnalysis({
+                        errorPrefix: `Incorrect format: ${key}[${i}][${_key}]=${_value}.`,
+                        tested: _value as string,
+                      })
+                      if (!formatAnalysis.ok) {
+                        res.ok = false
+                        res.message = formatAnalysis.message || 'No message'
+                      }
                       break
-                    case (_value as string).length === 0:
-                      res.ok = false
-                      res.message = `${key}[${i}][${_key}]=${_value} должно быть непустой строкой`
-                      break
-                    default:
-                      break
+                    }
                   }
                   return res
                 },
@@ -53,16 +109,17 @@ export const theDayValidationObject: NValidate.TRule = {
                 validate: ({ key: _key, value: _value }) => {
                   const res: NValidate.TResult = { ok: true }
                   switch (true) {
-                    case typeof _value !== 'string':
-                      res.ok = false
-                      res.message = `${key}[${i}][${_key}]=${_value} должно быть строкой (получено ${typeof _value})`
+                    default: {
+                      const formatAnalysis = getTimeChunkAnalysis({
+                        errorPrefix: `Incorrect format: ${key}[${i}][${_key}]=${_value}.`,
+                        tested: _value as string,
+                      })
+                      if (!formatAnalysis.ok) {
+                        res.ok = false
+                        res.message = formatAnalysis.message || 'No message'
+                      }
                       break
-                    case (_value as string).length === 0:
-                      res.ok = false
-                      res.message = `${key}[${i}][${_key}]=${_value} должно быть непустой строкой`
-                      break
-                    default:
-                      break
+                    }
                   }
                   return res
                 },
@@ -70,7 +127,7 @@ export const theDayValidationObject: NValidate.TRule = {
             },
             event: (value as TDayFormat[])[i],
           })
-          
+
           if (!validated.ok && !!validated.message)
             errs.push(validated.message)
         }
