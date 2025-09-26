@@ -3,7 +3,7 @@ import { Chart } from 'react-google-charts'
 import { TJob } from '~/shared/xstate'
 import { getSortedSpeedsCalc } from '~/shared/utils/team-scoring/getSortedSpeedsCalc'
 import { getRounded } from '~/shared/utils/number-ops'
-import baseClasses from '~/App.module.scss'
+// import baseClasses from '~/App.module.scss'
 
 type TProps = {
   targetJob?: TJob;
@@ -44,8 +44,7 @@ export const SpeedsFunctionGraph = ({
       getRounded((item.speed || 0) * 100 / speedsCalc.sensed.averageSpeed, 0),
       `color: ${item.isSensed ? 'rgb(51, 102, 204)' : '#e5e4e2'}`,
       (item.delta || 0) * 100 / speedsCalc.delta.min,
-      `color: ${
-        item.id === targetJob?.id
+      `color: ${item.id === targetJob?.id
         ? '#e63946'
         : 'lightgray'
       }`,
@@ -92,9 +91,9 @@ export const SpeedsFunctionGraph = ({
           legendToggle
         />
       </div>
-      <pre className={baseClasses.preNormalized}>
+      {/* <pre className={baseClasses.preNormalized}>
         {JSON.stringify(speedsCalc, null, 2)}
-      </pre>
+      </pre> */}
     </div>
   )
 }

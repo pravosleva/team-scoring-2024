@@ -6,9 +6,21 @@ import { Button, Drawer } from '@mui/material'
 import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
 import { useSearchParams } from 'react-router-dom'
+import { soundManager } from '~/shared'
 
 export const JobsPage = memo(() => {
   const [isOpened, setIsOpened] = useState(false)
+  useEffect(() => {
+    if (isOpened) {
+      soundManager.playDelayedSoundConfigurable({
+        soundCode: 'click-30-kassa',
+        delay: {
+          before: 0,
+          after: 500,
+        },
+      })
+    }
+  }, [isOpened])
   const [activeJobId, setActiveJobId] = useState<number | null>(null)
   const [urlSearchParams] = useSearchParams()
   const shouldDrawerBeOpened = useMemo(() => urlSearchParams.get('openDrawer') === '1', [urlSearchParams])

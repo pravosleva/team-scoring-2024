@@ -292,8 +292,10 @@ export const LastJobActivityPage = memo(() => {
                                   url: `/jobs/${job.id}`,
                                   query: {
                                     ...queryParams,
-                                    from: memoizedCurrentPage,
+                                    to: memoizedCurrentPage,
+                                    forwardActionUiText: targetJobs.length === 1 ? `History | ${targetJobs[0].title}` : `History of ${targetJobs.length} pinned`,
                                   },
+                                  queryKeysToremove: ['from'],
                                 })}
                               >
                                 <ArrowBackIcon sx={{ fontSize: '12px' }} />

@@ -312,7 +312,7 @@ let port // TODO? var ports = new Map()
           __eType: NES.Socket.ECustom.ONLINE_CONN_ERR,
 
           message: 'Connection error',
-          code: 'ui_message_danger'
+          // code: 'ui_message_danger'
         })
       },
       [NES.Socket.ENative.RECONNECT]: function (e) {

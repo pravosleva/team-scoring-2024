@@ -75,7 +75,7 @@ const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
           log('Case 2.2.2.1')
           log(`✅ Page _currentPageIndex=${_currentPageIndex} includes target item ${requiredCurrentIndex} (already detected and exists)`)
           log(`Target page will be taken from finalPager[${_currentPageIndex}]`)
-          currentPage = finalPager[_currentPageIndex]
+          // currentPage = finalPager[_currentPageIndex]
           _service.message = 'Ok'
         } else {
           log('Case 2.2.2.2')

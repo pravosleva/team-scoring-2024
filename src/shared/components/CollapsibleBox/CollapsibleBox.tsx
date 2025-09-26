@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react'
+import { useState, useCallback, memo, useEffect } from 'react'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import classes from './CollapsibleBox.module.scss'
@@ -8,20 +8,35 @@ import { TUiConnectVariant } from './types'
 import { getStylesByUiConnectVariant } from './getStylesByUiConnectVariant'
 
 type TProps = {
+  id?: string;
   header: string | React.ReactNode;
   text: string | React.ReactNode;
   connectedOnThe?: TUiConnectVariant[];
   icon?: React.ReactNode;
+  onClose?: (ps: { id: string }) => void;
+  onOpen?: (ps: { id: string }) => void;
 }
 
-export const CollapsibleBox = memo(({ icon, header, text, connectedOnThe }: TProps) => {
+export const CollapsibleBox = memo(({ onClose, onOpen, id, icon, header, text, connectedOnThe }: TProps) => {
   const [isOpened, setIsOpened] = useState(false)
+  const [wasOpened, setWasOpened] = useState(false)
   const handleToggle = useCallback(() => {
     setIsOpened((s) => !s)
   }, [setIsOpened])
+  useEffect(() => {
+    if (!isOpened) {
+      if (wasOpened) {
+        if (typeof onClose === 'function' && typeof id === 'string') onClose({ id })
+      }
+    } else {
+      setWasOpened(true)
+      if (typeof onOpen === 'function' && typeof id === 'string') onOpen({ id })
+    }
+  }, [isOpened, wasOpened, onClose, onOpen, id])
 
   return (
     <div
+      id={id}
       style={{
         display: 'flex',
         flexDirection: 'column',

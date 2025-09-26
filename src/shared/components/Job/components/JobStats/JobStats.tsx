@@ -18,7 +18,10 @@ import { useWorstCalcWebWorker } from '~/shared/components/Job/components/JobSta
 import { groupLog } from '~/shared/utils'
 import CircularProgress from '@mui/material/CircularProgress'
 import { getPercentage } from '~/shared/utils/number-ops'
-import { JobTimingStandartInfo } from './components/SubjobsList/components/JobTimingStandartInfo';
+// import { JobTimingStandartInfo } from './components/SubjobsList/components/JobTimingStandartInfo'
+// import { ProductivityAnalysisGraph } from './components/ProductivityAnalysisGraph'
+// import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+// import QueryStatsIcon from '@mui/icons-material/QueryStats'
 
 type TProps = {
   job: TJob;
@@ -44,6 +47,12 @@ const getInputDataAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): 
   }
   return res
 }
+
+// const specialScroll = scrollToIdFactory({
+//   timeout: 200,
+//   offsetTop: 100,
+//   elementHeightCritery: 550,
+// })
 
 export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
@@ -483,7 +492,7 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
         )
       }
 
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <Grid container spacing={0} sx={{ border: 'none' }}>
           <Grid container spacing={1} size={12} sx={{ border: 'none' }}>
             <Grid size={12}>
@@ -491,24 +500,24 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
             </Grid>
             <Grid size={12}>
               <CollapsibleBox
+                id='job-stats'
+                onClose={({ id }) => specialScroll({ id })}
                 connectedOnThe={[]}
-                header={'Common Productivity Analysis'}
+                header={'Productivity Analysis'}
+                icon={<QueryStatsIcon fontSize='small' />}
                 text={
-                  <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <ProductivityAnalysisGraph job={job} />
                     <em style={{ fontSize: 'small' }}>
                       <JobTimingStandartInfo job={job} />
                     </em>
-                    {/* <br />
-                      <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
-                      <br />
-                      <JobResultReviewShort job={job} /> */}
-                  </>
+                  </div>
                 }
               />
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </Grid> */}
 
       {
         jobsChildren.length > 0 && (

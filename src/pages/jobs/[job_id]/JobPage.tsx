@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
 import {
+  CollapsibleBox,
   DistributionFunctionGraph,
   ResponsiveBlock,
   SpeedsFunctionGraph,
@@ -15,7 +16,7 @@ import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 import { Alert, Box, Button, Rating } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-// import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { JobStats } from '~/shared/components/Job/components'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ConstructionIcon from '@mui/icons-material/Construction'
@@ -30,6 +31,17 @@ import StarIcon from '@mui/icons-material/Star'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { TotalJobChecklist, ProjectsTree } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
+import clsx from 'clsx'
+import { ProductivityAnalysisGraph } from '~/shared/components/Job/components/JobStats/components/ProductivityAnalysisGraph'
+import { JobTimingStandartInfo } from '~/shared/components/Job/components/JobStats/components/SubjobsList/components/JobTimingStandartInfo'
+import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+import QueryStatsIcon from '@mui/icons-material/QueryStats'
+
+const specialScroll = scrollToIdFactory({
+  timeout: 200,
+  offsetTop: 16,
+  elementHeightCritery: 550,
+})
 
 export const JobPage = memo(() => {
   // const todosActorRef = TopLevelContext.useActorRef()
@@ -76,17 +88,17 @@ export const JobPage = memo(() => {
   //   user: targetUser,
   // }), [targetJob, targetUser])
 
-  const targetJobWithoutLogs = useMemo(() => {
-    try {
-      if (!targetJob) throw new Error('No targetJob')
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { logs, ...rest } = targetJob
-      return rest
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_err) {
-      return null
-    }
-  }, [targetJob])
+  // const targetJobWithoutLogs = useMemo(() => {
+  //   try {
+  //     if (!targetJob) throw new Error('No targetJob')
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //     const { logs, ...rest } = targetJob
+  //     return rest
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (_err) {
+  //     return null
+  //   }
+  // }, [targetJob])
 
   // const [urlSearchParams] = useSearchParams()
   // const urlSearchParamFrom = useMemo(() => urlSearchParams.get('from'), [urlSearchParams])
@@ -282,6 +294,42 @@ export const JobPage = memo(() => {
       }
 
       {
+        !!targetJob && (
+          <Grid size={12}>
+            <Grid container spacing={0} sx={{ border: 'none' }}>
+              <Grid container spacing={1} size={12} sx={{ border: 'none' }}>
+                <Grid size={12}>
+                  <b>ℹ️ About your Business Time</b>
+                </Grid>
+                <Grid size={12}>
+                  <CollapsibleBox
+                    id='job-stats'
+                    onClose={({ id }) => specialScroll({ id })}
+                    onOpen={({ id }) => specialScroll({ id })}
+                    connectedOnThe={[]}
+                    header={'Productivity Analysis'}
+                    icon={<QueryStatsIcon fontSize='small' />}
+                    text={
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <ProductivityAnalysisGraph job={targetJob} />
+                        <em style={{ fontSize: 'small' }}>
+                          <JobTimingStandartInfo job={targetJob} />
+                        </em>
+                        {/* <br />
+                          <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                          <br />
+                          <JobResultReviewShort job={job} /> */}
+                      </div>
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        )
+      }
+
+      {
         !isJobDone && (
           <Grid size={12}>
             <h2>[ Current stats ]</h2>
@@ -304,7 +352,7 @@ export const JobPage = memo(() => {
         )
       }
 
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <pre className={baseClasses.preNormalized}>
           {JSON.stringify({ targetUser }, null, 2)}
         </pre>
@@ -314,7 +362,7 @@ export const JobPage = memo(() => {
         <pre className={baseClasses.preNormalized}>
           {JSON.stringify({ targetJobWithoutLogs }, null, 2)}
         </pre>
-      </Grid>
+      </Grid> */}
 
       {/* <Grid size={12}>
         <pre className={baseClasses.preNormalized}>
@@ -325,63 +373,37 @@ export const JobPage = memo(() => {
       <ResponsiveBlock
         className={baseClasses.stack1}
         style={{
-          padding: '16px 0 16px 0',
+          // padding: '16px 0 16px 0',
+          padding: '0px 0px 0px 0px',
+          borderRadius: '24px',
           position: 'sticky',
-          bottom: 0,
+          bottom: 16,
           backgroundColor: '#fff',
           zIndex: 50, // NOTE: See ./components/ProjectTree/components/ProjectNode
           marginTop: 'auto',
-          boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+          marginBottom: '16px',
+          // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
         }}
       >
-        {
-          (!!userRouteControls.to || !!userRouteControls.from) && (
-            <ResponsiveBlock
-              className={baseClasses.specialActionsGrid}
-            // style={{
-            //   border: '1px solid red'
-            // }}
-            >
-              {
-                !!userRouteControls.from
-                  ? (
-                    <Link
-                      to={userRouteControls.from.value}
-                      target='_self'
-                      className={baseClasses.truncate}
-                    >
-                      <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
-                        <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
-                      </Button>
-                    </Link>
-                  )
-                  : null
-              }
-
-              {
-                !!userRouteControls.to
-                  ? (
-                    <Link
-                      to={userRouteControls.to.value}
-                      target='_self'
-                      className={baseClasses.truncate}
-                    >
-                      <Button variant='contained' startIcon={<ArrowBackIcon />} fullWidth className={baseClasses.truncate}>
-                        <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
-                      </Button>
-                    </Link>
-                  )
-                  : null
-              }
-            </ResponsiveBlock>
-          )
-        }
 
         <ResponsiveBlock
-          className={baseClasses.specialActionsGrid}
-        // style={{
-        //   border: '1px solid red'
-        // }}
+          // className={baseClasses.specialActionsGrid}
+          className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+          style={{
+            padding: '16px 16px 16px 16px',
+            // border: '1px dashed red',
+            // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+            position: 'sticky',
+            bottom: '16px',
+            // backgroundColor: '#fff',
+            zIndex: 3,
+            marginTop: 'auto',
+            // borderRadius: '16px 16px 0px 0px',
+            borderRadius: '24px',
+            // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            // marginBottom: '16px',
+          }}
         >
           {
             !!targetJob ? (
@@ -396,10 +418,14 @@ export const JobPage = memo(() => {
                 }
               >
                 <Button
+                  size='small'
                   fullWidth
                   variant='outlined'
                   startIcon={<ArrowBackIcon />}
-                // className={baseClasses.truncate}
+                  // className={baseClasses.truncate}
+                  sx={{
+                    borderRadius: 4,
+                  }}
                 >
                   <span className={baseClasses.truncate}>Open details | {targetJob.title || 'No title'}</span>
                 </Button>
@@ -408,39 +434,116 @@ export const JobPage = memo(() => {
               <em>No target job</em>
             )
           }
+
           {
-            !!targetJob?.forecast.assignedTo && (
-              <Link
-                to={
-                  [
-                    `/employees/${targetJob.forecast.assignedTo}`,
-                    !!targetJob
-                      ? '?'
-                      : '',
-                    !!targetJob
-                      ? [
-                        `lastSeenJob=${targetJob.id}`,
-                        `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
-                        // `backActionUiText=${encodeURIComponent(`Job // ${targetJob.title}`)}`,
-                      ].join('&')
-                      : '',
-                  ].join('')
-                }
-                target='_self'
-                className={baseClasses.truncate}
+            (
+              !!targetJob?.forecast.assignedTo
+              || (!!userRouteControls.to || !!userRouteControls.from)
+            ) && (
+              <ResponsiveBlock
+                className={baseClasses.specialActionsGrid}
               >
-                <Button
-                  variant='outlined'
-                  color='gray'
-                  startIcon={<AccountCircleIcon />}
-                  fullWidth
-                  className={baseClasses.truncate}
-                >
-                  <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
-                </Button>
-              </Link>
+                {
+                  !!targetJob?.forecast.assignedTo && (
+                    <Link
+                      to={
+                        [
+                          `/employees/${targetJob.forecast.assignedTo}`,
+                          !!targetJob
+                            ? '?'
+                            : '',
+                          !!targetJob
+                            ? [
+                              `lastSeenJob=${targetJob.id}`,
+                              `from=${encodeURIComponent(`/jobs/${targetJob.id}`)}`,
+                              // `backActionUiText=${encodeURIComponent(`Job // ${targetJob.title}`)}`,
+                            ].join('&')
+                            : '',
+                        ].join('')
+                      }
+                      target='_self'
+                      className={baseClasses.truncate}
+                    >
+                      <Button
+                        size='small'
+                        variant='outlined'
+                        color='gray'
+                        startIcon={<AccountCircleIcon />}
+                        fullWidth
+                        className={baseClasses.truncate}
+                        sx={{
+                          borderRadius: 4,
+                        }}
+                      >
+                        <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
+                      </Button>
+                    </Link>
+                  )
+                }
+                {
+                  (!!userRouteControls.to || !!userRouteControls.from) && (
+                    <ResponsiveBlock
+                      className={baseClasses.specialActionsGrid}
+                    // style={{
+                    //   border: '1px solid red'
+                    // }}
+                    >
+                      {
+                        !!userRouteControls.from
+                          ? (
+                            <Link
+                              to={userRouteControls.from.value}
+                              target='_self'
+                              className={baseClasses.truncate}
+                            >
+                              <Button
+                                size='small'
+                                variant='contained'
+                                startIcon={<ArrowBackIcon />}
+                                fullWidth
+                                className={baseClasses.truncate}
+                                sx={{
+                                  borderRadius: 4,
+                                }}
+                              >
+                                <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
+                              </Button>
+                            </Link>
+                          )
+                          : null
+                      }
+
+                      {
+                        !!userRouteControls.to
+                          ? (
+                            <Link
+                              to={userRouteControls.to.value}
+                              target='_self'
+                              className={baseClasses.truncate}
+                            >
+                              <Button
+                                size='small'
+                                variant='contained'
+                                endIcon={<ArrowForwardIcon />}
+                                fullWidth
+                                className={baseClasses.truncate}
+                                sx={{
+                                  borderRadius: 4,
+                                }}
+                              >
+                                <span className={baseClasses.truncate}>{userRouteControls.to.uiText || 'To'}</span>
+                              </Button>
+                            </Link>
+                          )
+                          : null
+                      }
+                    </ResponsiveBlock>
+                  )
+                }
+              </ResponsiveBlock>
             )
           }
+
         </ResponsiveBlock>
       </ResponsiveBlock>
     </Grid>

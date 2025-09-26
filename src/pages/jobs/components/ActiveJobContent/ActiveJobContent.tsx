@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
-import { Button, IconButton } from '@mui/material'
+import { Button, IconButton, Grid2 as Grid } from '@mui/material'
 import { TJob, TLogLink, TopLevelContext, TUser } from '~/shared/xstate'
 import {
+  CollapsibleBox,
   RadioGroupRating, ResponsiveBlock,
   // SimpleCheckList,
 } from '~/shared/components'
@@ -24,6 +25,13 @@ import dayjs from 'dayjs'
 import LinkIcon from '@mui/icons-material/Link'
 import { CollapsibleText } from '../../[job_id]/components/ProjectsTree/components'
 // import ChecklistIcon from '@mui/icons-material/Checklist';
+// import { JobTimingStandartInfo } from './components/SubjobsList/components/JobTimingStandartInfo'
+// import { ProductivityAnalysisGraph } from './components/ProductivityAnalysisGraph'
+// import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import { ProductivityAnalysisGraph } from '~/shared/components/Job/components/JobStats/components/ProductivityAnalysisGraph'
+import { JobTimingStandartInfo } from '~/shared/components/Job/components/JobStats/components/SubjobsList/components/JobTimingStandartInfo'
+import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 
 type TProps = {
   isOpened: boolean;
@@ -36,6 +44,12 @@ type TProps = {
 // const TopResponsiveBlock = forwardRef<HTMLDivElement, { children: React.ReactNode; style: CSSRuleList }>(({ children, ...props }, ref) => (
 //   <ResponsiveBlock ref={ref} {...props}>{children}</ResponsiveBlock>
 // ))
+
+const specialScroll = scrollToIdFactory({
+  timeout: 200,
+  offsetTop: 16,
+  elementHeightCritery: 550,
+})
 
 export const ActiveJobContent = memo(({
   isOpened,
@@ -387,6 +401,39 @@ export const ActiveJobContent = memo(({
             }}
           >
             <div className={baseClasses.stack2}>
+
+              <Grid size={12}>
+                <Grid container spacing={0} sx={{ border: 'none' }}>
+                  <Grid container spacing={1} size={12} sx={{ border: 'none' }}>
+                    <Grid size={12}>
+                      <b>ℹ️ About your Business Time</b>
+                    </Grid>
+                    <Grid size={12}>
+                      <CollapsibleBox
+                        id='job-stats'
+                        onClose={({ id }) => specialScroll({ id })}
+                        onOpen={({ id }) => specialScroll({ id })}
+                        connectedOnThe={[]}
+                        header={'Productivity Analysis'}
+                        icon={<QueryStatsIcon fontSize='small' />}
+                        text={
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <ProductivityAnalysisGraph job={job} />
+                            <em style={{ fontSize: 'small' }}>
+                              <JobTimingStandartInfo job={job} />
+                            </em>
+                            {/* <br />
+                              <em>{dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')} - {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</em>
+                              <br />
+                              <JobResultReviewShort job={job} /> */}
+                          </div>
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+
               <JobStats
                 job={{
                   ...job,
@@ -398,6 +445,7 @@ export const ActiveJobContent = memo(({
                   },
                 }}
               />
+
             </div>
           </ResponsiveBlock>
         </ResponsiveBlock>

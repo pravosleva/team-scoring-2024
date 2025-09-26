@@ -47,6 +47,7 @@
     "react-hook-inview": "^4.5.1",
     "react-router-dom": "6.x",
     "react-time-ago": "^7.3.3",
+    "recharts": "^3.1.2",
     "string-to-color": "^2.2.2",
     "todomvc-app-css": "^2.4.3",
     "todomvc-common": "^1.0.5",

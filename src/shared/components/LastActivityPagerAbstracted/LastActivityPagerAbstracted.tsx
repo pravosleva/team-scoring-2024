@@ -517,7 +517,7 @@ export const LastActivityPagerAbstracted = memo(({
                               `/jobs/${log.jobId}`,
                               '?',
                               [
-                                `from=${encodeURIComponent(
+                                `to=${encodeURIComponent(
                                   [
                                     '/last-activity',
                                     '?',
@@ -527,7 +527,7 @@ export const LastActivityPagerAbstracted = memo(({
                                     ].join('&')
                                   ].join('')
                                 )}`,
-                                `backActionUiText=${encodeURIComponent('Last activity')}`,
+                                `forwardActionUiText=${encodeURIComponent('Last activity')}`,
                               ].join('&')
                             ].join('')
                           }

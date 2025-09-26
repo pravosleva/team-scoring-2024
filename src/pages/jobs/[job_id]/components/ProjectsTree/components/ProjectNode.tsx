@@ -37,6 +37,7 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 // import PushPinIcon from '@mui/icons-material/PushPin'
 // import LabelImportantIcon from '@mui/icons-material/LabelImportant'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
+import QueryStatsIcon from '@mui/icons-material/QueryStats'
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -55,7 +56,8 @@ type TProps = {
     jobTitle?: string;
     fromLevel?: number;
     dontActualizeSubjob?: boolean;
-  }) => (e: any) => void
+  }) => (e: any) => void;
+  onScrollToStats: (ps: { jobId: number; }) => (e: any) => void;
 }
 
 class JobAnalyzer {
@@ -84,6 +86,7 @@ export const ProjectNode = ({
   level,
   onNavigateToChecklistClick,
   onNavigateToJobNode,
+  onScrollToStats,
 }: TProps) => {
   const [isLastActivityOpened, setIsLastActivityOpened] = useState(false)
   const toggleLastActivity = () => setIsLastActivityOpened((s) => !s)
@@ -373,75 +376,114 @@ export const ProjectNode = ({
               style={{
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 gap: '16px',
               }}
             >
-              {
-                activeJobId === projectsTree.model.id
-                  ? (
-                    <Link
-                      className={clsx(
-                        // classes.lastActivityOfCurrentJobLink,
-                        // baseClasses.underlineSolid,
-                        baseClasses.truncate,
-                      )}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        textDecoration: 'none'
-                      }}
-                      to={
-                        [
-                          `/last-activity/${projectsTree.model.id}`,
-                          // !!activeJobId
-                          //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
-                          //   : '',
-                          [
-                            '?',
-                            [
-                              `lastSeenLogKey=job-${activeJobId}-log-${projectsTree.model.logs.items[0].ts}`,
-                              `lastSeenJob=${activeJobId}`,
-                              !!activeJobName
-                                ? [
-                                  `from=${encodeURIComponent(
-                                    [
-                                      `/jobs/${activeJobId}`,
-                                      // '?',
-                                      // `from=${!!activeJobName ? `backActionUiText=${activeJobName}` : ''}`
-                                    ].join('')
-                                  )}`,
-                                  !!activeJobName ? `backActionUiText=${encodeURIComponent(activeJobName)}` : '',
-                                ].join('&')
-                                : '',
-                            ].join('&')
-                          ].join('')
-                        ].join('')
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
+                {
+                  activeJobId === projectsTree.model.id && (
+                    <Button
+                      // disabled={!projectsTree.model.completed}
+                      size='small'
+                      // endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+                      color='salmon'
+                      variant='outlined'
+                      sx={
+                        {
+                          borderTopLeftRadius: '16px',
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                          borderBottomLeftRadius: '16px',
+                        }
                       }
+                      // startIcon={<SportsBasketballIcon />}
+                      onClick={onScrollToStats({ jobId: projectsTree.model.id })}
                     >
-                      <Button
-                        size='small'
-                        endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
-                        variant='outlined'
-                        sx={{
-                          borderRadius: 4,
-                        }}
-                        startIcon={<SportsBasketballIcon />}
-                      >
-                        <span className={baseClasses.truncate}>History from {dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
-                      </Button>
-
-                    </Link>
-                  ) : (
-                    <b className={baseClasses.underlineDashed} style={{ fontSize: 'small' }}>Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>
+                      {/* <span className={baseClasses.truncate}>Stats</span> */}
+                      <QueryStatsIcon sx={{ fontSize: '23px' }} />
+                    </Button>
                   )
-              }
+                }
+                {
+                  activeJobId === projectsTree.model.id
+                    ? (
+                      <Link
+                        className={clsx(
+                          // classes.lastActivityOfCurrentJobLink,
+                          // baseClasses.underlineSolid,
+                          baseClasses.truncate,
+                        )}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          textDecoration: 'none'
+                        }}
+                        to={
+                          [
+                            `/last-activity/${projectsTree.model.id}`,
+                            // !!activeJobId
+                            //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
+                            //   : '',
+                            [
+                              '?',
+                              [
+                                `lastSeenLogKey=job-${activeJobId}-log-${projectsTree.model.logs.items[0].ts}`,
+                                `lastSeenJob=${activeJobId}`,
+                                !!activeJobName
+                                  ? [
+                                    `from=${encodeURIComponent(
+                                      [
+                                        `/jobs/${activeJobId}`,
+                                        // '?',
+                                        // `from=${!!activeJobName ? `backActionUiText=${activeJobName}` : ''}`
+                                      ].join('')
+                                    )}`,
+                                    !!activeJobName ? `backActionUiText=${encodeURIComponent(activeJobName)}` : '',
+                                  ].join('&')
+                                  : '',
+                              ].join('&')
+                            ].join('')
+                          ].join('')
+                        }
+                      >
+                        <Button
+                          size='small'
+                          endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+                          variant='outlined'
+                          sx={
+                            {
+                              borderTopLeftRadius: 0,
+                              borderTopRightRadius: '16px',
+                              borderBottomRightRadius: '16px',
+                              borderBottomLeftRadius: 0,
+                            }
+                          }
+                          startIcon={<SportsBasketballIcon />}
+                        >
+                          <span className={baseClasses.truncate}>{dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
+                        </Button>
+                      </Link>
+                    ) : (
+                      <b className={baseClasses.underlineDashed} style={{ fontSize: 'small' }}>Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>
+                    )
+                }
+              </div>
               <code
                 className={baseClasses.noBreakWords}
                 // style={{ fontSize: 'x-small', fontWeight: 'bold', cursor: 'pointer' }}
                 style={{
+                  marginLeft: 'auto',
                   cursor: 'pointer',
                   fontSize: 'x-small',
                   fontWeight: 'bold',
@@ -739,6 +781,7 @@ export const ProjectNode = ({
               projectsTree.children.map((child) => (
                 <div style={{ paddingLeft: '0px' }} key={child.model.id}>
                   <ProjectNode
+                    onScrollToStats={onScrollToStats}
                     onNavigateToJobNode={onNavigateToJobNode}
                     onNavigateToChecklistClick={onNavigateToChecklistClick}
                     projectsTree={child}

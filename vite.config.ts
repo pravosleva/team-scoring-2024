@@ -33,6 +33,7 @@ const modulesToSeparate = [
   'dayjs',
   'react-google-charts',
   'react-hook-form',
+  'recharts',
 ]
 const _chunksMap = new Map()
 

@@ -237,6 +237,16 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
   useEffect(() => {
     setBackToActiveJob(null)
   }, [jobId])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleScrollToStats = useCallback((ps: {
+    jobId: number;
+  }) => (e: any) => {
+    if (!!e?.preventDefault) e.preventDefault()
+    specialScroll({
+      id: 'job-stats',
+      // _cfg: _specialNavigate,
+    })
+  }, [])
 
   return (
     <div
@@ -275,6 +285,7 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
             level={1}
             onNavigateToChecklistClick={handleNavigateToChecklistClick}
             onNavigateToJobNode={handleNavigateToJobNode}
+            onScrollToStats={handleScrollToStats}
           />
         ) : (
           <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>

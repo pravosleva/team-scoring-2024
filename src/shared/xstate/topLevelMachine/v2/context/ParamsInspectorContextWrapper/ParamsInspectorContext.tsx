@@ -3,6 +3,7 @@ import { useLayoutEffect } from 'react'
 import { useSearchParams, useLocation, useParams } from 'react-router-dom'
 import { EJobsStatusFilter, TJob, TopLevelContext } from '~/shared/xstate'
 import { createFastContext } from '~/shared/utils'
+import { soundManager } from '~/shared/soundManager';
 
 export type TCountersPack = {
   estimateReached: number;
@@ -416,6 +417,87 @@ const Logic = ({ children }: TProps) => {
   }, [todosActorRef])
 
   // TODO: 3. Users info
+
+  // NOTE: Sount for route change
+  useLayoutEffect(() => {
+    console.log(location)
+    console.log(params)
+    const isHomepage = location.pathname === '/'
+    const isUsersPage = location.pathname === '/employees'
+    const isUserPage = location.pathname === `/employees/${params.user_id}`
+    const isJobsPage = location.pathname === '/jobs'
+    const isJobPage = location.pathname === `/jobs/${params.job_id}`
+    const isLastActivityPage = location.pathname === '/last-activity'
+    const isLastActivityInTargetJobsPage = location.pathname === `/last-activity/${params.job_ids}`
+
+    switch (true) {
+      case isJobsPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'mech-82-glitch',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      case isHomepage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'electro-15',
+          delay: {
+            before: 0,
+            after: 4000,
+          },
+        })
+        break
+      case isUsersPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'electro-16-impulse-1',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      case isLastActivityInTargetJobsPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'transition-5-dj', // 'mech-73-robots-moving-2',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      case isLastActivityPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'whoosh-16-rev',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      case isJobPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'electro-18-impulse-3', // 'transition-11-kiberpank-2077-notif',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      case isUserPage:
+        soundManager.playDelayedSoundConfigurable({
+          soundCode: 'mech-82-glitch',
+          delay: {
+            before: 0,
+            after: 500,
+          },
+        })
+        break
+      default:
+        break
+    }
+  }, [location.pathname, params.user_id, params.job_id, location, params])
 
   return (
     <>

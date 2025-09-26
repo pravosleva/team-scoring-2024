@@ -7,6 +7,8 @@ const sounds = {
   'click-8': '/click/click-8.mp3',
   'click-12': '/click/click-12.mp3',
   'click-27': '/click/click-27.mp3',
+  'click-30-kassa': '/click/click-30-kassa.mp3',
+
   'electro-1-transformator': '/electro/electro-1-transformator.mp3',
   'electro-2': '/electro/electro-2.mp3',
   'electro-10-headphones-jh-808-2-c-1s': '/electro/electro-10-headphones-jh-808-2-c-1s.mp3',
@@ -21,6 +23,7 @@ const sounds = {
   'electro-19-hit-and-impulse-4': '/electro/electro-19-hit-and-impulse-4.mp3',
   'electro-20-impulse-5': '/electro/electro-20-impulse-5.mp3',
   'electro-21-quick': '/electro/electro-21-quick.mp3',
+
   'fail-11': '/fail/fail-11.mp3',
   'fail-41': '/fail/fail-41.mp3',
   'fail-116': '/fail/fail-116-sheep.mp3',
@@ -40,6 +43,7 @@ const sounds = {
   'mech-74-robots-big-cyber-moving': '/mech/mech-74-robots-big-cyber-moving.mp3',
   'mech-78-step': '/mech/mech-78-step.mp3',
   'mech-81-step-hydraulic-robot': '/mech/mech-81-step-hydraulic-robot.mp3',
+  'mech-82-glitch': '/mech/mech-82-glitch.mp3',
 
   'ojing-eo-geim_player-excluded': '/click/ojing-eo-geim_player-excluded.mp3',
   'plop-1': '/plop/plop-1.mp3',
@@ -47,6 +51,11 @@ const sounds = {
 
   'switch-2-between-cameras': '/switch/switch-2-between-cameras.mp3',
   'switch-3-epic': '/switch/switch-3-epic.mp3',
+
+  'transition-5-dj': '/transition/transition-5-dj.mp3',
+  'transition-11-kiberpank-2077-notif': '/transition/transition-11-kiberpank-2077-notif.mp3',
+
+  'whoosh-16-rev': '/whoosh/whoosh-16-rev.mp3',
 }
 
 enum ELoadStatus {

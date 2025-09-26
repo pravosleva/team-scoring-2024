@@ -49,6 +49,24 @@ export const BusinessTime = () => {
   const [counter, setCounter] = useState<number>(0)
   const incCounter = useCallback(() => setCounter((c) => c + 1), [])
 
+  // -- NOTE: Diagrams exp
+  const notCommitedDiagramListRef = useRef<{ [key: string]: string[] }>({})
+  const setNotCommitedDiagramListRef = useCallback(({ value, namespace }: {
+    value?: string[];
+    namespace?: string;
+  }) => {
+    switch (true) {
+      case !value || !namespace:
+        notCommitedDiagramListRef.current = {}
+        break
+      default: {
+        notCommitedDiagramListRef.current[namespace] = value.filter(Boolean)
+        break
+      }
+    }
+  }, [])
+  // --
+
   const [businessTimeConfig, saveBusinessTimeConfig] = useLocalStorageState<{ [key: string]: TBusinessTimeData }>({
     key: 'teamScoring2024:businessTimeConfig',
     initialValue: {
@@ -94,6 +112,33 @@ export const BusinessTime = () => {
       setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" }), 300)
   }
 
+  const __handleSaveDiagrams = useCallback(() => {
+    if (!!activeTab) {
+      // TODO: Confirm modal?
+      saveBusinessTimeConfig({
+        ...businessTimeConfig,
+        [activeTab]: {
+          ...businessTimeConfig[activeTab],
+          // cfg: notCommitedNormalizedCfgRef.current,
+          ts: {
+            createdAt: businessTimeConfig[activeTab].ts.createdAt,
+            updatedAt: new Date().getTime(),
+          },
+          _diagrams: notCommitedDiagramListRef.current[activeTab] || [],
+        },
+      })
+      removeInfoMessage()
+      setIsReadyForSave(false)
+      setInfoMessage(null)
+      // setNotCommitedNormalizedCfg(null)
+      setNotCommitedDiagramListRef({})
+      setIsEditModeEnabled(false)
+    }
+  }, [
+    businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave,
+    setInfoMessage,
+    setNotCommitedDiagramListRef,
+  ])
   const handleSave = useCallback(() => {
     if (!!notCommitedNormalizedCfgRef.current && !!activeTab) {
       // TODO: Confirm modal?
@@ -112,9 +157,16 @@ export const BusinessTime = () => {
       setIsReadyForSave(false)
       setInfoMessage(null)
       setNotCommitedNormalizedCfg(null)
+      setNotCommitedDiagramListRef({})
       setIsEditModeEnabled(false)
     }
-  }, [businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave, setInfoMessage, setNotCommitedNormalizedCfg])
+    __handleSaveDiagrams()
+  }, [
+    businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave,
+    setInfoMessage, setNotCommitedNormalizedCfg,
+    setNotCommitedDiagramListRef,
+    __handleSaveDiagrams,
+  ])
 
   const handleRenameTimeConfig = useCallback(() => {
     const newName = window.prompt('New name', activeTab)
@@ -276,28 +328,54 @@ export const BusinessTime = () => {
                     <TabPanel
                       value={key}
                       key={key}
-                      sx={{ p: 2 }}
+                      sx={{
+                        p: 2,
+                      }}
                     >
-                      <JsonEditor<TWeekConfig>
-                        key={counter}
-                        initialState={businessTimeConfig[key].cfg}
-                        isReadOnly={(businessTimeConfig[key]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isEditModeEnabled}
-                        validationRules={{
-                          [EDay.MON]: theDayValidationObject,
-                          [EDay.THU]: theDayValidationObject,
-                          [EDay.WED]: theDayValidationObject,
-                          [EDay.TUE]: theDayValidationObject,
-                          [EDay.FRI]: theDayValidationObject,
-                          [EDay.SAT]: theDayValidationObject,
-                          [EDay.SUN]: theDayValidationObject,
-                        }}
-                        onValidate={({ validatedResult, value }) => {
-                          removeInfoMessage()
-                          setIsReadyForSave(validatedResult.ok)
-                          setInfoMessage(validatedResult.message || null)
-                          setNotCommitedNormalizedCfg(validatedResult.ok ? value : null)
-                        }}
-                      />
+                      <div className={baseClasses.stack1}>
+                        <JsonEditor<TWeekConfig>
+                          key={`bt-${counter}`}
+                          initialState={businessTimeConfig[key].cfg}
+                          isReadOnly={(businessTimeConfig[key]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isEditModeEnabled}
+                          validationRules={{
+                            [EDay.MON]: theDayValidationObject,
+                            [EDay.THU]: theDayValidationObject,
+                            [EDay.WED]: theDayValidationObject,
+                            [EDay.TUE]: theDayValidationObject,
+                            [EDay.FRI]: theDayValidationObject,
+                            [EDay.SAT]: theDayValidationObject,
+                            [EDay.SUN]: theDayValidationObject,
+                          }}
+                          onValidate={({ validatedResult, value }) => {
+                            removeInfoMessage()
+                            setIsReadyForSave(validatedResult.ok)
+                            setInfoMessage(validatedResult.message || null)
+                            setNotCommitedNormalizedCfg(validatedResult.ok ? value : null)
+                          }}
+                        />
+                        <JsonEditor<{ _diagrams: string[] }>
+                          key={`_diagrams-${counter}`}
+                          initialState={{ _diagrams: businessTimeConfig[key]._diagrams || [] }}
+                          // isReadOnly={(businessTimeConfig[key]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isEditModeEnabled}
+                          isReadOnly={!isEditModeEnabled}
+                          validationRules={{
+                            _diagrams: {
+                              isRequired: false,
+                              validate: ({ value, key }) => ({
+                                ok: Array.isArray(value) && value.every((v) => typeof v === 'string' && !!v),
+                                message: `Each elem of "${key}" should be a string`,
+                              }),
+                            },
+                          }}
+                          onValidate={({ validatedResult, value }) => {
+                            removeInfoMessage()
+                            setIsReadyForSave(validatedResult.ok)
+                            setInfoMessage(validatedResult.message || null)
+                            // setNotCommitedNormalizedCfg(validatedResult.ok ? value : null)
+                            setNotCommitedDiagramListRef({ namespace: key, value: value._diagrams })
+                          }}
+                        />
+                      </div>
                     </TabPanel>
                   ))
                 }
