@@ -196,7 +196,7 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
                 />
               </Grid>
             ) : (
-              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
+              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
                 <CircularProgress />
               </Grid>
             )

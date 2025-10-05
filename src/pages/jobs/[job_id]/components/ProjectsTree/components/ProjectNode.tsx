@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp'
 // import ArrowBack from '@mui/icons-material/ArrowBack'
 // import ConstructionIcon from '@mui/icons-material/Construction'
 // import TimelapseIcon from '@mui/icons-material/Timelapse'
@@ -118,6 +119,9 @@ export const ProjectNode = ({
           },
         )
       }
+    // style={{
+    //   boxShadow: level === 2 ? '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 0px 8px 0px rgba(0, 0, 0, 0.12)' : 'none',
+    // }}
     >
       {/*
         projectsTree.model.completed && (
@@ -141,6 +145,12 @@ export const ProjectNode = ({
               justifyContent: 'center',
               gap: '2px',
 
+              // border: '1px solid red',
+              // borderTopLeftRadius: 'inherit',
+              // borderTopRightRadius: 'inherit',
+
+              paddingRight: '8px',
+
               position: 'sticky',
               top: `${level === 1 ? 0 : (level - 1) * stickyElementHeight}px`,
               height: `${stickyElementHeight}px`,
@@ -158,7 +168,7 @@ export const ProjectNode = ({
               style={{
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 gap: '8px',
               }}
@@ -192,13 +202,13 @@ export const ProjectNode = ({
                 !!projectsTree.model.relations?.parent && (
                   <code
                     className={clsx(baseClasses.noBreakWords, 'node-blinker-disablable')}
-                    style={{ fontSize: 'x-small', fontWeight: 'bold', color: 'lightgray', cursor: 'pointer' }}
+                    style={{ fontSize: 'x-small', fontWeight: 'bold', color: '#959eaa', cursor: 'pointer', marginLeft: 'auto' }}
                     onClick={onNavigateToJobNode({
                       jobId: projectsTree.model.relations?.parent,
                       // backToJobId: projectsTree.model.id,
                       // jobTitle: projectsTree.model.title,
                     })}
-                  >[ parent ]
+                  >[ <KeyboardDoubleArrowUpIcon fontSize='inherit' /> ]
                   </code>
                 )
               }
@@ -225,6 +235,8 @@ export const ProjectNode = ({
               flexDirection: 'column',
               justifyContent: 'center',
               gap: '2px',
+
+              paddingRight: '8px',
 
               // border: '1px solid red',
 
@@ -304,48 +316,58 @@ export const ProjectNode = ({
         )
       }
 
-      <CollapsibleText
-        briefText={
-          <span
-            style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}
-          >
-            <span>Details</span>
-            {!isPinned && (
-              <code
-                // style={{ fontSize: 'x-small', cursor: 'pointer' }}
-                style={{
-                  cursor: 'pointer',
-                  fontSize: 'x-small',
-                  fontWeight: 'bold',
-                  display: 'inline-flex',
-                  flexDirection: 'row',
-                  gap: '5px',
-                  alignItems: 'center',
-                  // border: '1px solid red'
-                }}
-                onClick={handlePin}
-              >
-                <span>[</span>
-                {/* <span>Pin</span> */}
-                <BookmarkIcon fontSize='small' />
-                <span>]</span>
-              </code>
-            )}
-          </span>
-        }
-        // isOpenedByDefault={true}
-        targetText={projectsTree.model.descr}
-        contentRender={({ targetText }) => (
-          <>
-            <b
+      <div
+        style={{
+          paddingRight: '8px',
+        }}
+      >
+        <CollapsibleText
+          briefText={
+            <span
               style={{
-                // fontSize: 'normal',
-                wordBreak: 'break-word',
+                display: 'inline-flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '6px',
               }}
-              className={baseClasses.specialText}
-            >{projectsTree.model.title}</b>
-            {!!projectsTree.model.descr && (<div className={classes.descr}>{targetText}</div>)}
-            {/*
+            >
+              <span>Details</span>
+              {!isPinned && (
+                <code
+                  // style={{ fontSize: 'x-small', cursor: 'pointer' }}
+                  style={{
+                    cursor: 'pointer',
+                    fontSize: 'x-small',
+                    fontWeight: 'bold',
+                    display: 'inline-flex',
+                    flexDirection: 'row',
+                    gap: '5px',
+                    alignItems: 'center',
+                    // border: '1px solid red'
+                  }}
+                  onClick={handlePin}
+                >
+                  <span>[</span>
+                  {/* <span>Pin</span> */}
+                  <BookmarkIcon fontSize='small' />
+                  <span>]</span>
+                </code>
+              )}
+            </span>
+          }
+          // isOpenedByDefault={true}
+          targetText={projectsTree.model.descr}
+          contentRender={({ targetText }) => (
+            <>
+              <b
+                style={{
+                  // fontSize: 'normal',
+                  wordBreak: 'break-word',
+                }}
+                className={baseClasses.specialText}
+              >{projectsTree.model.title}</b>
+              {!!projectsTree.model.descr && (<div className={classes.descr}>{targetText}</div>)}
+              {/*
               !isPinned && (
                 <Button
                   variant='outlined'
@@ -357,9 +379,10 @@ export const ProjectNode = ({
                 </Button>
               )
             */}
-          </>
-        )}
-      />
+            </>
+          )}
+        />
+      </div>
 
       {
         projectsTree.model.logs.items.length > 0 && (
@@ -370,6 +393,8 @@ export const ProjectNode = ({
               gap: '8px',
               wordBreak: 'break-word',
               fontSize: 'small',
+
+              paddingRight: '8px',
             }}
           >
             <div
@@ -475,7 +500,11 @@ export const ProjectNode = ({
                         </Button>
                       </Link>
                     ) : (
-                      <b className={baseClasses.underlineDashed} style={{ fontSize: 'small' }}>Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>
+                      <b
+                        onClick={toggleLastActivity}
+                        className={baseClasses.underlineDashed}
+                        style={{ fontSize: 'small' }}
+                      >Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>
                     )
                 }
               </div>
@@ -524,48 +553,61 @@ export const ProjectNode = ({
             {
               projectsTree.model._service.aboutJob.existingChecklists.length > 0 && (
                 <CollapsibleText
-                  briefText={`Checklists (${projectsTree.model._service.aboutJob.existingChecklists.length}) | Completed ${getArithmeticalMean(projectsTree.model._service.aboutJob.existingChecklists.map(({ completePercentage }) => completePercentage)).toFixed(0)}%`}
+                  isClickableBrief
+                  briefText={`Checklist (${projectsTree.model._service.aboutJob.existingChecklists.length}) | Done ${getArithmeticalMean(projectsTree.model._service.aboutJob.existingChecklists.map(({ completePercentage }) => completePercentage)).toFixed(0)}%`}
                   targetText='(render-props)'
                   contentRender={() => (
                     <ul className={baseClasses.compactList}>
                       {
                         projectsTree.model._service.aboutJob.existingChecklists
-                          .map(({ uniqueChecklistKey, logTs, completePercentage }) => (
-                            <li key={uniqueChecklistKey}>
+                          .map(({ logText, uniqueChecklistKey, logTs, completePercentage }) => (
+                            <li
+                              key={uniqueChecklistKey}
+                            >
                               <span
                                 style={{
-                                  fontSize: 'small',
-                                  fontWeight: 'bold',
+                                  // border: '1px solid red',
                                   display: 'flex',
-                                  flexDirection: 'row',
-                                  justifyContent: 'space-between',
+                                  flexDirection: 'column',
+                                  gap: '4px',
                                 }}
                               >
-                                {
-                                  activeJobId === projectsTree.model.id
-                                    ? (
-                                      <a
-                                        style={{
-                                          fontSize: 'small',
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          gap: '6px',
-                                          cursor: 'pointer',
-                                        }}
-                                        onClick={onNavigateToChecklistClick({
-                                          checklistUniqueKey: uniqueChecklistKey,
-                                          jobId: projectsTree.model.id,
-                                          jobTitle: projectsTree.model.title,
-                                        })}
-                                      >
-                                        <span>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
-                                        <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
-                                      </a>
-                                    ) : (
-                                      <span style={{ fontSize: 'small' }}>Checklist created at {dayjs(logTs).format('DD.MM.YYYY')}</span>
-                                    )
-                                }
-                                <b style={{ color: completePercentage === 0 ? 'red' : completePercentage < 100 ? 'black' : 'lightgray' }}>{completePercentage.toFixed(0)}%</b>
+                                <span
+                                  style={{
+                                    fontSize: 'small',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                  }}
+                                >
+                                  {
+                                    activeJobId === projectsTree.model.id
+                                      ? (
+                                        <a
+                                          style={{
+                                            fontSize: 'small',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            cursor: 'pointer',
+                                          }}
+                                          onClick={onNavigateToChecklistClick({
+                                            checklistUniqueKey: uniqueChecklistKey,
+                                            jobId: projectsTree.model.id,
+                                            jobTitle: projectsTree.model.title,
+                                          })}
+                                        >
+                                          <span>{dayjs(logTs).format('DD.MM.YYYY HH:mm')}</span>
+                                          <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
+                                        </a>
+                                      ) : (
+                                        <span style={{ fontSize: 'small' }}>{dayjs(logTs).format('DD.MM.YYYY HH:mm')}</span>
+                                      )
+                                  }
+                                  <b style={{ color: completePercentage === 0 ? 'red' : completePercentage < 100 ? 'black' : 'lightgray' }}>{completePercentage.toFixed(0)}%</b>
+                                </span>
+                                <span>{logText}</span>
                               </span>
                             </li>
                           ))
@@ -579,6 +621,7 @@ export const ProjectNode = ({
             {
               projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length > 0 && (
                 <CollapsibleText
+                  isClickableBrief
                   briefText={`Subjobs (${projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.reduce((acc, { originalJob }) => { if (originalJob.completed) acc += 1; return acc }, 0)} of ${projectsTree.model._service.aboutJob.existingChildrenNodes.nodesInfo.length})`}
                   targetText='(render-props)'
                   contentRender={() => (
@@ -630,7 +673,12 @@ export const ProjectNode = ({
                                   <span
                                   // className={baseClasses.truncate}
                                   >{originalJob.title}</span>
-                                  <span style={{ paddingTop: '2px', marginLeft: 'auto' }}>
+                                  <span
+                                    style={{
+                                      paddingRight: '3px',
+                                      paddingTop: '2px', marginLeft: 'auto'
+                                    }}
+                                  >
                                     <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
                                   </span>
                                 </a>

@@ -1120,7 +1120,7 @@ export const topLevelMachine = setup({
 
                   const newLog: TLogsItem = {
                     ts: updateTime,
-                    text: _newMsgs.size > 0 ? [..._newMsgs].join(' // ') : 'Updated', // •
+                    text: _newMsgs.size > 0 ? [..._newMsgs].join(' • ') : 'Updated', // •
                   }
                   if (!!progress) newLog.progress = progress
 

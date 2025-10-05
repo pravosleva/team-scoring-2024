@@ -1,4 +1,5 @@
 export * from './AutoRefreshedJobMuiAva'
 export * from './getIcon'
 export * from './getJobColor'
+export * from './getJobsIntuitiveSummaryInfo'
 export * from './getJobStage'

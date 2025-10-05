@@ -288,7 +288,7 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
             onScrollToStats={handleScrollToStats}
           />
         ) : (
-          <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
+          <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
             <CircularProgress />
           </Grid>
         )

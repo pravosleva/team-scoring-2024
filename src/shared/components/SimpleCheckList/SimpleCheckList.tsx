@@ -12,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import clsx from 'clsx';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-// import baseClasses from '~/App.module.scss'
+import baseClasses from '~/App.module.scss'
 import { getPercentage } from '~/shared/utils/number-ops'
 import { useNavigate } from 'react-router-dom'
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
@@ -34,6 +34,7 @@ type TProps<T, TAddInfo> = {
   connectedOnThe?: ('top')[];
   isMiniVariant?: boolean;
   infoLabel: string;
+  isInfoLabelClickable?: boolean;
   createBtnLabel: string;
   isCopiable?: boolean;
   isEditable: boolean;
@@ -72,6 +73,7 @@ function SimpleCheckListFn<TAddInfo>({
   isMiniVariant,
   items,
   infoLabel,
+  isInfoLabelClickable,
   createBtnLabel,
   isCopiable,
   isEditable,
@@ -317,13 +319,32 @@ function SimpleCheckListFn<TAddInfo>({
                     }
                   )}
                 >
-                  <div className={clsx({
-                    [classes.absoluteBadgeTopRight]: !isMiniVariant,
-                    [classes.absoluteBadgeBottomLeft]: isMiniVariant,
-                    [classes.default]: !hasNotActiveItems,
-                    [classes.success]: hasNotActiveItems,
-                  })}>
-                    {infoLabel} | {currentPercentage.toFixed(0)}%
+                  <div
+                    className={clsx(baseClasses.truncate, {
+                      [classes.absoluteBadgeTopRight]: !isMiniVariant,
+                      [classes.absoluteBadgeBottomLeft]: isMiniVariant,
+                      [classes.default]: !hasNotActiveItems,
+                      [classes.success]: hasNotActiveItems,
+                    })}
+                    style={{
+                      maxWidth: 'calc(100% - 130px)',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '6px',
+                      cursor: isInfoLabelClickable ? 'pointer' : 'default'
+                    }}
+                    onClick={
+                      isInfoLabelClickable ? () => window.alert(infoLabel) : undefined
+                    }
+                  >
+                    <span
+                      className={clsx(baseClasses.truncate)}
+                    // style={{
+                    //   border: '1px solid red',
+                    // }}
+                    >{infoLabel}</span>
+                    <span>|</span>
+                    <span>{currentPercentage.toFixed(0)}%</span>
                   </div>
                   {/* <div className={classes.commentDescription}>
                     <pre

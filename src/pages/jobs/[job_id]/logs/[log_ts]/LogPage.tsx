@@ -371,18 +371,31 @@ export const LogPage = () => {
                   )
                   : (
                     <Link
-                      to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
+                      to={
+                        !!targetLog
+                          ? `/jobs?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
+                            `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
+                            // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
+                          )
+                          }&backActionUiText=${encodeURIComponent('Log page')}`
+                          : '/jobs'
+                      }
                       target='_self'
                     >
-                      <Button color={!!targetJob ? 'primary' : 'gray'} variant='outlined' startIcon={<ArrowBack />} fullWidth>
-                        Jobs
+                      <Button
+                        variant='outlined'
+                        color='salmon'
+                        startIcon={<ArrowBack />}
+                        fullWidth
+                      >
+                        {!!targetLog ? 'Jobs pager' : 'All Jobs'}
                       </Button>
                     </Link>
                   )
               }
 
               {
-                !!userRouteControls.to ? (
+                !!userRouteControls.to && (
                   <Link
                     to={userRouteControls.to.value}
                     target='_self'
@@ -393,28 +406,16 @@ export const LogPage = () => {
                     </Button>
                   </Link>
                 )
-                  : !!targetJob && !!targetLog && (
-                    <Link
-                      to={
-                        `/jobs?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
-                          `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
-                          // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
-                        )
-                        }&backActionUiText=${encodeURIComponent('Log page')
-                        }`
-                      }
-                      target='_self'
-                    >
-                      <Button
-                        variant='outlined'
-                        color='salmon'
-                        endIcon={<ArrowForwardIcon />}
-                        fullWidth
-                      >
-                        Jobs pager
-                      </Button>
-                    </Link>
-                  )
+                // : !!targetJob && !!targetLog && (
+                //   <Link
+                //     to={`/jobs${!!targetJob ? `?lastSeenJob=${targetJob.id}` : ''}`}
+                //     target='_self'
+                //   >
+                //     <Button color={!!targetJob ? 'primary' : 'gray'} variant='outlined' endIcon={<ArrowForwardIcon />} fullWidth>
+                //       Jobs
+                //     </Button>
+                //   </Link>
+                // )
               }
 
             </ResponsiveBlock>

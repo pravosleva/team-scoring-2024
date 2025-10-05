@@ -14,6 +14,7 @@ import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { soundManager } from '~/shared/soundManager'
 import { UserAva } from '~/shared/components/Job/components'
+// import { getJobsIntuitiveSummaryInfo } from '~/shared/components/Job/utils'
 
 type TProps = {
   isOpenedByDefault?: boolean;
@@ -82,6 +83,7 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   }, [send])
   const allJobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
+
   const modifiedPinnedJobs: { [key: string]: TPartialModifiedJob } = useMemo(
     () => pinnedJobsIds.reduce((acc: { [key: string]: TPartialModifiedJob }, curId) => {
       const targetJob = allJobs.find(({ id }) => id === curId)
@@ -121,6 +123,11 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   }, [navigate, params.job_id, handleOpenToggle])
   const hasPinnedCurrentJob = !!params.job_id && pinnedJobsIds.includes(Number(params.job_id))
   const location = useLocation()
+
+  // const summaryInfo = useMemo(() => getJobsIntuitiveSummaryInfo({ jobs:  }), [])
+
+  if (location.pathname === `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`)
+    return null
 
   return (
     <>
@@ -164,15 +171,29 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                   }}
                 // className={baseClasses.truncate}
                 >
-                  <code
+                  <div
                     style={{
+                      // border: '1px solid red',
+                      maxWidth: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
                       fontSize: 'small',
-                      // wordBreak: 'keep-all',
-                      whiteSpace: 'nowrap',
-                      paddingTop: '1px',
                     }}
-                    onClick={handleUnpinJob({ jobId: Number(id) })}
-                  >[ x ]</code>
+                  >
+                    <code
+                      style={{
+                        fontSize: 'small',
+                        // wordBreak: 'keep-all',
+                        whiteSpace: 'nowrap',
+                        paddingTop: '1px',
+                      }}
+                      onClick={handleUnpinJob({ jobId: Number(id) })}
+                    >[ x ]</code>
+                    {
+
+                    }
+                  </div>
 
                   <div
                     style={{

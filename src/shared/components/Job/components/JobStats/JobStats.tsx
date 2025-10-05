@@ -526,6 +526,7 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
             jobs={jobsChildren}
             descr='Related as children.'
             showLastLog
+            showSummaryTiming
           />
         )
       }

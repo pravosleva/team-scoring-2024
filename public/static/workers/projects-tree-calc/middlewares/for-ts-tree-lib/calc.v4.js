@@ -117,6 +117,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                                   }, 0),
                                 sum: cur.checklist.length,
                               }),
+                              logText: cur.text,
                             })
                           }
 

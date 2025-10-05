@@ -248,7 +248,7 @@ export const EmployeePage2 = memo(() => {
 
           {
             !outputWorkerData && (
-              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
+              <Grid size={12} sx={{ widht: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
                 <CircularProgress />
               </Grid>
             )

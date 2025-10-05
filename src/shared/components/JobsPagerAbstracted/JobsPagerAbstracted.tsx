@@ -229,7 +229,7 @@ export const JobsPagerAbstracted = memo(({
 
           {
             !outputWorkerData && (
-              <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 2 }}>
+              <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
                 <CircularProgress />
               </Grid>
             )

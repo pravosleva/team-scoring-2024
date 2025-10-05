@@ -37,6 +37,7 @@ export type TLogsItem = {
   text: string;
   progress?: TLogProgress;
   links?: TLogLink[];
+  useTextAsTitle?: boolean;
   checklist?: TLogChecklistItem[];
 };
 export type TLogs = {

@@ -375,7 +375,7 @@ export const JobPage = memo(() => {
         style={{
           // padding: '16px 0 16px 0',
           padding: '0px 0px 0px 0px',
-          borderRadius: '24px',
+          borderRadius: '32px',
           position: 'sticky',
           bottom: 16,
           backgroundColor: '#fff',
@@ -383,6 +383,9 @@ export const JobPage = memo(() => {
           marginTop: 'auto',
           marginBottom: '16px',
           // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+          // width: 'calc(100% - 16px)',
+          // marginLeft: 'auto',
+          // marginRight: 'auto',
         }}
       >
 
@@ -399,7 +402,7 @@ export const JobPage = memo(() => {
             zIndex: 3,
             marginTop: 'auto',
             // borderRadius: '16px 16px 0px 0px',
-            borderRadius: '24px',
+            borderRadius: '32px',
             // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
             boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
             // marginBottom: '16px',
@@ -529,6 +532,7 @@ export const JobPage = memo(() => {
                                 className={baseClasses.truncate}
                                 sx={{
                                   borderRadius: 4,
+                                  boxShadow: 'none',
                                 }}
                               >
                                 <span className={baseClasses.truncate}>{userRouteControls.to.uiText || 'To'}</span>

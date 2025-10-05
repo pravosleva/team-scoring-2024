@@ -6,6 +6,7 @@ import { Chip } from '@mui/material'
 import dayjs from 'dayjs'
 import Countdown from 'react-countdown'
 import { TimeAgo } from '~/shared/components'
+import { getJobsIntuitiveSummaryInfo } from '~/shared/components/Job/utils'
 import { CountdownRenderer } from './components'
 
 export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
@@ -30,6 +31,8 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
       if (!!timeoutRef.current) clearInterval(timeoutRef.current)
     }
   }, [])
+
+  const progressDiffInfo = getJobsIntuitiveSummaryInfo({ jobs: [job] })
 
   const Image = useMemo(() => {
     switch (true) {
@@ -68,11 +71,16 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
                   label={(
                     <TimeAgo
                       date={job.forecast.finish}
-                      style={{ color: 'gray' }}
+                      style={{ color: '#959eaa' }}
                       prefix='Done'
                     />
                   )}
                 />
+              )
+            }
+            {
+              !!progressDiffInfo.humanizedIntuitiveDiff && (
+                <code style={{ fontSize: 'small', color: '#959eaa' }}>{progressDiffInfo.humanizedIntuitiveDiff}</code>
               )
             }
           </div>
@@ -103,25 +111,42 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
             <div>{!isGood ? '+' : ''}{hrsDiff}h</div>
             {
               !!job.forecast.estimate && !job.completed && (
-                <span
-                  style={{
-                    marginLeft: isSpaceBetween ? 'auto' : 'none'
-                  }}
-                >
-                  <Countdown
-                    renderer={CountdownRenderer}
-                    date={job.forecast.estimate}
-                  />
-                </span>
+                <Countdown
+                  renderer={CountdownRenderer}
+                  date={job.forecast.estimate}
+                />
+              )
+            }
+            {
+              !!progressDiffInfo.humanizedIntuitiveDiff && (
+                <code style={{ fontSize: 'small', color: '#959eaa', marginLeft: isSpaceBetween ? 'auto' : 'none' }}>{progressDiffInfo.humanizedIntuitiveDiff}</code>
               )
             }
           </div>
         )
       }
       case isNew:
-        return <span style={{ fontSize: 'small' }}>New</span>
+        return (
+          <span style={{ fontSize: 'small', display: 'inline-flex', gap: '8px' }}>
+            <span>New</span>
+            {
+              !!progressDiffInfo.humanizedIntuitiveDiff && (
+                <code style={{ fontSize: 'small', color: '#959eaa', marginLeft: isSpaceBetween ? 'auto' : 'none' }}>{progressDiffInfo.humanizedIntuitiveDiff}</code>
+              )
+            }
+          </span>
+        )
       case isStartedOnly:
-        return <span style={{ fontSize: 'small' }}>Started</span>
+        return (
+          <span style={{ fontSize: 'small', display: 'inline-flex', gap: '8px' }}>
+            <span>Started</span>
+            {
+              !!progressDiffInfo.humanizedIntuitiveDiff && (
+                <code style={{ fontSize: 'small', color: '#959eaa', marginLeft: isSpaceBetween ? 'auto' : 'none' }}>{progressDiffInfo.humanizedIntuitiveDiff}</code>
+              )
+            }
+          </span>
+        )
       default:
         return null
     }
@@ -135,6 +160,7 @@ export const JobResultReviewShort = memo(({ job, isSpaceBetween }: {
     isJobStartedAndEstimated,
     job.completed,
     isSpaceBetween,
+    progressDiffInfo.humanizedIntuitiveDiff,
   ])
 
   return Image

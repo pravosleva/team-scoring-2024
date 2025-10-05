@@ -10,6 +10,7 @@ export type TEnchancedJobByWorker = TJob & {
         jobId: number;
         logTs: number;
         completePercentage: number;
+        logText: string;
       }[];
       existingChildrenNodes: {
         nodesInfo: {

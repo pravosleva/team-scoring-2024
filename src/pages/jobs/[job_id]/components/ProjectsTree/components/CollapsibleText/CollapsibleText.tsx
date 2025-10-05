@@ -9,6 +9,7 @@ type TProps = {
   isOpenedByDefault?: boolean;
   targetText?: string;
   contentRender: (ps: Pick<TProps, 'briefText' | 'targetText'>) => React.ReactNode;
+  isClickableBrief?: boolean;
 }
 
 export const CollapsibleText = memo(({
@@ -16,6 +17,7 @@ export const CollapsibleText = memo(({
   briefText,
   targetText,
   contentRender,
+  isClickableBrief,
 }: TProps) => {
   const [isDescrOpened, setIsDescrOpened] = useState(isOpenedByDefault)
   const descrToggle = () => setIsDescrOpened((v) => !v)
@@ -37,19 +39,20 @@ export const CollapsibleText = memo(({
           alignItems: 'center',
           gap: '6px',
         }}
+        onClick={isClickableBrief ? descrToggle : undefined}
       >
         <div
           className={baseClasses.truncate}
           style={{
             fontWeight: 'bold',
-            // textDecoration: 'underline dashed'
+            textDecoration: isClickableBrief ? 'underline dashed' : 'none'
           }}
         >
           {briefText}
         </div>
         <code
           className={baseClasses.noBreakWords}
-          onClick={descrToggle}
+          onClick={!isClickableBrief ? descrToggle : undefined}
           style={{
             cursor: 'pointer',
             fontSize: 'x-small',

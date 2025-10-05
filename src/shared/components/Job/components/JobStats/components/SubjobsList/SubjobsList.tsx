@@ -10,6 +10,8 @@ import { getJobStatus } from '~/shared/components/Job/utils/getJobStatus'
 import { JobTimingInfo } from './components'
 import dayjs from 'dayjs'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
+import { getJobsIntuitiveSummaryInfo } from '~/shared/components/Job/utils'
+// import clsx from 'clsx'
 
 type TProps = {
   jobs: TJob[];
@@ -18,9 +20,10 @@ type TProps = {
   noPercentageInHeader?: boolean;
   noTotalTiming?: boolean;
   showLastLog?: boolean;
+  showSummaryTiming?: boolean;
 }
 
-export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, showLastLog }: TProps) => {
+export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, showLastLog, showSummaryTiming }: TProps) => {
   const doneItems = useMemo<number>(() => jobs.reduce((acc, job) => {
     if (job.completed) acc += 1
     return acc
@@ -85,12 +88,46 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
     return msgs.join('\n')
   }, [descr])
 
+  const summaryTimingInfo = useMemo<{
+    intuitiveStartDate: number | null;
+    firstResult: number | null;
+    lastResult: number | null;
+    intuitiveFinishDate: number;
+    humanized: string | null;
+  } | null>(() => {
+    switch (showSummaryTiming) {
+      case true: {
+        const summaryInfo = getJobsIntuitiveSummaryInfo({ jobs })
+        const intuitiveStartDate = summaryInfo.intuitiveStart
+        const intuitiveFinishDate = summaryInfo.intuitiveFinish
+        const humanizedIntuitiveDiff = summaryInfo.humanizedIntuitiveDiff
+        return {
+          intuitiveStartDate,
+          firstResult: !!summaryInfo.firstJobFinish
+            ? (summaryInfo.firstJobFinish === summaryInfo.firstJobStart || summaryInfo.firstJobFinish === summaryInfo.firstLog)
+              ? null
+              : summaryInfo.firstJobFinish
+            : null,
+          intuitiveFinishDate,
+          lastResult: !!summaryInfo.lastJobFinishTs
+            ? (summaryInfo.lastJobFinishTs === summaryInfo.firstJobFinish || summaryInfo.lastJobFinishTs === summaryInfo.lastLogTs)
+              ? null
+              : summaryInfo.lastJobFinishTs
+            : null,
+          humanized: humanizedIntuitiveDiff
+        }
+      }
+      default:
+        return null
+    }
+  }, [showSummaryTiming, jobs])
+
   return (
     <Grid size={12}>
       <CollapsibleText
         briefText={
           <>
-            {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage.toFixed(0)}% ({doneItems} of {jobs.length})</span>}
+            {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage.toFixed(0)}% ({doneItems} of {jobs.length}){!!summaryTimingInfo?.humanized ? ` ~${summaryTimingInfo.humanized}` : ''}</span>}
           </>
         }
         contentRender={() => (
@@ -98,6 +135,28 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
             {/* <Grid size={12}>
               {header} {!noPercentageInHeader && <span style={{ opacity: 0.5 }}>{donePercentage}% ({doneItems} of {jobs.length})</span>}
             </Grid> */}
+            {
+              showSummaryTiming && !!summaryTimingInfo && (
+                <Grid size={12}>
+                  <div>
+                    {[
+                      !!summaryTimingInfo.intuitiveStartDate
+                        ? `~${dayjs(summaryTimingInfo.intuitiveStartDate).format('DD.MM.YYYY')}`
+                        : null,
+                      !!summaryTimingInfo.firstResult
+                        ? `🔥 ${dayjs(summaryTimingInfo.firstResult).format('DD.MM.YYYY')}`
+                        : 'No result yet',
+                      // !!summaryTimingInfo.lastResult && (summaryTimingInfo.firstResult !== summaryTimingInfo.lastResult)
+                      //   ? `${donePercentage === 100 ? '🏁 ' : ''}${dayjs(summaryTimingInfo.lastResult).format('DD.MM.YYYY')}`
+                      //   : null,
+                      !!summaryTimingInfo.intuitiveFinishDate
+                        ? `💬 ~${dayjs(summaryTimingInfo.intuitiveFinishDate).format('DD.MM.YYYY')}`
+                        : null,
+                    ].filter(Boolean).join(' 👉 ')}
+                  </div>
+                </Grid>
+              )
+            }
             {
               !!finalDescr && (
                 <Grid size={12}>
@@ -134,46 +193,49 @@ export const SubjobsList = memo(({ jobs, header, descr, noPercentageInHeader, sh
               // style={{ listStyleType: 'circle' }}
               >
                 {
-                  jobs.map((job) => (
-                    <li
-                      key={job.id}
-                      style={{
-                        display: 'flex',
-                        gap: '8px',
-                        flexDirection: 'column',
-                        // border: '1px solid red'
-                      }}
-                    >
-                      <Link to={`/jobs/${job.id}`}>
-                        <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity})
-                      </Link>
-                      {
-                        showLastLog && job.logs.items.length > 0 && (
-                          <>
-                            <span
-                              style={{
-                                borderLeft: '4px solid #959eaa',
-                                paddingLeft: '8px',
-                              }}
-                            >
-                              <span style={{ color: '#959eaa' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
+                  jobs.map((job) => {
+                    const jobIntuitiveSummaryInfo = getJobsIntuitiveSummaryInfo({ jobs: [job] }).humanizedIntuitiveDiff
+                    return (
+                      <li
+                        key={job.id}
+                        style={{
+                          display: 'flex',
+                          gap: '8px',
+                          flexDirection: 'column',
+                          // border: '1px solid red'
+                        }}
+                      >
+                        <Link to={`/jobs/${job.id}`}>
+                          <b>{getJobStatus({ job })} {job.title}</b> (complexity {job.forecast.complexity}){!!jobIntuitiveSummaryInfo ? ` ~${jobIntuitiveSummaryInfo}` : ''}
+                        </Link>
+                        {
+                          showLastLog && job.logs.items.length > 0 && (
+                            <>
+                              <span
+                                style={{
+                                  borderLeft: '4px solid #959eaa',
+                                  paddingLeft: '8px',
+                                }}
+                              >
+                                <span style={{ color: '#959eaa' }}>Last log {dayjs(job.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span> <b>{job.logs.items[0].text}</b>
+                              </span>
+                            </>
+                          )
+                        }
+                        <CollapsibleText
+                          briefText='Timing'
+                          contentRender={() => (
+                            <span>
+                              <JobTimingInfo
+                                key={job.id}
+                                job={job}
+                              />
                             </span>
-                          </>
-                        )
-                      }
-                      <CollapsibleText
-                        briefText='Timing'
-                        contentRender={() => (
-                          <span>
-                            <JobTimingInfo
-                              key={job.id}
-                              job={job}
-                            />
-                          </span>
-                        )}
-                      />
-                    </li>
-                  ))
+                          )}
+                        />
+                      </li>
+                    )
+                  })
                 }
               </ul>
             </Grid>
