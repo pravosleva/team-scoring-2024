@@ -656,7 +656,7 @@ export const LastActivityPagerAbstracted = memo(({
                                       // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
                                       style={{
                                         marginTop: 'auto',
-                                        display: 'inline-flex',
+                                        display: 'flex',
                                         flexDirection: 'row',
                                         justifyContent: 'space-between',
                                         flexWrap: 'wrap',
@@ -664,7 +664,7 @@ export const LastActivityPagerAbstracted = memo(({
                                         gap: '8px',
                                         textDecoration: 'none',
                                       }}
-                                      className={baseClasses.truncate}
+                                    // className={baseClasses.truncate}
                                     >
                                       <span
                                         style={{
@@ -690,6 +690,7 @@ export const LastActivityPagerAbstracted = memo(({
                                           fontWeight: 'bold',
                                           borderTopRightRadius: '0px',
                                           borderBottomRightRadius: '0px',
+                                          transform: 'translateX(8px)',
                                         }}
                                         className={baseClasses.backdropBlurDark}
                                       >
@@ -720,7 +721,7 @@ export const LastActivityPagerAbstracted = memo(({
                                     <Link
                                       style={{
                                         marginTop: 'auto',
-                                        display: 'inline-flex',
+                                        display: 'flex',
                                         justifyContent: 'space-between',
                                         flexWrap: 'wrap',
                                         flexDirection: 'row',
@@ -745,10 +746,10 @@ export const LastActivityPagerAbstracted = memo(({
                                         },
                                         queryKeysToremove: ['to', 'forwardActionUiText', 'page'],
                                       })}
-                                      className={baseClasses.truncate}
+                                    // className={baseClasses.truncate}
                                     // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
                                     >
-                                      <span
+                                      <div
                                         style={{
                                           color: '#FFF',
                                           borderRadius: '16px',
@@ -758,9 +759,10 @@ export const LastActivityPagerAbstracted = memo(({
                                           fontWeight: 'bold',
                                           borderTopLeftRadius: '0px',
                                           borderBottomLeftRadius: '0px',
+                                          transform: 'translateX(-8px)',
                                         }}
                                         className={baseClasses.backdropBlurDark}
-                                      >{dayjs(log.__prevLog.ts).format('DD MMM')}</span>
+                                      >{dayjs(log.__prevLog.ts).format('DD MMM')}</div>
                                       <span
                                         style={{
                                           display: 'inline-flex',
