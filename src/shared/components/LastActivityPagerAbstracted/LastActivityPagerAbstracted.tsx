@@ -688,6 +688,8 @@ export const LastActivityPagerAbstracted = memo(({
                                           // backgroundColor: 'black',
                                           fontSize: 'x-small',
                                           fontWeight: 'bold',
+                                          borderTopRightRadius: '0px',
+                                          borderBottomRightRadius: '0px',
                                         }}
                                         className={baseClasses.backdropBlurDark}
                                       >
@@ -754,6 +756,8 @@ export const LastActivityPagerAbstracted = memo(({
                                           // backgroundColor: 'black',
                                           fontSize: 'x-small',
                                           fontWeight: 'bold',
+                                          borderTopLeftRadius: '0px',
+                                          borderBottomLeftRadius: '0px',
                                         }}
                                         className={baseClasses.backdropBlurDark}
                                       >{dayjs(log.__prevLog.ts).format('DD MMM')}</span>
