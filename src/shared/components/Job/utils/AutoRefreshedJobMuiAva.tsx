@@ -4,6 +4,7 @@ import { getJobColor } from './getJobColor'
 import { TJob } from '~/shared/xstate'
 import { getIcon } from './getIcon'
 import { getCurrentPercentage } from '~/shared/utils'
+import dayjs from 'dayjs'
 
 type TProps = {
   job: TJob;
@@ -39,6 +40,27 @@ export const AutoRefreshedJobMuiAva = memo(({ job, delay, size }: TProps) => {
   const MemoizedIcon = useMemo(() => getIcon({ job }), [job])
   const jobColor = useMemo(() => getJobColor({ forecast: job.forecast, percentageValue }), [job.forecast, percentageValue])
 
+  const handleClick = useCallback(() => {
+    const json = {
+      started: !!job.forecast?.start
+        ? dayjs(job.forecast.start).format('DD.MM.YYYY HH:mm')
+        : undefined,
+      estimate: !!job.forecast?.estimate
+        ? dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')
+        : undefined,
+      finish: !!job.forecast?.finish
+        ? dayjs(job.forecast.finish).format('DD.MM.YYYY HH:mm')
+        : undefined,
+    }
+
+    window.alert([
+      job.title,
+      Object.values(json).some(Boolean)
+        ? JSON.stringify(json, null, 2)
+        : 'No timers',
+    ].join('\n\n'))
+  }, [job.title, job.forecast?.start, job.forecast?.estimate, job.forecast?.finish])
+
   return (
     <Avatar
       sx={{
@@ -46,6 +68,7 @@ export const AutoRefreshedJobMuiAva = memo(({ job, delay, size }: TProps) => {
         width: !!size ? size : undefined,
         height: !!size ? size : undefined,
       }}
+      onClick={handleClick}
     >
       {MemoizedIcon}
     </Avatar>

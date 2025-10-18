@@ -13,12 +13,23 @@ import clsx from 'clsx'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
 type TLogBg = 'default' | 'green' | 'warn'
-type TModifiedLog = (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number });
+type TModifiedLog = (TLogsItem & {
+  jobId: number;
+  jobTitle: string;
+  logBorder: TLogBorder;
+  logBg: TLogBg;
+  jobType: TJobType;
+  logUniqueKey: string;
+  jobTsUpdate: number;
+  __prevLog: (TLogsItem & Pick<TModifiedLog, 'jobId' | 'jobTitle' | 'jobType' | 'logUniqueKey'>) | null;
+  __nextLog: (TLogsItem & Pick<TModifiedLog, 'jobId' | 'jobTitle' | 'jobType' | 'logUniqueKey'>) | null;
+});
 type TTargetResultByWorker = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _partialInput: any;
@@ -51,11 +62,12 @@ const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null,
 const getNormalizedPage = (index: number): number => index + 1
 
 export const LastActivityPage = memo(() => {
-  const [counter, setCounter] = useState<number>(0)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const incCounter = useCallback(() => {
-    setCounter((v) => v + 1)
-  }, [])
+  const [counter, _setCounter] = useState<number>(0)
+  // const incCounter = useCallback(() => {
+  //   setCounter((v) => v + 1)
+  // }, [])
+
   const [outputWorkerData, setOutputWorkerData] = useState<TTargetResultByWorker | null>(null)
   const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
   const [outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
@@ -261,7 +273,8 @@ export const LastActivityPage = memo(() => {
               // borderRadius: '16px 16px 0px 0px',
               borderRadius: '32px',
               // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-              boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+              // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+              boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
               marginBottom: '16px',
             }}
           >
@@ -359,6 +372,28 @@ export const LastActivityPage = memo(() => {
                 </Button>
               </Link> */}
             </ResponsiveBlock>
+
+            {
+              !!userRouteControls.to && (
+                <Link
+                  to={userRouteControls.to.value}
+                  target='_self'
+                  className={baseClasses.truncate}
+                >
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    variant='outlined'
+                    endIcon={<ArrowForwardIcon />}
+                    fullWidth
+                    className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
+                  </Button>
+                </Link>
+              )
+            }
+
             {/* <Button
               variant='outlined'
               fullWidth

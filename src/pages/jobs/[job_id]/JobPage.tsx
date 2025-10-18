@@ -404,7 +404,8 @@ export const JobPage = memo(() => {
             // borderRadius: '16px 16px 0px 0px',
             borderRadius: '32px',
             // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
             // marginBottom: '16px',
           }}
         >

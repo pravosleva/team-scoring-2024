@@ -34,12 +34,13 @@
 }
 
 .isActive {
-  border-left: 4px solid red;
-  background-color: #ffecec;
+  border-left: 4px solid #ff5733;
+  background-color: #fff6f1;
+  // background-color: #ffecec;
 }
 
 a.lastActivityOfCurrentJobLink {
-  color: red;
+  color: #ff5733;
 }
 
 .isCompleted {
@@ -76,8 +77,8 @@ a.lastActivityOfCurrentJobLink {
   z-index: 1;
 
   background-color: #fff;
-  border: 2px solid red;
-  color: red;
+  border: 2px solid #ff5733;
+  color: #ff5733;
 }
 
 .descr {

@@ -186,7 +186,8 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         fontSize: 'small',
                         // wordBreak: 'keep-all',
                         whiteSpace: 'nowrap',
-                        paddingTop: '1px',
+                        // paddingTop: '1px',
+                        transform: 'translateY(-2px)',
                       }}
                       onClick={handleUnpinJob({ jobId: Number(id) })}
                     >[ x ]</code>
@@ -215,14 +216,16 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '0px',
-                        fontSize: 'small',
+                        fontSize: 'x-small',
+
+                        wordBreak: 'break-word',
                       }}
-                      className={clsx(baseClasses.rowsLimited2)}
+                      className={clsx(baseClasses.rowsLimited3)}
                     >
                       <a
                         style={{
                           textDecoration: 'none',
-                          fontSize: 'small',
+                          fontSize: 'x-small',
                           color: Number(params.job_id) === Number(id)
                             ? 'red' // '#00a47d'
                             : undefined
@@ -238,9 +241,9 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                           pinnedJobId: Number(id),
                         })}
                         // baseClasses.truncate
-                        className={clsx(baseClasses.rowsLimited2)}
+                        className={clsx(baseClasses.rowsLimited3)}
                       >{modifiedPinnedJobs[id].title}</a>
-                      {!!modifiedPinnedJobs[id].descr && (
+                      {/* !!modifiedPinnedJobs[id].descr && (
                         <span
                           style={{
                             fontSize: 'x-small',
@@ -248,7 +251,7 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                           }}
                           className={clsx(baseClasses.rowsLimited1)}
                         >{modifiedPinnedJobs[id].descr}</span>
-                      )}
+                      ) */}
                     </div>
 
                     {

@@ -611,7 +611,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                   startIcon: <TimerOffIcon />,
                   isEnabled: true,
                   onClick: async () => {
-                    const isConfirmed = window.confirm('⚡ Sure? All dates will be removed!')
+                    const isConfirmed = window.confirm('⚡ Sure? ALL DATES WILL BE REMOVED!')
                     if (isConfirmed) {
                       onClearDates({ id: job.id });
                       return Promise.resolve({ ok: true });
@@ -620,28 +620,6 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                     }
                   },
                   gridItemSize: 12,
-                },
-                {
-                  label: '+2h to finish',
-                  color: 'error',
-                  variant: 'outlined',
-                  startIcon: <MoreTimeIcon />,
-                  isEnabled: !!job.forecast.finish,
-                  onClick: async () => {
-                    try {
-                      if (typeof onAddTimeToFinishDate === 'function') {
-                        const isConfirmed = window.confirm('⚡ Sure? +2h to finish date')
-                        if (isConfirmed) {
-                          onAddTimeToFinishDate({ hours: 2 });
-                          return Promise.resolve({ ok: true });
-                        }
-                        else throw new Error('Canceled by user')
-                      } else throw new Error('ERR1')
-                    } catch (err: any) {
-                      return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
-                    }
-                  },
-                  gridItemSize: 6,
                 },
                 {
                   label: '+4h to finish',
@@ -658,12 +636,56 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                           return Promise.resolve({ ok: true });
                         }
                         else throw new Error('Canceled by user')
+                      } else throw new Error('ERR1')
+                    } catch (err: any) {
+                      return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                    }
+                  },
+                  gridItemSize: 6,
+                },
+                {
+                  label: '+8h to finish',
+                  color: 'error',
+                  variant: 'outlined',
+                  startIcon: <MoreTimeIcon />,
+                  isEnabled: !!job.forecast.finish,
+                  onClick: async () => {
+                    try {
+                      if (typeof onAddTimeToFinishDate === 'function') {
+                        const isConfirmed = window.confirm('⚡ Sure? +8h to finish date')
+                        if (isConfirmed) {
+                          onAddTimeToFinishDate({ hours: 8 });
+                          return Promise.resolve({ ok: true });
+                        }
+                        else throw new Error('Canceled by user')
                       } else throw new Error('ERR2')
                     } catch (err: any) {
                       return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
                     }
                   },
                   gridItemSize: 6,
+                },
+                {
+                  label: '+24h to finish',
+                  color: 'error',
+                  variant: 'outlined',
+                  startIcon: <MoreTimeIcon />,
+                  isEnabled: !!job.forecast.finish,
+                  onClick: async () => {
+                    try {
+                      if (typeof onAddTimeToFinishDate === 'function') {
+                        const isConfirmed = window.confirm('⚡ Sure? +24h to finish date')
+                        if (isConfirmed) {
+                          onAddTimeToFinishDate({ hours: 24 });
+                          return Promise.resolve({ ok: true });
+                        }
+                        else throw new Error('Canceled by user')
+                      } else throw new Error('ERR3')
+                    } catch (err: any) {
+                      return Promise.reject({ ok: false, message: `Decline: ${err.message || 'No err.message'}` });
+                    }
+                  },
+                  gridItemSize: 12,
                 },
               ] : undefined
           }

@@ -16,25 +16,50 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import { getFullUrl as _getFullUrl } from '~/shared/utils/string-ops'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowBack from '@mui/icons-material/ArrowBack'
 import classes from './LastActivityPagerAbstracted.module.scss'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+// -- EXP
+import __TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import ru from 'javascript-time-ago/locale/ru'
+// --
+
+__TimeAgo.addDefaultLocale(en)
+__TimeAgo.addLocale(ru)
+
+const timeAgo = new __TimeAgo('en-US')
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
 type TLogBg = 'default' | 'green' | 'warn'
 
+type TModifiedLog = (TLogsItem & {
+  jobId: number;
+  jobTitle: string;
+  logBorder: TLogBorder;
+  logBg: TLogBg;
+  jobType: TJobType;
+  logUniqueKey: string;
+  jobTsUpdate: number;
+  __prevLog: (TLogsItem & Pick<TModifiedLog, 'jobId' | 'jobTitle' | 'jobType' | 'logUniqueKey'>) | null;
+  __nextLog: (TLogsItem & Pick<TModifiedLog, 'jobId' | 'jobTitle' | 'jobType' | 'logUniqueKey'>) | null;
+});
+
 type TProps = {
   counters?: TCountersPack;
   // activeLogTs?: number | null;
   // onToggleDrawer?: (isDrawlerOpened: boolean) => ({ jobId }: { jobId: number }) => void;
-  modifiedLogs: (TLogsItem & { jobId: number; jobTitle: string; logBorder: TLogBorder; logBg: TLogBg; jobType: TJobType; logUniqueKey: string; jobTsUpdate: number })[];
+  modifiedLogs: TModifiedLog[];
   // onCreateNew?: () => void;
   subheader: string;
   contentDescription?: string | React.ReactNode;
   pageInfo?: string;
   pagerControlsHardcodedPath: string;
   noFilters?: boolean;
+  // getPrevLogLink?: (ps: (TLogsItem & Pick<TModifiedLog, 'jobId' | 'jobTitle' | 'jobType' | 'logUniqueKey'>)) => string;
 }
 const specialScroll = scrollToIdFactory({
   timeout: 200,
@@ -50,6 +75,7 @@ export const LastActivityPagerAbstracted = memo(({
   subheader,
   contentDescription,
   noFilters,
+  // getPrevLogLink,
 }: TProps) => {
   const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
 
@@ -405,20 +431,51 @@ export const LastActivityPagerAbstracted = memo(({
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'space-between',
+                            gap: '8px',
                           }}
+                          className={baseClasses.truncate}
                         >
-                          <em
-                            // style={{ fontSize: 'small', color: 'gray', fontWeight: 'bold' }}
-                            className={classes.date}
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              flexDirection: 'row',
+                              justifyContent: 'flex-start',
+                              alignItems: 'center',
+                              gap: '6px',
+                            }}
+                            className={clsx(classes.date, baseClasses.truncate)}
                           >
-                            {dayjs(log.ts).format('DD.MM.YYYY HH:mm')}
-                          </em>
+                            {
+                              !!log.__prevLog?.ts && (
+                                <span
+                                  style={{
+                                    color: '#FFF',
+                                    borderRadius: '16px',
+                                    padding: '1px 6px',
+                                    // backgroundColor: 'black',
+                                  }}
+                                  className={baseClasses.backdropBlurDark}
+                                >
+                                  +{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d
+                                </span>
+                              )
+                            }
+                            <span
+                              className={classes.date}
+                            >
+                              {dayjs(log.ts).format('DD MMM YYYY HH:mm')}
+                            </span>
+                            <span className={baseClasses.truncate}>
+                              ({timeAgo.format(log.ts)})
+                            </span>
+                          </span>
                           <span
                             style={{
                               display: 'flex',
                               flexDirection: 'row',
                               gap: '8px',
                               justifyContent: 'flex-start',
+                              alignItems: 'center',
                             }}
                           >
                             {/* <a style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
@@ -451,7 +508,13 @@ export const LastActivityPagerAbstracted = memo(({
                                   ].join('&')
                                 ].join('')
                               }
-                            >EDIT LOG ➡️</Link>
+                              style={{
+                                display: 'inline-flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: '8px',
+                              }}
+                            ><span>EDIT LOG</span><ArrowForwardIcon fontSize='inherit' /></Link>
                           </span>
                         </em>
                         <div
@@ -536,7 +599,128 @@ export const LastActivityPagerAbstracted = memo(({
                             fontSize: 'small',
                             fontWeight: 'bold',
                           }}
-                        >{log.jobTitle}</Link>
+                        >
+                          {log.jobTitle}
+                        </Link>
+
+                        {
+                          (!!log.__prevLog || !!log.__nextLog) && (
+                            <div
+                              style={{
+                                // display: 'flex',
+                                // flexDirection: 'row',
+                                gap: '8px',
+
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                              }}
+                            >
+                              {
+                                !!log.__nextLog && (
+                                  <div
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
+                                    style={{
+                                      fontSize: 'small',
+                                      // border: '1px solid lightgray',
+                                      boxShadow: 'rgba(100, 100, 111, 0.4) 0px 0px 4px 0px',
+                                      padding: '8px',
+                                      borderRadius: '8px',
+                                      width: '100%',
+                                    }}
+                                  >
+                                    <span className={baseClasses.rowsLimited10}>{log.__nextLog.text}</span>
+                                    <Link
+                                      to={getFullUrl({
+                                        url: pagerControlsHardcodedPath,
+                                        query: {
+                                          lastSeenLogKey: log.__nextLog.logUniqueKey,
+                                          lastSeenJob: log.__nextLog.jobId,
+                                          to: [
+                                            pagerControlsHardcodedPath,
+                                            '?',
+                                            [
+                                              `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                              `lastSeenJob=${log.jobId}`,
+                                            ].join('&')
+                                          ].join(''),
+                                          forwardActionUiText: `Go to ${dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d before`,
+                                        },
+                                        queryKeysToremove: ['from', 'backActionUiText', 'page'],
+                                      })}
+                                      // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
+                                      style={{
+                                        marginTop: 'auto',
+                                        display: 'inline-flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none'
+                                      }}
+                                    >
+                                      <ArrowBack fontSize='inherit' />
+                                      <span style={{ textDecoration: 'underline' }}>{dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d after</span>
+                                      <span>({dayjs(log.__nextLog.ts).format('DD MMM')})</span>
+                                    </Link>
+                                  </div>
+                                )
+                              }
+                              {
+                                !!log.__prevLog && (
+                                  <div
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
+                                    style={{
+                                      fontSize: 'small',
+
+                                      // border: '1px solid lightgray',
+                                      // boxShadow: 'rgba(100, 100, 111, 0.2) 0px 0px 8px 0px',
+                                      boxShadow: 'rgba(100, 100, 111, 0.4) 0px 0px 4px 0px',
+                                      padding: '8px',
+                                      borderRadius: '8px',
+                                      width: '100%',
+                                      gridColumnStart: 2,
+                                      // textAlign: 'right',
+                                    }}
+                                  >
+                                    <span className={baseClasses.rowsLimited10}>{log.__prevLog.text}</span>
+                                    <Link
+                                      style={{
+                                        marginTop: 'auto',
+                                        display: 'inline-flex',
+                                        justifyContent: 'flex-end',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none'
+                                      }}
+                                      to={getFullUrl({
+                                        url: pagerControlsHardcodedPath,
+                                        query: {
+                                          lastSeenLogKey: log.__prevLog.logUniqueKey,
+                                          lastSeenJob: log.__prevLog.jobId,
+                                          from: [
+                                            pagerControlsHardcodedPath,
+                                            '?',
+                                            [
+                                              `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                              `lastSeenJob=${log.jobId}`,
+                                            ].join('&')
+                                          ].join(''),
+                                          backActionUiText: `${dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d after`,
+                                        },
+                                        queryKeysToremove: ['to', 'forwardActionUiText', 'page'],
+                                      })}
+                                    // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
+                                    >
+                                      <span>({dayjs(log.__prevLog.ts).format('DD MMM')})</span>
+                                      <span style={{ textDecoration: 'underline' }}>{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d before</span>
+                                      <ArrowForwardIcon fontSize='inherit' />
+                                    </Link>
+                                  </div>
+                                )
+                              }
+                            </div>
+                          )
+                        }
                       </div>
                     )
                   })

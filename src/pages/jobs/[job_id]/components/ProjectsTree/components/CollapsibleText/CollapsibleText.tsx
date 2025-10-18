@@ -45,7 +45,8 @@ export const CollapsibleText = memo(({
           className={baseClasses.truncate}
           style={{
             fontWeight: 'bold',
-            textDecoration: isClickableBrief ? 'underline dashed' : 'none'
+            textDecoration: isClickableBrief ? 'underline dashed' : 'none',
+            cursor: isClickableBrief ? 'pointer' : 'default',
           }}
         >
           {briefText}

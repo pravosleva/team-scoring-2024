@@ -2,7 +2,17 @@ import { memo, useMemo } from 'react'
 import { TJob, TLogChecklistItem, TopLevelContext } from '~/shared/xstate'
 // import baseClasses from '~/App.module.scss'
 import { SimpleCheckList } from '~/shared/components'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs'
+// -- EXP
+import __TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import ru from 'javascript-time-ago/locale/ru'
+// --
+
+__TimeAgo.addDefaultLocale(en)
+__TimeAgo.addLocale(ru)
+
+const timeAgo = new __TimeAgo('en-US')
 
 type TProps = {
   job_id: number;
@@ -67,8 +77,9 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
             // -- NOTE: Exp
             // infoLabel={`Created ${dayjs(targetJobTotalChecklistMaping[checklistKey].logTs).format('DD.MM.YYYY HH:mm')}`}
             infoLabel={[
-              dayjs(targetJobTotalChecklistMaping[checklistKey].logTs).format('DD.MM.YYYY HH:mm'),
-              targetJobTotalChecklistMaping[checklistKey].text,
+              // dayjs(targetJobTotalChecklistMaping[checklistKey].logTs).format('DD.MM.YYYY HH:mm'),
+              timeAgo.format(targetJobTotalChecklistMaping[checklistKey].logTs),
+              // targetJobTotalChecklistMaping[checklistKey].text,
             ].join('\n\n')}
             isInfoLabelClickable
             // --

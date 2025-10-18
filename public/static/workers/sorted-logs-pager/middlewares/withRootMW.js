@@ -88,6 +88,7 @@ const withRootMW = (arg) => compose([
                     default:
                       break
                   }
+                  let _logsCounter = 0
                   for (const log of curJob.logs.items) {
                     let logBorder = 'default' // TLogBorder
                     let logBg = 'default' // TLogBg
@@ -119,7 +120,39 @@ const withRootMW = (arg) => compose([
                       default:
                         break
                     }
-                    logsAcc.push({ ...log, jobId: curJob.id, jobTitle: curJob.title, logBorder, logBg, jobType, logUniqueKey: `job-${curJob.id}-log-${log.ts}`, jobTsUpdate: curJob.ts.update })
+                    logsAcc.push({
+                      ...log,
+                      jobId: curJob.id,
+                      jobTitle: curJob.title,
+                      logBorder,
+                      logBg,
+                      jobType,
+                      logUniqueKey: `job-${curJob.id}-log-${log.ts}`,
+                      jobTsUpdate: curJob.ts.update,
+                      __prevLog: _logsCounter === curJob.logs.items.length - 1
+                        ? null
+                        : {
+                          ...curJob.logs.items[_logsCounter + 1],
+                          jobId: curJob.id,
+                          jobTitle: curJob.title,
+                          // logBorder,
+                          // logBg,
+                          jobType,
+                          logUniqueKey: `job-${curJob.id}-log-${curJob.logs.items[_logsCounter + 1].ts}`,
+                        },
+                      __nextLog: _logsCounter === 0
+                        ? null
+                        : {
+                          ...curJob.logs.items[_logsCounter - 1],
+                          jobId: curJob.id,
+                          jobTitle: curJob.title,
+                          // logBorder,
+                          // logBg,
+                          jobType,
+                          logUniqueKey: `job-${curJob.id}-log-${curJob.logs.items[_logsCounter - 1].ts}`,
+                        },
+                    })
+                    _logsCounter += 1
                   }
                   return logsAcc
                 }, []),

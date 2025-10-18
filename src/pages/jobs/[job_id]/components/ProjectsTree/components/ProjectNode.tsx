@@ -39,6 +39,16 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 // import LabelImportantIcon from '@mui/icons-material/LabelImportant'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
+// -- EXP
+import __TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import ru from 'javascript-time-ago/locale/ru'
+// --
+
+__TimeAgo.addDefaultLocale(en)
+__TimeAgo.addLocale(ru)
+
+const timeAgo = new __TimeAgo('en-US')
 
 type TProps = {
   projectsTree: TreeNode<TEnchancedJobByWorker>;
@@ -158,7 +168,7 @@ export const ProjectNode = ({
               backgroundColor: isCompleted
                 ? '#EFF0F1'
                 : isActiveNode
-                  ? '#ffecec'
+                  ? '#fff6f1' // '#ffecec'
                   : '#FFF',
               zIndex: 50 - level,
             }}
@@ -247,7 +257,7 @@ export const ProjectNode = ({
               backgroundColor: isCompleted
                 ? '#EFF0F1'
                 : isActiveNode
-                  ? '#ffecec'
+                  ? '#fff6f1' // '#ffecec'
                   : '#FFF',
               zIndex: 50 - level,
             }}
@@ -578,7 +588,8 @@ export const ProjectNode = ({
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     flexDirection: 'row',
-                                    justifyContent: 'space-between',
+                                    justifyContent: 'flex-start',
+                                    gap: '6px',
                                   }}
                                 >
                                   {
@@ -597,15 +608,25 @@ export const ProjectNode = ({
                                             jobId: projectsTree.model.id,
                                             jobTitle: projectsTree.model.title,
                                           })}
+                                          className={baseClasses.truncate}
                                         >
-                                          <span>{dayjs(logTs).format('DD.MM.YYYY HH:mm')}</span>
+                                          <span className={baseClasses.truncate}>{dayjs(logTs).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(logTs)})</span>
                                           <ArrowDownwardIcon sx={{ fontSize: '12px' }} />
                                         </a>
                                       ) : (
                                         <span style={{ fontSize: 'small' }}>{dayjs(logTs).format('DD.MM.YYYY HH:mm')}</span>
                                       )
                                   }
-                                  <b style={{ color: completePercentage === 0 ? 'red' : completePercentage < 100 ? 'black' : 'lightgray' }}>{completePercentage.toFixed(0)}%</b>
+                                  <b
+                                    style={{
+                                      color: completePercentage === 0
+                                        ? 'red'
+                                        : completePercentage < 100
+                                          ? 'black'
+                                          : 'lightgray',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >{completePercentage.toFixed(0)}%</b>
                                 </span>
                                 <span>{logText}</span>
                               </span>
@@ -715,7 +736,7 @@ export const ProjectNode = ({
                           ? '#EFF0F1'
                           : '#FFF',
                         // isActiveNode
-                        //   ? '#ffecec'
+                        //   ? '#fff6f1 // '#ffecec'
                         //   : '#FFF',
                         // border: '1px solid red',
                       }}
@@ -743,7 +764,10 @@ export const ProjectNode = ({
                             // border: '1px solid red',
                           }}
                         >
-                          <AutoRefreshedJobMuiAva job={itemData.originalJob as TJob} delay={1000} />
+                          <AutoRefreshedJobMuiAva
+                            job={itemData.originalJob as TJob}
+                            delay={1000}
+                          />
                           <b className={baseClasses.rowsLimited3}>{itemData.originalJob.title}</b>
                           {
                             !!itemData.originalJob.forecast.assignedTo && (
