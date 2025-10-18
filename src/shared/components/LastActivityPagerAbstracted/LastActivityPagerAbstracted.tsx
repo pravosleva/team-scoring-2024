@@ -445,7 +445,7 @@ export const LastActivityPagerAbstracted = memo(({
                             }}
                             className={clsx(classes.date, baseClasses.truncate)}
                           >
-                            {
+                            {/*
                               !!log.__prevLog?.ts && (
                                 <span
                                   style={{
@@ -459,9 +459,15 @@ export const LastActivityPagerAbstracted = memo(({
                                   +{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d
                                 </span>
                               )
-                            }
+                            */}
                             <span
-                              className={classes.date}
+                              style={{
+                                color: '#FFF',
+                                borderRadius: '16px',
+                                padding: '1px 6px',
+                                // backgroundColor: 'black',
+                              }}
+                              className={clsx(classes.date, baseClasses.backdropBlurDark)}
                             >
                               {dayjs(log.ts).format('DD MMM YYYY HH:mm')}
                             </span>
@@ -618,7 +624,7 @@ export const LastActivityPagerAbstracted = memo(({
                               {
                                 !!log.__nextLog && (
                                   <div
-                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite, baseClasses.truncate)}
                                     style={{
                                       fontSize: 'small',
                                       // border: '1px solid lightgray',
@@ -652,14 +658,40 @@ export const LastActivityPagerAbstracted = memo(({
                                         marginTop: 'auto',
                                         display: 'inline-flex',
                                         flexDirection: 'row',
+                                        justifyContent: 'space-between',
                                         alignItems: 'center',
                                         gap: '8px',
-                                        textDecoration: 'none'
+                                        textDecoration: 'none',
                                       }}
+                                      className={baseClasses.truncate}
                                     >
-                                      <ArrowBack fontSize='inherit' />
-                                      <span style={{ textDecoration: 'underline' }}>{dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d after</span>
-                                      <span>({dayjs(log.__nextLog.ts).format('DD MMM')})</span>
+                                      <span
+                                        style={{
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          justifyContent: 'flex-start',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          textDecoration: 'none',
+                                        }}
+                                        className={baseClasses.truncate}
+                                      >
+                                        <ArrowBack fontSize='inherit' />
+                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>{dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d after</span>
+                                      </span>
+                                      <span
+                                        style={{
+                                          color: '#FFF',
+                                          borderRadius: '16px',
+                                          padding: '1px 6px',
+                                          // backgroundColor: 'black',
+                                          fontSize: 'x-small',
+                                          fontWeight: 'bold',
+                                        }}
+                                        className={baseClasses.backdropBlurDark}
+                                      >
+                                        {dayjs(log.__nextLog.ts).format('DD MMM')}
+                                      </span>
                                     </Link>
                                   </div>
                                 )
@@ -667,7 +699,7 @@ export const LastActivityPagerAbstracted = memo(({
                               {
                                 !!log.__prevLog && (
                                   <div
-                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite, baseClasses.truncate)}
                                     style={{
                                       fontSize: 'small',
 
@@ -686,11 +718,11 @@ export const LastActivityPagerAbstracted = memo(({
                                       style={{
                                         marginTop: 'auto',
                                         display: 'inline-flex',
-                                        justifyContent: 'flex-end',
+                                        justifyContent: 'space-between',
                                         flexDirection: 'row',
                                         alignItems: 'center',
                                         gap: '8px',
-                                        textDecoration: 'none'
+                                        textDecoration: 'none',
                                       }}
                                       to={getFullUrl({
                                         url: pagerControlsHardcodedPath,
@@ -711,9 +743,31 @@ export const LastActivityPagerAbstracted = memo(({
                                       })}
                                     // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
                                     >
-                                      <span>({dayjs(log.__prevLog.ts).format('DD MMM')})</span>
-                                      <span style={{ textDecoration: 'underline' }}>{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d before</span>
-                                      <ArrowForwardIcon fontSize='inherit' />
+                                      <span
+                                        style={{
+                                          color: '#FFF',
+                                          borderRadius: '16px',
+                                          padding: '1px 6px',
+                                          // backgroundColor: 'black',
+                                          fontSize: 'x-small',
+                                          fontWeight: 'bold',
+                                        }}
+                                        className={baseClasses.backdropBlurDark}
+                                      >{dayjs(log.__prevLog.ts).format('DD MMM')}</span>
+                                      <span
+                                        style={{
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          justifyContent: 'flex-start',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          textDecoration: 'none',
+                                        }}
+                                        className={baseClasses.truncate}
+                                      >
+                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d before</span>
+                                        <ArrowForwardIcon fontSize='inherit' />
+                                      </span>
                                     </Link>
                                   </div>
                                 )
