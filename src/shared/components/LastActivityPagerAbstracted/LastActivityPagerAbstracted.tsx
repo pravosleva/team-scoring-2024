@@ -624,7 +624,7 @@ export const LastActivityPagerAbstracted = memo(({
                               {
                                 !!log.__nextLog && (
                                   <div
-                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite, baseClasses.truncate)}
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
                                     style={{
                                       fontSize: 'small',
                                       // border: '1px solid lightgray',
@@ -659,6 +659,7 @@ export const LastActivityPagerAbstracted = memo(({
                                         display: 'inline-flex',
                                         flexDirection: 'row',
                                         justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
                                         alignItems: 'center',
                                         gap: '8px',
                                         textDecoration: 'none',
@@ -699,7 +700,7 @@ export const LastActivityPagerAbstracted = memo(({
                               {
                                 !!log.__prevLog && (
                                   <div
-                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite, baseClasses.truncate)}
+                                    className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
                                     style={{
                                       fontSize: 'small',
 
@@ -719,6 +720,7 @@ export const LastActivityPagerAbstracted = memo(({
                                         marginTop: 'auto',
                                         display: 'inline-flex',
                                         justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
                                         flexDirection: 'row',
                                         alignItems: 'center',
                                         gap: '8px',
@@ -741,6 +743,7 @@ export const LastActivityPagerAbstracted = memo(({
                                         },
                                         queryKeysToremove: ['to', 'forwardActionUiText', 'page'],
                                       })}
+                                      className={baseClasses.truncate}
                                     // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
                                     >
                                       <span
