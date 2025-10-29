@@ -1,7 +1,7 @@
 {
   "name": "taro-2024",
   "private": true,
-  "version": "2.1.3-socket-exp",
+  "version": "2.1.4-beta-socket-exp",
   "type": "module",
   "engines": {
     "npm": ">=10.8.2",

@@ -104,7 +104,7 @@ export const LastActivityPage = memo(() => {
         if (isDebugEnabled) {
           logger.log({
             label: '🟢 onEachSuccessItemData',
-            event: data,
+            evt: data,
             err: null,
           })
         }
@@ -118,7 +118,7 @@ export const LastActivityPage = memo(() => {
         if (isDebugEnabled) {
           logger.log({
             label: '🔴 onFinalError',
-            event: null,
+            evt: null,
             err: { reason },
           })
         }

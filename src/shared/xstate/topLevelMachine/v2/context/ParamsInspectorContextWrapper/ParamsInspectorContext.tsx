@@ -1,8 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useLayoutEffect } from 'react'
 import { useSearchParams, useLocation, useParams } from 'react-router-dom'
+import type { Location } from "@remix-run/router";
 import { EJobsStatusFilter, TJob, TopLevelContext } from '~/shared/xstate'
-import { createFastContext } from '~/shared/utils'
+import { createFastContext, debugFactory } from '~/shared/utils'
 import { soundManager } from '~/shared/soundManager';
 
 export type TCountersPack = {
@@ -112,13 +113,14 @@ type TProps = {
 
 const getIsJobAssigned = ({ job }: { job: TJob }): boolean =>
   !!job.forecast.assignedTo
-
 const getIsJobProject = ({ job }: { job: TJob }): boolean =>
   Array.isArray(job.relations?.children) && job.relations.children.length > 0
 const getIsJobNew = ({ job }: { job: TJob }): boolean =>
   !job.forecast.estimate
-
 const debugFiltersLevels: string[] = ['1']
+const logger = debugFactory<{ [key: string]: string | undefined } | Location<unknown> | null, { reason: string; } | null>({
+  label: 'Params inspector',
+})
 
 const Logic = ({ children }: TProps) => {
   const todosActorRef = TopLevelContext.useActorRef()
@@ -420,8 +422,8 @@ const Logic = ({ children }: TProps) => {
 
   // NOTE: Sount for route change
   useLayoutEffect(() => {
-    console.log(location)
-    console.log(params)
+    logger.log({ evt: location, err: null, label: 'eff:sound (location)' })
+    logger.log({ evt: params, err: null, label: 'eff:sound (params)' })
     const isHomepage = location.pathname === '/'
     const isUsersPage = location.pathname === '/employees'
     const isUserPage = location.pathname === `/employees/${params.user_id}`

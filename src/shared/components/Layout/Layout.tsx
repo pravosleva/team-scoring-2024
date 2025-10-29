@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import SpeedDial from '@mui/material/SpeedDial'
 import Backdrop from '@mui/material/Backdrop'
+// import BioTechIcon from '@mui/icons-material/Biotech'
 // import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import SpeedDialAction from '@mui/material/SpeedDialAction'
 import { Link } from 'react-router-dom'
@@ -59,6 +60,11 @@ const allActions: TSpeedDialMenuItem[] = [
     _Icon: <SportsBasketballIcon color='primary' />,
     name: 'Last Activity',
   },
+  // {
+  //   to: '/report/total',
+  //   _Icon: <BioTechIcon color='primary' />,
+  //   name: 'Report exp',
+  // },
 ]
 
 const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'No VITE_APP_VERSION'

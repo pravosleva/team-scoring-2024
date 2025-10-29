@@ -92,7 +92,7 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
         if (isDebugEnabled) {
           logger.log({
             label: '🟢 onEachSuccessItemData',
-            event: data,
+            evt: data,
             err: null,
           })
         }
@@ -106,7 +106,7 @@ export const JobsPagerExp = memo(({ isDebugEnabled = true }: TProps) => {
         if (isDebugEnabled) {
           logger.log({
             label: '🔴 onFinalError',
-            event: null,
+            evt: null,
             err: { reason },
           })
         }

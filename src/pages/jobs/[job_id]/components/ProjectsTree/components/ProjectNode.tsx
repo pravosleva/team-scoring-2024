@@ -39,6 +39,7 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 // import LabelImportantIcon from '@mui/icons-material/LabelImportant'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import BioTechIcon from '@mui/icons-material/Biotech'
 // -- EXP
 import __TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
@@ -233,7 +234,6 @@ export const ProjectNode = ({
               }
               <JobResultReviewShort job={projectsTree.model} />
             </span>
-            {/* <span>WIP</span> */}
           </div>
         )
       }
@@ -247,8 +247,6 @@ export const ProjectNode = ({
               gap: '2px',
 
               paddingRight: '8px',
-
-              // border: '1px solid red',
 
               position: 'sticky',
               height: `${stickyElementHeight}px`,
@@ -393,6 +391,35 @@ export const ProjectNode = ({
           )}
         />
       </div>
+
+      <Link
+        style={{
+          textDecoration: 'none',
+          width: 'fit-content',
+        }}
+        to={getFullUrl({
+          url: `/report/exp/${projectsTree.model.id}`,
+          query: {
+            ...queryParams,
+            // from: `/jobs/${activeJobId}`,
+            from: `/jobs/${projectsTree.model.id}`,
+            backActionUiText: projectsTree.model.title,
+          },
+          // queryKeysToremove,
+        })}
+      >
+        <Button
+          size='small'
+          startIcon={<BioTechIcon />}
+          endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+          color='primary'
+          variant='contained'
+          // fullWidth
+          sx={{ boxShadow: 'none', borderRadius: 4 }}
+        >
+          Progress Tree
+        </Button>
+      </Link>
 
       {
         projectsTree.model.logs.items.length > 0 && (

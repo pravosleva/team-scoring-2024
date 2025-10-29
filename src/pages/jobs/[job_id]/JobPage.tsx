@@ -429,6 +429,7 @@ export const JobPage = memo(() => {
                   // className={baseClasses.truncate}
                   sx={{
                     borderRadius: 4,
+                    boxShadow: 'none',
                   }}
                 >
                   <span className={baseClasses.truncate}>Open details | {targetJob.title || 'No title'}</span>
@@ -477,6 +478,7 @@ export const JobPage = memo(() => {
                         className={baseClasses.truncate}
                         sx={{
                           borderRadius: 4,
+                          boxShadow: 'none',
                         }}
                       >
                         <span className={baseClasses.truncate}>{targetUser?.displayName || 'Employee'}</span>
@@ -508,6 +510,7 @@ export const JobPage = memo(() => {
                                 className={baseClasses.truncate}
                                 sx={{
                                   borderRadius: 4,
+                                  boxShadow: 'none',
                                 }}
                               >
                                 <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>

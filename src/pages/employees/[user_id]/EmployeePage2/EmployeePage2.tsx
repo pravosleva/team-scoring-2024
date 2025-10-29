@@ -101,7 +101,7 @@ export const EmployeePage2 = memo(() => {
         if (isDebugEnabled) {
           logger.log({
             label: '🟢 onEachSuccessItemData',
-            event: data,
+            evt: data,
             err: null,
           })
         }
@@ -115,7 +115,7 @@ export const EmployeePage2 = memo(() => {
         if (isDebugEnabled) {
           logger.log({
             label: '🔴 onFinalError',
-            event: null,
+            evt: null,
             err: { reason },
           })
         }

@@ -85,7 +85,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
         // console.log(e.data?.message)
         if (isDebugEnabled) logger.log({
           label: 'new data (high level subscriber)',
-          event: {
+          evt: {
             ok: true,
             originalResponse: e.data,
           },
@@ -100,7 +100,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
           case NWService.EWorkerToClientEvent.ONLINE_INCOMING_DATA: // NEvents.ECustom.WORKER_TO_CLIENT_REMOTE_DATA:
             if (isDebugEnabled) logger.log({
               label: `✅ (on data) [${e.data.__eType}] e.data:`,
-              event: {
+              evt: {
                 ok: true,
                 originalResponse: e.data,
               },
@@ -115,7 +115,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
             if (isDebugEnabled) {
               logger.log({
                 label: `🟢 [${e.data.__eType}] e.data:`,
-                event: {
+                evt: {
                   ok: true,
                   originalResponse: e.data,
                 },
@@ -143,7 +143,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
             if (isDebugEnabled) {
               logger.log({
                 label: `🔴 [${e.data.__eType}] e.data:`,
-                event: {
+                evt: {
                   ok: true,
                   originalResponse: e.data,
                 },
@@ -157,7 +157,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
                     ? 'So, this event does not affect the user interface'
                     : 'So, this event will affect the user interface',
                 ].join(' '),
-                event: {
+                evt: {
                   ok: true,
                   originalResponse: e.data,
                 },
@@ -169,7 +169,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
             if (isDebugEnabled) {
               logger.log({
                 label: `⚠️ (on data) Необработанное событие! [${e.data.__eType}] e.data:`,
-                event: {
+                evt: {
                   ok: true,
                   originalResponse: e.data,
                 },
@@ -229,7 +229,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
         if (isDebugEnabled) {
           logger.log({
             label: `🚫 OnErr event:`,
-            event: {
+            evt: {
               ok: true,
               originalResponse: e,
             },
@@ -248,7 +248,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
             if (isDebugEnabled) {
               logger.log({
                 label: `🚫 die [${wName}]`,
-                event: {
+                evt: {
                   ok: true,
                   originalResponse: e,
                 },

@@ -16,6 +16,8 @@ export namespace NWService {
 
     GET_SORTED_LOGS_PAGER = 'c-w:sorted-logs-pager:ping:get',
 
+    GET_SORTED_REPORT_PAGER = 'c-w:sorted-report-pager:ping:get',
+
     // NOTE: 1/2 Others...
   }
   export enum EWorkerToClientEvent {
@@ -38,6 +40,9 @@ export namespace NWService {
 
     SORTED_LOGS_PAGER_OK = 'w-c:sorted-logs-pager:pong:ok',
     SORTED_LOGS_PAGER_ERR = 'w-c:sorted-logs-pager:pong:err',
+
+    SORTED_REPORT_PAGER_OK = 'w-c:sorted-report-pager:pong:ok',
+    SORTED_REPORT_PAGER_ERR = 'w-c:sorted-report-pager:pong:err',
 
     // NOTE: 2/2 Others...
 

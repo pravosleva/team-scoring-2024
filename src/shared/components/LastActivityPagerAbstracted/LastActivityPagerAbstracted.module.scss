@@ -52,3 +52,22 @@
   // outline-offset: 4px;
   box-shadow: none;
 }
+
+.btnAsLink {
+  line-height: 16px;
+  word-break: break-word;
+  font-size: small;
+  font-weight: bold;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+  background-color: transparent;
+  padding: 0px;
+  width: fit-content;
+  color: inherit;
+
+  &:hover {
+    color: #00a47d;
+  }
+}

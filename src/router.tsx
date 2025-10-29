@@ -2,7 +2,9 @@ import { createHashRouter } from 'react-router-dom'
 import {
   AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
   JobPage, JobsPage, LogPage, LastActivityPage, LastJobActivityPage,
-  OnlineExpPage, SoundCheckPage, WorkerExpPage,
+  OnlineExpPage, SoundCheckPage,
+  TotalReport,
+  WorkerExpPage,
 } from '~/pages'
 import { Layout, JobsPagerAbstracted } from '~/shared/components'
 
@@ -47,11 +49,19 @@ export const router = createHashRouter(
     },
     {
       path: '/last-activity/:job_ids',
-      element: <Layout noScrollTopBtn><LastJobActivityPage /></Layout>,
+      element: (
+        <Layout noScrollTopBtn>
+          <LastJobActivityPage />
+        </Layout>
+      ),
     },
     {
       path: '/last-activity',
-      element: <Layout noScrollTopBtn><LastActivityPage /></Layout>,
+      element: (
+        <Layout noScrollTopBtn>
+          <LastActivityPage />
+        </Layout>
+      ),
     },
     {
       path: '/worker-exp',
@@ -59,7 +69,11 @@ export const router = createHashRouter(
     },
     {
       path: '/jobs-pager-exp',
-      element: <Layout noScrollTopBtn><JobsPagerAbstracted pagerControlsHardcodedPath='/jobs-pager-exp' /></Layout>,
+      element: (
+        <Layout noScrollTopBtn>
+          <JobsPagerAbstracted pagerControlsHardcodedPath='/jobs-pager-exp' />
+        </Layout>
+      ),
     },
     {
       path: '/sound-check',
@@ -68,6 +82,10 @@ export const router = createHashRouter(
     {
       path: '/online-exp',
       element: <OnlineExpPage />,
+    },
+    {
+      path: '/report/exp/:job_id',
+      element: <TotalReport />,
     },
   ]
 )

@@ -559,6 +559,18 @@
   }
 }
 
+.backdropBlurPrimary {
+  background-color: rgba(149, 158, 170, .9);
+}
+
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .backdropBlurPrimary {
+    background-color: rgba(149, 158, 170, .5);
+    -webkit-backdrop-filter: blur(2em);
+    backdrop-filter: blur(2em);
+  }
+}
+
 .underlineDashed {
   text-decoration: underline dashed;
 }

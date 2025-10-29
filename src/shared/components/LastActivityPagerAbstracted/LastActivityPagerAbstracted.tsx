@@ -1,6 +1,6 @@
 import { memo, useEffect, useCallback, useMemo } from 'react'
 import { TLogsItem, EJobsStatusFilter, TopLevelContext } from '~/shared/xstate/topLevelMachine/v2'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
@@ -80,7 +80,7 @@ export const LastActivityPagerAbstracted = memo(({
   const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
 
   // -- NOTE: 2/3 Совершенно необязательный механизм
-  const [urlSearchParams] = useSearchParams()
+  const [urlSearchParams, setSearchParams] = useSearchParams()
   const urlSearchParamLastSeenLogKey = useMemo(() => urlSearchParams.get('lastSeenLogKey'), [urlSearchParams])
   // const urlSearchParamCurrentPage = useMemo(() => urlSearchParams.get('page'), [urlSearchParams])
   // const [lastSeenJobId, setLastSeenJobId] = useState<number | null>(null)
@@ -89,16 +89,22 @@ export const LastActivityPagerAbstracted = memo(({
   //   if (!!urlSearchParamLastSeenLogKey && !Number.isNaN(Number(urlSearchParamLastSeenLogKey))) setLastSeenJobId(Number(idToScroll))
   // }, [urlSearchParamLastSeenLogKey])
   const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
+
+  const location = useLocation()
   useEffect(() => {
-    // console.log(`- EFF - page=${currentPage} | ${urlSearchParamLastSeenLogKey}`)
-    // console.log(urlSearchParamLastSeenLogKey)
     scrollTopExtra()
+  }, [location.pathname])
+
+  // -- NOTE: exp
+  // NOTE: deps exp: urlSearchParamLastSeenLogKey, location.pathname
+  useEffect(() => {
     if (!!urlSearchParamLastSeenLogKey) {
       specialScroll({ id: `log_list_item_${urlSearchParamLastSeenLogKey}` })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlSearchParamLastSeenLogKey, location.pathname])
-  // --urlSearchParamLastSeenLogKey
+  }, [queryParams.page])
+  // --
+
   const [_mainCounters] = useParamsInspectorContextStore((ctx) => ctx.counters.main)
   const counters = useMemo(() => _counters || _mainCounters, [_mainCounters, _counters])
   const navigate = useNavigate()
@@ -113,7 +119,38 @@ export const LastActivityPagerAbstracted = memo(({
     url: string;
     query?: { [key: string]: string | null | number; };
     queryKeysToremove?: string[];
-  }) => () => navigate(getFullUrl({ url, query, queryKeysToremove })), [navigate, getFullUrl])
+  }) =>
+    () => {
+      // NOTE: Условный переход
+      // 1.Если запрошена текущая страница и такой элемент уже есть на странице -> скролл
+      if (
+        url === pagerControlsHardcodedPath
+        && !!query?.lastSeenLogKey
+      ) {
+        console.log(1)
+        specialScroll({
+          id: `log_list_item_${query.lastSeenLogKey}`,
+          cb: {
+            onSuccess: () => {
+              console.log(`onSuccess: lastSeenLogKey -> ${query.lastSeenLogKey}`)
+              urlSearchParams.set('lastSeenLogKey', String(query.lastSeenLogKey))
+              setSearchParams(urlSearchParams)
+            },
+            onErr: ({ reason }) => {
+              console.log(2)
+              console.log(reason)
+              // 2. Иначе переход на другую страницу
+              navigate(getFullUrl({ url, query, queryKeysToremove }))
+            },
+          },
+        })
+      } else {
+        console.log(3)
+        navigate(getFullUrl({ url, query, queryKeysToremove }))
+      }
+    },
+    [navigate, getFullUrl, pagerControlsHardcodedPath, urlSearchParams, setSearchParams]
+  )
 
   const jobsActorRef = TopLevelContext.useActorRef()
 
@@ -418,10 +455,10 @@ export const LastActivityPagerAbstracted = memo(({
 
                             // NOTE: Active (from url search params)
                             [classes.activeDashedBorder]: log.logUniqueKey === urlSearchParamLastSeenLogKey,
-                          }
+                          },
                         )}
                       >
-                        <em
+                        <div
                           style={{
                             color: 'gray',
                             // whiteSpace: 'pre-wrap',
@@ -466,6 +503,7 @@ export const LastActivityPagerAbstracted = memo(({
                                 borderRadius: '16px',
                                 padding: '1px 6px',
                                 // backgroundColor: 'black',
+                                lineHeight: '16px',
                               }}
                               className={clsx(classes.date, baseClasses.backdropBlurDark)}
                             >
@@ -522,10 +560,8 @@ export const LastActivityPagerAbstracted = memo(({
                               }}
                             ><span>EDIT LOG</span><ArrowForwardIcon fontSize='inherit' /></Link>
                           </span>
-                        </em>
-                        <div
-                          style={{ fontSize: '14px' }}
-                        >{log.text}</div>
+                        </div>
+                        <div style={{ fontSize: '14px' }}>{log.text}</div>
                         {
                           Array.isArray(log.links) && log.links?.length > 0 && (
                             log.links.map((link) => (
@@ -579,7 +615,28 @@ export const LastActivityPagerAbstracted = memo(({
                           )
                         }
 
-                        <Link
+                        <button
+                          onClick={goPage({
+                            url: `/jobs/${log.jobId}`,
+                            query: {
+                              to: [
+                                '/last-activity',
+                                '?',
+                                [
+                                  `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                  `lastSeenJob=${log.jobId}`,
+                                ].join('&')
+                              ].join(''),
+                              forwardActionUiText: 'Last activity',
+                            },
+                            // queryKeysToremove: ['isProject', 'jobStatusFilter', 'estimateReached']
+                          })}
+                          className={classes.btnAsLink}
+                        >
+                          {log.jobTitle}
+                        </button>
+
+                        {/* <Link
                           // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}
                           to={
                             [
@@ -607,7 +664,7 @@ export const LastActivityPagerAbstracted = memo(({
                           }}
                         >
                           {log.jobTitle}
-                        </Link>
+                        </Link> */}
 
                         {
                           (!!log.__prevLog || !!log.__nextLog) && (
@@ -628,14 +685,14 @@ export const LastActivityPagerAbstracted = memo(({
                                     style={{
                                       fontSize: 'small',
                                       // border: '1px solid lightgray',
-                                      boxShadow: 'rgba(100, 100, 111, 0.4) 0px 0px 4px 0px',
+                                      boxShadow: 'rgba(0, 0, 0, 0.5) 0px 0px 4px 0px',
                                       padding: '8px',
                                       borderRadius: '8px',
                                       width: '100%',
                                     }}
                                   >
                                     <span className={baseClasses.rowsLimited10}>{log.__nextLog.text}</span>
-                                    <Link
+                                    {/* <Link
                                       to={getFullUrl({
                                         url: pagerControlsHardcodedPath,
                                         query: {
@@ -664,7 +721,37 @@ export const LastActivityPagerAbstracted = memo(({
                                         gap: '8px',
                                         textDecoration: 'none',
                                       }}
-                                    // className={baseClasses.truncate}
+                                    > */}
+                                    <button
+                                      onClick={goPage({
+                                        url: pagerControlsHardcodedPath,
+                                        query: {
+                                          lastSeenLogKey: log.__nextLog.logUniqueKey,
+                                          lastSeenJob: log.__nextLog.jobId,
+                                          to: [
+                                            pagerControlsHardcodedPath,
+                                            '?',
+                                            [
+                                              `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                              `lastSeenJob=${log.jobId}`,
+                                            ].join('&')
+                                          ].join(''),
+                                          forwardActionUiText: `Go to ${dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d before`,
+                                        },
+                                        queryKeysToremove: ['from', 'backActionUiText', 'page'],
+                                      })}
+                                      className={classes.btnAsLink}
+                                      style={{
+                                        marginTop: 'auto',
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none',
+                                        width: '100%',
+                                      }}
                                     >
                                       <span
                                         style={{
@@ -678,7 +765,7 @@ export const LastActivityPagerAbstracted = memo(({
                                         className={baseClasses.truncate}
                                       >
                                         <ArrowBack fontSize='inherit' />
-                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>{dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d after</span>
+                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>+{dayjs(log.__nextLog.ts).diff(log.ts, 'days')}d after</span>
                                       </span>
                                       <span
                                         style={{
@@ -696,7 +783,8 @@ export const LastActivityPagerAbstracted = memo(({
                                       >
                                         {dayjs(log.__nextLog.ts).format('DD MMM')}
                                       </span>
-                                    </Link>
+                                    </button>
+                                    {/* </Link> */}
                                   </div>
                                 )
                               }
@@ -709,7 +797,7 @@ export const LastActivityPagerAbstracted = memo(({
 
                                       // border: '1px solid lightgray',
                                       // boxShadow: 'rgba(100, 100, 111, 0.2) 0px 0px 8px 0px',
-                                      boxShadow: 'rgba(100, 100, 111, 0.4) 0px 0px 4px 0px',
+                                      boxShadow: 'rgba(0, 0, 0, 0.5) 0px 0px 4px 0px',
                                       padding: '8px',
                                       borderRadius: '8px',
                                       width: '100%',
@@ -717,8 +805,10 @@ export const LastActivityPagerAbstracted = memo(({
                                       // textAlign: 'right',
                                     }}
                                   >
-                                    <span className={baseClasses.rowsLimited10}>{log.__prevLog.text}</span>
-                                    <Link
+                                    <span
+                                      className={baseClasses.rowsLimited10}
+                                    >{log.__prevLog.text}</span>
+                                    {/* <Link
                                       style={{
                                         marginTop: 'auto',
                                         display: 'flex',
@@ -748,6 +838,37 @@ export const LastActivityPagerAbstracted = memo(({
                                       })}
                                     // className={baseClasses.truncate}
                                     // http://localhost:3001/#/last-activity/1752276422152,1751310188735,1752139850755?from=%252Flast-activity%252F1752276422152%252C1751310188735%252C1752139850755%253FlastSeenLogKey%253Djob-1751310188735-log-1753434607595%2526lastSeenJob%253D1751310188735&backActionUiText=Go%2520to%25208d%2520after
+                                    > */}
+                                    <button
+                                      onClick={goPage({
+                                        url: pagerControlsHardcodedPath,
+                                        query: {
+                                          lastSeenLogKey: log.__prevLog.logUniqueKey,
+                                          lastSeenJob: log.__prevLog.jobId,
+                                          to: [
+                                            pagerControlsHardcodedPath,
+                                            '?',
+                                            [
+                                              `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                              `lastSeenJob=${log.jobId}`,
+                                            ].join('&')
+                                          ].join(''),
+                                          forwardActionUiText: `Go to ${dayjs(log.__prevLog.ts).diff(log.ts, 'days')}d before`,
+                                        },
+                                        queryKeysToremove: ['from', 'backActionUiText', 'page'],
+                                      })}
+                                      className={classes.btnAsLink}
+                                      style={{
+                                        marginTop: 'auto',
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none',
+                                        width: '100%',
+                                      }}
                                     >
                                       <div
                                         style={{
@@ -774,10 +895,11 @@ export const LastActivityPagerAbstracted = memo(({
                                         }}
                                         className={baseClasses.truncate}
                                       >
-                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d before</span>
+                                        <span style={{ textDecoration: 'underline' }} className={baseClasses.truncate}>-{dayjs(log.ts).diff(log.__prevLog.ts, 'days')}d before</span>
                                         <ArrowForwardIcon fontSize='inherit' />
                                       </span>
-                                    </Link>
+                                    </button>
+                                    {/* </Link> */}
                                   </div>
                                 )
                               }

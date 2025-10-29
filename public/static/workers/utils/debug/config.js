@@ -16,7 +16,7 @@ var debugConfig = {
     },
   },
   socketState: {
-    isEnabled: true,
+    isEnabled: false,
   },
   swState: {
     isEnabled: true,

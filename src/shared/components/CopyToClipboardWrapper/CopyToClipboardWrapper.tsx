@@ -14,6 +14,7 @@ import {
   // closeSnackbar,
 } from 'notistack'
 import classes from './CopyToClipboardWrapper.module.scss'
+import { getTruncated } from '~/shared/utils/string-ops'
 
 type TProps = {
   text: string;
@@ -35,7 +36,7 @@ export const CopyToClipboardWrapper = memo(({ onCopy, text, uiText, showNotifOnC
   //   showNotif(message, { variant: 'default' })
   // }, [showNotif])
   const showInfo = useCallback(({ message }: { message: string }) => {
-    showNotif(message || 'No message', {
+    showNotif(getTruncated(message, 100) || 'No message', {
       variant: 'info',
       hideIconVariant: true,
       anchorOrigin: {

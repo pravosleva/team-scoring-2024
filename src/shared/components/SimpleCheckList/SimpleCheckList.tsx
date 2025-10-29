@@ -247,7 +247,11 @@ function SimpleCheckListFn<TAddInfo>({
     <>
       {
         isEditMode ? (
-          <Grid container spacing={2} ref={editFormRef}>
+          <Grid
+            container
+            spacing={2}
+            ref={editFormRef}
+          >
             <Grid size={12}>
               <CustomizedTextField
                 size='small'
@@ -305,6 +309,7 @@ function SimpleCheckListFn<TAddInfo>({
               <Grid size={12}>
                 <div
                   className={clsx(
+                    baseClasses.backdropBlurSuperLite,
                     {
                       [classes.commentBox]: !isMiniVariant,
                       [classes.commentBoxMini]: isEditable && isMiniVariant,
@@ -320,18 +325,21 @@ function SimpleCheckListFn<TAddInfo>({
                   )}
                 >
                   <div
-                    className={clsx(baseClasses.truncate, {
-                      [classes.absoluteBadgeTopRight]: !isMiniVariant,
-                      [classes.absoluteBadgeBottomLeft]: isMiniVariant,
-                      [classes.default]: !hasNotActiveItems,
-                      [classes.success]: hasNotActiveItems,
-                    })}
+                    className={clsx(
+                      baseClasses.truncate,
+                      {
+                        [classes.absoluteBadgeTopRight]: !isMiniVariant,
+                        [classes.absoluteBadgeBottomLeft]: isMiniVariant,
+                        [classes.default]: !hasNotActiveItems,
+                        [classes.success]: hasNotActiveItems,
+                      })
+                    }
                     style={{
                       maxWidth: 'calc(100% - 130px)',
                       display: 'flex',
                       flexDirection: 'row',
                       gap: '6px',
-                      cursor: isInfoLabelClickable ? 'pointer' : 'default'
+                      cursor: isInfoLabelClickable ? 'pointer' : 'default',
                     }}
                     onClick={
                       isInfoLabelClickable ? () => window.alert(infoLabel) : undefined

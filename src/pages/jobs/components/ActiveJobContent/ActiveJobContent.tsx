@@ -328,6 +328,9 @@ export const ActiveJobContent = memo(({
                   <div style={{ fontSize: 'small' }}>
                     Grade: {ratingIcons[expressAppraiserStars].label}
                   </div>
+                  <div style={{ fontSize: 'small' }}>
+                    <Link to={`/report/exp/${job.id}`}>Report exp</Link>
+                  </div>
 
                   <ResponsiveBlock
                     style={{
