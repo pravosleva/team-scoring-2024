@@ -11,13 +11,15 @@ import { debugFactory, NWService } from '~/shared/utils'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 // import { getFullUrl } from '~/shared/utils/string-ops'
-import { CopyToClipboardWrapper, ResponsiveBlock } from '~/shared/components'
+import { CollapsibleBox, CopyToClipboardWrapper, ResponsiveBlock } from '~/shared/components'
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import CircularProgress from '@mui/material/CircularProgress'
 import { JsonEditor as JsonEditorByCarlosNZ } from 'json-edit-react'
 import BioTechIcon from '@mui/icons-material/Biotech'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { BrainJsExp, EfficiencyAnalysisExp } from './components'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -29,11 +31,34 @@ type TProps = {
 
 type TTargetResultByWorker = {
   _partialInput: any;
-  modelFullTree: any;
-  modelPartialTree: any;
-  otputFullJobsTree: string;
-  otputFullActiveCheckboxesTree: string;
-  outputTargetActiveCheckboxTree: string;
+  output: {
+    modelFullTree: any;
+    modelPartialTree: any;
+    fullJobsTree: {
+      result: string;
+      counter: number;
+    };
+    fullActiveCheckboxesTree: {
+      result: string;
+      counter: number;
+    };
+    targetActiveCheckboxTree: {
+      result: string;
+      counter: number;
+    };
+    fullDoneLast3MonthsCheckboxesTree?: {
+      result: string;
+      counter: number;
+    };
+    fullDoneLast7DaysCheckboxesTree?: {
+      result: string;
+      counter: number;
+    };
+    targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?: {
+      result: string;
+      counter: number;
+    };
+  };
   message?: string;
   binarySearchedIndex: number;
   pagination: {
@@ -175,94 +200,213 @@ export const ReportPagerAbstracted = ({
           )}
 
           {
-            !!outputWorkerData?.outputTargetActiveCheckboxTree && (
+            !!outputWorkerData?.output.targetActiveCheckboxTree
+            && (
               <>
                 <h2 style={{ color: '#959eaa', marginBottom: '0px' }}>Target</h2>
 
                 <Grid size={12}>
-                  <pre
-                    className={clsx(
-                      baseClasses.preNormalized,
-                      classes.resultWrapper,
-                      {
-                        [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
-                        [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
-                      }
-                    )}
-                    style={{ overflowY: 'auto' }}
-                  >
-                    {outputWorkerData.outputTargetActiveCheckboxTree}
-                  </pre>
-                </Grid>
-
-                <Grid size={12}>
-                  <CopyToClipboardWrapper
-                    text={outputWorkerData.outputTargetActiveCheckboxTree}
-                    uiText='Copy as text'
-                    showNotifOnCopy
-                  />
-                </Grid>
-
-                {
-                  !!outputWorkerData?.modelPartialTree && (
-                    <>
-                      <Grid size={12}>
+                  <CollapsibleText
+                    briefText={`🔥 In progress (${outputWorkerData.output.targetActiveCheckboxTree.counter})`}
+                    isClickableBrief
+                    contentRender={() => (
+                      <>
                         <pre
                           className={clsx(
                             baseClasses.preNormalized,
                             classes.resultWrapper,
-                            // {
-                            //   [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
-                            //   [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
-                            // }
+                            {
+                              [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                              [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                            }
                           )}
                           style={{ overflowY: 'auto' }}
                         >
-                          {JSON.stringify(outputWorkerData.modelPartialTree, null, 2)}
+                          {outputWorkerData.output.targetActiveCheckboxTree.result}
                         </pre>
-                      </Grid>
-                      <Grid size={12}>
-                        <CopyToClipboardWrapper
-                          text={JSON.stringify(outputWorkerData.modelPartialTree, null, 2)}
-                          uiText='Copy partial jobs tree (target)'
-                          showNotifOnCopy
-                        />
-                      </Grid>
-                    </>
-                  )
-                }
+                      </>
+                    )}
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <CopyToClipboardWrapper
+                    text={outputWorkerData.output.targetActiveCheckboxTree.result}
+                    uiText='Copy target tree as text'
+                    showNotifOnCopy
+                  />
+                </Grid>
               </>
             )
           }
 
           {
-            !!outputWorkerData?.otputFullActiveCheckboxesTree && (
+            !!outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.result
+            && outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counter > 0
+            && (
+              <Grid size={12}>
+                <CollapsibleBox
+                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counter})</span>}
+                  text={(
+                    <div className={baseClasses.stack1}>
+                      <pre
+                        className={clsx(
+                          baseClasses.preNormalized,
+                          classes.resultWrapper,
+                          {
+                            [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                            [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                          }
+                        )}
+                        style={{ overflowY: 'auto' }}
+                      >
+                        {outputWorkerData.output.fullDoneLast7DaysCheckboxesTree?.result}
+                      </pre>
+                      <div>
+                        <CopyToClipboardWrapper
+                          text={outputWorkerData.output.fullDoneLast7DaysCheckboxesTree?.result}
+                          uiText='Copy as text'
+                          showNotifOnCopy
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
+              </Grid>
+            )
+          }
+
+          {
+            !!outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.result
+            && outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counter > 0
+            && (
+              <Grid size={12}>
+                <CollapsibleBox
+                  header={<span>✅ Done last 1 month ({outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counter})</span>}
+                  text={(
+                    <div className={baseClasses.stack1}>
+                      <pre
+                        className={clsx(
+                          baseClasses.preNormalized,
+                          classes.resultWrapper,
+                          {
+                            [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                            [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                          }
+                        )}
+                        style={{ overflowY: 'auto' }}
+                      >
+                        {outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.result}
+                      </pre>
+                      <div>
+                        <CopyToClipboardWrapper
+                          text={outputWorkerData.output.fullDoneLast3MonthsCheckboxesTree?.result}
+                          uiText='Copy as text'
+                          showNotifOnCopy
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
+              </Grid>
+            )
+          }
+
+          {
+            !!outputWorkerData?.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?.result
+            && outputWorkerData?.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?.counter > 0
+            && (
+              <Grid size={12}>
+                <CollapsibleBox
+                  header={<span>💀 Created early than 1 month & incompleted yet ({outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.counter})</span>}
+                  text={(
+                    <div className={baseClasses.stack1}>
+                      <pre
+                        className={clsx(
+                          baseClasses.preNormalized,
+                          classes.resultWrapper,
+                          // {
+                          //   [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                          //   [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                          // }
+                        )}
+                        style={{
+                          overflowY: 'auto',
+                          color: '#FFF',
+                          backgroundColor: '#000',
+                        }}
+                      >
+                        {outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.result}
+                      </pre>
+                      <div>
+                        <CopyToClipboardWrapper
+                          text={outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.result}
+                          uiText='Copy as text'
+                          showNotifOnCopy
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
+              </Grid>
+            )
+          }
+
+          {
+            !!outputWorkerData?.output.modelPartialTree && (
+              <>
+                <Grid size={12}>
+                  <EfficiencyAnalysisExp tree={outputWorkerData.output.modelPartialTree} />
+                </Grid>
+                <Grid size={12}>
+                  <CopyToClipboardWrapper
+                    text={JSON.stringify(outputWorkerData.output.modelPartialTree, null, 2)}
+                    uiText='Copy partial jobs tree (target)'
+                    showNotifOnCopy
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <BrainJsExp tree={outputWorkerData.output.modelPartialTree} />
+                </Grid>
+              </>
+            )
+          }
+
+          {
+            !!outputWorkerData?.output.fullActiveCheckboxesTree.result
+            && (
               <>
                 <h2 style={{ color: '#959eaa', marginBottom: '0px' }}>Full tree</h2>
 
                 <Grid size={12}>
-                  <pre
-                    className={clsx(
-                      baseClasses.preNormalized,
-                      classes.resultWrapper,
-                      {
-                        [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
-                        [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
-                      }
+                  <CollapsibleBox
+                    header={<span>🔥 In progress ({outputWorkerData?.output.fullActiveCheckboxesTree.counter})</span>}
+                    text={(
+                      <div className={baseClasses.stack1}>
+                        <pre
+                          className={clsx(
+                            baseClasses.preNormalized,
+                            classes.resultWrapper,
+                            {
+                              [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                              [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                            }
+                          )}
+                          style={{ overflowY: 'auto' }}
+                        >
+                          {outputWorkerData.output.fullActiveCheckboxesTree.result}
+                        </pre>
+                        <div>
+                          <CopyToClipboardWrapper
+                            text={outputWorkerData.output.fullActiveCheckboxesTree.result}
+                            uiText='Copy as text'
+                            showNotifOnCopy
+                          />
+                        </div>
+                      </div>
                     )}
-                    style={{ overflowY: 'auto' }}
-                  >
-                    {outputWorkerData.otputFullActiveCheckboxesTree}
-                  </pre>
-                </Grid>
-
-                <Grid size={12}>
-                  <CopyToClipboardWrapper
-                    text={outputWorkerData.otputFullActiveCheckboxesTree}
-                    uiText='Copy as text'
-                    showNotifOnCopy
                   />
                 </Grid>
+
                 {/* <Grid size={12}>
                   <CopyToClipboardWrapper
                     text={outputWorkerData.}
@@ -271,10 +415,10 @@ export const ReportPagerAbstracted = ({
                   />
                 </Grid> */}
                 {
-                  !!outputWorkerData?.modelFullTree && (
+                  !!outputWorkerData?.output.modelFullTree && (
                     <Grid size={12}>
                       <CopyToClipboardWrapper
-                        text={JSON.stringify(outputWorkerData.modelFullTree, null, 2)}
+                        text={JSON.stringify(outputWorkerData.output.modelFullTree, null, 2)}
                         uiText='Copy full jobs tree'
                         showNotifOnCopy
                       />
@@ -297,7 +441,7 @@ export const ReportPagerAbstracted = ({
           }
 
           {
-            !!outputWorkerData?.otputFullJobsTree && (
+            !!outputWorkerData?.output.fullJobsTree.result && (
               <>
                 <h2 style={{ color: '#959eaa', marginBottom: '0px' }}>Full tree (ids)</h2>
 
@@ -313,14 +457,14 @@ export const ReportPagerAbstracted = ({
                     )}
                     style={{ overflowY: 'auto' }}
                   >
-                    {outputWorkerData.otputFullJobsTree}
+                    {outputWorkerData.output.fullJobsTree.result}
                   </pre>
                 </Grid>
               </>
             )
           }
 
-          {
+          {/*
             isDebugEnabled && (
               <Grid size={12}>
                 <pre
@@ -340,7 +484,7 @@ export const ReportPagerAbstracted = ({
                   {JSON.stringify({
                     // reportText: outputWorkerData.reportText,
                     // outputTargetActiveCheckboxTree: outputWorkerData?.outputTargetActiveCheckboxTree || null,
-                    _service: outputWorkerData?.modelFullTree || null,
+                    _service: outputWorkerData?.output.modelFullTree || null,
                     // cur: {
                     //   pagCurrentPageIndex: outputWorkerData?.pagination.currentPageIndex,
                     //   pagCurrentPage: outputWorkerData?.pagination.currentPage,
@@ -357,7 +501,7 @@ export const ReportPagerAbstracted = ({
                 </pre>
               </Grid>
             )
-          }
+          */}
 
           {isDebugEnabled && !!outputWorkerDebugMsg && (
             <Grid size={12}>

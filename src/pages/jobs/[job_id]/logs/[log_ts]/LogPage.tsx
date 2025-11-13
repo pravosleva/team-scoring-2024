@@ -11,7 +11,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components/JobResultReviewShort'
 import { getJobStatusText } from '~/pages/jobs/[job_id]/utils'
-import { ResponsiveBlock, SimpleCheckList } from '~/shared/components'
+import { ResponsiveBlock, SimpleCheckList, TimeAgo } from '~/shared/components'
 import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -20,7 +20,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
-import { CommentManager, SingleTextManager } from './components'
+import { SingleTextManager } from '~/shared/components'
+import { CommentManager } from './components'
 
 export const LogPage = () => {
   const params = useParams()
@@ -48,12 +49,12 @@ export const LogPage = () => {
       default:
         return undefined
     }
-  }, [targetJob, targetJob?.logs.items, params.log_ts])
+  }, [targetJob, params.log_ts])
 
   const jobsActorRef = TopLevelContext.useActorRef()
 
   const handleEditLog = useCallback(({ text }: { text: string; }) => {
-    if (!!targetJob?.id && !!targetLog) {
+    if (!!targetJob?.id && !!targetLog?.ts) {
       jobsActorRef.send({
         type: 'todo.editLog',
         value: {
@@ -63,7 +64,7 @@ export const LogPage = () => {
         },
       })
     }
-  }, [targetJob?.id, targetLog?.ts])
+  }, [targetJob?.id, targetLog?.ts, jobsActorRef])
 
   return (
     <Grid container spacing={2}>
@@ -153,9 +154,20 @@ export const LogPage = () => {
         >
           <div style={{ fontWeight: 'bold' }} className={baseClasses.truncate}>{targetJob?.title || `Job not found #${params.job_id}`}</div>
           {
+            !!targetJob?.ts.create && (
+              <TimeAgo
+                date={targetJob?.ts.create}
+                style={{ color: '#959eaa', fontStyle: 'italic', fontSize: 'small' }}
+                prefix='Created'
+              />
+            )
+          }
+          {
             !!targetJob && (
               // TODO: <SingleTextManager buttonText='Edit job description'
-              <em style={{ fontSize: 'small', color: 'gray' }}>{targetJob.descr || 'No description'}</em>
+              <em style={{ fontSize: 'small', color: '#959eaa', fontWeight: 'bold' }}>
+                {targetJob.descr || 'No description'}
+              </em>
             )
           }
         </Box>
@@ -173,6 +185,15 @@ export const LogPage = () => {
               }}
             >
               <div style={{ fontWeight: 'bold' }}>Log #{params.log_ts} | {dayjs(targetLog?.ts).format('DD.MM.YYYY HH:mm')}</div>
+              {
+                !!targetLog?.ts && (
+                  <TimeAgo
+                    date={targetLog?.ts}
+                    style={{ color: '#959eaa', fontStyle: 'italic', fontSize: 'small' }}
+                  // prefix='Created'
+                  />
+                )
+              }
               <SingleTextManager
                 infoLabel='Log text'
                 buttonText='Add log text'

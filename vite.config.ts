@@ -34,6 +34,7 @@ const modulesToSeparate = [
   'react-google-charts',
   'react-hook-form',
   'recharts',
+  'brain.js',
 ]
 const _chunksMap = new Map()
 

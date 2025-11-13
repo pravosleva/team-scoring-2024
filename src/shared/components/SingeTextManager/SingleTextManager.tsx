@@ -24,9 +24,9 @@ import baseClasses from '~/App.module.scss'
 type TProps<T> = {
   initialState: T;
   infoLabel: string;
-  buttonText: string;
-  onSuccess: ({ state }: { state: T, cleanup: () => void }) => void;
-  onDelete: ({ cleanup }: { cleanup: () => void }) => void;
+  buttonText?: string;
+  onSuccess?: ({ state }: { state: T, cleanup: () => void }) => void;
+  onDelete?: ({ cleanup }: { cleanup: () => void }) => void;
   isEditable: boolean;
   isDeletable: boolean;
 }
@@ -81,7 +81,7 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
   const handleClose = useCallback(() => {
     setIsEditMode(false)
   }, [])
-  
+
   const handleChangeText = useCallback((e: any) => {
     setLocalText(e.target.value)
   }, [])
@@ -92,20 +92,20 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
   }, [setLocalText, handleClose])
 
   const handleSubmit = useCallback(() => {
-    onSuccess({ state: { text: localText }, cleanup: handleCleanup })
+    onSuccess?.({ state: { text: localText }, cleanup: handleCleanup })
     handleClose()
   }, [localText, onSuccess, handleClose, handleCleanup])
 
   const handleRemove = useCallback(() => {
     const isConfirmed = window.confirm('Уверены?')
     if (isConfirmed) {
-      onDelete({ cleanup: handleCleanup })
+      onDelete?.({ cleanup: handleCleanup })
     }
   }, [handleCleanup, onDelete])
 
   const hasUpdated = useMemo(() => {
     return localText !== initialState.text
-  }, [localText, initialState.text ])
+  }, [localText, initialState.text])
 
   return (
     <>
@@ -124,9 +124,9 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
                 onChange={handleChangeText}
                 multiline
                 maxRows={7}
-                // sx={{
-                //   borderRadius: '8px',
-                // }}
+              // sx={{
+              //   borderRadius: '8px',
+              // }}
               />
             </Grid>
 
@@ -237,7 +237,7 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
                       variant='outlined' color='primary' onClick={handleEditToggle}
 
                     >
-                      {buttonText}
+                      {buttonText || 'No buttonText'}
                     </Button>
                   </Grid>
                 </Grid>

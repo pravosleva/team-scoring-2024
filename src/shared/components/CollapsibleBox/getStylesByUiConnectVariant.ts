@@ -48,7 +48,7 @@ export const getStylesByUiConnectVariant = ({ codes }: {
         border: {
           width: [2, 2, 2, 2],
           radius: [28, 28, 28, 28],
-          color: ['lightgray', 'lightgray', 'lightgray', 'lightgray'],
+          color: ['#959eaa', '#959eaa', '#959eaa', '#959eaa'],
           style: ['solid', 'solid', 'solid', 'solid'],
         },
       },
@@ -56,7 +56,7 @@ export const getStylesByUiConnectVariant = ({ codes }: {
         border: {
           width: [2, 2, 2, 2],
           radius: [20, 20, 20, 20],
-          color: ['lightgray', 'lightgray', 'lightgray', 'lightgray'],
+          color: ['#959eaa', '#959eaa', '#959eaa', '#959eaa'],
           style: ['solid', 'solid', 'solid', 'solid'],
         },
       },
@@ -104,10 +104,10 @@ export const getStylesByUiConnectVariant = ({ codes }: {
   }
   res.output.collapsed.border.radius = res.values.collapsed.border.radius.map((n) => `${n}px`).join(' ')
   res.output.opened.border.radius = res.values.opened.border.radius.map((n) => `${n}px`).join(' ')
-  
+
   res.output.collapsed.border.width = res.values.collapsed.border.width.map((n) => `${n}px`).join(' ')
   res.output.opened.border.width = res.values.opened.border.width.map((n) => `${n}px`).join(' ')
-  
+
   res.output.collapsed.border.color = res.values.collapsed.border.color.join(' ')
   res.output.opened.border.color = res.values.opened.border.color.join(' ')
   return res

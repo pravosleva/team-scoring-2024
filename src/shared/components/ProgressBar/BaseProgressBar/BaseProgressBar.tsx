@@ -52,7 +52,7 @@ const ProgressBar = styled('div')<TBaseProgressBarProps>(({
     codes: connectedOnThe,
   }).extentalMui,
   position: 'relative',
-  backgroundColor: 'lightgray',
+  backgroundColor: '#959eaa',
   boxSizing: 'border-box',
   width: '100%',
   height: '3em',
@@ -60,6 +60,7 @@ const ProgressBar = styled('div')<TBaseProgressBarProps>(({
   fontFamily: 'system-ui',
 
   '&::before': {
+    boxShadow: 'rgba(255, 255, 255, 0.8) 0px 0px 6px 0px',
     boxSizing: 'border-box',
     // fontSize: '8px',
     whiteSpace: 'pre',
@@ -76,10 +77,10 @@ const ProgressBar = styled('div')<TBaseProgressBarProps>(({
     // value > 100 -> background-color: #e46046;
     // value < 0 -> background-color: #2280fa;
     backgroundColor:
-      value > 100 ? '#e46046'
-      : value < 0
-        ? '#2280fa'
-        : '#2cc194',
+      value > 100 ? '#f46d52'
+        : value < 0
+          ? '#2280fa'
+          : '#2cc194',
     minWidth: '2rem',
     maxWidth: 'calc(100% - 1em)',
     borderRadius: '1em',

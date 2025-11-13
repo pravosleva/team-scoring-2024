@@ -2,7 +2,7 @@
 importScripts('../../../static/workers/utils/math-ops/getArithmeticalMean.js')
 importScripts('../../../static/workers/utils/math-ops/getLinear.js')
 importScripts('../../../static/workers/utils/math-ops/getPercentage.js')
-
+importScripts('../../../static/workers/utils/time-ops/getTimeAgo.js')
 
 console.log('[LOADED] report-pager/middlewares/withRootMW')
 
@@ -214,8 +214,9 @@ const withRootMW = (arg) => compose([
 
               const getNodeReportChunk = ({
                 model, children, level, isLast, levelsInfoMap,
-                getHeaderByModel, getDescriptionMessagesByModel,
+                getHeaderByModel, getDescriptionMessagesByModel, validateFn,
                 // __onEacnIteration,
+                emoji = '🔥',
               }) => {
                 const mainStrChuncks = [
                   !isLast
@@ -224,11 +225,6 @@ const withRootMW = (arg) => compose([
                 ]
                 if (level > 0) {
                   const fullPrefixChars = []
-
-                  // -- NOTE: It works
-                  // let targetPref = `${level}--`.repeat(level)
-                  // --
-
                   let expTargetPerf = []
 
                   for (let i = 0, max = level; i < max; i++) {
@@ -247,48 +243,47 @@ const withRootMW = (arg) => compose([
                   mainStrChuncks.unshift(fullPrefixChars.join(''))
                 }
 
+                const final = [
+                  mainStrChuncks.join(''),
+                ]
+                let counter = 0
+                if (typeof getDescriptionMessagesByModel === 'function') {
+                  const adds = getDescriptionMessagesByModel({
+                    model,
+                    validateFn,
+                    __incCounter: () => counter + 1
+                  })
+                  if (adds.length > 0)
+                    for (const str of adds) {
+                      final.push(['   '.repeat(level), str].join(`   • ${emoji} `))
+                      counter += 1
+                    }
+                }
+
                 const subStrChuncks = []
                 let _c = 0
-
                 for (const child of children) {
                   _c += 1
                   const isLast = _c === children.length
-                  subStrChuncks.push(getNodeReportChunk({
+                  const nodeReport = getNodeReportChunk({
+                    emoji,
                     ...child,
                     level: level + 1,
                     isLast,
                     levelsInfoMap: levelsInfoMap.set(level + 1, isLast),
                     getHeaderByModel,
                     getDescriptionMessagesByModel,
-                  }).result)
+                    validateFn,
+                  })
+                  subStrChuncks.push(nodeReport.result)
+                  counter += nodeReport.counter
                 }
 
-                const final = [
-                  mainStrChuncks.join(''),
-                ]
-
-                if (typeof getDescriptionMessagesByModel === 'function') {
-                  const adds = getDescriptionMessagesByModel({ model })
-                  // console.log(adds)
-                  if (adds.length > 0) {
-                    for (const str of adds) {
-                      final.push([
-                        // `${level}--`.repeat(level),
-                        '   '.repeat(level),
-                        str,
-                      ].join('   • 🔥 '))
-                    }
-                  }
-                }
-
-                const targetReport = [
-                  ...final,
-                  subStrChuncks.join(''),
-                ].join('\n')
+                const targetReport = [...final, subStrChuncks.join('')].join('\n')
 
                 return {
                   result: targetReport,
-
+                  counter,
                 }
               }
 
@@ -301,7 +296,7 @@ const withRootMW = (arg) => compose([
                   [0, true]
                 ]),
                 getHeaderByModel: ({ model }) => model.id,
-              }).result
+              })
 
               const otputFullJobsTree = __otputFullJobsTree
 
@@ -355,8 +350,8 @@ const withRootMW = (arg) => compose([
                 //   }
                 // }
               })
-              const otputFullActiveCheckboxesTree = __otputFullActiveCheckboxesTree.result
 
+              // -- NOTE: Active tree
               const __targetActiveCheckboxTree = getNodeReportChunk({
                 model: __reportExpTarget.model,
                 children: __reportExpTarget.children,
@@ -382,15 +377,18 @@ const withRootMW = (arg) => compose([
                   }, { vals: [], isEnabled: false })
                   return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
                 },
-                getDescriptionMessagesByModel: ({ model }) =>
+                getDescriptionMessagesByModel: ({ model, __incCounter }) =>
                   model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
-                      for (const checklist of cur.checklist) {
-                        if (!checklist.isDone && !checklist.isDisabled) {
-                          const msgs = [`${checklist.title}`]
-                          if (!!checklist.descr) {
-                            msgs.push(`(${checklist.descr})`)
+                      for (const microtask of cur.checklist) {
+                        if (!microtask.isDone && !microtask.isDisabled) {
+                          const msgs = [
+                            `${microtask.title}`,
+                          ]
+                          if (!!microtask.descr) {
+                            msgs.push(`(${microtask.descr})`)
                           }
+                          if (typeof __incCounter === 'function') __incCounter()
                           acc.push(msgs.join(' '))
                         }
                       }
@@ -398,7 +396,187 @@ const withRootMW = (arg) => compose([
                     return acc
                   }, []),
               })
-              const outputTargetActiveCheckboxTree = __targetActiveCheckboxTree.result
+              // --
+              // -- NOTE: Aux info
+              // 1. Done last 1 month tree
+              const limit1Months = 1
+              const nowDateTs = new Date().getTime()
+              const __target3mTs = new Date(nowDateTs - 1000 * 60 * 60 * 24 * 30 * limit1Months).getTime()
+
+              const __outputFullDoneLast3MonthsCheckboxesTree = getNodeReportChunk({
+                emoji: '✅',
+                model: __reportExpTarget.model,
+                children: __reportExpTarget.children,
+                level: 0,
+                isLast: true,
+                levelsInfoMap: new Map([
+                  [0, true]
+                ]),
+                validateFn: (microtask) => {
+                  return (
+                    microtask.isDone
+                    && !microtask.isDisabled
+                    && microtask.ts.updatedAt > __target3mTs
+                  )
+                },
+                getHeaderByModel: ({ model }) => {
+                  const percentage = model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      acc.isEnabled = true
+                      acc.vals.push(getPercentage({
+                        x: cur.checklist
+                          .reduce((acc, cur) => {
+                            if (cur.isDone || cur.isDisabled) acc += 1
+                            return acc
+                          }, 0),
+                        sum: cur.checklist.length,
+                      }))
+                    }
+                    return acc
+                  }, { vals: [], isEnabled: false })
+                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                },
+                getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
+                  model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      for (const microtask of cur.checklist) {
+                        if (typeof validateFn === 'function' && validateFn(microtask)) {
+                          const msgs = [
+                            `[${getTimeAgo({ dateInput: microtask.ts.updatedAt })}]`,
+                            `${microtask.title}`,
+                          ]
+                          if (!!microtask.descr) {
+                            msgs.push(`(${microtask.descr})`)
+                          }
+                          if (typeof __incCounter === 'function') __incCounter()
+                          acc.push(msgs.join(' '))
+                        }
+                      }
+                    }
+                    return acc
+                  }, []),
+              })
+
+              // 2. Done last week
+              const limit1DaysAgo = 7
+              const __target7dNoEarlyTs = new Date(nowDateTs - 1000 * 60 * 60 * 24 * limit1DaysAgo).getTime()
+              const __outputFullDoneLast7DaysCheckboxesTree = getNodeReportChunk({
+                emoji: '✅',
+                model: __reportExpTarget.model,
+                children: __reportExpTarget.children,
+                level: 0,
+                isLast: true,
+                levelsInfoMap: new Map([
+                  [0, true]
+                ]),
+                validateFn: (microtask) => (
+                  microtask.isDone
+                  && !microtask.isDisabled
+                  && microtask.ts.updatedAt >= __target7dNoEarlyTs
+                ),
+                getHeaderByModel: ({ model }) => {
+                  const percentage = model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      acc.isEnabled = true
+                      acc.vals.push(getPercentage({
+                        x: cur.checklist
+                          .reduce((acc, cur) => {
+                            if (cur.isDone || cur.isDisabled) acc += 1
+                            return acc
+                          }, 0),
+                        sum: cur.checklist.length,
+                      }))
+                    }
+                    return acc
+                  }, { vals: [], isEnabled: false })
+                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                },
+                getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
+                  model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      for (const microtask of cur.checklist) {
+                        if (typeof validateFn === 'function' && validateFn(microtask)) {
+                          const msgs = [
+                            `[${getTimeAgo({ dateInput: microtask.ts.updatedAt })}]`,
+                            `${microtask.title}`,
+                          ]
+                          if (!!microtask.descr) {
+                            msgs.push(`(${microtask.descr})`)
+                          }
+                          if (typeof __incCounter === 'function') __incCounter()
+                          acc.push(msgs.join(' '))
+                        }
+                        // else {
+                        //   acc.push([
+                        //     'DEBUG:',
+                        //     `validateFn is ${typeof validateFn}`,
+                        //     `validateFn -> ${validateFn(microtask)}`,
+                        //   ].join(' '))
+                        // }
+                      }
+                    }
+                    return acc
+                  }, []),
+              })
+
+              // 3. Created eary than 1 month ago and not completed
+              const limit2Months = 1
+              const __target1mNoEarlyTs = new Date(nowDateTs - 1000 * 60 * 60 * 24 * 30 * limit2Months).getTime()
+
+              const __outputTargetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree = getNodeReportChunk({
+                emoji: '💀',
+                model: __reportExpTarget.model,
+                children: __reportExpTarget.children,
+                level: 0,
+                isLast: true,
+                levelsInfoMap: new Map([
+                  [0, true]
+                ]),
+                validateFn: (microtask) => {
+                  return (
+                    !microtask.isDone
+                    && !microtask.isDisabled
+                    && microtask.ts.createdAt <= __target1mNoEarlyTs
+                  )
+                },
+                getHeaderByModel: ({ model }) => {
+                  const percentage = model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      acc.isEnabled = true
+                      acc.vals.push(getPercentage({
+                        x: cur.checklist
+                          .reduce((acc, cur) => {
+                            if (cur.isDone || cur.isDisabled) acc += 1
+                            return acc
+                          }, 0),
+                        sum: cur.checklist.length,
+                      }))
+                    }
+                    return acc
+                  }, { vals: [], isEnabled: false })
+                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                },
+                getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
+                  model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      for (const microtask of cur.checklist) {
+                        if (typeof validateFn === 'function' && validateFn(microtask)) {
+                          const msgs = [
+                            `[${getTimeAgo({ dateInput: microtask.ts.createdAt })}]`,
+                            `${microtask.title}`,
+                          ]
+                          if (!!microtask.descr) {
+                            msgs.push(`(${microtask.descr})`)
+                          }
+                          if (typeof __incCounter === 'function') __incCounter()
+                          acc.push(msgs.join(' '))
+                        }
+                      }
+                    }
+                    return acc
+                  }, []),
+              })
+              // --
               // ----
 
               const calc = {
@@ -416,11 +594,29 @@ const withRootMW = (arg) => compose([
                   _activeFilters: eventData?.input?._activeFilters,
                   _reportExp: __reportExp,
                 },
-                otputFullJobsTree,
-                otputFullActiveCheckboxesTree,
-                outputTargetActiveCheckboxTree,
-                // modelFullTree: __reportExp,
-                modelPartialTree: __reportExpTargetMinimal,
+                output: {
+                  fullJobsTree: {
+                    result: otputFullJobsTree.result,
+                    counter: otputFullJobsTree.counter,
+                  },
+                  fullActiveCheckboxesTree: {
+                    ...__otputFullActiveCheckboxesTree,
+                  },
+                  targetActiveCheckboxTree: {
+                    ...__targetActiveCheckboxTree,
+                  },
+                  fullDoneLast3MonthsCheckboxesTree: {
+                    ...__outputFullDoneLast3MonthsCheckboxesTree,
+                  },
+                  fullDoneLast7DaysCheckboxesTree: {
+                    ...__outputFullDoneLast7DaysCheckboxesTree,
+                  },
+                  targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree: {
+                    ...__outputTargetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree,
+                  },
+                  modelFullTree: __reportExp,
+                  modelPartialTree: __reportExpTargetMinimal,
+                },
               }
 
               // ---
