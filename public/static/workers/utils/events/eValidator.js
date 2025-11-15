@@ -2,10 +2,10 @@
 /**
  * Универсальная валидация
  *
- * @param {{ event: any; rules: any; }} param0 
+ * @param {{ event: unknown; rules: { [key: string]: { isRequired: boolean; type: string; validate?: (unknown) => { ok: boolean; reason?: string; } } }; }} param0 
  * @param {*} param0.event Обект для валидации
  * @param {*} param0.rules Правила валидации
- * @returns {{ ok: boolean; }} Результат валидации
+ * @returns {{ ok: boolean; reason?: string; }} Результат валидации
  */
 const eValidator = ({
   event,
