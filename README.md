@@ -3,6 +3,16 @@ Mechanism that allows obtaining an adjusted forecast for the completion of a par
 
 [Roadmap](https://pravosleva.pro/p/67723f368c79264aa7fd53b1)
 
+## Install deps
+```shell
+yarn
+```
+
+## Generte documentation
+```shell
+yarn _jsdoc-gen
+```
+
 ## JSDoc
 ### Step 1. Install deps
 ```shell
