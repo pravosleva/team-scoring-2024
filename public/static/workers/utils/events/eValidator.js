@@ -12,10 +12,7 @@ const eValidator = ({
   rules,
 }) => {
   let _c = 0
-  let res = {
-    ok: true,
-    // reason?: string;
-  }
+  let res = { ok: true }
   const errs = [] // NOTE: TS like { msg: string, _reponseDetails?: any }[] = []
 
   for (const key in rules) {
