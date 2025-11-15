@@ -5,6 +5,17 @@ const loggerFactory = ({ label, cb }) => {
     return cb(`${c}. ${msg}`)
   }
 }
+
+/**
+ * Общая информация (пример: "1-10 of 293")
+ *
+ * @param {{ currentPageIndex: number; pageLimit: number; totalPages: number; totalItems: number; }} param0 
+ * @param {number} param0.currentPageIndex 
+ * @param {number} param0.pageLimit 
+ * @param {number} param0.totalPages 
+ * @param {number} param0.totalItems 
+ * @returns {string} 
+ */
 const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) => {
   return [
     currentPageIndex * pageLimit + 1,
@@ -17,6 +28,39 @@ const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) =
   ].join(' ')
 }
 
+
+/**
+ * Группировка массива (pager)
+ *
+ * @param {{ pageLimit: number; list: unknown[]; options: any; }} param0 
+ * @param {number} param0.pageLimit Лимит элементов на странице
+ * @param {unknown[]} param0.list Целевой массив элементов
+ * @param {*} param0.options 
+ * @param {number} param0.options.requiredPageIndex Запрошенный индекс страницы (более приоритетный)
+ * @param {number} param0.options.requiredCurrentIndex Запрошенный индекс элемента (менее приоритентый)
+ * @returns {{
+ * ok: boolean;
+ * message: string;
+ * logs: string[];
+ * result: {
+ *   pager:unknown[][];
+ * } | null;
+ * pagination:{
+ *   itemsRangeInfo: string;
+ *   pageLimit: number;
+ *   totalItems: number;
+ *   totalPages: number;
+ *   currentPageIndex: number;
+ *   currentPage: number;
+ *   nextPageIndex: number | null;
+ *   nextPage: number | null;
+ *   prevPageIndex: number | null;
+ *   prevPage: number | null;
+ *   isCurrentPageFirst: boolean;
+ *   isCurrentPageLast: boolean;
+ * };
+ * }} 
+ */
 const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
   const _service = {
     ok: true,

@@ -18,11 +18,11 @@ function compare(a, b, key, order) {
 /**
  * Сортировка элементов массива
  *
- * @param {{ arr: unknown; keys: string[]; order?: number; }} param0 
- * @param {*} param0.arr Целево массив для сортировки
- * @param {*} param0.keys Список ключей (предмет сортировки) в порядке убывания приоритета
- * @param {number} [param0.order=1] Ордер сортировки (1|-1)
- * @returns {*} 
+ * @param {{ arr: unknown[]; keys: string[]; order?: 1|-1; }} param0 
+ * @param {unknown[]} param0.arr Целевой массив для сортировки
+ * @param {string[]} param0.keys Список ключей (предмет сортировки) в порядке убывания приоритета
+ * @param {number} [param0.order=1] Ордер сортировки (1 по умолчанию)
+ * @returns {unknown[]} Результат сортировки
  */
 function getSortedArray({
   arr,
