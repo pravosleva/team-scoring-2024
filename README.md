@@ -1,8 +1,53 @@
 # Team Scoring 2024
-
 Mechanism that allows obtaining an adjusted forecast for the completion of a particular task based on an analysis of deviations in forecasting similar tasks.
 
 [Roadmap](https://pravosleva.pro/p/67723f368c79264aa7fd53b1)
+
+## JSDoc
+### Step 1. Install deps
+```shell
+yarn add -D jsdoc
+```
+
+### Step 2 `.gitignore`
+```gitignore
+## Docs
+docs/*
+```
+
+### Step 3. `jsdoc.json`
+```json
+{
+  "source": {
+    "include": [
+      "./src",
+      "./public"
+    ],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "destination": "./docs",
+    "recurse": true,
+    "template": "templates/default"
+  }
+}
+```
+
+### Step 3. Script
+`package.json`
+```json
+{
+  "scripts": {
+    "_jsodc-gen": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json -d ./docs"
+  }
+}
+```
+
+### Step 4. Usage
+```shell
+yarn _jsodc-gen
+```
 
 # React + TypeScript + Vite
 
