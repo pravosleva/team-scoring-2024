@@ -1,3 +1,7 @@
+/**
+ * Пространство для описания значений (реплика на типизацию)
+ *
+ */
 const NES = {
   // NOTE: Should be sync with NEvents.ECustom in ~/types/NEvents.ts
   Common: {

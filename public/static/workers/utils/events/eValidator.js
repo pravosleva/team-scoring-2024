@@ -1,3 +1,12 @@
+
+/**
+ * Универсальная валидация
+ *
+ * @param {{ event: any; rules: any; }} param0 
+ * @param {*} param0.event Обект для валидации
+ * @param {*} param0.rules Правила валидации
+ * @returns {{ ok: boolean; }} Результат валидации
+ */
 const eValidator = ({
   event,
   rules,
@@ -27,7 +36,7 @@ const eValidator = ({
         switch (true) {
           case !!rules[key].validate && typeof rules[key].validate === 'function': {
             const validationItemResult = rules[key].validate(event[key])
-    
+
             if (!validationItemResult.ok) {
               errs.push({
                 msg: `Incorrect event.${key} format: ${!!validationItemResult.reason ? `: ${validationItemResult.reason}` : ''}`
@@ -44,7 +53,7 @@ const eValidator = ({
         })
       }
     }
-  
+
     if (!res.ok) {
       res._c = _c
 

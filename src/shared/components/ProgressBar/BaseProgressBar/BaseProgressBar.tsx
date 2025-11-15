@@ -60,7 +60,8 @@ const ProgressBar = styled('div')<TBaseProgressBarProps>(({
   fontFamily: 'system-ui',
 
   '&::before': {
-    boxShadow: 'rgba(255, 255, 255, 0.8) 0px 0px 6px 0px',
+    // boxShadow: 'rgba(255, 255, 255, 0.8) 0px 0px 6px 0px',
+    border: '1px solid #FFF',
     boxSizing: 'border-box',
     // fontSize: '8px',
     whiteSpace: 'pre',

@@ -20,6 +20,8 @@ import BioTechIcon from '@mui/icons-material/Biotech'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { BrainJsExp, EfficiencyAnalysisExp } from './components'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
+import { getArithmeticalMean } from '~/shared/utils/number-ops'
+import { BaseProgressBar } from '../ProgressBar/BaseProgressBar'
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -36,27 +38,57 @@ type TTargetResultByWorker = {
     modelPartialTree: any;
     fullJobsTree: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
     fullActiveCheckboxesTree: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
     targetActiveCheckboxTree: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
     fullDoneLast3MonthsCheckboxesTree?: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
     fullDoneLast7DaysCheckboxesTree?: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
     targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?: {
       result: string;
-      counter: number;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
     };
   };
   message?: string;
@@ -205,9 +237,37 @@ export const ReportPagerAbstracted = ({
               <>
                 <h2 style={{ color: '#959eaa', marginBottom: '0px' }}>Target</h2>
 
+                {
+                  !!outputWorkerData.output.targetActiveCheckboxTree.percentage?.done
+                  && outputWorkerData.output.targetActiveCheckboxTree.percentage?.done.length > 0 && (
+                    <Grid size={12}>
+                      <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                        <Grid size={12}>
+                          <BaseProgressBar
+                            value={getArithmeticalMean(outputWorkerData.output.targetActiveCheckboxTree.percentage.done)}
+                            label={`~${getArithmeticalMean(outputWorkerData.output.targetActiveCheckboxTree.percentage.done).toFixed(0)}%`}
+                            connectedOnThe={['bottom']}
+                          />
+                        </Grid>
+                        <Grid size={12}>
+                          <CollapsibleBox
+                            connectedOnThe={['top']}
+                            header='Total detailed progress'
+                            text={
+                              <em>
+                                * Расчет с учетом всех подзадач в любом узле дерева
+                              </em>
+                            }
+                          />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  )
+                }
+
                 <Grid size={12}>
                   <CollapsibleText
-                    briefText={`🔥 In progress (${outputWorkerData.output.targetActiveCheckboxTree.counter})`}
+                    briefText={`🔥 In progress (${outputWorkerData.output.targetActiveCheckboxTree.counters.adds})`}
                     isClickableBrief
                     contentRender={() => (
                       <>
@@ -241,11 +301,11 @@ export const ReportPagerAbstracted = ({
 
           {
             !!outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.result
-            && outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counter > 0
+            && outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds > 0
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counter})</span>}
+                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds})</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre
@@ -277,11 +337,11 @@ export const ReportPagerAbstracted = ({
 
           {
             !!outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.result
-            && outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counter > 0
+            && outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counters.adds > 0
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 1 month ({outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counter})</span>}
+                  header={<span>✅ Done last 1 month ({outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counters.adds})</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre
@@ -313,11 +373,11 @@ export const ReportPagerAbstracted = ({
 
           {
             !!outputWorkerData?.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?.result
-            && outputWorkerData?.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?.counter > 0
+            && outputWorkerData?.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree?.counters.adds > 0
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>💀 Created early than 1 month & incompleted yet ({outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.counter})</span>}
+                  header={<span>💀 Created early than 1 month & incompleted yet ({outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.counters.adds})</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre
@@ -379,7 +439,7 @@ export const ReportPagerAbstracted = ({
 
                 <Grid size={12}>
                   <CollapsibleBox
-                    header={<span>🔥 In progress ({outputWorkerData?.output.fullActiveCheckboxesTree.counter})</span>}
+                    header={<span>🔥 In progress ({outputWorkerData?.output.fullActiveCheckboxesTree.counters.adds})</span>}
                     text={(
                       <div className={baseClasses.stack1}>
                         <pre

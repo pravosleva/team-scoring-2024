@@ -218,10 +218,11 @@ const withRootMW = (arg) => compose([
                 // __onEacnIteration,
                 emoji = '🔥',
               }) => {
+                const header = getHeaderByModel({ model })
                 const mainStrChuncks = [
                   !isLast
-                    ? `├─ ${getHeaderByModel({ model })}`
-                    : `└─ ${getHeaderByModel({ model })}`
+                    ? `├─ ${header.label}`
+                    : `└─ ${header.label}`
                 ]
                 if (level > 0) {
                   const fullPrefixChars = []
@@ -246,17 +247,22 @@ const withRootMW = (arg) => compose([
                 const final = [
                   mainStrChuncks.join(''),
                 ]
-                let counter = 0
+                const counters = {
+                  adds: 0,
+                }
+                const percentage = {
+                  done: header.readyPercentageVals || [],
+                }
                 if (typeof getDescriptionMessagesByModel === 'function') {
                   const adds = getDescriptionMessagesByModel({
                     model,
                     validateFn,
-                    __incCounter: () => counter + 1
+                    __incCounter: () => counters.adds + 1
                   })
                   if (adds.length > 0)
                     for (const str of adds) {
                       final.push(['   '.repeat(level), str].join(`   • ${emoji} `))
-                      counter += 1
+                      counters.adds += 1
                     }
                 }
 
@@ -276,14 +282,18 @@ const withRootMW = (arg) => compose([
                     validateFn,
                   })
                   subStrChuncks.push(nodeReport.result)
-                  counter += nodeReport.counter
+                  counters.adds += nodeReport.counters.adds
+                  for (let c of nodeReport.percentage.done) {
+                    percentage.done.push(c)
+                  }
                 }
 
                 const targetReport = [...final, subStrChuncks.join('')].join('\n')
 
                 return {
                   result: targetReport,
-                  counter,
+                  counters,
+                  percentage,
                 }
               }
 
@@ -295,7 +305,7 @@ const withRootMW = (arg) => compose([
                 levelsInfoMap: new Map([
                   [0, true]
                 ]),
-                getHeaderByModel: ({ model }) => model.id,
+                getHeaderByModel: ({ model }) => ({ label: model.id }),
               })
 
               const otputFullJobsTree = __otputFullJobsTree
@@ -309,21 +319,26 @@ const withRootMW = (arg) => compose([
                   [0, true]
                 ]),
                 getHeaderByModel: ({ model }) => {
-                  const percentage = model.logs.items.reduce((acc, cur) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
                       acc.isEnabled = true
                       acc.vals.push(getPercentage({
+                        // Ready
                         x: cur.checklist
-                          .reduce((acc, cur) => {
-                            if (cur.isDone || cur.isDisabled) acc += 1
+                          .reduce((acc, microtask) => {
+                            if (microtask.isDone || microtask.isDisabled) acc += 1
                             return acc
                           }, 0),
+                        // Total
                         sum: cur.checklist.length,
                       }))
                     }
                     return acc
                   }, { vals: [], isEnabled: false })
-                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`,
+                    readyPercentageVals: readyPercentage.isEnabled ? readyPercentage.vals : [],
+                  }
                 },
                 getDescriptionMessagesByModel: ({ model }) =>
                   model.logs.items.reduce((acc, cur) => {
@@ -361,7 +376,7 @@ const withRootMW = (arg) => compose([
                   [0, true]
                 ]),
                 getHeaderByModel: ({ model }) => {
-                  const percentage = model.logs.items.reduce((acc, cur) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
                       acc.isEnabled = true
                       acc.vals.push(getPercentage({
@@ -375,7 +390,10 @@ const withRootMW = (arg) => compose([
                     }
                     return acc
                   }, { vals: [], isEnabled: false })
-                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`,
+                    readyPercentageVals: readyPercentage.isEnabled ? readyPercentage.vals : [],
+                  }
                 },
                 getDescriptionMessagesByModel: ({ model, __incCounter }) =>
                   model.logs.items.reduce((acc, cur) => {
@@ -420,7 +438,7 @@ const withRootMW = (arg) => compose([
                   )
                 },
                 getHeaderByModel: ({ model }) => {
-                  const percentage = model.logs.items.reduce((acc, cur) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
                       acc.isEnabled = true
                       acc.vals.push(getPercentage({
@@ -434,7 +452,9 @@ const withRootMW = (arg) => compose([
                     }
                     return acc
                   }, { vals: [], isEnabled: false })
-                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  }
                 },
                 getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
                   model.logs.items.reduce((acc, cur) => {
@@ -475,7 +495,7 @@ const withRootMW = (arg) => compose([
                   && microtask.ts.updatedAt >= __target7dNoEarlyTs
                 ),
                 getHeaderByModel: ({ model }) => {
-                  const percentage = model.logs.items.reduce((acc, cur) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
                       acc.isEnabled = true
                       acc.vals.push(getPercentage({
@@ -489,7 +509,9 @@ const withRootMW = (arg) => compose([
                     }
                     return acc
                   }, { vals: [], isEnabled: false })
-                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  }
                 },
                 getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
                   model.logs.items.reduce((acc, cur) => {
@@ -540,7 +562,7 @@ const withRootMW = (arg) => compose([
                   )
                 },
                 getHeaderByModel: ({ model }) => {
-                  const percentage = model.logs.items.reduce((acc, cur) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
                     if (cur.checklist?.length > 0) {
                       acc.isEnabled = true
                       acc.vals.push(getPercentage({
@@ -554,7 +576,9 @@ const withRootMW = (arg) => compose([
                     }
                     return acc
                   }, { vals: [], isEnabled: false })
-                  return `${percentage.isEnabled ? `${getArithmeticalMean(percentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  }
                 },
                 getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
                   model.logs.items.reduce((acc, cur) => {
@@ -597,7 +621,7 @@ const withRootMW = (arg) => compose([
                 output: {
                   fullJobsTree: {
                     result: otputFullJobsTree.result,
-                    counter: otputFullJobsTree.counter,
+                    counters: otputFullJobsTree.counters,
                   },
                   fullActiveCheckboxesTree: {
                     ...__otputFullActiveCheckboxesTree,

@@ -1,3 +1,15 @@
+/**
+ * Конфигурация отладки
+ *
+ * @type {{ workerEvs: {
+ *     fromClient: { isEnabled: boolean; };
+ *     fromServer: { isEnabled: boolean; };
+ *     mwsInternalLogs: { isEnabled: boolean; }; };
+ *   api: { responseByServer: { isEnabled: boolean; }; };
+ *   socketState: { ...; };
+ *   swState: { ...; };
+ * }}
+ */
 var debugConfig = {
   workerEvs: {
     fromClient: {

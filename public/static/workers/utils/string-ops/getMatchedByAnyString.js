@@ -1,3 +1,14 @@
+/**
+ * Проверка соответствия тестируемой строки на предмет содержания хотябы одному из ожидаемых вариантов.
+ * 
+ * Внешние зависимости:
+ * - getMatchedByRegExp({ tested, regexp })
+ *
+ * @param {{ tested: string; expected: string[]; }} param0 
+ * @param {string} param0.tested 
+ * @param {string[]} param0.expected 
+ * @returns {boolean}
+ */
 const getMatchedByAnyString = ({
   tested, // string;
   expected, // string[];

@@ -15,6 +15,15 @@ function compare(a, b, key, order) {
   return 0;
 }
 
+/**
+ * Сортировка элементов массива
+ *
+ * @param {{ arr: unknown; keys: string[]; order?: number; }} param0 
+ * @param {*} param0.arr Целево массив для сортировки
+ * @param {*} param0.keys Список ключей (предмет сортировки) в порядке убывания приоритета
+ * @param {number} [param0.order=1] Ордер сортировки (1|-1)
+ * @returns {*} 
+ */
 function getSortedArray({
   arr,
   keys,
