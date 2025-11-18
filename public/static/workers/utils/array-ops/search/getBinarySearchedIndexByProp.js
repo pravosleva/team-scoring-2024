@@ -1,12 +1,12 @@
 /**
  * Бинарный поиск (поиск по сортированному списку элементов)
  *
- * @param {{ items: unknown; target: unknown; sorted: "DESC"|"ASC"; }} param0 
- * @param {*} param0.items Исходный массив для поиска
- * @param {*} param0.target Целевой объект с параметрами поиска
- * @param {*} param0.target.value Целевое значение
- * @param {string} param0.target.propName Целевое свойство (критерий поиска)
- * @param {"DESC"|"ASC"} param0.sorted Тип сортировки исходного массива:
+ * @param {Object} arg For example: { items: T[]; target: { value: unknown; propName: string; sorted: "ASC"|"DESC" } }
+ * @param {T[]} arg.items Исходный массив для поиска
+ * @param {Object} arg.target Целевой объект с параметрами поиска и сортировки
+ * @param {unknown} arg.target.value Целевое значение (киртерий сортировки)
+ * @param {string} arg.target.propName Целевое свойство (критерий поиска)
+ * @param {"DESC"|"ASC"} arg.sorted Тип сортировки исходного массива:
  * - DESC - по убыванию;
  * - ASC - по возрастанию;
  * @returns {number|never} Индекс найденного элемента:

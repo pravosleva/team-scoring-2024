@@ -3239,6 +3239,13 @@ diff-sequences@^29.6.3:
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-29.6.3.tgz#4deaf894d11407c51efc8418012f9e70b84ea921"
   integrity sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==
 
+docdash@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/docdash/-/docdash-2.0.2.tgz#e86dafb260b5dee4fbf1f7b34c8752634aa22f78"
+  integrity sha512-3SDDheh9ddrwjzf6dPFe1a16M6ftstqTNjik2+1fx46l24H9dD2osT2q9y+nBEC1wWz4GIqA48JmicOLQ0R8xA==
+  dependencies:
+    "@jsdoc/salty" "^0.2.1"
+
 dom-accessibility-api@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.6.3.tgz#993e925cc1d73f2c662e7d75dd5a5445259a8fd8"

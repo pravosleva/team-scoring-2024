@@ -31,5 +31,5 @@ dist-ssr
 _aux-tool.*
 _git-training.*
 
-## Docs
-docs/*
+## Docs (jsdoc)
+jsdoc

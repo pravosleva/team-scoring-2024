@@ -4,9 +4,9 @@
  * Внешние зависимости:
  * - getMatchedByRegExp({ tested, regexp })
  *
- * @param {{ tested: string; expected: string[]; }} param0 
- * @param {string} param0.tested 
- * @param {string[]} param0.expected 
+ * @param {*} arg Объект
+ * @param {string} arg.tested 
+ * @param {string[]} arg.expected 
  * @returns {boolean}
  */
 const getMatchedByAnyString = ({

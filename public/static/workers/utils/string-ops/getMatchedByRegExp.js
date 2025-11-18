@@ -1,9 +1,9 @@
 /**
  * Проверка соответствия тестируемой строки на предмет соответствия регулярке
  *
- * @param {{ tested: string; regexp: RegExp; }} param0 
- * @param {string} param0.tested Тестируемая строка
- * @param {RegExp} param0.regexp Регулярка
+ * @param {Object} arg 
+ * @param {string} arg.tested Тестируемая строка
+ * @param {RegExp} arg.regexp Регулярка
  * @returns {boolean} 
  */
 const getMatchedByRegExp = ({ tested, regexp }) => {

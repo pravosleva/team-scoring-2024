@@ -1,6 +1,45 @@
 /**
+ * @typedef {Object} EClientToWorkerEventRequestStandard
+ * @property {string} PING_GET - Запрос на расчет
+ */
+/**
+ * @typedef {Object} EWorkerToClientEventRequestStardard
+ * @property {string} PONG_OK - Успешный ответ
+ * @property {string} PONG_ERR - Ошибка
+ */
+/**
+ * @typedef {Object} CommunicationStandard
+ * @property {EClientToWorkerEventRequestStandard} EClientToWorkerEvent - Исходящие события из основного потока
+ * @property {EWorkerToClientEventRequestStardard} EWorkerToClientEvent - Исходящие события из воркера
+ */
+
+/**
+ * @typedef {Object} EWorkerService
+ * @property {string} CLIENT_TO_WORKER_RESET_HISTORY - Очистить историю
+ * @property {string} WORKER_TO_CLIENT_RESET_HISTORY_OK - История очищена успешно
+ * @property {string} CLIENT_TO_WORKER_MESSAGE - Отправка события от клиента в воркер
+ */
+
+/**
+ * @typedef {Object} EClientService
+ * @property {*} News - Список новостей
+ * @property {*} ProjectsTreeCalc - Дерево проектов
+ * @property {CommunicationStandard} Experimental - Эксперименты
+ * @property {CommunicationStandard} JobsPager - Работа со списками задач
+ * @property {CommunicationStandard} SortedJobsPager - Работа со списками задач (с сортировкой)
+ * @property {CommunicationStandard} SortedLogsPager - Работа со списками логов (с сортировкой)
+ * @property {CommunicationStandard} SortedReportPager - Работа с отчетами (с сортировкой)
+ */
+
+/**
  * Пространство для описания значений (реплика на типизацию)
  *
+ * @property {Object} Common Общие для всех типов воркеров
+ * @property {EWorkerService} Common.WorkerService Сервисные события для работы с воркером
+ * @property {EClientService} Common.ClientService Сервисные события для работы с клиентом (основной поток)
+ * @property {*} SharedWorker События для Shared Worker
+ * @property {*} Worker События для Dedicated Worker
+ * @property {*} Socket События для работы с сокет-соединением
  */
 const NES = {
   // NOTE: Should be sync with NEvents.ECustom in ~/types/NEvents.ts

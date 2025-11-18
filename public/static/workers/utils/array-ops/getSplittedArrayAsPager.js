@@ -7,14 +7,14 @@ const loggerFactory = ({ label, cb }) => {
 }
 
 /**
- * Общая информация (пример: "1-10 of 293")
+ * Общая информация (к примеру, для заголовка)
  *
- * @param {{ currentPageIndex: number; pageLimit: number; totalPages: number; totalItems: number; }} param0 
- * @param {number} param0.currentPageIndex 
- * @param {number} param0.pageLimit 
- * @param {number} param0.totalPages 
- * @param {number} param0.totalItems 
- * @returns {string} 
+ * @param {*} arg 
+ * @param {number} arg.currentPageIndex Запрошенный индекс страницы
+ * @param {number} arg.pageLimit Лимит элементов на странице
+ * @param {number} arg.totalPages Всего страниц
+ * @param {number} arg.totalItems Всег элементов
+ * @returns {string} Output (пример: "1-10 of 293")
  */
 const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) => {
   return [
@@ -30,36 +30,40 @@ const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) =
 
 
 /**
+ * @typedef {Object} TPagination
+ * @property {string} itemsRangeInfo - Info about range
+ * @property {number} pageLimit - Page limit
+ * @property {number} totalItems - Total items
+ * @property {number} totalPages - Total pages
+ * @property {number} currentPageIndex - Current page index
+ * @property {number} currentPage - Current page
+ * @property {number|null} nextPageIndex - Next page index
+ * @property {number|null} nextPage - Next page
+ * @property {number|null} prevPageIndex - Prev page index
+ * @property {number|null} prevPage - Prev page
+ * @property {boolean} isCurrentPageFirst - Is cur page first
+ * @property {boolean} isCurrentPageLast - Is cur page last
+ */
+
+/**
+ * @typedef {Object} TResult
+ * @property {boolean} ok - Service success indicator
+ * @property {string} message - Service message (optional)
+ * @property {string[]} logs - Service logs
+ * @property {*} result - Pager { pager: unknown[][] }
+ * @property {TPagination} pagination - The user's address details.
+ */
+
+/**
  * Группировка массива (pager)
  *
- * @param {{ pageLimit: number; list: unknown[]; options: any; }} param0 
- * @param {number} param0.pageLimit Лимит элементов на странице
- * @param {unknown[]} param0.list Целевой массив элементов
- * @param {*} param0.options 
- * @param {number} param0.options.requiredPageIndex Запрошенный индекс страницы (более приоритетный)
- * @param {number} param0.options.requiredCurrentIndex Запрошенный индекс элемента (менее приоритентый)
- * @returns {{
- * ok: boolean;
- * message: string;
- * logs: string[];
- * result: {
- *   pager:unknown[][];
- * } | null;
- * pagination:{
- *   itemsRangeInfo: string;
- *   pageLimit: number;
- *   totalItems: number;
- *   totalPages: number;
- *   currentPageIndex: number;
- *   currentPage: number;
- *   nextPageIndex: number | null;
- *   nextPage: number | null;
- *   prevPageIndex: number | null;
- *   prevPage: number | null;
- *   isCurrentPageFirst: boolean;
- *   isCurrentPageLast: boolean;
- * };
- * }} 
+ * @param {*} arg  Опции
+ * @param {number} arg.pageLimit Лимит элементов на странице
+ * @param {unknown[]} arg.list Целевой массив элементов
+ * @param {*} arg.options 
+ * @param {number} arg.options.requiredPageIndex Запрошенный индекс страницы (более приоритетный)
+ * @param {number} arg.options.requiredCurrentIndex Запрошенный индекс элемента (менее приоритентый)
+ * @returns {TResult} Result output object
  */
 const getSplittedArrayAsPager = ({ pageLimit, list, options }) => {
   const _service = {

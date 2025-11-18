@@ -3,8 +3,8 @@ console.log('[LOADED] workers/utils/getLinear')
 /**
  * Линейная интерполяция
  *
- * @param {{ x: number; x1: number; y1: number; x2: number; y2: number; }} param0 
- * @param {number} param0.x Целевое значение
+ * @param {Object} arg For example: { x: number; x1: number; y1: number; x2: number; y2: number; }
+ * @param {number} arg.x Целевое значение
  * @returns {number} Результат интерполяции
  */
 const getLinear = ({ x, x1, y1, x2, y2 }) => {

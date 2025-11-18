@@ -1,0 +1,68 @@
+@media only screen and (min-width: 681px) {
+  nav {
+    padding: 10px;
+    // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Apply a 10px Gaussian blur to the backdrop */
+  }
+}
+@media only screen and (max-width: 680px) {
+  nav {
+    padding: 10px;
+    // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Apply a 10px Gaussian blur to the backdrop */
+  }
+}
+nav > h1,
+nav > h2,
+nav > h3,
+nav > h4 {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+@media only screen and (max-width: 680px) {
+  body {
+    overflow-x: auto;
+  }
+  .navicon-button {
+    display: flex;
+    position: fixed;
+    top: 0.5em;
+    right: 0.5em;
+    z-index: 2;
+    width: 90px;
+    height: 90px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    scale: 0.6;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Apply a 10px Gaussian blur to the backdrop */
+  }
+}
+
+/* NOTE: Single-Line truncation */
+nav,
+nav > ul,
+nav > ul > li,
+nav > ul > li > a {
+  white-space: nowrap; /* Prevents text from wrapping to the next line */
+  overflow: hidden;    /* Hides any content that overflows the element's box */
+  text-overflow: ellipsis; /* Displays an ellipsis (...) to represent clipped text */
+}
+nav > ul > li > a:hover {
+  text-decoration-line: underline;
+}
+
+/* NOTE: Multi-Line truncation */
+
+.truncate-multi-line {
+  display: -webkit-box;       /* Required for -webkit-line-clamp */
+  -webkit-line-clamp: 3;      /* Limits the text to 3 lines */
+  -webkit-box-orient: vertical; /* Required for -webkit-line-clamp */
+  overflow: hidden;           /* Hides any content that overflows */
+  text-overflow: ellipsis;    /* Displays an ellipsis (...) */
+}

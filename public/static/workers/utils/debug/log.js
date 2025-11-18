@@ -5,9 +5,9 @@
 /**
  * Функция логирования
  *
- * @param {{ label: any; msgs: any; }} param0 
- * @param {*} param0.label Заголовок
- * @param {*} param0.msgs Сообщения
+ * @param {Object} arg 
+ * @param {string} arg.label Заголовок
+ * @param {string[]} arg.msgs Сообщения
  */
 var log = ({ label, msgs }) => {
   switch (true) {
