@@ -1,6 +1,9 @@
 # Team Scoring 2024
 Mechanism that allows obtaining an adjusted forecast for the completion of a particular task based on an analysis of deviations in forecasting similar tasks.
 
+## Demo
+https://pravosleva.pro/dist.estimate-corrector-2024
+
 [Roadmap](https://pravosleva.pro/p/67723f368c79264aa7fd53b1)
 
 ## Install deps
@@ -120,4 +123,17 @@ export default tseslint.config({
     ...react.configs['jsx-runtime'].rules,
   },
 })
+```
+
+## NGINX settings
+```nginx
+server {
+  #...
+
+  location /dist.estimate-corrector-2024 {
+    index index.html;
+    root /root/projects;
+    autoindex on;
+  }
+}
 ```

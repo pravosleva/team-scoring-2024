@@ -19,7 +19,7 @@ export const AboutPage = () => {
             <h1>About</h1>
             <p>
               This web app created for have reasonable estimation
-              of resolve the feature.
+              for predictable feature release.
             </p>
             <p>
               The calc based on previous experience of the employee.
@@ -30,6 +30,9 @@ export const AboutPage = () => {
             </p>
             <p>
               Bundle sizes analysis <a target='_blank' href={`${PUBLIC_URL}/stats.html`}>here</a>.
+            </p>
+            <p>
+              Documentation (some interested) <a target='_blank' href={`${PUBLIC_URL}/jsdoc/`}>here</a>.
             </p>
             {
               !!BUILD_DATE && (
