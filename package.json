@@ -16,9 +16,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "build:prod": "tsc && VITE_BUILD_DATE=$(date +\"%Y-%m-%d %T\") VITE_APP_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g') VITE_GIT_SHA1=$(git show --format=\"%h\" --no-patch) VITE_GIT_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) vite build --mode production --emptyOutDir",
-    "_deploy2:staging": "yarn build:prod && bash _aux-tool.deploy2.prod.sh",
+    "_deploy2:staging": "yarn build:prod && yarn _jsdoc-gen:v3 && bash _aux-tool.deploy2.prod.sh",
     "_pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/static/pwa/rolling-dices.svg",
-    "_jsdoc-gen": "./node_modules/jsdoc/jsdoc.js --configure jsdoc.t1.docdash.json"
+    "_jsdoc-gen:v1": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/docdash/jsdoc.json",
+    "_jsdoc-gen:v2": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/better-docs/jsdoc.json",
+    "_jsdoc-gen:v3": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/clean-jsdoc-theme/jsdoc.json"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -69,7 +71,9 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "2.1.8",
     "@vitest/web-worker": "^2.1.8",
+    "better-docs": "^2.7.3",
     "browserslist-to-esbuild": "^2.1.1",
+    "clean-jsdoc-theme": "^4.3.0",
     "docdash": "^2.0.2",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",

@@ -1,5 +1,25 @@
 importScripts('./middlewares/withSortedSpeedsCalcService/utils/getSortedSpeedsCalc.js')
 
+/**
+ * @typedef {Object} TWorstCalcResult Результат расчета
+ * @property {number} averageSpeed Медианная скорость
+ * @property {*} averageValue (wip)
+ * @property {number} date0 Дата лучшего сценария
+ * @property {number} date50 Дата с вероятностью 50% (целевое зачение)
+ * @property {number} date100 Дата худшего сценария
+ * @property {number} dateSensed Дата "ощущаемого" сценария
+ * @property {TSortedSpeedsCalcResult} sortedSpeedsCalcOutput Результат расчета внутренней функции
+ */
+/**
+ * Функция для расчета всех сценариев
+ *
+ * @param {Object} arg 
+ * @param {TJob[]} arg.theJobList Массив задач для расчета
+ * @param {Object} arg.ts Объект с временными точками
+ * @param {number} arg.ts.testStart Дата Старта
+ * @param {number} arg.ts.testDiff Разница между датой Анонса и датой Старта
+ * @returns {TWorstCalcResult} 
+ */
 const getWorstCalc = ({ theJobList, ts }) => {
   const result = {
     averageSpeed: 0,
@@ -10,16 +30,12 @@ const getWorstCalc = ({ theJobList, ts }) => {
     dateSensed: 0,
     sortedSpeedsCalcOutput: null,
   }
-  // const testDiff = testFinish - testStart;
+  // NOTE: testDiff = testFinish - testStart;
 
   if (theJobList.length === 0 || ts.testDiff === 0) {
     result.averageSpeed = 1
     result.averageValue = ts.testStart
   } else {
-    // const speeds = theJobList.map(
-    //   // @ts-ignore
-    //   (e) => (e.forecast.estimate / 1000 - e.forecast.start / 1000) / (e.forecast.finish / 1000 - e.forecast.start / 1000)
-    // )
     const speedsCalc = getSortedSpeedsCalc({
       theJobList,
       sensibility: 4,

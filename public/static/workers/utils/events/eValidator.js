@@ -1,20 +1,26 @@
+/**
+ * @typedef {Object} TValidationRule Списание правила валидации
+ * @property {boolean} isRequired - Обязательное поле
+ * @property {string} type - Тип (только для отображение, можно использовать псевдо-код)
+ * @property {Function} validate - Функция валидации, получившая в аргументе ориинальный объект (unknown) => { ok: boolean; reason?: string; }
+ */
+/**
+ * @typedef {Object} TValidationResult Результат валидации поля
+ * @property {boolean} ok - Индикатор успеха
+ * @property {string} reason - Причина неуспеха
+ */
 
 /**
  * Универсальная валидация
  *
  * @param {Object} arg 
  * @param {unknown} arg.event Оригинальный обект для валидации
- * @param {*} arg.rules Универсальные правила валидации для arg.event в виде объекта 👉 { [key: string]: {
- * isRequired: boolean;
- * type: string;
- * validate?: (unknown) => { ok: boolean; reason?: string; } } }
+ * @param {Object} arg.rules Универсальные правила валидации для arg.event в виде объекта
+ * @param {TValidationRule} arg.rules.ANY_KEY Элемент валидации (нейминг ключа соответствует имени поля в оригинальном объекте)
  * 
- * @returns {Object} Результат валидации 👉 { ok: boolean; reason?: string; }
+ * @returns {TValidationResult} Результат валидации 👉 { ok: boolean; reason?: string; }
  */
-const eValidator = ({
-  event,
-  rules,
-}) => {
+const eValidator = ({ event, rules }) => {
   let _c = 0
   let res = { ok: true }
   const errs = [] // NOTE: TS like { msg: string, _reponseDetails?: any }[] = []
@@ -37,7 +43,6 @@ const eValidator = ({
         switch (true) {
           case !!rules[key].validate && typeof rules[key].validate === 'function': {
             const validationItemResult = rules[key].validate(event[key])
-
             if (!validationItemResult.ok) {
               errs.push({
                 msg: `Incorrect event.${key} format: ${!!validationItemResult.reason ? `: ${validationItemResult.reason}` : ''}`
@@ -57,11 +62,9 @@ const eValidator = ({
 
     if (!res.ok) {
       res._c = _c
-
       if (errs.length > 0) {
         res.reason = errs.map(({ msg }) => msg).join('; ')
       }
-
       break
     }
   }

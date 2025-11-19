@@ -13,7 +13,7 @@ const loggerFactory = ({ label, cb }) => {
  * @param {number} arg.currentPageIndex Запрошенный индекс страницы
  * @param {number} arg.pageLimit Лимит элементов на странице
  * @param {number} arg.totalPages Всего страниц
- * @param {number} arg.totalItems Всег элементов
+ * @param {number} arg.totalItems Всего элементов
  * @returns {string} Output (пример: "1-10 of 293")
  */
 const getRangeInfo = ({ currentPageIndex, pageLimit, totalPages, totalItems }) => {

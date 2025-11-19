@@ -1,0 +1,29 @@
+h1, h2, h3, h4, h5, h6 {
+  word-break: break-word;
+  line-height: 1.5 !important;
+}
+
+.mobile-sidebar-items-c,
+.sidebar-items-container {
+  padding: 0 8px 0 8px;
+}
+
+/* .sidebar-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+} */
+
+.pre-div {
+  border-radius: 1rem 1rem 0 0 !important;
+}
+
+code {
+  font-family: monospace !important;
+}
+
+@media only screen and (max-width: 680px) {
+  .details ul li {
+    flex-direction: column;
+  }
+}

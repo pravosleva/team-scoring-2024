@@ -32,7 +32,7 @@ export const AboutPage = () => {
               Bundle sizes analysis <a target='_blank' href={`${PUBLIC_URL}/stats.html`}>here</a>.
             </p>
             <p>
-              Documentation (some interested) <a target='_blank' href={`${PUBLIC_URL}/jsdoc/`}>here</a>.
+              Documentation (some interested moments) <a target='_blank' href={`${PUBLIC_URL}/jsdoc/clean-jsdoc-theme/`}>here</a>.
             </p>
             {
               !!BUILD_DATE && (

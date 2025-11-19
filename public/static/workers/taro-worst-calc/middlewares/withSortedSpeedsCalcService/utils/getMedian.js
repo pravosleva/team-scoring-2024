@@ -1,3 +1,9 @@
+/**
+ * Функция для расчета медианного значения
+ *
+ * @param {number[]} arr Исходный массив
+ * @returns {number} Медианное значение
+ */
 const getMedian = (arr) => {
   if (arr.length === 0) {
     throw new Error('Input array is empty');

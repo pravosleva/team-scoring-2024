@@ -1,27 +1,27 @@
 /**
- * @typedef {Object} EClientToWorkerEventRequestStandard
- * @property {string} PING_GET - Запрос на расчет
+ * @typedef {Object} EClientToWorkerEventRequestStandard События от клиента в воркер
+ * @property {string} PING_GET Запрос на расчет
  */
 /**
- * @typedef {Object} EWorkerToClientEventRequestStardard
- * @property {string} PONG_OK - Успешный ответ
- * @property {string} PONG_ERR - Ошибка
+ * @typedef {Object} EWorkerToClientEventRequestStardard События от воркера в клиент (основной поток)
+ * @property {string} PONG_OK Успешный ответ
+ * @property {string} PONG_ERR Ошибка
  */
 /**
- * @typedef {Object} CommunicationStandard
- * @property {EClientToWorkerEventRequestStandard} EClientToWorkerEvent - Исходящие события из основного потока
- * @property {EWorkerToClientEventRequestStardard} EWorkerToClientEvent - Исходящие события из воркера
+ * @typedef {Object} CommunicationStandard Стандарты событий
+ * @property {EClientToWorkerEventRequestStandard} EClientToWorkerEvent - Исходящие события из основного потока в воркер
+ * @property {EWorkerToClientEventRequestStardard} EWorkerToClientEvent - Исходящие события из воркера в основной поток
  */
 
 /**
- * @typedef {Object} EWorkerService
+ * @typedef {Object} EWorkerService Сервисные события воркера (входящие и исходящие)
  * @property {string} CLIENT_TO_WORKER_RESET_HISTORY - Очистить историю
  * @property {string} WORKER_TO_CLIENT_RESET_HISTORY_OK - История очищена успешно
  * @property {string} CLIENT_TO_WORKER_MESSAGE - Отправка события от клиента в воркер
  */
 
 /**
- * @typedef {Object} EClientService
+ * @typedef {Object} EClientService Явные стандарты
  * @property {*} News - Список новостей
  * @property {*} ProjectsTreeCalc - Дерево проектов
  * @property {CommunicationStandard} Experimental - Эксперименты

@@ -1,0 +1,44 @@
+h1, h2, h3, h4, h5, h6 {
+  word-break: break-word;
+}
+
+.footer {
+  margin: 0px;
+}
+
+.tag-source span a {
+  color: #b2b2b9;
+  word-break: break-word;
+}
+
+.method-parameter {
+  font-size: 16px;
+}
+
+@media only screen and (min-width: 681px) {
+  #main > .core > .content {
+    border-radius: 20px;
+  }
+  .prettyprint {
+    border-radius: 10px;
+  }
+}
+@media only screen and (max-width: 680px) {
+  body {
+    font-size: 0.8em;
+  }
+  #main > .core > .content {
+    padding: 20px;
+  }
+  .member:not(:last-child):after {
+    margin-right: 0px;
+    margin-left: 0px;
+  }
+  #main >.sidebar {
+    padding: 30px 15px;
+  }
+}
+
+#main >.sidebar {
+  width: 300px;
+}

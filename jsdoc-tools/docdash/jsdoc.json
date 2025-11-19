@@ -8,19 +8,19 @@
     "excludePattern": "(^|\\/|\\\\)_"
   },
   "opts": {
-    "destination": "./public/jsdoc",
+    "destination": "./public/jsdoc/docdash",
     "recurse": true,
     "verbose": true,
     "template": "node_modules/docdash"
   },
   "templates": {
     "default": {
-      "layoutFile": "./jsdoc-tools/docdash/jsdoc-layout.tmpl",
+      "layoutFile": "./jsdoc-tools/docdash/layout.tmpl",
       "staticFiles": {
         "include": [
           "node_modules/docdash/static/styles/jsdoc.css",
           "node_modules/docdash/static/styles/prettify.css",
-          "./jsdoc-tools/docdash/jsdoc-fix.css"
+          "./jsdoc-tools/docdash/theme-fix.css"
         ]
       }
     }

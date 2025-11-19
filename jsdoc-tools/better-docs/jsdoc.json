@@ -1,0 +1,49 @@
+{
+  "tags": {
+    "allowUnknownTags": [
+      "category"
+    ]
+  },
+  "source": {
+    "include": [
+      "./src/shared",
+      "./public/static/workers"
+    ],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "destination": "./public/jsdoc/better-docs",
+    "recurse": true,
+    "verbose": true,
+    "template": "node_modules/better-docs"
+  },
+  "templates": {
+    "search": true,
+    "default": {
+      "layoutFile": "./jsdoc-tools/better-docs/layout.tmpl",
+      "staticFiles": {
+        "include": [
+          "node_modules/better-docs/static/styles/reset.css",
+          "node_modules/better-docs/static/styles/app.min.css",
+          "node_modules/better-docs/static/styles/iframe.css",
+          "node_modules/better-docs/static/styles/prettify-jsdoc.css",
+          "node_modules/better-docs/static/styles/prettify-tomorrow.css",
+          "./jsdoc-tools/better-docs/theme-fix.css"
+        ]
+      }
+    },
+    "better-docs": {
+      "navLinks": [
+        {
+          "label": "Github",
+          "href": "https://github.com/pravosleva/team-scoring-2024"
+        },
+        {
+          "label": "Example Application",
+          "href": "https://pravosleva.pro/dist.estimate-corrector-2024"
+        }
+      ]
+    }
+  }
+}

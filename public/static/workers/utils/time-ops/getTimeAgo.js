@@ -1,3 +1,11 @@
+/**
+ * Время пройденное на момент вызова
+ *
+ * @param {Object} arg 
+ * @param {Date|number} arg.dateInput 
+ * @param {string} [arg.locale='en'] 
+ * @returns {string} Internationalized relative time message as string; See also {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/format MDN}
+ */
 function getTimeAgo({ dateInput, locale = 'en' }) {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const now = new Date();

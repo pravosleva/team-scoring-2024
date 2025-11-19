@@ -6,41 +6,26 @@ https://pravosleva.pro/dist.estimate-corrector-2024
 
 [Roadmap](https://pravosleva.pro/p/67723f368c79264aa7fd53b1)
 
-## Install deps
-```shell
-yarn
-```
-
 ## Generte documentation with [JSDoc](https://habr.com/ru/articles/572968/)
 ```shell
 yarn _jsdoc-gen
 ```
 
-## JSDoc
-### BTW: Awesome JSDoc Template Themes & Examples
-- DocDash: https://github.com/clenemt/docdash
-> `yarn add -D docdash`
-> `jsdoc.json` -> `opts.template: "node_modules/docdash"`
-- Minami: https://github.com/archiverjs/jsdoc-theme
-- Clean: https://github.com/ankitskvmdam/clean-jsdoc-theme
-> `yarn add clean-jsdoc-theme -D`
-> `jsdoc.json` -> `opts.template: "node_modules/clean-jsdoc-theme"`
-> `package.json` -> `scripts.generate-docs: "jsdoc --configure jsdoc.json --verbose"`
-- BetterDocs: https://github.com/SoftwareBrothers/better-docs
-### Step 1. Install deps
+### JSDoc: Basic
+#### Step 1. Install deps
 ```shell
 yarn add -D jsdoc
 ```
 
 // "layoutFile": "node_modules/docdash/tmpl/layout.tmpl",
 
-### Step 2 `.gitignore`
+#### Step 2 `.gitignore`
 ```gitignore
 ## Docs
 docs/*
 ```
 
-### Step 3. `jsdoc.json`
+#### Step 3. `jsdoc.json`
 ```json
 {
   "source": {
@@ -59,20 +44,31 @@ docs/*
 }
 ```
 
-### Step 3. Script
+#### Step 3. Script
 `package.json`
 ```json
 {
   "scripts": {
-    "_jsodc-gen": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json -d ./docs"
+    "_jsdoc-gen": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json -d ./docs"
   }
 }
 ```
 
-### Step 4. Usage
+#### Step 4. Usage
 ```shell
-yarn _jsodc-gen
+yarn _jsdoc-gen
 ```
+
+### JSDoc: Other themes
+- DocDash: https://github.com/clenemt/docdash
+> `yarn add -D docdash`
+> `jsdoc.json` -> `opts.template: "node_modules/docdash"`
+- Minami: https://github.com/archiverjs/jsdoc-theme
+- Clean: https://github.com/ankitskvmdam/clean-jsdoc-theme
+> `yarn add clean-jsdoc-theme -D`
+> `jsdoc.json` -> `opts.template: "node_modules/clean-jsdoc-theme"`
+> `package.json` -> `scripts.generate-docs: "jsdoc --configure jsdoc.json --verbose"`
+- BetterDocs: https://github.com/SoftwareBrothers/better-docs
 
 # React + TypeScript + Vite
 

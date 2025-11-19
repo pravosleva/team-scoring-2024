@@ -1,39 +1,6 @@
 import clsx from 'clsx';
 import { TaskModel, TaskNode } from '~/shared/components/ReportPagerAbstracted/components/types'
 
-// interface Timestamp {
-//   create: number;
-//   update: number;
-// }
-
-// interface Forecast {
-//   complexity?: number;
-//   assignedTo?: number;
-//   start?: number;
-//   estimate?: number;
-//   finish?: number;
-// }
-
-// interface Relations {
-//   parent?: number;
-//   children: number[];
-// }
-
-// interface TaskModel {
-//   id: number;
-//   title: string;
-//   ts: Timestamp;
-//   descr: string;
-//   completed: boolean;
-//   relations: Relations;
-//   forecast: Forecast;
-// }
-
-// interface TaskNode {
-//   model: TaskModel;
-//   children: TaskNode[];
-// }
-
 interface CompletedTask {
   id: number;
   title: string;
@@ -260,23 +227,6 @@ export class TaskEfficiencyAnalyzer {
     };
   }
 
-  // Метод для красивого вывода результатов
-  // public printAnalysis(): void {
-  //   const analysis = this.analyzeEfficiency();
-
-  //   console.log('📊 АНАЛИЗ ЭФФЕКТИВНОСТИ ВЫПОЛНЕНИЯ ЗАДАЧ');
-  //   console.log('='.repeat(50));
-
-  //   console.log(`\n📈 ТЕНДЕНЦИЯ: ${analysis.trendAnalysis.trend === 'improvement' ? '📈 УЛУЧШЕНИЕ' : analysis.trendAnalysis.trend === 'decline' ? '📉 УХУДШЕНИЕ' : '➡️ СТАБИЛЬНО'}`);
-  //   console.log(analysis.trendAnalysis.message);
-
-  //   console.log('\n📋 СТАТИСТИКА ПО ПЕРИОДАМ:');
-  //   this.printPeriodStats(analysis.recentPeriod);
-  //   this.printPeriodStats(analysis.previousPeriod);
-
-  //   console.log('\n🔍 ДЕТАЛИ ПО СЛОЖНОСТИ ЗАДАЧ:');
-  //   this.printComplexityStats(analysis);
-  // }
   public getAnalysisInfo(): TAnalysisInfo {
     const result: TAnalysisInfo = {
       header: '📊 Анализ эффективности',
@@ -315,15 +265,6 @@ export class TaskEfficiencyAnalyzer {
     return result
   }
 
-  // private printPeriodStats(stats: PeriodStats): void {
-  //   console.log(`\n${stats.period}:`);
-  //   console.log(`  Всего задач: ${stats.totalTasks}`);
-  //   console.log(`  Задач в месяц: ${stats.tasksPerMonth.toFixed(1)}`);
-  //   console.log(`  Среднее время выполнения: ${stats.avgCompletionDays.toFixed(1)} дней`);
-  //   console.log(`  Медианное время выполнения: ${stats.medianCompletionDays} дней`);
-  //   console.log(`  Минимальное время: ${stats.minCompletionDays} дней`);
-  //   console.log(`  Максимальное время: ${stats.maxCompletionDays} дней`);
-  // }
   private getPeriodStats(stats: PeriodStats, level: 0 | 1 | 2): string[] {
     const msgs: string[] = []
     const getMsg = (msg: string, lvl: number) => [
@@ -339,17 +280,6 @@ export class TaskEfficiencyAnalyzer {
     return msgs
   }
 
-  // private printComplexityStats(analysis: EfficiencyAnalysis): void {
-  //   const printComplexityForPeriod = (stats: PeriodStats, periodName: string) => {
-  //     console.log(`\n${periodName}:`);
-  //     Object.entries(stats.completionByComplexity).forEach(([complexity, data]) => {
-  //       console.log(`  Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`);
-  //     });
-  //   };
-
-  //   printComplexityForPeriod(analysis.recentPeriod, "Последние 3 месяца");
-  //   printComplexityForPeriod(analysis.previousPeriod, "Предыдущие 3 месяца");
-  // }
   private getComplexityStats(analysis: EfficiencyAnalysis, level: 0 | 1 | 2): string[] {
     const msgs: string[] = []
     const getMsg = (msg: string, lvl: number) => [

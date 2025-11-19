@@ -1,0 +1,30 @@
+{
+  "source": {
+    "include": [
+      "./src/shared",
+      "./public/static/workers"
+    ],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "destination": "./public/jsdoc/clean-jsdoc-theme",
+    "recurse": true,
+    "verbose": true,
+    "template": "node_modules/clean-jsdoc-theme",
+    "theme_opts": {
+      "include_css": [
+        "./jsdoc-tools/clean-jsdoc-theme/theme-fix.css"
+      ],
+      "include_js": [
+        "./jsdoc-tools/clean-jsdoc-theme/core-fix.js"
+      ]
+    }
+  },
+  "templates": {
+    "default": {
+      "layoutFile": "./jsdoc-tools/clean-jsdoc-theme/layout.tmpl",
+      "staticFiles": {}
+    }
+  }
+}
