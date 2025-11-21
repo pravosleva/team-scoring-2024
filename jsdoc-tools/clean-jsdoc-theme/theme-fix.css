@@ -22,8 +22,43 @@ code {
   font-family: monospace !important;
 }
 
+.details ul li {
+  gap: 6px;
+  flex-wrap: wrap;
+}
 @media only screen and (max-width: 680px) {
   .details ul li {
     flex-direction: column;
   }
+}
+
+body[data-theme=dark] .icon-button.search-close-button svg {
+  fill: #FFF !important;
+}
+
+/* #sidebar { border: 1px solid red; } */
+/* #sidebar > .sidebar-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+} */
+.sidebar-items-container > *:not(:first-child) {}
+.sidebar-items-container > *:not(:last-child) {}
+
+/* .sidebar-section-children-container {
+  overflow: unset !important;
+} */
+
+.sidebar-section-title.with-arrow:hover {
+  background: transparent;
+  color: #FFF;
+}
+
+body[data-theme=dark] .sidebar-section-children a:hover {
+  background: #4df1b4 !important;
+  color: #000 !important;
+}
+body[data-theme=dark] .sidebar-section-children.active a {
+  background: #f46664 !important;
+  color: #000 !important;
 }

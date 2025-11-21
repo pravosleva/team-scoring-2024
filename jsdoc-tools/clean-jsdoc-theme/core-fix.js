@@ -3,48 +3,30 @@ var accordionLocalStorageKey = 'accordion-id';
 var themeLocalStorageKey = 'theme';
 var fontSizeLocalStorageKey = 'font-size';
 var html = document.querySelector('html');
-
 var MAX_FONT_SIZE = 30;
 var MIN_FONT_SIZE = 10;
-
-
 var localStorage = window.localStorage;
 
 function getTheme() {
   var theme = localStorage.getItem(themeLocalStorageKey);
-
   if (theme) return theme;
-
   theme = document.body?.getAttribute('data-theme');
-
   switch (theme) {
     case 'dark':
     case 'light':
       return theme;
     case 'fallback-dark':
       if (
-
         window.matchMedia('(prefers-color-scheme)').matches &&
-
         window.matchMedia('(prefers-color-scheme: light)').matches
-      ) {
-        return 'light';
-      }
-
+      ) return 'light';
       return 'dark';
-
     case 'fallback-light':
       if (
-
         window.matchMedia('(prefers-color-scheme)').matches &&
-
         window.matchMedia('(prefers-color-scheme: dark)').matches
-      ) {
-        return 'dark';
-      }
-
+      ) return 'dark';
       return 'light';
-
     default:
       return 'dark';
   }
@@ -54,12 +36,10 @@ function localUpdateTheme(theme) {
   var body = document.body;
   var svgUse = document.querySelectorAll('.theme-svg-use');
   var iconID = theme === 'dark' ? '#light-theme-icon' : '#dark-theme-icon';
-
   try {
     body.setAttribute('data-theme', theme);
     body.classList.remove('dark', 'light');
     body.classList.add(theme);
-
     svgUse.forEach(function (svg) {
       svg.setAttribute('xlink:href', iconID);
     });
@@ -76,15 +56,12 @@ function updateTheme(theme) {
 function toggleTheme() {
   var body = document.body;
   var theme = body.getAttribute('data-theme');
-
   var newTheme = theme === 'dark' ? 'light' : 'dark';
-
   updateTheme(newTheme);
 }
 
 (function () {
   var theme = getTheme();
-
   updateTheme(theme);
 })();
 
@@ -97,7 +74,6 @@ function setAccordionIdToLocalStorage(id) {
    * @type {object}
    */
   var ids = JSON.parse(localStorage.getItem(accordionLocalStorageKey));
-
   ids[id] = id;
   localStorage.setItem(accordionLocalStorageKey, JSON.stringify(ids));
 }
@@ -111,7 +87,6 @@ function removeAccordionIdFromLocalStorage(id) {
    * @type {object}
    */
   var ids = JSON.parse(localStorage.getItem(accordionLocalStorageKey));
-
   delete ids[id];
   localStorage.setItem(accordionLocalStorageKey, JSON.stringify(ids));
 }
@@ -126,14 +101,12 @@ function getAccordionIdsFromLocalStorage() {
    * @type {object}
    */
   var ids = JSON.parse(localStorage.getItem(accordionLocalStorageKey));
-
   return ids || {};
 }
 
 function toggleAccordion(element) {
   var currentNode = element;
   var isCollapsed = currentNode.getAttribute('data-isopen') === 'false';
-
   if (isCollapsed) {
     currentNode.setAttribute('data-isopen', 'true');
     setAccordionIdToLocalStorage(currentNode.id);
@@ -147,12 +120,9 @@ function initAccordion() {
   if (
     localStorage.getItem(accordionLocalStorageKey) === undefined ||
     localStorage.getItem(accordionLocalStorageKey) === null
-  ) {
-    localStorage.setItem(accordionLocalStorageKey, '{}');
-  }
+  ) localStorage.setItem(accordionLocalStorageKey, '{}');
   var allAccordion = document.querySelectorAll('.sidebar-section-title');
   var ids = getAccordionIdsFromLocalStorage();
-
   allAccordion.forEach(function (item) {
     item.addEventListener('click', function () {
       toggleAccordion(item);
@@ -169,110 +139,63 @@ function isSourcePage() {
 
 function bringElementIntoView(element, updateHistory = true) {
   // If element is null then we are not going further
-  if (!element) {
-    return;
-  }
-
+  if (!element) return;
   /**
    * tocbotInstance is defined in layout.tmpl
    * It is defined when we are initializing tocbot.
    *
    */
-
-  if (tocbotInstance) {
-    setTimeout(
-
-      () => tocbotInstance.updateTocListActiveElement(element),
-      60
-    );
-  }
+  if (tocbotInstance) setTimeout(() => tocbotInstance.updateTocListActiveElement(element), 1000);
   var navbar = document.querySelector('.navbar-container');
   var body = document.querySelector('.main-content');
   var elementTop = element.getBoundingClientRect().top;
-
   var offset = 16;
-
-  if (navbar) {
-    offset += navbar.scrollHeight;
-  }
-
-  if (body) {
-    body.scrollBy(0, elementTop - offset);
-  }
-
-  if (updateHistory) {
-
-    history.pushState(null, null, '#' + element.id);
-  }
+  if (!!navbar) offset += navbar.scrollHeight;
+  if (!!body) body.scrollBy(0, elementTop - offset);
+  if (!!updateHistory) history.pushState(null, null, '#' + element.id);
 }
-
 
 function bringLinkToView(event) {
   event.preventDefault();
   event.stopPropagation();
   var id = event.currentTarget.getAttribute('href');
-
-  if (!id) {
-    return;
-  }
-
+  if (!id) return;
   var element = document.getElementById(id.slice(1));
-
-  if (element) {
-    bringElementIntoView(element);
-  }
+  if (element) bringElementIntoView(element);
 }
 
 function bringIdToViewOnMount() {
-  if (isSourcePage()) {
-    return;
-  }
-
-
+  if (isSourcePage()) return;
   var id = window.location.hash;
-
-  if (id === '') {
-    return;
-  }
-
+  if (id === '') return;
   var element = document.getElementById(id.slice(1));
-
   if (!element) {
     id = decodeURI(id);
     element = document.getElementById(id.slice(1));
   }
-
-  if (element) {
-    bringElementIntoView(element, false);
-  }
+  if (element) bringElementIntoView(element, false);
 }
 
 function createAnchorElement(id) {
   var anchor = document.createElement('a');
-
   anchor.textContent = '#';
   anchor.href = '#' + id;
   anchor.classList.add('link-anchor');
   anchor.onclick = bringLinkToView;
-
   return anchor;
 }
 
 function addAnchor() {
   var main = document.querySelector('.main-content').querySelector('section');
-
   try {
     var h1 = main.querySelectorAll('h1');
     var h2 = main.querySelectorAll('h2');
     var h3 = main.querySelectorAll('h3');
     var h4 = main.querySelectorAll('h4');
-
     var targets = [h1, h2, h3, h4];
-
     targets.forEach(function (target) {
       target.forEach(function (heading) {
         var anchor = createAnchorElement(heading.id);
-
         heading.classList.add('has-anchor');
         heading.append(anchor);
       });
@@ -288,7 +211,6 @@ function addAnchor() {
  */
 function copy(value) {
   const el = document.createElement('textarea');
-
   el.value = value;
   document.body.appendChild(el);
   el.select();
@@ -298,43 +220,35 @@ function copy(value) {
 
 function showTooltip(id) {
   var tooltip = document.getElementById(id);
-
   tooltip.classList.add('show-tooltip');
   setTimeout(function () {
     tooltip.classList.remove('show-tooltip');
   }, 3000);
 }
 
-
 function copyFunction(id) {
   // selecting the pre element
   var code = document.getElementById(id);
-
   // selecting the ol.linenums
   var element = code.querySelector('.linenums');
-
   if (!element) {
     // selecting the code block
     element = code.querySelector('code');
   }
-
   // copy
   copy(element.innerText.trim().replace(/(^\t)/gm, ''));
-
   // show tooltip
   showTooltip('tooltip-' + id);
 }
 
 function hideTocOnSourcePage() {
-  if (isSourcePage()) {
+  if (isSourcePage())
     document.querySelector('.toc-container').style.display = 'none';
-  }
 }
 
 function getPreTopBar(id, lang = '') {
   // tooltip
   var tooltip = '<div class="tooltip" id="tooltip-' + id + '">Copied!</div>';
-
   // template of copy to clipboard icon container
   var copyToClipboard =
     '<button aria-label="copy code" class="icon-button copy-code" onclick="copyFunction(\'' +
@@ -342,26 +256,21 @@ function getPreTopBar(id, lang = '') {
     '\')"><svg class="sm-icon" alt="click to copy"><use xlink:href="#copy-icon"></use></svg>' +
     tooltip +
     '</button>';
-
   var langNameDiv =
     '<div class="code-lang-name-container"><div class="code-lang-name">' +
     lang.toLocaleUpperCase() +
     '</div></div>';
-
   var topBar =
     '<div class="pre-top-bar-container">' +
     langNameDiv +
     copyToClipboard +
     '</div>';
-
   return topBar;
 }
 
 function getPreDiv() {
   var divElement = document.createElement('div');
-
   divElement.classList.add('pre-div');
-
   return divElement;
 }
 
@@ -369,36 +278,19 @@ function processAllPre() {
   var targets = document.querySelectorAll('pre');
   var footer = document.querySelector('#PeOAagUepe');
   var navbar = document.querySelector('#VuAckcnZhf');
-
   var navbarHeight = 0;
   var footerHeight = 0;
-
-  if (footer) {
-    footerHeight = footer.getBoundingClientRect().height;
-  }
-
-  if (navbar) {
-    navbarHeight = navbar.getBoundingClientRect().height;
-  }
-
-
+  if (footer) footerHeight = footer.getBoundingClientRect().height;
+  if (navbar) navbarHeight = navbar.getBoundingClientRect().height;
   var preMaxHeight = window.innerHeight - navbarHeight - footerHeight - 250;
-
   targets.forEach(function (pre, idx) {
     var parent = pre.parentNode;
-
-    if (parent && parent.getAttribute('data-skip-pre-process') === 'true') {
-      return;
-    }
-
+    if (parent && parent.getAttribute('data-skip-pre-process') === 'true') return;
     var div = getPreDiv();
     var id = 'ScDloZOMdL' + idx;
-
     var lang = pre.getAttribute('data-lang') || 'code';
     var topBar = getPreTopBar(id, lang);
-
     div.innerHTML = topBar;
-
     pre.style.maxHeight = preMaxHeight + 'px';
     pre.id = id;
     pre.classList.add('prettyprint');
@@ -408,14 +300,10 @@ function processAllPre() {
 }
 
 function highlightAndBringLineIntoView() {
-
   var lineNumber = window.location.hash.replace('#line', '');
-
   try {
     var selector = '[data-line-number="' + lineNumber + '"';
-
     var element = document.querySelector(selector);
-
     element.scrollIntoView();
     element.parentNode.classList.add('selected');
   } catch (error) {
@@ -425,7 +313,6 @@ function highlightAndBringLineIntoView() {
 
 function getFontSize() {
   var currentFontSize = 16;
-
   try {
     currentFontSize = Number.parseInt(
       html.style.fontSize.split('px')[0],
@@ -434,20 +321,13 @@ function getFontSize() {
   } catch (error) {
     console.log(error);
   }
-
   return currentFontSize;
 }
 
 function localUpdateFontSize(fontSize) {
   html.style.fontSize = fontSize + 'px';
-
-  var fontSizeText = document.querySelector(
-    '#b77a68a492f343baabea06fad81f651e'
-  );
-
-  if (fontSizeText) {
-    fontSizeText.innerHTML = fontSize;
-  }
+  const fontSizeText = document.querySelector('#b77a68a492f343baabea06fad81f651e');
+  if (fontSizeText) fontSizeText.innerHTML = fontSize;
 }
 
 function updateFontSize(fontSize) {
@@ -458,13 +338,9 @@ function updateFontSize(fontSize) {
 (function () {
   var fontSize = getFontSize();
   var fontSizeInLocalStorage = localStorage.getItem(fontSizeLocalStorageKey);
-
   if (fontSizeInLocalStorage) {
-    var n = Number.parseInt(fontSizeInLocalStorage, 10);
-
-    if (n === fontSize) {
-      return;
-    }
+    const n = Number.parseInt(fontSizeInLocalStorage, 10);
+    if (n === fontSize) return;
     updateFontSize(n);
   } else {
     updateFontSize(fontSize);
@@ -474,84 +350,64 @@ function updateFontSize(fontSize) {
 
 function incrementFont(event) {
   var n = getFontSize();
-
-  if (n < MAX_FONT_SIZE) {
-    updateFontSize(n + 1);
-  }
+  if (n < MAX_FONT_SIZE) updateFontSize(n + 1);
 }
 
 
 function decrementFont(event) {
   var n = getFontSize();
-
-  if (n > MIN_FONT_SIZE) {
-    updateFontSize(n - 1);
-  }
+  if (n > MIN_FONT_SIZE) updateFontSize(n - 1);
 }
 
 function fontSizeTooltip() {
   var fontSize = getFontSize();
-
   return `
-  <div class="font-size-tooltip">
-    <button aria-label="decrease-font-size" class="icon-button ${fontSize >= MAX_FONT_SIZE ? 'disabled' : ''
+<div class="font-size-tooltip">
+  <button aria-label="decrease-font-size" class="icon-button ${fontSize >= MAX_FONT_SIZE ? 'disabled' : ''
     }" onclick="decrementFont(event)">
-      <svg>
-        <use xlink:href="#minus-icon"></use>
-      </svg>
-    </button>
-    <div class="font-size-text" id="b77a68a492f343baabea06fad81f651e">
-      ${fontSize}
-    </div>
-    <button aria-label="increase-font-size" class="icon-button ${fontSize <= MIN_FONT_SIZE ? 'disabled' : ''
-    }" onclick="incrementFont(event)">
-      <svg>
-        <use xlink:href="#add-icon"></use>
-      </svg>
-    </button>
-    <button class="icon-button" onclick="updateFontSize(16)">
-      <svg>
-        <use xlink:href="#reset-icon"></use>
-      </svg>
-    </button>
+    <svg>
+      <use xlink:href="#minus-icon"></use>
+    </svg>
+  </button>
+  <div class="font-size-text" id="b77a68a492f343baabea06fad81f651e">
+    ${fontSize}
   </div>
-
-  `;
+  <button aria-label="increase-font-size" class="icon-button ${fontSize <= MIN_FONT_SIZE ? 'disabled' : ''
+    }" onclick="incrementFont(event)">
+    <svg>
+      <use xlink:href="#add-icon"></use>
+    </svg>
+  </button>
+  <button class="icon-button" onclick="updateFontSize(16)">
+    <svg>
+      <use xlink:href="#reset-icon"></use>
+    </svg>
+  </button>
+</div>`;
 }
 
 function initTooltip() {
   // add tooltip to navbar item
-
   tippy('.theme-toggle', {
     content: 'Toggle Theme',
     delay: 500,
   });
-
-
   tippy('.search-button', {
     content: 'Search',
     delay: 500,
   });
-
-
   tippy('.font-size', {
     content: 'Change font size',
     delay: 500,
   });
-
-
   tippy('.codepen-button', {
     content: 'Open code in CodePen',
     placement: 'left',
   });
-
-
   tippy('.copy-code', {
     content: 'Copy this code',
     placement: 'left',
   });
-
-
   tippy('.font-size', {
     content: fontSizeTooltip(),
     trigger: 'click',
@@ -583,15 +439,9 @@ function hideMobileMenu() {
   var target = document.querySelector('#mobile-menu');
   var svgUse = target.querySelector('use');
 
-  if (mobileMenuContainer) {
-    mobileMenuContainer.classList.remove('show');
-  }
-  if (target) {
-    target.setAttribute('data-isopen', 'false');
-  }
-  if (svgUse) {
-    svgUse.setAttribute('xlink:href', '#menu-icon');
-  }
+  if (mobileMenuContainer) mobileMenuContainer.classList.remove('show');
+  if (target) target.setAttribute('data-isopen', 'false');
+  if (svgUse) svgUse.setAttribute('xlink:href', '#menu-icon');
 }
 
 function showMobileMenu() {
@@ -599,30 +449,25 @@ function showMobileMenu() {
   var target = document.querySelector('#mobile-menu');
   var svgUse = target.querySelector('use');
 
-  if (mobileMenuContainer) {
-    mobileMenuContainer.classList.add('show');
-  }
-  if (target) {
-    target.setAttribute('data-isopen', 'true');
-  }
-  if (svgUse) {
-    svgUse.setAttribute('xlink:href', '#close-icon');
-  }
+  if (mobileMenuContainer) mobileMenuContainer.classList.add('show');
+  if (target) target.setAttribute('data-isopen', 'true');
+  if (svgUse) svgUse.setAttribute('xlink:href', '#close-icon');
 }
 
 function onMobileMenuClick() {
   console.log('- MENU CLICKED')
   var target = document.querySelector('#mobile-menu');
-  // const mobileSidebar = document.querySelector('#mobile-sidebar');
-  // const hasShowClass = mobileSidebar.classList.contains('show');
   var isOpen = target?.getAttribute('data-isopen') === 'true';
-
   console.log(`target is ${typeof target} // 'data-isopen' is "${target?.getAttribute('data-isopen')}" (${typeof target?.getAttribute('data-isopen')})`)
 
-  if (isOpen) {
-    hideMobileMenu();
-  } else {
-    showMobileMenu();
+  if (isOpen) hideMobileMenu();
+  else showMobileMenu();
+}
+
+const setAllInactive = () => {
+  const elms = document.getElementsByClassName('sidebar-section-children')
+  for (const elm of elms) {
+    elm.classList.remove('active')
   }
 }
 
@@ -630,17 +475,26 @@ function onMobileMenuClick() {
 const subscribersMap = new Map();
 function initMobileMenu() {
   var menu = document.querySelector('#mobile-menu');
-  if (menu) {
-    menu.addEventListener('click', onMobileMenuClick);
-  } else {
-    console.warn('Mobile toggler not found')
-  }
+  if (menu) menu.addEventListener('click', onMobileMenuClick);
+  else console.warn('Mobile toggler not found')
   // NOTE: Close menu by click
   const elms = document.getElementsByClassName('sidebar-section-children-container')
   // Alternatively, use a for...of loop for cleaner iteration
   const listener = (closedByHref) => () => {
     console.log(`Closed by ${closedByHref}`)
     hideMobileMenu()
+
+    // TODO: 1. Remove css class .active fomr "sidebar-section-children active"
+    setAllInactive()
+    // TODO: 2. Set class .active for this parent elm (desktop sidebar and mobile menu)
+    const targetChilds = document.querySelectorAll(`a[href="${closedByHref}"]`)
+    for (const child of targetChilds) {
+      const parent = child.parentElement
+      // console.log(parent)
+      if (parent.classList.contains('sidebar-section-children')) {
+        parent.classList.add('active')
+      }
+    }
   }
   for (const elm of elms) {
     for (const node of elm.children) {
@@ -661,11 +515,7 @@ function initMobileMenu() {
 
 function addHrefToSidebarTitle() {
   var titles = document.querySelectorAll('.sidebar-title-anchor');
-
-  titles.forEach(function (title) {
-
-    title.setAttribute('href', baseURL);
-  });
+  titles.forEach((title) => title.setAttribute('href', baseURL));
 }
 
 function highlightActiveLinkInSidebar() {
@@ -675,36 +525,26 @@ function highlightActiveLinkInSidebar() {
 
   if (!element) {
     try {
-      element = document.querySelector(
-        `.sidebar a[href*='${targetURL.split('#')[0]}']`
-      );
+      element = document.querySelector(`.sidebar a[href*='${targetURL.split('#')[0]}']`);
     } catch (e) {
       console.error(e);
-
       return;
     }
   }
-
   if (!element) return;
-
   element.parentElement.classList.add('active');
   element.scrollIntoView();
 }
 
 function onDomContentLoaded() {
   var themeButton = document.querySelectorAll('.theme-toggle');
-
   initMobileMenu();
-
   if (themeButton) {
     themeButton.forEach(function (button) {
       button.addEventListener('click', toggleTheme);
     });
   }
-
-  // Highlighting code
-
-
+  // -- Highlighting code
   hljs.addPlugin({
     'after:highlightElement': function (obj) {
       // Replace 'code' with result.language when
@@ -713,47 +553,34 @@ function onDomContentLoaded() {
       obj.el.parentNode.setAttribute('data-lang', 'code');
     },
   });
-
   hljs.highlightAll();
-
   hljs.initLineNumbersOnLoad({
     singleLine: true,
   });
-
-  // Highlight complete
-
+  // -- Highlight complete
   initAccordion();
   addAnchor();
   processAllPre();
   hideTocOnSourcePage();
   setTimeout(function () {
     bringIdToViewOnMount();
-    if (isSourcePage()) {
-      highlightAndBringLineIntoView();
-    }
+    if (isSourcePage()) highlightAndBringLineIntoView();
   }, 1000);
   initTooltip();
   fixTable();
   addHrefToSidebarTitle();
   highlightActiveLinkInSidebar();
 }
-
 window.addEventListener('DOMContentLoaded', onDomContentLoaded);
-
 window.addEventListener('hashchange', (event) => {
   const url = new URL(event.newURL);
-
   if (url.hash !== '') {
     bringIdToViewOnMount(url.hash);
   }
 });
-
 window.addEventListener('storage', (event) => {
   if (event.newValue === 'undefined') return;
-
   initTooltip();
-
   if (event.key === themeLocalStorageKey) localUpdateTheme(event.newValue);
-  if (event.key === fontSizeLocalStorageKey)
-    localUpdateFontSize(event.newValue);
+  if (event.key === fontSizeLocalStorageKey) localUpdateFontSize(event.newValue);
 });
