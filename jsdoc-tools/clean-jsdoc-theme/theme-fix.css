@@ -51,6 +51,8 @@ body[data-theme=dark] .icon-button.search-close-button svg {
 
 .sidebar-section-title.with-arrow:hover {
   background: transparent;
+}
+body[data-theme=dark] .sidebar-section-title.with-arrow:hover {
   color: #FFF;
 }
 
