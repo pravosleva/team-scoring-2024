@@ -1,3 +1,12 @@
+/**
+ * Настраиваемый скролл до элемента по id (конструктор)
+ *
+ * @param {Object} arg 
+ * @param {number} arg.timeout Задержка для отмены частых вызовов (вызовется последний)
+ * @param {number} arg.offsetTop Настройка верхнего отступа (если элемент имеет слишком большую высоту из-за чего отображение по центру становится не до конца информативным)
+ * @param {number} arg.elementHeightCritery Критерий высоты элемента по превышении которого элемент будет скроллиться в топ сраницы (в соответствии с настройкой отступа от верха)
+ * @returns {Function} Функция для вызовов ( id, _cfg, cb }) => void
+ */
 export const scrollToIdFactory = ({ timeout, offsetTop, elementHeightCritery }: {
   timeout: number;
   offsetTop: number;

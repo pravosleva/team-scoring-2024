@@ -66,4 +66,24 @@ describe('Тестирование извлечения свойства', () =>
 
     expect(tested).toEqual(expected);
   })
+
+  test('case 5', () => {
+    const tested = getNestedValue({
+      obj: {
+        a: {
+          b: {
+            c: [1, 2, 3]
+          }
+        }
+      },
+      path: 'a',
+    });
+    const expected = {
+      b: {
+        c: [1, 2, 3]
+      }
+    }
+
+    expect(tested).toEqual(expected);
+  })
 })

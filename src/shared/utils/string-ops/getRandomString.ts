@@ -1,3 +1,10 @@
+/**
+ * Random string
+ *
+ * @export
+ * @param {number} length 
+ * @returns {string} 
+ */
 export function getRandomString(length: number): string {
   let result = ''
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

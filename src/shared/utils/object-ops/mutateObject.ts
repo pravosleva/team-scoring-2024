@@ -1,7 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+type TAbstractedObject = null | { [key: string]: TAbstractedObject } | { [key: string]: TAbstractedObject }[] | string | string[] | boolean | boolean[] | number | number[] | TAbstractedObject[]
+
+/**
+ * Мутации объекта
+ *
+ * @param {Object} arg 
+ * @param {*} arg.target 
+ * @param {*} arg.source 
+ * @param {boolean} arg.removeIfUndefined 
+ * @returns {Object} 
+ */
 export const mutateObject = ({ target, source, removeIfUndefined }: {
-  target: any;
-  source: { [key: string]: any };
+  target: { [key: string]: TAbstractedObject };
+  source: { [key: string]: TAbstractedObject };
   removeIfUndefined?: boolean;
 }) => {
   if (typeof source === 'object') {
@@ -11,11 +21,11 @@ export const mutateObject = ({ target, source, removeIfUndefined }: {
           if (!!target[key] && Array.isArray(target[key])) target[key] = [...new Set([...target[key], ...source[key]])]
           else target[key] = source[key]
           break
-        case typeof source[key] === 'object' && !!source[key]:
-          if (target[key]) mutateObject({ target: target[key], source: source[key], removeIfUndefined })
+        case typeof source[key] === 'object' && !!source[key] && source[key] !== null:
+          if (target[key]) mutateObject({ target: target[key] as { [key: string]: TAbstractedObject }, source: source[key], removeIfUndefined })
           else target[key] = source[key]
           break
-        case typeof source[key] === 'object' && !source[key]:
+        case source[key] === null:
           target[key] = source[key]
           break
         case typeof source[key] === 'string':

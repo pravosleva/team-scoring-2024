@@ -1,4 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Подсветка узла DOM-дерева по id элемента (конструктор)
+ *
+ * @export
+ * @template T Специальные данные
+ * @param {Object} arg 
+ * @param {number} arg.timeout Задержка перед вызовом (мс)
+ * @param {Object} arg.cb Коллбэки
+ * @param {Object} arg.cb.onStart Целевой вызов ({ targetElm: HTMLElement }) => T
+ * @param {Object} arg.cb.onEnd Конечный вызов после задержки ({ targetElm: HTMLElement, specialData: T }) => void
+ * @param {Object} arg.cb.onError Коллбэк для ошибки ({ message: string }) => void
+ * @returns {Function} Экземпляр для взовов: ({ id }) => void
+ */
 export function blinkNodeIdFactory<T>({ timeout, cb }: {
   timeout: number;
   cb: {
@@ -6,53 +18,29 @@ export function blinkNodeIdFactory<T>({ timeout, cb }: {
     onStart: (ps: {
       targetElm: HTMLElement;
     }) => T;
-
     // NOTE: Do something with your data and element
     onEnd: (ps: {
       specialData: T;
       targetElm: HTMLElement;
     }) => void;
-
     onError: (ps: { message: string }) => void;
   },
 }) {
-  // let _timeout: NodeJS.Timeout | undefined = undefined
-  // let _currentNodeId
-
   return ({ id }: { id: string; }) => {
     try {
       const nodeId = id
       const targetElm = document.getElementById(nodeId)
       if (!!targetElm) {
-        // let _timeout: NodeJS.Timeout | undefined = undefined
         const specialData = cb.onStart({ targetElm })
         setTimeout(() => {
           cb.onEnd({ targetElm, specialData })
         }, timeout)
-
-        // if (!!_timeout) clearTimeout(_timeout)
-        // setTimeout(() => {
-        //   const curHeight = targetElm.
-        //   if (curHeight <= elementHeightCritery) {
-        //     // NOTE: Скроллить до середины контента
-        //     targetElm?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
-        //   } else {
-        //     // NOTE: Скроллить в начало контента
-        //     const elementPosition = targetElm.getBoundingClientRect().top
-        //     const offsetPosition = elementPosition + window.pageYOffset - offsetTop
-        //     window.scrollTo({
-        //       top: offsetPosition,
-        //       behavior: 'smooth',
-        //     });
-        //   }
-        // }, timeout)
-
       }
       else
         throw new Error(`Node not found for nodeId=${id}`)
-    } catch (err: any) {
+    } catch (err) {
       console.warn(err)
-      cb.onError({ message: err?.message || 'No message' })
+      cb.onError({ message: (err as Error)?.message || 'No message' })
     }
   }
 }

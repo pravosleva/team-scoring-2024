@@ -1,7 +1,6 @@
 // NOTE: Attention!
 // _perfInfo is global for this.
 
-
 /**
  * Функция логирования
  *

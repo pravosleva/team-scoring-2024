@@ -1,11 +1,10 @@
 {
   "source": {
     "include": [
-      "./src/shared",
+      "./src/shared/utils",
       "./public/static/workers"
     ],
-    "includePattern": ".+\\.js(doc|x)?$",
-    "excludePattern": "(^|\\/|\\\\)_"
+    "includePattern": ".+\\.(j|t)s(doc|x)?$"
   },
   "opts": {
     "destination": "./public/jsdoc/clean-jsdoc-theme",

@@ -1,8 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * @typedef {Object} TDelayedCallFactoryConfigurableDelayResult Результат настраиваемого вызова
+ * @property {Object} delay Настройки задержек (мс)
+ * @property {number} delay.before Задержка до вызова
+ * @property {number} delay.after Задержка после для следующего вызова
+ * @property {boolean} stopPrevious Остановить предыдущий вызов?
+ */
 
-// NOTE: See also https://stackoverflow.com/a/76915071/30637683
-
-export const delayedCallFactoryConfigurableDelay = <R, A extends any[]>(
+/**
+ * Настраиваемая версия delayedCallFactory.
+ * Используется для проигрывания аудио чтоб звуки не смешивались при их вызовах в процедурах.
+ * See also {@link https://stackoverflow.com/a/76915071/30637683 stackoverflow}
+ *
+ * @template R 
+ * @template {unknown[]} A Аргументы для вызова
+ * @param {Function} fn Целевая функция
+ * @param {number} delayByDefault Задержка в миллисекундах
+ * @returns {TDelayedCallFactoryConfigurableDelayResult} Результат
+ */
+export const delayedCallFactoryConfigurableDelay = <R, A extends unknown[]>(
   fn: (...args: A) => R,
   delayByDefault: number
 ): [(...args: A) => (ps: {

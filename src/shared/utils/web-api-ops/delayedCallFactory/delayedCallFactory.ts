@@ -1,8 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-// NOTE: See also https://stackoverflow.com/a/76915071/30637683
-
-export const delayedCallFactory = <R, A extends any[]>(
+/**
+ * Простой отложенный вызов.
+ * Это превращает существующую функцию в её ограниченную версию.
+ * Она не использует очередь, а вместо этого планирует вызовы функции через setTimeout, если они происходят слишком часто.
+ * See also {@link https://stackoverflow.com/a/76915071/30637683 stackoverflow}
+ *
+ * @template R 
+ * @template {unknown[]} A Аргументы для вызова
+ * @param {Function} fn Целевая функция
+ * @param {number} delay Задержка в миллисекундах
+ * @returns {Function[]} Массив функций
+ */
+export const delayedCallFactory = <R, A extends unknown[]>(
   fn: (...args: A) => R,
   delay: number
 ): [(...args: A) => void] => {
