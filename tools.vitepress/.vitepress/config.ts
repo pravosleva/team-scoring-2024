@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitepress'
 
+const PUBLIC_URL = process.env.VITE_PUBLIC_URL || ''
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Estimate Corrector 2024",
-  description: "This web app created for have reasonable correction of employee estimation",
+  description: "WIP",
+  base: `${PUBLIC_URL}`,
+  outDir: 'output',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

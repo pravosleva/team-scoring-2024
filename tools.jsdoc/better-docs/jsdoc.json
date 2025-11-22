@@ -21,7 +21,7 @@
   "templates": {
     "search": true,
     "default": {
-      "layoutFile": "./jsdoc-tools/better-docs/layout.tmpl",
+      "layoutFile": "./tools.jsdoc/better-docs/layout.tmpl",
       "staticFiles": {
         "include": [
           "node_modules/better-docs/static/styles/reset.css",
@@ -29,7 +29,7 @@
           "node_modules/better-docs/static/styles/iframe.css",
           "node_modules/better-docs/static/styles/prettify-jsdoc.css",
           "node_modules/better-docs/static/styles/prettify-tomorrow.css",
-          "./jsdoc-tools/better-docs/theme-fix.css"
+          "./tools.jsdoc/better-docs/theme-fix.css"
         ]
       }
     },

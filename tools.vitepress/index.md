@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "Estimate Corrector 2024"
-  text: "This web app created for have reasonable correction of employee estimation"
+  text: "WIP"
   tagline: My great project tagline
   actions:
     - theme: brand

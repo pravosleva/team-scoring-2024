@@ -1,7 +1,6 @@
 {
   "source": {
     "include": [
-      "./src/shared/utils",
       "./public/static/workers"
     ],
     "includePattern": ".+\\.(j|t)s(doc|x)?$"
@@ -13,16 +12,16 @@
     "template": "node_modules/clean-jsdoc-theme",
     "theme_opts": {
       "include_css": [
-        "./jsdoc-tools/clean-jsdoc-theme/theme-fix.css"
+        "./tools.jsdoc/clean-jsdoc-theme/theme-fix.css"
       ],
       "include_js": [
-        "./jsdoc-tools/clean-jsdoc-theme/core-fix.js"
+        "./tools.jsdoc/clean-jsdoc-theme/core-fix.js"
       ]
     }
   },
   "templates": {
     "default": {
-      "layoutFile": "./jsdoc-tools/clean-jsdoc-theme/layout.tmpl",
+      "layoutFile": "./tools.jsdoc/clean-jsdoc-theme/layout.tmpl",
       "staticFiles": {}
     }
   }

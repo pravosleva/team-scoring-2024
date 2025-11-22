@@ -15,12 +15,12 @@
   },
   "templates": {
     "default": {
-      "layoutFile": "./jsdoc-tools/docdash/layout.tmpl",
+      "layoutFile": "./tools.jsdoc/docdash/layout.tmpl",
       "staticFiles": {
         "include": [
           "node_modules/docdash/static/styles/jsdoc.css",
           "node_modules/docdash/static/styles/prettify.css",
-          "./jsdoc-tools/docdash/theme-fix.css"
+          "./tools.jsdoc/docdash/theme-fix.css"
         ]
       }
     }

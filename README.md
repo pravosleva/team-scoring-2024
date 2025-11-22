@@ -17,8 +17,6 @@ yarn _jsdoc-gen
 yarn add -D jsdoc
 ```
 
-// "layoutFile": "node_modules/docdash/tmpl/layout.tmpl",
-
 #### Step 2 `.gitignore`
 ```gitignore
 ## Docs
@@ -69,6 +67,98 @@ yarn _jsdoc-gen
 > `jsdoc.json` -> `opts.template: "node_modules/clean-jsdoc-theme"`
 > `package.json` -> `scripts.generate-docs: "jsdoc --configure jsdoc.json --verbose"`
 - BetterDocs: https://github.com/SoftwareBrothers/better-docs
+
+## Vitepress
+### Step 1. Install
+```bash
+yarn add -D vitepress
+```
+
+### Step 2. Settings
+```bash
+npx vitepress init
+```
+
+For example, u can set dir `tools.vitepress` as main for this tool
+
+### Step 3. Scripts in `package.json`
+```json
+{
+  "scripts": {
+    "_vitepress-docs:dev": "./node_modules/vitepress/bin/vitepress.js dev tools.vitepress",
+    "_vitepress-docs:build": "VITE_PUBLIC_URL=/dist.estimate-corrector-2024/vitepress/output ./node_modules/vitepress/bin/vitepress.js build tools.vitepress",
+    "_vitepress-docs:postbuild": "bash _aux-tool.quaint-files-copy.sh tools.vitepress/output public/vitepress html && bash _aux-tool.quaint-files-copy.sh tools.vitepress/output public/vitepress css && bash _aux-tool.quaint-files-copy.sh tools.vitepress/output public/vitepress js",
+    "_vitepress-docs:preview": "./node_modules/vitepress/bin/vitepress.js preview tools.vitepress"
+  }
+}
+```
+
+### Step 4. Config `tools.vitepress/.vitepress/config`
+
+```ts
+import { defineConfig } from 'vitepress'
+
+const PUBLIC_URL = process.env.VITE_PUBLIC_URL || ''
+
+export default defineConfig({
+  // ...
+  base: `${PUBLIC_URL}`,
+  outDir: 'output',
+  // ...
+})
+```
+
+## Aux scripts
+`./_aux-tool.quaint-files-copy.sh`
+```bash
+#!/bin/bash
+
+# quaint_copy копирует файлы определённого расширения $3 из каталога $1 в
+# каталог $2
+
+quaint_copy(){
+  srcDir=$1
+  destDir=$2
+  ext=$3
+  
+  rsync -r -f '+ *.'"$ext" -f '+ **/' -f '- *' --prune-empty-dirs $srcDir $destDir
+}
+
+quaint_copy $PWD/$1 $PWD/$2 $3
+```
+
+`./_aux-tool.dir-copy2.sh`
+```bash
+dir_copy() {
+  srcDir=$1
+  destDir=$2
+
+  for i in $srcDir/*; do cp -r $i $destDir; done;
+}
+```
+
+`./_aux-tool.read-env.sh`
+```bash
+#!/bin/bash
+
+# NOTE: Read env name $1 from file $2 (optional: .env by default)
+
+read_env() {
+  if [ -z "$1" ]; then
+    echo "environment variable name is required"
+    return 1
+  fi
+
+  local ENV_FILE='.env'
+  if [ ! -z "$2" ]; then
+    ENV_FILE="$2"
+  fi
+
+  local VAR=$(grep $1 "$ENV_FILE" | xargs)
+  IFS="=" read -ra VAR <<< "$VAR"
+  echo ${VAR[1]}
+}
+```
 
 # React + TypeScript + Vite
 
