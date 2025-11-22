@@ -20,7 +20,10 @@
     "_pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/static/pwa/rolling-dices.svg",
     "_jsdoc-gen:v1": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/docdash/jsdoc.json",
     "_jsdoc-gen:v2": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/better-docs/jsdoc.json",
-    "_jsdoc-gen:v3": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/clean-jsdoc-theme/jsdoc.json"
+    "_jsdoc-gen:v3": "./node_modules/jsdoc/jsdoc.js --configure ./jsdoc-tools/clean-jsdoc-theme/jsdoc.json",
+    "_vitepress-docs:dev": "./node_modules/vitepress/bin/vitepress.js dev vitepress-tools",
+    "_vitepress-docs:build": "./node_modules/vitepress/bin/vitepress.js build vitepress-tools",
+    "_vitepress-docs:preview": "./node_modules/vitepress/bin/vitepress.js preview vitepress-tools"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

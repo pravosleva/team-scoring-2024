@@ -33,3 +33,4 @@ _git-training.*
 
 ## Docs (jsdoc)
 jsdoc
+vitepress-tools/.vitepress/dist
