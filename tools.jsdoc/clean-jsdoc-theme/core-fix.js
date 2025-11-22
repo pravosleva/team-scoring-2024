@@ -127,9 +127,7 @@ function initAccordion() {
     item.addEventListener('click', function () {
       toggleAccordion(item);
     });
-    if (item.id in ids) {
-      toggleAccordion(item);
-    }
+    if (item.id in ids) toggleAccordion(item);
   });
 }
 
@@ -205,10 +203,6 @@ function addAnchor() {
   }
 }
 
-/**
- *
- * @param {string} value
- */
 function copy(value) {
   const el = document.createElement('textarea');
   el.value = value;
@@ -347,12 +341,10 @@ function updateFontSize(fontSize) {
   }
 })();
 
-
 function incrementFont(event) {
   var n = getFontSize();
   if (n < MAX_FONT_SIZE) updateFontSize(n + 1);
 }
-
 
 function decrementFont(event) {
   var n = getFontSize();
@@ -419,15 +411,12 @@ function initTooltip() {
 
 function fixTable() {
   const tables = document.querySelectorAll('table');
-
   for (const table of tables) {
     if (table.classList.contains('hljs-ln')) {
       // don't want to wrap code blocks.
       return;
     }
-
     var div = document.createElement('div');
-
     div.classList.add('table-div');
     table.parentNode.insertBefore(div, table);
     div.appendChild(table);
@@ -438,7 +427,6 @@ function hideMobileMenu() {
   var mobileMenuContainer = document.querySelector('#mobile-sidebar');
   var target = document.querySelector('#mobile-menu');
   var svgUse = target.querySelector('use');
-
   if (mobileMenuContainer) mobileMenuContainer.classList.remove('show');
   if (target) target.setAttribute('data-isopen', 'false');
   if (svgUse) svgUse.setAttribute('xlink:href', '#menu-icon');
@@ -448,7 +436,6 @@ function showMobileMenu() {
   var mobileMenuContainer = document.querySelector('#mobile-sidebar');
   var target = document.querySelector('#mobile-menu');
   var svgUse = target.querySelector('use');
-
   if (mobileMenuContainer) mobileMenuContainer.classList.add('show');
   if (target) target.setAttribute('data-isopen', 'true');
   if (svgUse) svgUse.setAttribute('xlink:href', '#close-icon');
@@ -458,17 +445,13 @@ function onMobileMenuClick() {
   console.log('- MENU CLICKED')
   var target = document.querySelector('#mobile-menu');
   var isOpen = target?.getAttribute('data-isopen') === 'true';
-  console.log(`target is ${typeof target} // 'data-isopen' is "${target?.getAttribute('data-isopen')}" (${typeof target?.getAttribute('data-isopen')})`)
-
   if (isOpen) hideMobileMenu();
   else showMobileMenu();
 }
 
 const setAllInactive = () => {
   const elms = document.getElementsByClassName('sidebar-section-children')
-  for (const elm of elms) {
-    elm.classList.remove('active')
-  }
+  for (const elm of elms) elm.classList.remove('active')
 }
 
 // NOTE: Mobile toggle btn
@@ -490,10 +473,8 @@ function initMobileMenu() {
     const targetChilds = document.querySelectorAll(`a[href="${closedByHref}"]`)
     for (const child of targetChilds) {
       const parent = child.parentElement
-      // console.log(parent)
-      if (parent.classList.contains('sidebar-section-children')) {
+      if (parent.classList.contains('sidebar-section-children'))
         parent.classList.add('active')
-      }
     }
   }
   for (const elm of elms) {
@@ -507,7 +488,6 @@ function initMobileMenu() {
         }
         subscribersMap.set(c.attributes?.href.value, listener(c.attributes?.href.value))
         c.addEventListener('click', subscribersMap.get(c.attributes?.href.value))
-
       }
     }
   }
@@ -554,9 +534,7 @@ function onDomContentLoaded() {
     },
   });
   hljs.highlightAll();
-  hljs.initLineNumbersOnLoad({
-    singleLine: true,
-  });
+  hljs.initLineNumbersOnLoad({ singleLine: true });
   // -- Highlight complete
   initAccordion();
   addAnchor();
@@ -574,9 +552,7 @@ function onDomContentLoaded() {
 window.addEventListener('DOMContentLoaded', onDomContentLoaded);
 window.addEventListener('hashchange', (event) => {
   const url = new URL(event.newURL);
-  if (url.hash !== '') {
-    bringIdToViewOnMount(url.hash);
-  }
+  if (url.hash !== '') bringIdToViewOnMount(url.hash);
 });
 window.addEventListener('storage', (event) => {
   if (event.newValue === 'undefined') return;
