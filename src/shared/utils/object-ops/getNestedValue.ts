@@ -2,6 +2,8 @@
 
 /**
  * Получение значения поля произвольной вложенности в объекте
+ * 
+ * @source Get object prop value by path
  *
  * @param {Object} arg For example: { obj: unknown; path: string; }
  * @param {*} arg.obj Целевой объект

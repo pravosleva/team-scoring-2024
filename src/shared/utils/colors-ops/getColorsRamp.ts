@@ -13,7 +13,17 @@ function hexToRgb(hex: string) {
     : null;
 }
 
-// returns an array of startColor, colors between according to steps, and endColor
+/**
+ * Color steps between two colors
+ * 
+ * @source Решение задачи получения промежуточных цветов в соотв. с заданным отрезком и количеству шагов
+ *
+ * @export
+ * @param {string} startColor 
+ * @param {string} endColor 
+ * @param {number} steps 
+ * @returns {string[]} An array of startColor, colors between according to steps, and endColor
+ */
 export function getColorsRamp(startColor: string, endColor: string, steps: number) {
   const ramp = [];
 

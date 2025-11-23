@@ -36,3 +36,5 @@ jsdoc
 public/jsdoc/*
 tools.vitepress/output/*
 public/vitepress/*
+public/typedoc/*
+tools.typedoc/output/*

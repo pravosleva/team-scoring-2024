@@ -1,7 +1,9 @@
-type TAbstractedObject = null | { [key: string]: TAbstractedObject } | { [key: string]: TAbstractedObject }[] | string | string[] | boolean | boolean[] | number | number[] | TAbstractedObject[]
+type TAbstractedObject = null | { [key: string]: TAbstractedObject } | { [key: string]: TAbstractedObject }[] | string | string[] | boolean | boolean[] | number | number[] | TAbstractedObject[];
 
 /**
  * Мутации объекта
+ * 
+ * @source Optional source comments exp
  *
  * @param {Object} arg 
  * @param {*} arg.target 

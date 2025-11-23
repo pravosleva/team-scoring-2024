@@ -6,6 +6,19 @@ type TProps<TItemFormat> = {
   };
 }
 
+/**
+ * Бинарны поиск
+ * 
+ * @source Binary search tool
+ *
+ * @template TItemFormat 
+ * @param {TProps<TItemFormat>} arg 
+ * @param {TItemFormat[]} arg.items Sorted list
+ * @param {Object} arg.target 
+ * @param {number} arg.target.value Value
+ * @param {string} arg.target.propName Prop name
+ * @returns {number} 
+ */
 export const getBinarySearchedIndexByProp = <TItemFormat>({ items, target }: TProps<TItemFormat>): number => {
   const { value, propName } = target
   let result: number = -1

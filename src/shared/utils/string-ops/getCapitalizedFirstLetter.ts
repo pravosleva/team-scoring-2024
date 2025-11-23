@@ -1,5 +1,7 @@
 /**
  * Возврщает строку с првым символом в верхнем реистре
+ * 
+ * @source First letter will be set in uppercase
  *
  * @param {string} val 
  * @returns {string} 

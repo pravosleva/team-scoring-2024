@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-
 import { useLayoutEffect, useCallback } from 'react'
-// import { groupLog, EReportType } from '~/utils'
 import { wws, NWService } from '~/shared/utils/wws'
 // import { NEvents } from '~/types'
 import { vi } from '~/shared/utils/vi'
@@ -30,9 +26,9 @@ type TProps = {
 const VITE_GIT_SHA1 = import.meta.env.VITE_GIT_SHA1
 
 type TIncomingData = {
-  output?: any;
+  output?: unknown;
   // type?: NEvents.ESharedWorkerNative;
-  yourData?: { [key: string]: any; };
+  yourData?: { [key: string]: unknown; };
   code?: NWService.EUIMessage;
   __eType: string;
   message?: string;
@@ -43,7 +39,7 @@ type TIncomingData = {
     response: {
       ok: boolean;
       id?: number;
-      gRes?: any;
+      gRes?: unknown;
     };
   };
 };
@@ -225,13 +221,13 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
 
     wws.subscribeOnErr({
       wName: 'online-metrix',
-      cb: (e: any) => {
+      cb: (e: unknown) => {
         if (isDebugEnabled) {
           logger.log({
             label: `🚫 OnErr event:`,
             evt: {
               ok: true,
-              originalResponse: e,
+              originalResponse: e as TIncomingData,
             },
             err: null,
           })
@@ -244,13 +240,13 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
       for (const wName of wList) {
         wws.terminate({
           wName,
-          cb: (e: any) => {
+          cb: (e: unknown) => {
             if (isDebugEnabled) {
               logger.log({
                 label: `🚫 die [${wName}]`,
                 evt: {
                   ok: true,
-                  originalResponse: e,
+                  originalResponse: e as TIncomingData,
                 },
                 err: null,
               })
@@ -267,7 +263,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
   }: {
     input: {
       opsEventType: NWService.EClientToWorkerEvent,
-      metrixEventType: any;
+      metrixEventType: NWService.EMetrixClientOutgoing;
       stateValue: string;
       // tradeinId: number | null;
       uniquePageLoadKey: string;
@@ -278,7 +274,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
     // - TODO: Custom input data for the particular stateValue
     const customData: {
       // imei?: string;
-      stepDetails?: any;
+      stepDetails?: { dataSample: { [key: string]: number } };
       reportType?: NWService.EReportType;
     } = {
       // imei: smViSnap.imei.value,
@@ -302,7 +298,7 @@ export const useMetrix = ({ isDebugEnabled }: TProps) => {
           version: string;
         };
         stepDetails?: {
-          [key: string]: any;
+          dataSample: { [key: string]: number };
         };
       }
     }>({

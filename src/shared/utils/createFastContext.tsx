@@ -6,6 +6,16 @@ import React, {
   useSyncExternalStore,
 } from 'react'
 
+/**
+ * Quick ctx by Jack Herrington
+ * 
+ * @source
+ *
+ * @export
+ * @template Store 
+ * @param {Store} initialState 
+ * @returns {{ Provider: ({ children }: { children: React.ReactNode; }) => any; useStore: <SelectorOutput>(selector: (store: Store) => SelectorOutput) => [SelectorOutput, (value: Partial<...>) => void]; }} 
+ */
 export function createFastContext<Store>(initialState: Store) {
   function useStoreData(): {
     get: () => Store;

@@ -2,13 +2,25 @@ import { useCallback, useState } from 'react'
 import { localStorageWrapper } from './utils/storage'
 import { useLatest } from './utils/useLatest'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFunction = (...args: any[]) => any;
+type AnyFunction = (...args: unknown[]) => unknown;
 
 function isFunction(val: unknown): val is AnyFunction {
   return typeof val === "function";
 }
 
+/**
+ * Local Storage ops React hook
+ * 
+ * @source Abstraction for Local Storage usage
+ *
+ * @export
+ * @template T 
+ * @param {Object} arg 
+ * @param {string} arg.key Key
+ * @param {T|Function} arg.initialValue Initial value
+ * @param {boolean} arg.isReadOnly 
+ * @returns {*} 
+ */
 export function useLocalStorageState<T>({
   key, initialValue, isReadOnly,
 }: {

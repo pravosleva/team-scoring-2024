@@ -1,3 +1,14 @@
+/**
+ * Convert bytes to readable size
+ * 
+ * @source Size converter
+ *
+ * @export
+ * @param {Object} arg 
+ * @param {number} arg.bytes 
+ * @param {number} [arg.decimals=2] 
+ * @returns {string} 
+ */
 export function getHumanReadableSize({
   bytes,
   decimals = 2

@@ -1,0 +1,49 @@
+{
+  "plugin": [
+    "typedoc-theme-hierarchy",
+    "typedoc-plugin-inline-sources"
+  ],
+  "theme": "hierarchy",
+  "customCss": "./custom-styles.css",
+  "entryPointStrategy": "resolve",
+  "entryPoints": [
+    "../src/shared/utils",
+    "../src/shared/hooks"
+  ],
+  "hostedBaseUrl": "https://pravosleva.pro/dist.estimate-corrector-2024/typedoc/output",
+  "outputs": [
+    {
+      "name": "html",
+      "path": "./output",
+      "options": {
+        "navigation": {
+          "includeCategories": true,
+          "includeGroups": true,
+          "excludeReferences": false,
+          "includeFolders": true
+        }
+      }
+    }
+  ],
+  "githubPages": false,
+  "cleanOutputDir": true,
+  "navigationLinks": {
+    "Life Demo": "https://pravosleva.pro/estimate-corrector-2024",
+    "TypeDoc": "https://typedoc.org",
+  },
+  "highlightLanguages": [
+    "nginx",
+    "js",
+    "javascript",
+    "typescript",
+    "tsx",
+    "css",
+    "json",
+    "jsonc",
+    "python",
+    "yaml",
+    "markdown",
+    "bash",
+    "shell"
+  ],
+}

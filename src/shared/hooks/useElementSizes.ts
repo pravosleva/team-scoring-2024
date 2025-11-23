@@ -5,6 +5,15 @@ const breakpoints = {
   DESKTOP: 1024,
 }
 
+/**
+ * Recat hook for dynamic DOM element size usage
+ * 
+ * @source
+ *
+ * @param {({ ref: HTMLDivElement | null })} arg 
+ * @param {*} arg.ref 
+ * @returns {{ width: number; isDetected: boolean; targetElement: { isMobile: boolean; isDesktop: boolean; }; externalWindow: { isMobile: boolean|undefined; isDesktop: boolean; }; }} 
+ */
 export const useElementSizes = ({ ref }: { ref: HTMLDivElement | null }) => {
   const isMobile = useMediaQuery({
     query: `(max-width: ${breakpoints.DESKTOP - 1}px)`,

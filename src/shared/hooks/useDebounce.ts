@@ -1,8 +1,18 @@
 import { useEffect, useState } from 'react'
 
+/**
+ * React hook for debounce usage
+ * 
+ * @source
+ *
+ * @export
+ * @template T 
+ * @param {T} value Dinamically refreshed value
+ * @param {number} delay Debounce delay (ms)
+ * @returns {T} Debounced value
+ */
 export function useDebounce<T>(value: T, delay: number) {
   // State and setters for debounced value
-
   const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(

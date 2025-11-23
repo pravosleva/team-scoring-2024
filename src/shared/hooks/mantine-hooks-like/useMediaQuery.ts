@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
   useState, useEffect, useRef, useLayoutEffect
@@ -16,7 +14,7 @@ function attachMediaListener(query: MediaQueryList, callback: MediaQueryCallback
   try {
     query.addEventListener('change', callback);
     return () => query.removeEventListener('change', callback);
-  } catch (e: any) {
+  } catch (_e: unknown) {
     query.addListener(callback);
     return () => query.removeListener(callback);
   }
@@ -40,6 +38,22 @@ function getInitialValue({
   return false;
 }
 
+/**
+ * React hook for media query detection
+ * 
+ * @source Special tool
+ *
+ * @export
+ * @param {({
+ *   query: string;
+ *   initialValue?: boolean;
+ * } & UseMediaQueryOptions)} arg 
+ * @param {boolean} arg.initialValue 
+ * @param {string} arg.query 
+ * @param {boolean} [arg.getInitialValueInEffect=true] 
+ * @param {boolean} [arg.isUseLayoutEffect=false] 
+ * @returns {boolean | undefined} 
+ */
 export function useMediaQuery({
   initialValue,
   query,

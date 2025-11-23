@@ -32,7 +32,13 @@ export const AboutPage = () => {
               Bundle sizes analysis <a target='_blank' href={`${PUBLIC_URL}/stats.html`}>here</a>.
             </p>
             <p>
-              Documentation (some interested moments) <a target='_blank' href={`${PUBLIC_URL}/jsdoc/clean-jsdoc-theme/`}>here</a>.
+              JSDoc exp <a target='_blank' href={`${PUBLIC_URL}/jsdoc/clean-jsdoc-theme/`}>here</a>.
+            </p>
+            <p>
+              VitePress exp <a target='_blank' href={`${PUBLIC_URL}/vitepress/output/`}>here</a>.
+            </p>
+            <p>
+              Documentation (some interested moments) <a target='_blank' href={`${PUBLIC_URL}/typedoc/output/`}>here</a>.
             </p>
             {
               !!BUILD_DATE && (

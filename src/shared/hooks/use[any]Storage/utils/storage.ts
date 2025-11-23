@@ -1,3 +1,11 @@
+/**
+ * Storage ops
+ * 
+ * @source Abstraction for storage usage
+ *
+ * @class StorageWrapper
+ * @typedef {StorageWrapper}
+ */
 class StorageWrapper {
   private storage?: Storage;
 

@@ -7,6 +7,8 @@ type TProps = {
 
 /**
  * Текущий прогресс по времени
+ * 
+ * @source
  *
  * @param {Object} arg 
  * @param {number} arg.startDateTs Дата старта
