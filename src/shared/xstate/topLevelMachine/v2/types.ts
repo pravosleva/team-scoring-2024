@@ -46,7 +46,25 @@ export type TLogs = {
   items: TLogsItem[];
 };
 
+export type TPointsetItem = {
+  id: number;
+  title: string;
+  descr?: string;
+  isDone: boolean;
+  isDisabled: boolean;
+  statusCode: string;
+  ts: {
+    created: number;
+    updated: number;
+  };
+  relations: {
+    parent: number | null;
+    children: number[];
+  };
+};
+
 export type TJob = {
+  pointset?: TPointsetItem[];
   relations: {
     parent: number | null;
     children: number[];

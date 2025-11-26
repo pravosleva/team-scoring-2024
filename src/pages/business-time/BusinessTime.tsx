@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { Layout } from '~/shared/components/Layout'
 import baseClasses from '~/App.module.scss'
-import Grid from '@mui/material/Grid2'
-import { Alert, Box, Button, Tabs, Tab } from '@mui/material'
+import { Alert, Box, Button, Tabs, Tab, Grid2 as Grid } from '@mui/material'
 import { TabContext, TabPanel } from '@mui/lab'
 import { DialogAsButton } from '~/shared/components/Dialog/DialogAsButton'
 import AddIcon from '@mui/icons-material/Add'
@@ -12,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ClearIcon from '@mui/icons-material/Clear'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
-import { JsonEditor } from './components'
+import { JsonEditor } from '~/shared/components/JsonEditor'
 import { TBusinessTimeData, TWeekConfig, EDay } from './utils/types'
 import { theDayValidationObject } from './utils/theDayValidationObject'
 // import { getTruncated } from '~/shared/utils/string-ops'
@@ -79,7 +78,7 @@ export const BusinessTime = () => {
   }) => {
     saveBusinessTimeConfig({
       ...businessTimeConfig,
-      [name]: getDefaultBusinessTimeConfig({ isReadOnly: false }),
+      [name]: getDefaultBusinessTimeConfig({ isReadOnly: name === defaultBusinessTimeConfigItemName }),
     })
     setActiveTab(name)
   }, [saveBusinessTimeConfig, businessTimeConfig])
@@ -87,10 +86,8 @@ export const BusinessTime = () => {
   const handleRemoveTimeConfig = useCallback(({ name }: {
     name: string;
   }) => () => {
-    const isConfirmed = window.confirm('Sure?')
+    const isConfirmed = window.confirm(`Business time config will be removed for "${name}". Yes?`)
     if (!isConfirmed) return
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [name]: _toRemove, ...rest } = businessTimeConfig
     saveBusinessTimeConfig(rest)
     setActiveTab(defaultBusinessTimeConfigItemName)

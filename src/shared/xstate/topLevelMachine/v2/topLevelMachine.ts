@@ -1,5 +1,5 @@
 import { assign, setup } from 'xstate'
-import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink, TLogChecklistItem } from './types'
+import { EJobsStatusFilter, TJob, TLogsItem, TUser, TLogProgress, TLogLink, TLogChecklistItem, TPointsetItem } from './types'
 import { getCurrentPercentage } from '~/shared/utils'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
@@ -54,6 +54,9 @@ export const topLevelMachine = setup({
     | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
     | { type: 'todo.pin'; value: { jobId: number; } }
     | { type: 'todo.unpin'; value: { jobId: number; } }
+    | { type: 'todo.pointset:create-item'; value: { jobId: number; title: string; descr?: string; initialStatusCode: string; relations?: { parent?: number; } } }
+    | { type: 'todo.pointset:update-item'; value: { jobId: number; pointId: number; title: string; descr?: string; statusCode: string; relations?: { parent?: number; } } }
+    | { type: 'todo.pointset:delete-item'; value: { jobId: number; pointId: number; } }
   }
 }).createMachine({
   id: 'topLevel',
@@ -1452,6 +1455,348 @@ export const topLevelMachine = setup({
           return {
             ...context.users,
             items: context.users.items.filter(({ id }) => id !== event.value.id)
+          }
+        }
+      })
+    },
+    'todo.pointset:create-item': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          return {
+            ...context.jobs,
+            // items: context.users.items.filter(({ id }) => id !== event.value.id)
+            items: context.jobs.items.map((todo) => {
+              const isTargetJob = event.value.jobId === todo.id
+              switch (isTargetJob) {
+                case true: {
+                  // NOTE mutate todo!
+                  const createTime = new Date().getTime()
+                  const newPoint: TPointsetItem = {
+                    id: createTime,
+                    isDisabled: false,
+                    isDone: false,
+                    title: event.value.title,
+                    descr: event.value.descr,
+                    statusCode: event.value.initialStatusCode,
+                    ts: {
+                      created: createTime,
+                      updated: createTime,
+                    },
+                    relations: {
+                      children: [],
+                      parent: event.value.relations?.parent || null,
+                    },
+                  }
+                  const isPointsetExists = !!todo.pointset && Array.isArray(todo.pointset)
+                  switch (true) {
+                    case isPointsetExists: {
+                      // NOTE: Modify target pointset
+                      const pointsLimit = 100
+                      if ((todo.pointset as TPointsetItem[]).length >= pointsLimit) {
+                        (todo.pointset as TPointsetItem[]).shift()
+                      }
+                      (todo.pointset as TPointsetItem[]).push(newPoint)
+                      break
+                    }
+                    default: {
+                      // NOTE: Create first pointset
+                      todo.pointset = [newPoint]
+                      break
+                    }
+                  }
+                  if (!!event.value.relations?.parent) {
+                    // NOTE: Add child to new parent
+                    const newParentId = event.value.relations?.parent
+                    const targetNewParentIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === newParentId)
+                    if (targetNewParentIndex !== -1) {
+                      const targetNewParent = { ...(todo.pointset as TPointsetItem[])[targetNewParentIndex] }
+                      targetNewParent.relations.children = [...new Set([...(targetNewParent.relations.children || []), createTime])]
+                    }
+                  }
+                  return todo
+                }
+                default:
+                  return todo
+              }
+            })
+          }
+        }
+      })
+    },
+    // -- TODO: DEL!
+    // NOTE: Check all items -> remove child if nes
+    // NOTE: Check all items -> remove parent if nes
+    'todo.pointset:delete-item': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          return {
+            ...context.jobs,
+            items: context.jobs.items.map((todo) => {
+              const isTargetJob = event.value.jobId === todo.id
+              switch (isTargetJob) {
+                case true: {
+                  const updateTime = new Date().getTime()
+                  const isPointsetExists = !!todo.pointset && Array.isArray(todo.pointset)
+
+                  switch (true) {
+                    case isPointsetExists: {
+                      const targetPointIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === event.value.pointId)
+                      if (targetPointIndex !== -1) {
+                        const pointForDelete: TPointsetItem = { ...(todo.pointset as TPointsetItem[])[targetPointIndex] }
+                        const oldParentId = pointForDelete.relations.parent
+                        const targetOldParentIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === oldParentId)
+
+                        if (!!oldParentId && targetOldParentIndex !== -1) {
+                          const targetOldParent = { ...(todo.pointset as TPointsetItem[])[targetOldParentIndex] }
+                          targetOldParent.relations.children = targetOldParent.relations.children.filter((c) => c !== event.value.pointId)
+                          targetOldParent.ts.updated = updateTime
+                            ; (todo.pointset as TPointsetItem[])[targetOldParentIndex] = targetOldParent
+                        }
+                        if ((pointForDelete.relations.children.length > 0)) {
+                          for (const childId of pointForDelete.relations.children) {
+                            const targetChildPointIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === childId)
+                            if (targetChildPointIndex !== -1) {
+                              (todo.pointset as TPointsetItem[])[targetChildPointIndex].relations.parent = null
+                                ; (todo.pointset as TPointsetItem[])[targetChildPointIndex].ts.updated = updateTime
+                            }
+                          }
+                        }
+
+                        todo.pointset = todo.pointset?.filter((p) => p.id !== event.value.pointId)
+                      }
+                      break
+                    }
+                    default:
+                      break
+                  }
+                  break
+                }
+                default:
+                  break
+              }
+
+              return todo
+            }),
+          }
+        },
+      }),
+    },
+    // --
+    'todo.pointset:update-item': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          return {
+            ...context.jobs,
+            // items: context.users.items.filter(({ id }) => id !== event.value.id)
+            items: context.jobs.items.map((todo) => {
+              const isTargetJob = event.value.jobId === todo.id
+              switch (isTargetJob) {
+                case true: {
+                  // NOTE mutate todo!
+                  const updateTime = new Date().getTime()
+                  // const newPoint: TPointsetItem = {
+                  //   id: updateTime,
+                  //   isDisabled: false,
+                  //   isDone: false,
+                  //   title: event.value.title,
+                  //   descr: event.value.descr,
+                  //   statusCode: event.value.statusCode,
+                  //   ts: {
+                  //     created: updateTime,
+                  //     updated: updateTime,
+                  //   },
+                  //   relations: {
+                  //     children: event.value.relations?.children || [],
+                  //     parent: event.value.relations?.parent || null,
+                  //   },
+                  // }
+                  const isPointsetExists = !!todo.pointset && Array.isArray(todo.pointset)
+                  switch (true) {
+                    case isPointsetExists: {
+                      // NOTE: Modify target pointset
+                      const targetPointIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === event.value.pointId)
+                      if (targetPointIndex !== -1) {
+                        const modifiedPoint: TPointsetItem = { ...(todo.pointset as TPointsetItem[])[targetPointIndex] }
+                        const oldParentId = modifiedPoint.relations.parent
+                        const targetOldParentIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === oldParentId)
+
+                        const newParentId = event.value.relations?.parent
+                        const targetNewParentIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === newParentId)
+
+                        if (modifiedPoint.title !== event.value.title)
+                          modifiedPoint.title = event.value.title
+                        if (modifiedPoint.descr !== event.value.descr)
+                          modifiedPoint.descr = event.value.descr
+                        if (!!event.value.relations) {
+                          // NOTE: New relations received
+                          switch (true) {
+                            case !event.value.relations.parent: {
+                              console.log('1 - NO NEW PARENT')
+                              // NOTE: NO NEW PARENT
+                              if (!!oldParentId) {
+                                console.log('1.1 - Remove child (if its cur) from previus parent')
+                                // NOTE: Remove child (if its cur) from previus parent
+                                if (targetOldParentIndex !== -1) {
+                                  console.log('1.1.1 - 🟢 found: targetOldParentIndex & targetOldParent children filtered (!== event.value.pointId)')
+                                  const targetOldParent = { ...(todo.pointset as TPointsetItem[])[targetOldParentIndex] }
+                                  targetOldParent.relations.children = targetOldParent.relations.children.filter((c) => c !== event.value.pointId)
+                                  targetOldParent.ts.updated = updateTime
+                                    ; (todo.pointset as TPointsetItem[])[targetOldParentIndex] = targetOldParent
+                                }
+                              }
+                              console.log('1.2 - Remove parent')
+                              // NOTE: Remove parent
+                              modifiedPoint.relations.parent = null
+                              modifiedPoint.ts.updated = updateTime
+                              break
+                            }
+                            default: {
+                              console.log('2 - NEW PARENT SHOULD BE SET')
+                              // NOTE: NEW PARENT SHOULD BE SET
+                              // NOTE: 1. Check old parent -> IF WAS: Remove child if new another parent
+                              if (!!oldParentId) {
+                                console.log('2.1 - HAS OLD PARENT')
+                                // NOTE: HAS OLD PARENT
+                                if (oldParentId !== event.value.relations.parent) {
+                                  console.log('2.1.1 - Parent updated')
+                                  // NOTE: Parent updated
+                                  if (targetOldParentIndex !== -1) {
+                                    console.log('2.1.1.1 - 🟢 Remove child (current elm) from old parent & targetOldParent children filtered (!== event.value.pointId)')
+                                    // NOTE: Remove child (current elm) from old parent
+                                    const targetOldParent = { ...(todo.pointset as TPointsetItem[])[targetOldParentIndex] }
+                                    targetOldParent.relations.children = targetOldParent.relations.children.filter((c) => c !== event.value.pointId)
+                                    targetOldParent.ts.updated = updateTime
+                                      ; (todo.pointset as TPointsetItem[])[targetOldParentIndex] = targetOldParent
+                                  } else {
+                                    console.log('2.1.1.2 - Parent not found?')
+                                    // NOTE: Parent not found?
+                                  }
+                                } else {
+                                  console.log('2.1.2 - Parent not modified')
+                                  // NOTE: Parent not modified
+                                }
+                              }
+
+                              if (!oldParentId) {
+                                console.log('2.2 - HASNT OLD PARENT')
+                                // NOTE: HASNT OLD PARENT
+                                if (!!newParentId) {
+                                  console.log('2.2.1 - YES: newParentId')
+                                  if (targetNewParentIndex !== -1) {
+                                    console.log('2.2.1.1 - 🟢 found: targetNewParentIndex & targetNewParent children modified: curr added')
+                                    const targetNewParent = (todo.pointset as TPointsetItem[])[targetNewParentIndex]
+                                    targetNewParent.relations.children = [...new Set([...targetNewParent.relations.children || [], event.value.pointId])]
+
+                                    if (
+                                      targetNewParent.relations.parent === event.value.pointId
+                                    ) {
+                                      targetNewParent.relations.parent = null
+                                    }
+
+                                    targetNewParent.ts.updated = updateTime
+
+                                      ; (todo.pointset as TPointsetItem[])[targetNewParentIndex] = targetNewParent
+                                  } else {
+                                    console.log('2.2.1.2 - not found: targetNewParentIndex')
+                                  }
+                                } else {
+                                  console.log('2.2.2 - NO: newParentId')
+                                }
+                              }
+
+                              // NOTE: BUG! Remove child (from crrent elm) if its new parent
+                              if (!!newParentId && targetOldParentIndex !== -1) {
+                                console.log('3. - Remove child (from crrent elm) if its new parent')
+                                const targetOldParent = (todo.pointset as TPointsetItem[])[targetOldParentIndex]
+                                if (!!targetOldParent && modifiedPoint.relations.children.includes(newParentId)) {
+                                  console.log('3.1 - 🟢 found targetOldParent + has in children of current elm & curr children modified (!==newParentId)')
+                                  modifiedPoint.relations.children = modifiedPoint.relations.children.filter((c) => c !== newParentId)
+                                } else {
+                                  console.log('3.2 - 🟡 children of current elm will not modified')
+                                }
+                              } else {
+                                console.log('3.3 - 🟡 !(newParentId and found targetOldParentIndex) & children of current elm will not modified')
+                              }
+
+                              // const targetNewParent = (todo.pointset as TPointsetItem[])[targetNewParentIndex]
+                              // if (!!targetNewParent && targetNewParent.relations.children.includes(newParentId)) {
+                              //   targetNewParent.relations.children = targetNewParent.relations.children.filter((c) => c !== newParentId)
+                              //   targetNewParent.ts.updated = updateTime
+                              //     ; (todo.pointset as TPointsetItem[])[targetNewParentIndex] = targetNewParent
+                              // }
+
+                              // NOTE: Remove parent (if its current) from old parent
+                              console.log('4. - Remove parent (if its current) from old parent')
+                              if (!!newParentId && targetOldParentIndex !== -1) {
+                                console.log('4.1 - !!newParentId and found targetOldParentIndex')
+                                const targetOldParent = (todo.pointset as TPointsetItem[])[targetOldParentIndex]
+                                if (!!targetOldParent && targetOldParent.relations.parent === newParentId) {
+                                  console.log('4.1.1 - 🟢 targetOldParent + targetOldParent.relations.parent === newParentId & targetOldParent -> null')
+                                  targetOldParent.relations.parent = null
+                                  targetOldParent.ts.updated = updateTime
+                                    ; (todo.pointset as TPointsetItem[])[targetOldParentIndex] = targetOldParent
+                                } else {
+                                  console.log('4.1.2 - 🟡 !(targetOldParent + targetOldParent.relations.parent === newParentId) & targetOldParent.relations.parent not updated')
+                                }
+                              } else {
+                                console.log('4.2 - 🟡 !(newParentId and found targetOldParentIndex) & targetOldParent.relations.parent not updated')
+                              }
+
+                              // NOTE: BUG! Remove old child (from current elm) if its new parent
+                              console.log('5. - Remove old child (from current elm) if its new parent')
+                              if (!!newParentId && modifiedPoint.relations.children.includes(newParentId)) {
+                                console.log(`5.1 - !!newParentId & curr children has newParentId & current children filtered (!== newParentId=${newParentId})`)
+                                modifiedPoint.relations.children = modifiedPoint.relations.children.filter((c) => c !== newParentId)
+                              } else {
+                                console.log('5.2 - 🟡 current children not modified')
+                              }
+
+                              // NOTE: BUG! Remove old child (from old parent) if its new child?
+                              // console.log('6.')
+
+                              // NOTE: Set parent to child
+                              console.log(`6. - 🟢 current parent modified -> ${newParentId || null}`)
+                              modifiedPoint.relations.parent = newParentId || null
+                              modifiedPoint.ts.updated = updateTime
+
+                              // NOTE: Set child to new parent if necessary
+                              console.log('7. - Set child to new parent if necessary')
+                              if (!!newParentId && newParentId !== oldParentId) {
+                                console.log('7.1 - !!newParentId && newParentId !== oldParentId')
+                                // NOTE: Set child to new parent
+                                if (targetNewParentIndex !== -1) {
+                                  console.log(`7.1.1 - 🟢 found targetNewParentIndex -> targetNewParent children modified (added event.value.pointId=${event.value.pointId})`)
+                                  const targetNewParent = (todo.pointset as TPointsetItem[])[targetNewParentIndex]
+                                  targetNewParent.relations.children = [...new Set([...targetNewParent.relations.children || [], event.value.pointId])]
+                                  targetNewParent.ts.updated = updateTime
+
+                                    ; (todo.pointset as TPointsetItem[])[targetNewParentIndex] = targetNewParent
+                                } else {
+                                  console.log('7.1.2 - 🟡 targetNewParent children not modified')
+                                }
+                              } else {
+                                console.log('7.2 - 🟡 targetNewParent children not modified')
+                              }
+                              break
+                            }
+                          }
+                        }
+                        (todo.pointset as TPointsetItem[])[targetPointIndex] = modifiedPoint
+                      }
+                      break
+                    }
+                    default: {
+                      // NOTE: Err?
+                      console.log('- Не попали в блок isPointsetExists')
+                      break
+                    }
+                  }
+                  return todo
+                }
+                default:
+                  return todo
+              }
+            })
           }
         }
       })

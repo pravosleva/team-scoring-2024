@@ -27,7 +27,7 @@ export const getValidateResult = ({ rules, event }: {
     else if (rules[key].isRequired) {
       const validateResult = rules[key].validate<typeof event>({ value: event?.[key], event, key })
       if (!validateResult.ok) {
-        msgs.push(`Некорректное значение поля "${key}" <- ${validateResult?.message || 'No message'}`)
+        msgs.push(`Некорректное значение "${key}" <- ${validateResult?.message || 'No message'}`)
       }
     }
     else if (!rules[key].isRequired && typeof event?.[key] !== 'undefined') {
@@ -37,7 +37,7 @@ export const getValidateResult = ({ rules, event }: {
         event,
       })
       if (!validateResult.ok) {
-        msgs.push(`Некорректное значение поля "${key}" <- ${validateResult?.message || 'No message'}`)
+        msgs.push(`Некорректное значение "${key}" <- ${validateResult?.message || 'No message'}`)
       }
     }
     else {
@@ -47,7 +47,7 @@ export const getValidateResult = ({ rules, event }: {
 
   if (msgs.length > 0) {
     result.ok = false
-    result.message = `Неожиданный результат <- ${msgs.join(' // ')}`
+    result.message = `Что-то не сходится <- ${msgs.join(' // ')}`
   }
 
   return result

@@ -10,6 +10,7 @@ export type TOption = {
   _id?: number;
 }
 type TProps = {
+  size?: 'small';
   label: string;
   list: TOption[];
   onSelect: (item: TOption | null) => void;
@@ -17,11 +18,13 @@ type TProps = {
   isErrored?: boolean;
   helperText?: string;
   isCreatable?: boolean;
+  disableClearable?: boolean;
 }
 
 const filter = createFilterOptions<TOption>()
 
 export const Autocomplete = memo(({
+  size,
   label,
   list,
   onSelect,
@@ -29,6 +32,7 @@ export const Autocomplete = memo(({
   isErrored,
   helperText,
   isCreatable,
+  disableClearable,
 }: TProps) => {
   const [selectedOption, setSelectedOption] = useState<TOption | null>(defaultValue || null)
 
@@ -38,6 +42,8 @@ export const Autocomplete = memo(({
 
   return (
     <MuiAutocomplete
+      size={size}
+      disableClearable={disableClearable}
       value={selectedOption?.label}
       onChange={(_event, newValue) => {
         switch (true) {
@@ -47,7 +53,7 @@ export const Autocomplete = memo(({
               label: newValue,
             })
             break
-          case typeof newValue !=='string' && !!newValue?.inputValue: {
+          case typeof newValue !== 'string' && !!newValue?.inputValue: {
             // Create a new value from the user input
             const option: TOption = {
               label: newValue.inputValue,
@@ -89,10 +95,10 @@ export const Autocomplete = memo(({
       getOptionLabel={(option) => {
         // Value selected with enter, right from the input
         if (typeof option === 'string') return option
-        
+
         // Add "xxx" option created dynamically
         if (option.inputValue) return option.inputValue
-        
+
         // Regular option
         return option.label;
       }}

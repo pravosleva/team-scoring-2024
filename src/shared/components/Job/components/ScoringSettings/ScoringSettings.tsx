@@ -492,7 +492,11 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
 
   return (
     <Box
-      sx={{ display: 'flex', gap: 0, flexDirection: 'column' }}
+      sx={{
+        display: 'flex',
+        gap: 0,
+        flexDirection: 'column',
+      }}
       className={baseClasses.fadeIn}
     >
       <div
@@ -505,7 +509,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
         )}
       >
         <div className={clsx(classes.toggler, classes.red)} onClick={onDeleteJob}>
-          <DeleteIcon />
+          <DeleteIcon htmlColor='#FFF' />
         </div>
 
         {
@@ -710,7 +714,16 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                 <DatesStepper />
               </Grid> */}
                 <Grid size={12}>
-                  <pre className={baseClasses.preNormalized}>{JSON.stringify(job.relations, null, 2)}</pre>
+                  <pre
+                    className={baseClasses.preNormalized}
+                  >
+                    {
+                      JSON.stringify({
+                        relations: job.relations,
+                        pointset: job.pointset
+                      }, null, 2)
+                    }
+                  </pre>
                 </Grid>
               </Grid>
             </Box>

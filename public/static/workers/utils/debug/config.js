@@ -20,13 +20,13 @@
 var debugConfig = {
   workerEvs: {
     fromClient: {
-      isEnabled: true,
+      isEnabled: false,
     },
     fromServer: {
-      isEnabled: true,
+      isEnabled: false,
     },
     mwsInternalLogs: {
-      isEnabled: true,
+      isEnabled: false,
     },
   },
   api: {
@@ -38,6 +38,6 @@ var debugConfig = {
     isEnabled: false,
   },
   swState: {
-    isEnabled: true,
+    isEnabled: false,
   },
 }

@@ -1,0 +1,123 @@
+.externalWrapper {
+  padding: 24px 8px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 52px;
+  position: relative;
+  font-weight: bold;
+  font-size: small;
+
+  &.default {
+    border: 2px solid #959eaa;
+  }
+
+  &.success {
+    // border: 2px solid #7fd1ae;
+    border: 2px solid #02c39a;
+  }
+}
+
+.absoluteBadgeTopRight {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  // background-color: rgb(203, 213, 225);
+  background-color: #959eaa;
+  color: #fff;
+  // ...
+  padding: 0px 16px 2px 16px;
+  font-size: 12px;
+  line-height: 1.5em;
+  font-weight: bold;
+}
+
+.rounded {
+  border-radius: 16px;
+
+  &>.absoluteBadgeTopRight {
+    border-radius: 0 10px 0 16px;
+  }
+
+  &>.absoluteBadgeBottomLeft,
+  &>.absoluteBadgeBottomLeftSuccess {
+    border-radius: 0 16px 0 10px;
+  }
+}
+
+.btn {
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.btnRed {
+  background-color: red;
+  color: #fff;
+
+  &:hover {
+    background-color: red;
+  }
+}
+
+.btnRedLight {
+  background-color: #fff;
+  color: red;
+
+  &:hover {
+    background-color: #f3faff;
+  }
+}
+
+.btnGreen {
+  background-color: #02c39a;
+  color: #fff;
+
+  &:hover {
+    background-color: #02c39a;
+  }
+}
+
+.btnBlue {
+  background-color: #1565c0;
+  color: #fff;
+
+  &:hover {
+    background-color: #1565c0;
+  }
+}
+
+.btnGray {
+  background-color: #959eaa;
+  color: #fff;
+
+  &:hover {
+    background-color: #959eaa;
+  }
+}
+
+.controlsBox {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  align-items: center;
+
+  // & button {
+  //   border: none;
+  //   cursor: pointer;
+  //   font-size: 12px;
+  //   font-weight: bold;
+  //   padding: 8px 16px;
+  //   border-radius: 8px;
+  // }
+
+  & button:first-child:not(:last-child) {
+    border-radius: 8px 0px 0px 8px;
+  }
+
+  & button:last-child:not(:first-child) {
+    border-radius: 0px 8px 8px 0px;
+  }
+}

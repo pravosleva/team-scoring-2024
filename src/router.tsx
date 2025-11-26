@@ -2,6 +2,7 @@ import { createHashRouter } from 'react-router-dom'
 import {
   AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
   JobPage, JobsPage, LogPage, LastActivityPage, LastJobActivityPage,
+  LocalSettings,
   OnlineExpPage, SoundCheckPage,
   TotalReport,
   WorkerExpPage,
@@ -86,6 +87,10 @@ export const router = createHashRouter(
     {
       path: '/report/exp/:job_id',
       element: <TotalReport />,
+    },
+    {
+      path: '/local-settings',
+      element: <LocalSettings />
     },
   ]
 )

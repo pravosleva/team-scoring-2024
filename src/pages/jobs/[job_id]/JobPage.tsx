@@ -7,6 +7,7 @@ import {
   CollapsibleBox,
   DistributionFunctionGraph,
   ResponsiveBlock,
+  SimpleJobPointsetChecker,
   SpeedsFunctionGraph,
 } from '~/shared/components'
 import { getWorstCalc } from '~/shared/utils/team-scoring'
@@ -190,7 +191,7 @@ export const JobPage = memo(() => {
         </div>
       </Grid>
 
-      {/* <Grid size={12}>
+      <Grid size={12}>
         <Box
           sx={{
             display: 'flex',
@@ -201,7 +202,15 @@ export const JobPage = memo(() => {
           <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.job_id}`}</div>
           {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
         </Box>
-      </Grid> */}
+      </Grid>
+
+      {
+        !!targetJob && (
+          <Grid size={12}>
+            <SimpleJobPointsetChecker jobId={targetJob.id} isEditable={true} isCreatable={true} />
+          </Grid>
+        )
+      }
 
       {
         !!targetJob && (

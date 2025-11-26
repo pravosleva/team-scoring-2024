@@ -27,6 +27,7 @@ import { useSnapshot } from 'valtio/react'
 import { vi } from '~/shared/utils/vi'
 import LensBlurIcon from '@mui/icons-material/LensBlur'
 import LensIcon from '@mui/icons-material/Lens'
+import SettingsIcon from '@mui/icons-material/Settings'
 
 type TProps = {
   children: React.ReactNode;
@@ -54,6 +55,11 @@ const allActions: TSpeedDialMenuItem[] = [
     to: '/employees',
     _Icon: <PeopleIcon color='primary' />,
     name: 'Employees',
+  },
+  {
+    to: '/local-settings',
+    _Icon: <SettingsIcon color='primary' />,
+    name: 'Local settings',
   },
   {
     to: '/last-activity',

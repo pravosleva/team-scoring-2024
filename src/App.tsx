@@ -7,7 +7,7 @@ import { useMetrix } from '~/shared/hooks/useMetrix'
 
 export const App = () => {
   // NOTE: ⛔ Dont touch!
-  useMetrix({ isDebugEnabled: true })
+  useMetrix({ isDebugEnabled: false })
 
   return (
     <>

@@ -105,7 +105,8 @@ function _JsonEditor<T>({ initialState, isReadOnly, validationRules, onValidate 
               padding: '8px',
               borderRadius: '8px 0px 0px 8px',
               boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
-            }],
+            }
+          ],
           inputHighlight: '#b3d8ff',
           error: { fontSize: '0.8em', color: 'red', fontWeight: 'bold' },
           iconCollection: 'rgb(0, 43, 54)',
