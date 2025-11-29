@@ -73,6 +73,7 @@ export const LocalSettings = memo(() => {
         break
       default: {
         const normalized: { [key: string]: TLocalSettingsStatusOption } = {}
+        console.log(value)
         for (const statusName in value) {
           const normalizedStatusName = slugify(statusName)
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -146,7 +147,7 @@ export const LocalSettings = memo(() => {
       saveLocalSettings({
         ...localSettings,
         [activeTab]: {
-          ...localSettings[activeTab],
+          // ...localSettings[activeTab],
           ...(notCommitedDiagramListRef.current[activeTab] || {}),
         },
       })

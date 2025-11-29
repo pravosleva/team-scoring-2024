@@ -677,8 +677,17 @@ export const topLevelMachine = setup({
                   break
                 }
                 case (todo.id === jobToUpdate.id): {
+
                   // NOTE: TARGET JOB
                   console.log('- /TARGET JOB')
+
+                  console.log('- before jobToUpdate.pointset')
+                  console.log(jobToUpdate.pointset)
+                  if (!!todo.pointset) {
+                    jobToUpdate.pointset = [...todo.pointset]
+                  }
+                  console.log('- after jobToUpdate.pointset')
+                  console.log(jobToUpdate.pointset)
 
                   soundManager.playDelayedSoundConfigurable({
                     soundCode: 'mech-81-step-hydraulic-robot',
@@ -1493,9 +1502,9 @@ export const topLevelMachine = setup({
                       // NOTE: Modify target pointset
                       const pointsLimit = 100
                       if ((todo.pointset as TPointsetItem[]).length >= pointsLimit) {
-                        (todo.pointset as TPointsetItem[]).shift()
+                        (todo.pointset as TPointsetItem[]).pop()
                       }
-                      (todo.pointset as TPointsetItem[]).push(newPoint)
+                      (todo.pointset as TPointsetItem[]).unshift(newPoint)
                       break
                     }
                     default: {
@@ -1513,6 +1522,7 @@ export const topLevelMachine = setup({
                       targetNewParent.relations.children = [...new Set([...(targetNewParent.relations.children || []), createTime])]
                     }
                   }
+                  todo.ts.update = createTime
                   return todo
                 }
                 default:
@@ -1614,8 +1624,10 @@ export const topLevelMachine = setup({
                   switch (true) {
                     case isPointsetExists: {
                       // NOTE: Modify target pointset
+                      console.log('0 - Modify target pointset')
                       const targetPointIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === event.value.pointId)
                       if (targetPointIndex !== -1) {
+                        console.log('0.1 - targetPointIndex !== -1')
                         const modifiedPoint: TPointsetItem = { ...(todo.pointset as TPointsetItem[])[targetPointIndex] }
                         const oldParentId = modifiedPoint.relations.parent
                         const targetOldParentIndex = (todo.pointset as TPointsetItem[]).findIndex((p) => p.id === oldParentId)
@@ -1627,6 +1639,13 @@ export const topLevelMachine = setup({
                           modifiedPoint.title = event.value.title
                         if (modifiedPoint.descr !== event.value.descr)
                           modifiedPoint.descr = event.value.descr
+                        if (modifiedPoint.statusCode !== event.value.statusCode) {
+                          console.log('0.1.1 - modifiedPoint.statusCode !== event.value.statusCode')
+                          modifiedPoint.statusCode = event.value.statusCode
+                        } else {
+                          console.log('0.1.2 - modifiedPoint.statusCode === event.value.statusCode')
+                          console.log(modifiedPoint.statusCode, event.value.statusCode)
+                        }
                         if (!!event.value.relations) {
                           // NOTE: New relations received
                           switch (true) {
@@ -1780,6 +1799,8 @@ export const topLevelMachine = setup({
                               break
                             }
                           }
+                        } else {
+                          console.log('0.2 - targetPointIndex === -1')
                         }
                         (todo.pointset as TPointsetItem[])[targetPointIndex] = modifiedPoint
                       }
@@ -1791,6 +1812,7 @@ export const topLevelMachine = setup({
                       break
                     }
                   }
+                  todo.ts.update = updateTime
                   return todo
                 }
                 default:

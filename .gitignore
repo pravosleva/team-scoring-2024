@@ -35,6 +35,7 @@ _git-training.*
 jsdoc
 public/jsdoc/*
 tools.vitepress/output/*
+tools.vitepress/.vitepress/cache/*
 public/vitepress/*
 public/typedoc/*
 tools.typedoc/output/*

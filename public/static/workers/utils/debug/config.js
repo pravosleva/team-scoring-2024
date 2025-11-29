@@ -26,7 +26,7 @@ var debugConfig = {
       isEnabled: false,
     },
     mwsInternalLogs: {
-      isEnabled: false,
+      isEnabled: true,
     },
   },
   api: {

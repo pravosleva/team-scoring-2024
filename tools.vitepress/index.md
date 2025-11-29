@@ -4,22 +4,22 @@ layout: home
 
 hero:
   name: "Estimate Corrector 2024"
-  text: "WIP"
-  tagline: My great project tagline
+  text: "What's the price of your prediction, dude?"
+  tagline: Probability Theory in action
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Инструкция на русском
+      link: /ru/doc
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Documentation (EN)
+      link: /en/doc
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Task tracking and release estimation for more predictable future (individually for each employee)
+    details: Probability Theory in action
+  - title: Checklist for each log in task
+    details: Do you remember what happened a week ago? Yes, I do
+  - title: Progress bars for three scenarios
+    details: Estimated, Sensed, Worst
 ---
 

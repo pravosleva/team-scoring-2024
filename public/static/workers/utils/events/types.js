@@ -69,6 +69,15 @@ const NES = {
           PROJECTS_TREE_CALC_ERR: 'w-c:projects-tree-calc:err',
         },
       },
+      PointsetTreeCalc: {
+        EClientToWorkerEvent: {
+          GET_POINTSET_TREE_CALC: 'c-w:pointset-tree-calc:get',
+        },
+        EWorkerToClientEvent: {
+          POINTSET_TREE_CALC_OK: 'w-c:pointset-tree-calc:ok',
+          POINTSET_TREE_CALC_ERR: 'w-c:pointset-tree-calc:err',
+        },
+      },
       Experimental: {
         EClientToWorkerEvent: {
           PING: 'c-w:experimental:ping',

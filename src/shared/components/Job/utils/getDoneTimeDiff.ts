@@ -63,6 +63,13 @@ export type TResult = {
   };
 }
 
+/**
+ * Функция для расчета затраченного времени
+ *
+ * @param {Object} arg 
+ * @param {TJob} arg.job Стандартный для данного приложения формат элемента списка задач
+ * @returns {*} Полный анализ
+ */
 export const getDoneTimeDiff = ({ job }: {
   job: TJob;
 }): TResult => {

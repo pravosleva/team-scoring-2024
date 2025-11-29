@@ -160,7 +160,7 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
 
   useProjectsTreeCalcWorker({
     isEnabled: true,
-    isDebugEnabled: true,
+    isDebugEnabled: false,
     cb: {
       onEachSuccessItemData: (data) => {
         if (isDebugEnabled)

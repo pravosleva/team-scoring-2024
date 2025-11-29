@@ -1,6 +1,9 @@
 import { Layout } from '~/shared/components/Layout'
 import Grid from '@mui/material/Grid2'
 import baseClasses from '~/App.module.scss'
+import { Button } from '@mui/material'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+// import { Link } from 'react-router-dom'
 
 const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL || ''
 const BUILD_DATE = import.meta.env.VITE_BUILD_DATE || ''
@@ -35,10 +38,20 @@ export const AboutPage = () => {
               JSDoc exp <a target='_blank' href={`${PUBLIC_URL}/jsdoc/clean-jsdoc-theme/`}>here</a>.
             </p>
             <p>
-              VitePress exp <a target='_blank' href={`${PUBLIC_URL}/vitepress/output/`}>here</a>.
+              <a href={`${PUBLIC_URL}/vitepress/output/`} target='_blank'>
+                <Button
+                  sx={{ borderRadius: 4 }}
+                  size='small'
+                  variant='contained'
+                  fullWidth
+                  endIcon={<ArrowForwardIcon />}
+                >
+                  How to use
+                </Button>
+              </a>
             </p>
             <p>
-              Documentation (some interested moments) <a target='_blank' href={`${PUBLIC_URL}/typedoc/output/`}>here</a>.
+              Documentation (some interested moments in code) <a target='_blank' href={`${PUBLIC_URL}/typedoc/output/`}>here</a>.
             </p>
             {
               !!BUILD_DATE && (

@@ -7,6 +7,7 @@ export namespace NWService {
 
     GET_WORST_CALC = 'c-w:taro-worst-calc:sorted-speeds:get',
     GET_PROJECTS_TREE_CALC = 'c-w:projects-tree-calc:get',
+    GET_POINTSET_TREE_CALC = 'c-w:pointset-tree-calc:get',
 
     EXPERIMENTAL_PING = 'c-w:experimental:ping',
 
@@ -28,6 +29,9 @@ export namespace NWService {
 
     PROJECTS_TREE_CALC_OK = 'w-c:projects-tree-calc:ok',
     PROJECTS_TREE_CALC_ERR = 'w-c:projects-tree-calc:err',
+
+    POINTSET_TREE_CALC_OK = 'w-c:pointset-tree-calc:ok',
+    POINTSET_TREE_CALC_ERR = 'w-c:pointset-tree-calc:err',
 
     EXPERIMENTAL_PONG_OK = 'w-c:experimental:pong:ok',
     EXPERIMENTAL_PONG_ERR = 'w-c:experimental:pong:err',
