@@ -18,8 +18,10 @@ import { groupLog } from '~/shared/utils'
 import { TreeNode } from 'ts-tree-lib'
 // import DirectionsIcon from '@mui/icons-material/Directions'
 import StarIcon from '@mui/icons-material/Star'
+import { useElementInView } from 'use-element-in-view'
 import { usePoinsetTreeCalcWorker } from './hooks'
 import { TEnchancedPointByWorker } from './types'
+import { FixedBackToPointsetBtn } from './components'
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -35,6 +37,7 @@ const specialScrollForExternalBox = scrollToIdFactory({
 })
 
 export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, isDebugEnabled }: TProps) => {
+  const { inView, assignRef } = useElementInView()
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
   const [calc, setCalc] = useState<TreeNode<TEnchancedPointByWorker> | null>(null)
   const [reportText, setReportText] = useState<string | null>(null)
@@ -300,6 +303,7 @@ export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, 
     <div
       className={clsx(classes.externalWrapper, classes.default, classes.rounded, baseClasses.stack2)}
       id='checker-main-box'
+      ref={assignRef}
     >
       <div
         className={clsx(baseClasses.truncate, classes.absoluteBadgeTopRight)}
@@ -326,6 +330,16 @@ export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, 
               />
             </div>
           </>
+        )
+      }
+
+      {
+        !!targetJob?.pointset && targetJob?.pointset?.length > 0 && (
+          <FixedBackToPointsetBtn
+            isRequired={!inView}
+            onClick={scrollBoxIntoViewFnRef.current}
+          // label='Roadmap'
+          />
         )
       }
 

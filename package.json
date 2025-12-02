@@ -62,6 +62,7 @@
     "todomvc-app-css": "^2.4.3",
     "todomvc-common": "^1.0.5",
     "ts-tree-lib": "^1.0.3",
+    "use-element-in-view": "^1.0.3",
     "valtio": "^2.1.5",
     "xstate": "^5.19.1"
   },

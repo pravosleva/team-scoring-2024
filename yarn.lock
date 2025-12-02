@@ -8746,6 +8746,11 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
+use-element-in-view@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/use-element-in-view/-/use-element-in-view-1.0.3.tgz#0830022d35819347fcb69d71eb80a1ddaf990742"
+  integrity sha512-54/mbAiwdz/HtV61VTJE6Yc2ruavt8ebRki3bEDfCtLXBF6OvQf/ZAJ+KNceaJdj+iG24jh9M90QOdE1ucPZdQ==
+
 use-isomorphic-layout-effect@^1.1.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.2.0.tgz#afb292eb284c39219e8cb8d3d62d71999361a21d"
