@@ -18,7 +18,7 @@ features:
   - title: Task tracking and release estimation for more predictable future (individually for each employee)
     details: Probability Theory in action
   - title: Checklist for each log in task
-    details: Do you remember what happened a week ago? Yes, I do
+    details: Do you remember what happened a week ago?
   - title: Progress bars for three scenarios
     details: Estimated, Sensed, Worst
 ---

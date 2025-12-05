@@ -310,6 +310,7 @@ function SimpleCheckListFn<TAddInfo>({
                 <div
                   className={clsx(
                     baseClasses.backdropBlurSuperLite,
+                    baseClasses.autoShow,
                     {
                       [classes.commentBox]: !isMiniVariant,
                       [classes.commentBoxMini]: isEditable && isMiniVariant,

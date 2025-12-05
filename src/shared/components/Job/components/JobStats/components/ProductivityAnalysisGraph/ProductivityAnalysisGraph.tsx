@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { memo, useRef, useMemo } from 'react'
+import { memo, useRef, useMemo, useCallback } from 'react'
 import { getDoneTimeDiff } from '~/shared/components/Job/utils/getDoneTimeDiff'
 import { TJob } from '~/shared/xstate'
 import baseClasses from '~/App.module.scss'
@@ -108,7 +108,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
       }
       return acc
     }, { result: [], ok: false, counter: 0 })
-    , [timing.commonBusinessAnalysis.all])
+    , [timing.commonBusinessAnalysis.all, businessTimeConfig])
 
   const commonData = useMemo(() => Object.keys(timing.commonBusinessAnalysis.all)
     .reduce((acc: { result: TDataItem[]; ok: boolean }, key) => {
@@ -134,7 +134,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
       }
       return acc
     }, { result: [], ok: false })
-    , [timing.commonBusinessAnalysis.all])
+    , [timing.commonBusinessAnalysis.all, businessTimeConfig])
 
   const weekData: { id: string; data: TDataItem[] }[] = useMemo(() => ([
     'monday',
@@ -165,7 +165,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
         return acc
       }, [])
   }))
-    , [timing.commonBusinessAnalysis.all])
+    , [timing.commonBusinessAnalysis.all, businessTimeConfig])
   const handlePreventClick = (e: any) => {
     e?.stopPropagation()
   }
@@ -198,7 +198,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
   //   }, { result: [], ok: false, counter: 0 }),
   //   []
   // )
-  const getGlobalInfo = ({ day, targetCritery }: {
+  const getGlobalInfo = useCallback(({ day, targetCritery }: {
     day: string;
     targetCritery: 'productiveHours' | 'totalHours' | 'absoluteHours';
   }) => {
@@ -218,7 +218,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
         }
         return acc
       }, { ok: false, data: {}, counter: 0, keys: [] })
-  }
+  }, [businessTimeConfig, timing.commonBusinessAnalysis.all])
   // const globalProductive = useMemo(() => getGlobalInfo({ day: 'monday', targetCritery: 'productiveHours' }), [])
   const globalProductiveMonday = useMemo(() => getGlobalInfo({ day: 'monday', targetCritery: 'productiveHours' }), [])
   const globalProductiveCalc = useMemo(() => ({
@@ -231,7 +231,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
     sunday: getGlobalInfo({ day: 'sunday', targetCritery: 'productiveHours' }).data,
     __counter: globalProductiveMonday.counter,
     __keys: globalProductiveMonday.keys,
-  }), [globalProductiveMonday])
+  }), [globalProductiveMonday, getGlobalInfo])
   const globalWeekRewiewData = useMemo(() => ([
     'monday',
     'tuesday',
@@ -244,7 +244,7 @@ export const ProductivityAnalysisGraph = memo(({ job }: { job: TJob }) => {
     name: getCapitalizedFirstLetter(day),
     // @ts-ignore
     ...globalProductiveCalc[day],
-  })), [])
+  })), [globalProductiveCalc])
 
   return (
     <div

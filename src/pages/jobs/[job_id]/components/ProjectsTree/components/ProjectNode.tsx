@@ -122,6 +122,7 @@ export const ProjectNode = ({
         clsx(
           `projects-tree-level_${level}`,
           classes.wrapper,
+          baseClasses.autoShowFromBlur,
           classes[`borderRadiusLevel${level}`],
           {
             [classes.isActive]: isActiveNode,

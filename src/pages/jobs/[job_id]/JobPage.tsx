@@ -380,14 +380,15 @@ export const JobPage = memo(() => {
       </Grid> */}
 
       <ResponsiveBlock
-        className={baseClasses.stack1}
+        className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
         style={{
           // padding: '16px 0 16px 0',
           padding: '0px 0px 0px 0px',
           borderRadius: '32px',
           position: 'sticky',
           bottom: 16,
-          backgroundColor: '#fff',
+          // backgroundColor: '#fff',
+          border: '2px solid #fff',
           zIndex: 50, // NOTE: See ./components/ProjectTree/components/ProjectNode
           marginTop: 'auto',
           marginBottom: '16px',
@@ -395,6 +396,7 @@ export const JobPage = memo(() => {
           // width: 'calc(100% - 16px)',
           // marginLeft: 'auto',
           // marginRight: 'auto',
+          // transform: 'translateX(-8px)'
         }}
       >
 
@@ -411,10 +413,11 @@ export const JobPage = memo(() => {
             zIndex: 3,
             marginTop: 'auto',
             // borderRadius: '16px 16px 0px 0px',
-            borderRadius: '32px',
+            // borderRadius: '32px',
+            borderRadius: '30px',
             // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-            // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            // boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
             // marginBottom: '16px',
           }}
         >

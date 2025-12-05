@@ -26,7 +26,8 @@
 }
 
 .borderRadiusLevel1 {
-  border-radius: 16px 16px 16px 16px;
+  border-radius: 16px 16px 8px 16px;
+  // padding-bottom: 16px;
 }
 
 .borderRadiusLevel2 {
@@ -35,8 +36,10 @@
 
 .isActive {
   border-left: 4px solid #ff5733;
-  background-color: #fff6f1;
   // background-color: #ffecec;
+  // background-color: #fff6f1;
+  background-color: #FFF6F1;
+  // background: linear-gradient(146deg, rgba(255, 246, 241, 1) 0%, rgba(255, 246, 241, 1) 80%, rgba(255, 133, 107, 1) 100%);
 }
 
 a.lastActivityOfCurrentJobLink {

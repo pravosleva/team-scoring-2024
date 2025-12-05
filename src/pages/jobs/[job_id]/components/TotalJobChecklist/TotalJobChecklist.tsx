@@ -38,6 +38,7 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
           return acc
         }, {})
       : {},
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [targetJob, targetJob?.ts.update]
   )
 

@@ -191,8 +191,8 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                 if (adds.length > 0)
                   for (const str of adds) {
                     // final.push(['   '.repeat(level), str].join(`   • ${emoji} `))
-                    if (!!emoji) final.push(['    '.repeat(level), str].join(`  ${emoji} `))
-                    else final.push(['    '.repeat(level), str].join('  '))
+                    if (!!emoji) final.push(['   '.repeat(level), str].join(`  ${emoji} `))
+                    else final.push(['   '.repeat(level), str].join('   '))
                     counters.adds += 1
                   }
               }

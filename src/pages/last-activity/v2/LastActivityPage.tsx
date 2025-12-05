@@ -62,7 +62,7 @@ const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null,
 const getNormalizedPage = (index: number): number => index + 1
 
 export const LastActivityPage = memo(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const [counter, _setCounter] = useState<number>(0)
   // const incCounter = useCallback(() => {
   //   setCounter((v) => v + 1)
@@ -273,12 +273,11 @@ export const LastActivityPage = memo(() => {
               // borderRadius: '16px 16px 0px 0px',
               borderRadius: '32px',
               // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-              // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-              boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+              boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+              // boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
               marginBottom: '16px',
             }}
           >
-
             {
               !!userRouteControls.from && (
                 <Link
