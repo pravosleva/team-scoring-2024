@@ -236,39 +236,24 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                 [0, true]
               ]),
               getHeaderByModel: ({ model }) => {
-                // console.log('--- LABEL: input.statusPack')
-                // console.log(input.statusPack)
-                // console.log('--- model')
-                // console.log(model)
-                // console.log('--- input.statusPack[model.statusCode]')
+                // -- TODO: For example (remove this)
                 // console.log(input.statusPack[model.statusCode])
+                // --
                 return {
-
-                  // TODO: label: string; emoji: string;
-
-                  label: clsx(input.statusPack[model.statusCode]?.emoji, model.title, !!input.statusPack[model.statusCode]?.label ? `[${input.statusPack[model.statusCode]?.label}]` : undefined),
+                  label: clsx(
+                    input.statusPack[model.statusCode]?.emoji,
+                    model.title,
+                    !!input.statusPack[model.statusCode]?.label
+                      ? `[${input.statusPack[model.statusCode]?.label}]`
+                      : undefined
+                  ),
                   readyPercentageVals: [],
                 }
               },
               getDescriptionMessagesByModel: ({ model, __incCounter }) =>
-                // model.logs.items.reduce((acc, cur) => {
-                //   if (cur.checklist?.length > 0) {
-                //     for (const microtask of cur.checklist) {
-                //       if (!microtask.isDone && !microtask.isDisabled) {
-                //         const msgs = [
-                //           `${microtask.title}`,
-                //         ]
-                //         if (!!microtask.descr) {
-                //           msgs.push(`(${microtask.descr})`)
-                //         }
-                //         if (typeof __incCounter === 'function') __incCounter()
-                //         acc.push(msgs.join(' '))
-                //       }
-                //     }
-                //   }
-                //   return acc
-                // }, []),
-                !!model.descr ? [model.descr] : []
+                !!model.descr
+                  ? [model.descr]
+                  : []
             })
             // --
 
