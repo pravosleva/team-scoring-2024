@@ -22,6 +22,7 @@ import { getPercentage } from '~/shared/utils/number-ops'
 // import { ProductivityAnalysisGraph } from './components/ProductivityAnalysisGraph'
 // import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 // import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import baseClasses from '~/App.module.scss'
 
 type TProps = {
   job: TJob;
@@ -268,7 +269,10 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
                     <Grid size={12}>
                       <b>🤌 Estimated: {dayjs(job.forecast.estimate).format('DD.MM.YYYY HH:mm')}</b>
                     </Grid>
-                    <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                    <Grid
+                      className={baseClasses.autoShow}
+                      container spacing={0} size={12} sx={{ border: 'none' }}
+                    >
                       <Grid size={12}>
                         <AutoRefreshedProgressBar
                           startDate={job.forecast.start as number}
@@ -355,6 +359,7 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
                         <b>⚖️ Sensed: {averageSensedDateUI}</b>
                       </Grid>
                       <Grid
+                        className={baseClasses.autoShow}
                         container
                         spacing={0}
                         size={12}
@@ -427,7 +432,10 @@ export const JobStats = memo(({ job, isDebugEnabled }: TProps) => {
                       <Grid size={12}>
                         <b>😠 The worst: {worst100DateUI}</b>
                       </Grid>
-                      <Grid container spacing={0} size={12} sx={{ border: 'none' }}>
+                      <Grid
+                        className={baseClasses.autoShow}
+                        container spacing={0} size={12} sx={{ border: 'none' }}
+                      >
                         <Grid size={12}>
                           <AutoRefreshedProgressBar
                             key={job.forecast.complexity}

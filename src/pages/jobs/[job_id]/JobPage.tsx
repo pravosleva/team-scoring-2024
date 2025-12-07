@@ -310,7 +310,7 @@ export const JobPage = memo(() => {
                 <Grid size={12}>
                   <b>ℹ️ About your Business Time</b>
                 </Grid>
-                <Grid size={12}>
+                <Grid size={12} className={baseClasses.autoShow}>
                   <CollapsibleBox
                     id='job-stats'
                     onClose={({ id }) => specialScroll({ id })}
@@ -389,10 +389,12 @@ export const JobPage = memo(() => {
           bottom: 16,
           // backgroundColor: '#fff',
           border: '2px solid #fff',
+          // border: '2px solid #959eaa',
           zIndex: 50, // NOTE: See ./components/ProjectTree/components/ProjectNode
           marginTop: 'auto',
           marginBottom: '16px',
           // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+          boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
           // width: 'calc(100% - 16px)',
           // marginLeft: 'auto',
           // marginRight: 'auto',
@@ -416,7 +418,7 @@ export const JobPage = memo(() => {
             // borderRadius: '32px',
             borderRadius: '30px',
             // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
             // boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
             // marginBottom: '16px',
           }}

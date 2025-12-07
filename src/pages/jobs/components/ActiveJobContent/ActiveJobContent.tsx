@@ -417,7 +417,7 @@ export const ActiveJobContent = memo(({
                         onClose={({ id }) => specialScroll({ id })}
                         onOpen={({ id }) => specialScroll({ id })}
                         connectedOnThe={[]}
-                        header={'Productivity Analysis'}
+                        header='Productivity Analysis'
                         icon={<QueryStatsIcon fontSize='small' />}
                         text={
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
