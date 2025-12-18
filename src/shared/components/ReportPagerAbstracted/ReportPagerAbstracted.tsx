@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useMemo, useState } from 'react'
 import baseClasses from '~/App.module.scss'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
@@ -73,6 +73,15 @@ type TTargetResultByWorker = {
       };
     };
     fullDoneLast7DaysCheckboxesTree?: {
+      result: string;
+      counters: {
+        adds: number;
+      };
+      percentage?: {
+        done: number[];
+      };
+    };
+    fullDoneLast1DaysCheckboxesTree?: {
       result: string;
       counters: {
         adds: number;
@@ -300,6 +309,42 @@ export const ReportPagerAbstracted = ({
           }
 
           {
+            !!outputWorkerData?.output.fullDoneLast1DaysCheckboxesTree?.result
+            && outputWorkerData?.output.fullDoneLast1DaysCheckboxesTree?.counters.adds > 0
+            && (
+              <Grid size={12}>
+                <CollapsibleBox
+                  header={<span>✅ Done last 24 h ({outputWorkerData?.output.fullDoneLast1DaysCheckboxesTree?.counters.adds})</span>}
+                  text={(
+                    <div className={baseClasses.stack1}>
+                      <pre
+                        className={clsx(
+                          baseClasses.preNormalized,
+                          classes.resultWrapper,
+                          {
+                            [classes.resultWhenWorkerDisabled]: !isWorkerEnabled,
+                            [classes.resultWhenWorkerEnabled]: isWorkerEnabled,
+                          }
+                        )}
+                        style={{ overflowY: 'auto' }}
+                      >
+                        {outputWorkerData.output.fullDoneLast1DaysCheckboxesTree?.result}
+                      </pre>
+                      <div>
+                        <CopyToClipboardWrapper
+                          text={outputWorkerData.output.fullDoneLast1DaysCheckboxesTree?.result}
+                          uiText='Copy as text'
+                          showNotifOnCopy
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
+              </Grid>
+            )
+          }
+
+          {
             !!outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.result
             && outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds > 0
             && (
@@ -377,7 +422,7 @@ export const ReportPagerAbstracted = ({
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>💀 Created early than 1 month & incompleted yet ({outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.counters.adds})</span>}
+                  header={<span>💀 Created early than 1 Mo. & incompleted ({outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.counters.adds})</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre

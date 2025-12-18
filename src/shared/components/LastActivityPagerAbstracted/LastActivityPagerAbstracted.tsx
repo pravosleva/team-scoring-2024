@@ -178,7 +178,7 @@ export const LastActivityPagerAbstracted = memo(({
             display: 'flex',
             flexDirection: 'column',
             // justifyContent: 'space-between',
-            gap: '8px',
+            gap: '24px', // NOTE: Between main header and target joblist
             // alignItems: 'center'
             marginBottom: '24px',
           }}
@@ -428,7 +428,7 @@ export const LastActivityPagerAbstracted = memo(({
                         style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '8px',
+                          gap: '16px',
                           padding: '8px',
                           borderRadius: '16px',
                         }}
@@ -557,8 +557,12 @@ export const LastActivityPagerAbstracted = memo(({
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 gap: '8px',
+                                fontSize: 'small',
                               }}
-                            ><span>EDIT LOG</span><ArrowForwardIcon fontSize='inherit' /></Link>
+                            >
+                              <span>LOG</span>
+                              <ArrowForwardIcon fontSize='inherit' />
+                            </Link>
                           </span>
                         </div>
                         <div style={{ fontSize: '14px' }}>{log.text}</div>

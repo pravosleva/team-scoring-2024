@@ -601,6 +601,65 @@ const withRootMW = (arg) => compose([
                   }, []),
               })
               // --
+
+              // --
+              // 4. Done last day
+              const limit3DaysAgo = 1
+              const __target1dNoEarlyTs = new Date(nowDateTs - 1000 * 60 * 60 * 24 * limit3DaysAgo).getTime()
+              const __outputFullDoneLast1DaysCheckboxesTree = getNodeReportChunk({
+                emoji: '✅',
+                model: __reportExpTarget.model,
+                children: __reportExpTarget.children,
+                level: 0,
+                isLast: true,
+                levelsInfoMap: new Map([
+                  [0, true]
+                ]),
+                validateFn: (microtask) => (
+                  microtask.isDone
+                  && !microtask.isDisabled
+                  && microtask.ts.updatedAt >= __target1dNoEarlyTs
+                ),
+                getHeaderByModel: ({ model }) => {
+                  const readyPercentage = model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      acc.isEnabled = true
+                      acc.vals.push(getPercentage({
+                        x: cur.checklist
+                          .reduce((acc, cur) => {
+                            if (cur.isDone || cur.isDisabled) acc += 1
+                            return acc
+                          }, 0),
+                        sum: cur.checklist.length,
+                      }))
+                    }
+                    return acc
+                  }, { vals: [], isEnabled: false })
+                  return {
+                    label: `${readyPercentage.isEnabled ? `${getArithmeticalMean(readyPercentage.vals).toFixed(0)}% ` : ''}${model.title}`
+                  }
+                },
+                getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
+                  model.logs.items.reduce((acc, cur) => {
+                    if (cur.checklist?.length > 0) {
+                      for (const microtask of cur.checklist) {
+                        if (typeof validateFn === 'function' && validateFn(microtask)) {
+                          const msgs = [
+                            `[${getTimeAgo({ dateInput: microtask.ts.updatedAt })}]`,
+                            `${microtask.title}`,
+                          ]
+                          if (!!microtask.descr) {
+                            msgs.push(`(${microtask.descr})`)
+                          }
+                          if (typeof __incCounter === 'function') __incCounter()
+                          acc.push(msgs.join(' '))
+                        }
+                      }
+                    }
+                    return acc
+                  }, []),
+              })
+              // --
               // ----
 
               const calc = {
@@ -634,6 +693,9 @@ const withRootMW = (arg) => compose([
                   },
                   fullDoneLast7DaysCheckboxesTree: {
                     ...__outputFullDoneLast7DaysCheckboxesTree,
+                  },
+                  fullDoneLast1DaysCheckboxesTree: {
+                    ...__outputFullDoneLast1DaysCheckboxesTree,
                   },
                   targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree: {
                     ...__outputTargetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree,

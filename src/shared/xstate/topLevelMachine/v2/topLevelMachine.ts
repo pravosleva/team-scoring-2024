@@ -81,7 +81,7 @@ export const topLevelMachine = setup({
           }
 
           const newPinnedList = [...context.jobs.pinned]
-          const limit = 7
+          const limit = 100
           if (newPinnedList.length >= limit) {
             newPinnedList.pop()
           }
@@ -904,16 +904,9 @@ export const topLevelMachine = setup({
                       break
                   }
                   // --
-                  // console.log('- CURRENT: todo.relations')
-                  // console.log(todo.relations) // { parent: null }
 
                   // NOTE: Tested
                   jobToUpdate.relations = todo.relations
-
-                  // console.log('- NEW: jobToUpdate.relations')
-                  // console.log(jobToUpdate.relations) // undefined?
-
-                  console.log('- /')
 
                   const { ts: { create } } = todo
                   jobToUpdate.ts.create = create
@@ -931,15 +924,21 @@ export const topLevelMachine = setup({
                   const _newMsgs = new Set()
 
                   switch (true) {
-                    case !todo.logs.isEnabled && jobToUpdate.logs.isEnabled:
+                    case !todo.logs.isEnabled && jobToUpdate.logs.isEnabled: {
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
 
-                      _newMsgs.add(`Logs enabled (detailed with your comments). ${comment || 'No comment'}`)
+                      const normalizedComment = !!comment ? comment.trim().replace(/\s+/g, ' ') : ''
+                      if (!!normalizedComment) {
+                        _newMsgs.add(comment)
+                      }
+
+                      _newMsgs.add('Logs enabled (will ask your comment for each activity)')
                       break
+                    }
                     case todo.logs.isEnabled && !jobToUpdate.logs.isEnabled: {
                       if (jobToUpdate.logs.items.length >= jobToUpdate.logs.limit) jobToUpdate.logs.items.pop()
 
-                      _newMsgs.add('Logs disabled (minimal)')
+                      _newMsgs.add('Logs disabled (minimal history)')
                       break
                     }
                     case (
@@ -1175,10 +1174,6 @@ export const topLevelMachine = setup({
 
                 todo.logs.items.unshift({ ts: updateTime, text: 'Dates cleared' })
               }
-
-              // console.log('-- clearDates: updated')
-              // console.log(todo)
-              // console.log('--')
               soundManager.playDelayedSound({ soundCode: 'click-27' })
             }
             newTodos.push(todo)
@@ -1203,6 +1198,15 @@ export const topLevelMachine = setup({
               const msgs: string[] = []
 
               // -- NOTE: Modify here
+              // 0. Add comment
+              if (todo.logs?.isEnabled) {
+                if (todo.logs.items.length >= todo.logs.limit)
+                  todo.logs.items.pop()
+
+                const normalizedComment = !!comment ? comment.trim().replace(/\s+/g, ' ') : ''
+                if (!!normalizedComment) msgs.push(normalizedComment)
+              }
+
               // 1. If exists -> add hrs
               if (!!todo.forecast.finish) {
                 msgs.push(`+${hours}h to finish time`)
@@ -1221,20 +1225,8 @@ export const topLevelMachine = setup({
 
               todo.ts.update = updateTime
 
-              if (todo.logs?.isEnabled) {
-                if (todo.logs.items.length >= todo.logs.limit)
-                  todo.logs.items.pop()
-
-                const normalizedComment = !!comment ? comment.trim().replace(/\s+/g, ' ') : ''
-                msgs.push(normalizedComment || 'No comment')
-              }
-
               if (msgs.length > 0)
                 todo.logs.items.unshift({ ts: updateTime, text: msgs.join(' // ') })
-
-              // console.log('-- clearDates: updated')
-              // console.log(todo)
-              // console.log('--')
             }
             newTodos.push(todo)
           }

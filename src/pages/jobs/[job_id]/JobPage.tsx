@@ -286,7 +286,9 @@ export const JobPage = memo(() => {
                 />
               </Grid>
               <Grid size={12}>
-                <em style={{ fontSize: 'small' }}>Based on another completed jobs{!!targetUserNameUI ? ` assigned to ${targetUserNameUI}` : ''}</em>
+                <em style={{ fontSize: 'small' }}>
+                  {clsx('Based on another completed jobs', !!targetUserNameUI ? `assigned to ${targetUserNameUI}` : undefined)}
+                </em>
               </Grid>
             </>
           ) : (

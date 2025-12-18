@@ -13,6 +13,7 @@ import { scrollToIdFactory, blinkNodeIdFactory } from '~/shared/utils/web-api-op
 import { CSSProperties } from '@mui/material/styles/createMixins'
 import { getMatchedByAnyString } from '~/shared/utils/string-ops'
 import { getIsNumeric } from '~/shared/utils/number-ops'
+import AnchorIcon from '@mui/icons-material/Anchor'
 
 export type TProject = {
   jobId: number;
@@ -248,6 +249,14 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
     })
   }, [])
 
+  const [timerIsActive, setTimerIsActive] = useState(false)
+  const timerReload = useCallback(() => {
+    setTimerIsActive(true)
+    setTimeout(() => {
+      setTimerIsActive((false))
+    }, 2000)
+  }, [setTimerIsActive])
+
   return (
     <div
       style={{
@@ -273,8 +282,27 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
       <FixedBackToNodeBtn
         onClick={handleNavigateToActiveNode}
         isRequired={!!backToActiveJob}
-        label={backToActiveJob?.jobTitle}
+        // label={backToActiveJob?.jobTitle}
+        color='green'
+        position='right-center'
+        DefaultIcon={<AnchorIcon htmlColor='#FFF' />}
       />
+
+      {
+        !!targetJob && (
+          <FixedBackToNodeBtn
+            onClick={() => {
+              specialScroll({ id: `job_node_${targetJob.id}`, _cfg: _specialNavigate })
+              timerReload()
+            }}
+            isRequired={!backToActiveJob && !timerIsActive}
+            // label={targetJob.title}
+            color='orange'
+            position='right-bottom'
+            DefaultIcon={<AnchorIcon htmlColor='#FFF' />}
+          />
+        )
+      }
 
       {
         !!calc ? (

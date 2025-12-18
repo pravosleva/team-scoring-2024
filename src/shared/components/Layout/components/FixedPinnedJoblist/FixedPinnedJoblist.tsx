@@ -51,7 +51,6 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   const [isOpened, setIsOpened] = useState<boolean>(ps.isOpenedByDefault || false)
   const handleOpenToggle = useCallback(
     () => {
-
       const wasOpened = isOpened
       if (wasOpened) {
         soundManager.playDelayedSoundConfigurable({
@@ -126,13 +125,15 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
 
   // const summaryInfo = useMemo(() => getJobsIntuitiveSummaryInfo({ jobs:  }), [])
 
+  const isWidgetReqired = useMemo(() => typeof window !== 'undefined' && pinnedJobsIds.length > 0, [typeof window, pinnedJobsIds.length])
+
   if (location.pathname === `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`)
     return null
 
   return (
     <>
       {
-        typeof window !== 'undefined' && pinnedJobsIds.length > 0 && (
+        isWidgetReqired && (
           <div
             className={clsx(
               baseClasses.fadeIn,
@@ -155,48 +156,17 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
               alignItems: 'flex-start',
             }}
           >
-            {
-              Object.keys(modifiedPinnedJobs).map((id) => (
-                <div
-                  key={id}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    fontWeight: 'bold',
-                    // border: '1px solid red',
-                    // padding: '8px',
-                    width: '100%',
-                  }}
-                // className={baseClasses.truncate}
-                >
+            <div
+              className={clsx(
+                baseClasses.stack1,
+                classes.pinnedItems,
+                baseClasses.fadeShadowBottom,
+              )}
+            >
+              {
+                Object.keys(modifiedPinnedJobs).map((id) => (
                   <div
-                    style={{
-                      // border: '1px solid red',
-                      maxWidth: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      fontSize: 'small',
-                    }}
-                  >
-                    <code
-                      style={{
-                        fontSize: 'small',
-                        // wordBreak: 'keep-all',
-                        whiteSpace: 'nowrap',
-                        // paddingTop: '1px',
-                        transform: 'translateY(-2px)',
-                      }}
-                      onClick={handleUnpinJob({ jobId: Number(id) })}
-                    >[ x ]</code>
-                    {
-
-                    }
-                  </div>
-
-                  <div
+                    key={id}
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -215,89 +185,128 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         maxWidth: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '0px',
-                        fontSize: 'x-small',
-
-                        wordBreak: 'break-word',
+                        gap: '8px',
+                        fontSize: 'small',
                       }}
-                      className={clsx(baseClasses.rowsLimited3)}
                     >
-                      <a
+                      <code
                         style={{
-                          textDecoration: 'none',
-                          fontSize: 'x-small',
-                          color: Number(params.job_id) === Number(id)
-                            ? 'red' // '#00a47d'
-                            : undefined
+                          fontSize: 'small',
+                          // wordBreak: 'keep-all',
+                          whiteSpace: 'nowrap',
+                          // paddingTop: '1px',
+                          // transform: 'translateY(-2px)',
+                          color: 'red',
                         }}
-                        // to={}
-                        // target='_self'
-                        onClick={handleNavigate({
-                          relativeUrl: getFullUrl({
-                            url: `/jobs/${id}`,
-                            query: { ...queryParams },
-                            // queryKeysToremove,
-                          }),
-                          pinnedJobId: Number(id),
-                        })}
-                        // baseClasses.truncate
-                        className={clsx(baseClasses.rowsLimited3)}
-                      >{modifiedPinnedJobs[id].title}</a>
-                      {/* !!modifiedPinnedJobs[id].descr && (
-                        <span
-                          style={{
-                            fontSize: 'x-small',
-                            color: '#959eaa'
-                          }}
-                          className={clsx(baseClasses.rowsLimited1)}
-                        >{modifiedPinnedJobs[id].descr}</span>
-                      ) */}
+                        onClick={handleUnpinJob({ jobId: Number(id) })}
+                      >[ x ]</code>
                     </div>
 
-                    {
-                      !!modifiedPinnedJobs[id].assignedToDisplayName && (
-                        <div
-                          style={{
-                            marginLeft: 'auto',
-                            display: 'inline-flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 'small'
-                            // border: '1px solid red',
-                          }}
-                        >
-                          <UserAva
-                            name={modifiedPinnedJobs[id].assignedToDisplayName}
-                            size={30}
-                          />
-                        </div>
-                      )
-                    }
-                  </div>
-                </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        fontWeight: 'bold',
+                        // border: '1px solid red',
+                        // padding: '8px',
+                        width: '100%',
+                      }}
+                    // className={baseClasses.truncate}
+                    >
+                      <div
+                        style={{
+                          // border: '1px solid red',
+                          maxWidth: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0px',
+                          fontSize: 'small',
 
-              ))
-            }
+                          wordBreak: 'break-word',
+                        }}
+                        className={clsx(baseClasses.rowsLimited3)}
+                      >
+                        <a
+                          style={{
+                            textDecoration: 'none',
+                            fontSize: 'small',
+                            color: Number(params.job_id) === Number(id)
+                              ? 'red' // '#00a47d'
+                              : undefined
+                          }}
+                          // to={}
+                          // target='_self'
+                          onClick={handleNavigate({
+                            relativeUrl: getFullUrl({
+                              url: `/jobs/${id}`,
+                              query: { ...queryParams },
+                              // queryKeysToremove,
+                            }),
+                            pinnedJobId: Number(id),
+                          })}
+                          // baseClasses.truncate
+                          className={clsx(baseClasses.rowsLimited3)}
+                        >{modifiedPinnedJobs[id].title}</a>
+                        {/* !!modifiedPinnedJobs[id].descr && (
+                          <span
+                            style={{
+                              fontSize: 'x-small',
+                              color: '#959eaa'
+                            }}
+                            className={clsx(baseClasses.rowsLimited1)}
+                          >{modifiedPinnedJobs[id].descr}</span>
+                        ) */}
+                      </div>
+
+                      {
+                        !!modifiedPinnedJobs[id].assignedToDisplayName && (
+                          <div
+                            style={{
+                              marginLeft: 'auto',
+                              display: 'inline-flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              fontSize: 'small',
+                              alignSelf: 'center',
+                            }}
+                          >
+                            <UserAva
+                              name={modifiedPinnedJobs[id].assignedToDisplayName}
+                              size={30}
+                            />
+                          </div>
+                        )
+                      }
+                    </div>
+                  </div>
+
+                ))
+              }
+            </div>
 
             {
               location.pathname !== `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}` && (
-                <Button
-                  size='small'
-                  onClick={handleNavigate({
-                    relativeUrl: getFullUrl({
-                      url: `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`,
-                      query: {
-                        ...queryParams,
-                        from: location.pathname,
-                      },
-                      // queryKeysToremove,
-                    }),
-                  })}
-                  fullWidth
-                  variant='outlined'
-                  startIcon={<SportsBasketballIcon />}
-                // sx={{ borderRadius: 4 }}
-                >Last activity</Button>
+                <div className={classes.action}>
+                  <Button
+                    size='small'
+                    onClick={handleNavigate({
+                      relativeUrl: getFullUrl({
+                        url: `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`,
+                        query: {
+                          ...queryParams,
+                          from: location.pathname,
+                        },
+                        // queryKeysToremove,
+                      }),
+                    })}
+                    fullWidth
+                    variant='outlined'
+                    startIcon={<SportsBasketballIcon />}
+                  // sx={{ borderRadius: 4 }}
+                  >Last activity</Button>
+                </div>
               )
             }
 

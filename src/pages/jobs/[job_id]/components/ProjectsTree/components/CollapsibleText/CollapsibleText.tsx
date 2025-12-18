@@ -5,6 +5,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 
 type TProps = {
+  briefPrefix?: React.ReactNode | string;
   briefText: React.ReactNode | string;
   isOpenedByDefault?: boolean;
   targetText?: string;
@@ -14,6 +15,7 @@ type TProps = {
 
 export const CollapsibleText = memo(({
   isOpenedByDefault,
+  briefPrefix,
   briefText,
   targetText,
   contentRender,
@@ -41,16 +43,43 @@ export const CollapsibleText = memo(({
         }}
         onClick={isClickableBrief ? descrToggle : undefined}
       >
-        <div
-          className={baseClasses.truncate}
-          style={{
-            fontWeight: 'bold',
-            textDecoration: isClickableBrief ? 'underline dashed' : 'none',
-            cursor: isClickableBrief ? 'pointer' : 'default',
-          }}
-        >
-          {briefText}
-        </div>
+        {
+          !!briefPrefix
+            ? (
+              <div
+                className={baseClasses.truncate}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                }}
+              >
+                <div>{briefPrefix}</div>
+                <div
+                  className={baseClasses.truncate}
+                  style={{
+                    fontWeight: 'bold',
+                    textDecoration: isClickableBrief ? 'underline dashed' : 'none',
+                    cursor: isClickableBrief ? 'pointer' : 'default',
+                  }}
+                >
+                  {briefText}
+                </div>
+              </div>
+            )
+            : (
+              <div
+                className={baseClasses.truncate}
+                style={{
+                  fontWeight: 'bold',
+                  textDecoration: isClickableBrief ? 'underline dashed' : 'none',
+                  cursor: isClickableBrief ? 'pointer' : 'default',
+                }}
+              >
+                {briefText}
+              </div>
+            )
+        }
         <code
           className={baseClasses.noBreakWords}
           onClick={!isClickableBrief ? descrToggle : undefined}
@@ -80,11 +109,13 @@ export const CollapsibleText = memo(({
       </div>
       {
         isDescrOpened && (
-          <>
+          <div
+          // style={{ paddingLeft: !!briefPrefix ? '24px' : '0px' }}
+          >
             {
               contentRender({ briefText, targetText })
             }
-          </>
+          </div>
         )
       }
     </div>

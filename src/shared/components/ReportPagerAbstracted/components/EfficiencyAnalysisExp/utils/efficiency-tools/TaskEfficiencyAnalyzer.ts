@@ -247,20 +247,20 @@ export class TaskEfficiencyAnalyzer {
     }
     result.msgs.push(analysis.trendAnalysis.message)
     result.msgs.push('📋 Статистика по периодам:')
-    result.msgs.push('  · Недавний период:')
+    result.msgs.push('· Недавний период:')
     result.msgs.push(
       this.getPeriodStats(analysis.recentPeriod, 2).join('\n')
     )
-    result.msgs.push('  · Предыдущий период:')
+    result.msgs.push('· Предыдущий период:')
     result.msgs.push(
       this.getPeriodStats(analysis.previousPeriod, 2).join('\n')
     )
     result.msgs.push('🔍 Детали по сложности задач')
+    // result.msgs.push(
+    //   this.getPeriodStats(analysis.previousPeriod, 2).join('\n')
+    // )
     result.msgs.push(
-      this.getPeriodStats(analysis.previousPeriod, 2).join('\n')
-    )
-    result.msgs.push(
-      this.getComplexityStats(analysis, 1).join('\n')
+      this.getComplexityStats(analysis, 0).join('\n')
     )
     return result
   }
@@ -292,12 +292,15 @@ export class TaskEfficiencyAnalyzer {
       // console.log(`\n${periodName}:`);
       Object.entries(stats.completionByComplexity).forEach(([complexity, data]) => {
         // console.log(`  Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`);
-        msgs.push(getMsg(`Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`, level + 1))
+        msgs.push(getMsg(`Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`, level + 2))
       });
+      if (msgs.length === 1) {
+        msgs.push(getMsg('Нет данных', level + 2))
+      }
       return msgs
     };
-    msgs.push(getComplexityForPeriod(analysis.recentPeriod, 'Последние 3 месяца', level + 1).join('\n'))
-    msgs.push(getComplexityForPeriod(analysis.previousPeriod, 'Предыдущие 3 месяца', level + 1).join('\n'))
+    msgs.push(getComplexityForPeriod(analysis.recentPeriod, '· Последние 3 месяца', level).join('\n'))
+    msgs.push(getComplexityForPeriod(analysis.previousPeriod, '· Предыдущие 3 месяца', level).join('\n'))
     return msgs
   }
 }

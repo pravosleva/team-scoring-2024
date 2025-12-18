@@ -598,7 +598,7 @@ export const ProjectNode = ({
                     <ul className={baseClasses.compactList}>
                       {
                         projectsTree.model._service.aboutJob.existingChecklists
-                          .map(({ logText, uniqueChecklistKey, logTs, completePercentage }) => (
+                          .map(({ logText: _logText, uniqueChecklistKey, logTs, completePercentage }) => (
                             <li
                               key={uniqueChecklistKey}
                             >
@@ -656,7 +656,7 @@ export const ProjectNode = ({
                                     }}
                                   >{completePercentage.toFixed(0)}%</b>
                                 </span>
-                                <span>{logText}</span>
+                                {/* <span>{logText}</span> */}
                               </span>
                             </li>
                           ))

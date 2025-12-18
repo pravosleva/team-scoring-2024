@@ -8,9 +8,12 @@ type TProps = {
   isRequired: boolean;
   onClick: () => void;
   label?: string;
+  color: 'green' | 'primary' | 'red' | 'orange';
+  position: 'right-center' | 'right-bottom';
+  DefaultIcon?: React.ReactNode;
 }
 
-export const FixedBackToNodeBtn = memo(({ isRequired, onClick, label }: TProps) => {
+export const FixedBackToNodeBtn = memo(({ isRequired, onClick, label, color, position, DefaultIcon }: TProps) => {
   return (
     <>
       {typeof window !== 'undefined' && (
@@ -24,6 +27,15 @@ export const FixedBackToNodeBtn = memo(({ isRequired, onClick, label }: TProps) 
               [classes.isRequired]: isRequired,
             },
             baseClasses.truncate,
+            {
+              [classes.green]: color === 'green',
+              [classes.primary]: color === 'primary',
+              [classes.red]: color === 'red',
+              [classes.orange]: color === 'orange',
+
+              [classes.rightCenter]: position === 'right-center',
+              [classes.rightBottom]: position === 'right-bottom',
+            }
           )}
         >
           {
@@ -32,7 +44,9 @@ export const FixedBackToNodeBtn = memo(({ isRequired, onClick, label }: TProps) 
                 <span className={baseClasses.truncate}>{label}</span>
               )
               : (
-                <KeyboardArrowUpIcon htmlColor='#FFF' />
+                <>
+                  {!!DefaultIcon ? <>{DefaultIcon}</> : <KeyboardArrowUpIcon htmlColor='#FFF' />}
+                </>
               )
           }
         </div>

@@ -18,6 +18,7 @@ import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils'
 import CloseIcon from '@mui/icons-material/Close'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { UserAvaAutoDetected } from '~/shared/components/Job/components'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
@@ -266,25 +267,42 @@ export const LastJobActivityPage = memo(() => {
                         style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '16px',
-                          // border: '1px solid red'
+                          gap: '24px',
                         }}
                       >
                         {targetJobs.map((job) => (
                           <div
                             key={job.id}
                             style={{
-                              // border: '1px solid red',
                               display: 'flex',
                               flexDirection: 'column',
-                              // alignItems: 'flex-start',
-                              gap: '4px',
+                              gap: '8px',
                               fontSize: 'small'
                             }}
                           >
+                            {!!job.relations.parent && (
+                              <CollapsibleText
+                                // briefPrefix='├─'
+                                briefText={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
+                                contentRender={() => (
+                                  <div style={{ fontSize: 'small', paddingLeft: '24px' }}>
+                                    <Link
+                                      to={getFullUrl({
+                                        url: `/last-activity/${job.relations.parent}`,
+                                        query: {
+                                          ...queryParams,
+                                        },
+                                      })}
+                                    >
+                                      {getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                    </Link>
+                                  </div>
+                                )}
+                                isClickableBrief
+                              />
+                            )}
                             <div
                               style={{
-                                // border: '1px solid red',
                                 display: 'flex',
                                 flexDirection: 'row',
                                 alignItems: 'flex-start',
@@ -298,7 +316,7 @@ export const LastJobActivityPage = memo(() => {
                                   display: 'inline-flex',
                                   justifyContent: 'center',
                                   alignItems: 'center',
-                                  gap: '6px',
+                                  gap: '8px',
                                 }}
                                 to={getFullUrl({
                                   url: `/jobs/${job.id}`,
@@ -317,14 +335,12 @@ export const LastJobActivityPage = memo(() => {
                                 style={{
                                   whiteSpace: 'nowrap',
                                   display: 'inline-flex',
-                                  // justifyContent: 'center',
                                   alignItems: 'center',
                                   gap: '6px',
                                   borderWidth: '1px',
                                   borderColor: 'inherit',
                                   borderStyle: 'solid',
                                   borderRadius: '50%',
-                                  // alignSelf: 'center',
                                   marginTop: '3px',
                                 }}
                                 to={getFullUrl({
@@ -346,6 +362,7 @@ export const LastJobActivityPage = memo(() => {
                                       gap: '8px',
                                       alignItems: 'center',
                                       marginLeft: 'auto',
+                                      alignSelf: 'center',
                                     }}
                                   >
                                     <AutoRefreshedJobMuiAva job={job} delay={1000} size={35} />
@@ -354,8 +371,63 @@ export const LastJobActivityPage = memo(() => {
                                 )
                               }
                             </div>
+                            {job.relations.children.length > 0 && (
+                              <CollapsibleText
+                                briefPrefix={!!job.descr ? '├─' : '└─'}
+                                briefText={`Children (${job.relations.children.length})`}
+                                contentRender={() => (
+                                  <div
+                                    style={{
+                                      fontSize: 'small',
+                                      paddingLeft: '24px',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '8px',
+                                    }}
+                                  >
+                                    {
+                                      job.relations.children.length > 1 && (
+                                        <Link
+                                          to={getFullUrl({
+                                            url: `/last-activity/${job.relations.children.join(',')}`,
+                                            query: {
+                                              ...queryParams,
+                                            },
+                                          })}
+                                        >
+                                          🔩 All children activity
+                                        </Link>
+                                      )
+                                    }
+                                    {
+                                      job.relations.children.map((j, i, a) => (
+                                        <Link
+                                          key={j}
+                                          to={getFullUrl({
+                                            url: `/last-activity/${j}`,
+                                            query: {
+                                              ...queryParams,
+                                            },
+                                          })}
+                                        >
+                                          {a.length - i}. {getModifiedJobLogText({ text: `[job=${j}]`, jobs, users: users.items })}
+                                        </Link>
+                                      ))
+                                    }
+                                  </div>
+                                )}
+                                isClickableBrief
+                              />
+                            )}
                             {!!job.descr && (
-                              <div style={{ fontSize: 'x-small' }}>{job.descr}</div>
+                              <CollapsibleText
+                                briefPrefix='└─'
+                                briefText='Description'
+                                contentRender={() => (
+                                  <div style={{ fontSize: 'small', paddingLeft: '24px' }}>{job.descr}</div>
+                                )}
+                                isClickableBrief
+                              />
                             )}
                           </div>
                         ))}

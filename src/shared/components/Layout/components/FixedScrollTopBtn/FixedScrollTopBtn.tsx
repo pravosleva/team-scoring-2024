@@ -3,7 +3,9 @@ import { useScrollPosition, IWindowDims } from '~/shared/hooks/useScrollPosition
 import clsx from 'clsx'
 import classes from './FixedScrollTopBtn.module.scss'
 import { scrollTop, scrollTopExtra } from '~/shared/components/Layout/utils'
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+// import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+// import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop'
 import { useSearchParams } from 'react-router-dom'
 import baseClasses from '~/App.module.scss'
 
@@ -58,7 +60,7 @@ export const FixedScrollTopBtn = memo(() => {
             }
           )}
         >
-          <KeyboardArrowUpIcon color='primary' />
+          <VerticalAlignTopIcon color='primary' />
         </div>
       )}
     </>

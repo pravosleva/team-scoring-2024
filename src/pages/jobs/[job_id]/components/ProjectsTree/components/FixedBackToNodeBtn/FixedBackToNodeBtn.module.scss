@@ -4,17 +4,14 @@
 }
 
 .wrapper {
-  bottom: 50%;
-  right: 0px;
   transition: transform 0.4s ease-in;
-  transform: translateX(calc(100%)) translateY(50%);
 
   // width: 56px;
   height: 56px;
   // padding: 0 24px;
   padding: 0 16px 0 24px;
   color: #FFF;
-  max-width: 140px;
+  max-width: 150px;
 
   border-radius: 56px 0px 0px 56px;
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
@@ -24,7 +21,9 @@
   display: flex;
   // background-color: #1565c0; // blue
   // background-color: #02c39a; // green
-  background-color: #00a47d; // green dark 1
+  // background-color: #00a47d; // green dark 1
+  font-size: small;
+  font-weight: bold;
 
   cursor: pointer;
 
@@ -32,6 +31,38 @@
   align-items: center;
 }
 
-.isRequired {
+.rightCenter {
+  bottom: 50%;
+  right: 0px;
+  transform: translateX(calc(100%)) translateY(50%);
+}
+
+.rightCenter.isRequired {
   transform: translateX(0px) translateY(50%);
+}
+
+.rightBottom {
+  bottom: 130px;
+  right: 0px;
+  transform: translateX(calc(100%));
+}
+
+.rightBottom.isRequired {
+  transform: translateX(0px);
+}
+
+.green {
+  background-color: #00a47d; // green dark 1
+}
+
+.primary {
+  background-color: #1565c0; // blue
+}
+
+.red {
+  background-color: #e63946; // red
+}
+
+.orange {
+  background-color: #e56e3f;
 }

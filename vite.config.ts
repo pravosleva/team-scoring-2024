@@ -35,6 +35,9 @@ const modulesToSeparate = [
   'react-hook-form',
   'recharts',
   'brain.js',
+  'javascript-time-ago',
+  'json-edit-react',
+  'ts-tree-lib',
 ]
 const _chunksMap = new Map()
 
@@ -131,7 +134,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       output: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
         manualChunks(id: string, _manualChunkMeta) {
           for (const moduleSubstr of modulesToSeparate) {
             // NOTE: Reducing the vendor chunk size
