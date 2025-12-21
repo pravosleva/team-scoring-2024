@@ -158,8 +158,10 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
                 isCreatable && !activeFilters.isAnyFilterActive && (
                   <TextField
                     type='text'
+                    enterKeyHint='next'
                     // ref={inputRef}
-                    placeholder='What needs to be done?'
+                    placeholder='Create new'
+                    helperText='New job will be created'
                     label='Title'
                     variant='outlined'
                     // error={!!__errsState[key]}

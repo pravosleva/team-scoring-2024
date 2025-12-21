@@ -72,7 +72,7 @@ export const scrollToIdFactory = ({ timeout, offsetTop, elementHeightCritery }: 
 
       }
       else {
-        cb?.onErr({ reason: `- node not found nodeId=${id}` });
+        cb?.onErr({ reason: `[NODE_NOT_FOUND] nodeId=${id}` });
       }
     } catch (err) {
       console.warn(err)

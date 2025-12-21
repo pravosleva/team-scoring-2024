@@ -16,12 +16,17 @@ const getIsJobNew = ({ job }) => !job.forecast.estimate
     "assignedTo": false,
     "estimateReached": false,
     "isProject": false,
+
+    isBasicSearchRequired: boolean;
+
     "values": {
       "isProject": null,
       "jobStatusFilter": null,
       "assignedTo": null,
       "estimateReached": null,
-      "isNew": null
+      "isNew": null,
+
+      basicSearchText: string | null,
     }
   }
 */
@@ -52,6 +57,9 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
   const preFilteredJobs = isTargetJobsRequested && targetJobsRequested.length > 0
     ? allJobs.filter((job) => targetJobsRequested.includes(job.id))
     : allJobs
+
+  const isBasicSearchRequired = activeFilters.isBasicSearchRequired
+  const basicSearchText = activeFilters.values?.basicSearchText
 
   const nowDate = new Date().getTime()
 
@@ -171,6 +179,20 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
             default:
               break
           }
+        }
+
+        // NOTE: 1.6. isBasicSearchRequired
+        // console.log(`isBasicSearchRequired -> ${isBasicSearchRequired}`)
+        // console.log(`!!basicSearchText -> ${!!basicSearchText}`)
+
+        if (isBasicSearchRequired && !!basicSearchText) {
+          const isMatched = getMatchedByAllStrings({
+            tested: clsx(job.title, job.descr, ...(job.pointset?.map(p => clsx(p.title, p.descr)) || [])),
+            expected: basicSearchText.split(' '),
+          })
+
+          if (isMatched) jobIsReady.push(true)
+          else jobIsReady.push(false)
         }
 
         if (jobIsReady.every(v => v === true))

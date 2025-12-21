@@ -4,7 +4,7 @@
  * Внешние зависимости:
  * - getMatchedByRegExp({ tested, regexp })
  *
- * @param {*} arg Объект
+ * @param {Object} arg Объект
  * @param {string} arg.tested 
  * @param {string[]} arg.expected 
  * @returns {boolean}

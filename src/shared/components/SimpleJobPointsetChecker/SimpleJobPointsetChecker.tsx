@@ -28,6 +28,7 @@ type TProps = {
   jobId: TJob['id'];
   isEditable: boolean;
   isCreatable: boolean;
+  noFixedNavigateBtn?: boolean;
 }
 
 const specialScrollForExternalBox = scrollToIdFactory({
@@ -36,7 +37,7 @@ const specialScrollForExternalBox = scrollToIdFactory({
   elementHeightCritery: 550,
 })
 
-export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, isDebugEnabled }: TProps) => {
+export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEditable, isCreatable, isDebugEnabled }: TProps) => {
   const { inView, assignRef } = useElementInView()
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
   const [calc, setCalc] = useState<TreeNode<TEnchancedPointByWorker> | null>(null)
@@ -334,7 +335,7 @@ export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, 
       }
 
       {
-        !!targetJob?.pointset && targetJob?.pointset?.length > 0 && (
+        !noFixedNavigateBtn && !!targetJob?.pointset && targetJob?.pointset?.length > 0 && (
           <FixedBackToPointsetBtn
             isRequired={!inView}
             onClick={scrollBoxIntoViewFnRef.current}
@@ -502,7 +503,7 @@ export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, 
       )}
 
       {
-        !!targetJob && Array.isArray(targetJob.pointset) && targetJob.pointset.length > 0 && !isEditMode && (
+        isEditable && !!targetJob && Array.isArray(targetJob.pointset) && targetJob.pointset.length > 0 && !isEditMode && (
           <>
             <div
               className={clsx(baseClasses.truncate, baseClasses.stack1)}
@@ -529,16 +530,20 @@ export const SimpleJobPointsetChecker = memo(({ jobId, isEditable, isCreatable, 
                             <div className={clsx(baseClasses.truncate)}>{clsx(localStatusPacksSettings[activeStatusPackKey][p.statusCode]?.emoji, p.title)}</div>
                           )
                       }
-                      <div
-                        style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'row', gap: '1px', alignItems: 'center' }}
-                      >
-                        <code className={classes.inlineControlBtn} onClick={handleEditToggle({ id: p.id })}>
-                          [ Edit ]
-                        </code>
-                        <code className={classes.inlineControlBtn} onClick={handleDeletePoint({ id: p.id })} style={{ color: 'red' }}>
-                          [ Del ]
-                        </code>
-                      </div>
+                      {
+                        isEditable && (
+                          <div
+                            style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'row', gap: '1px', alignItems: 'center' }}
+                          >
+                            <code className={classes.inlineControlBtn} onClick={handleEditToggle({ id: p.id })}>
+                              [ Edit ]
+                            </code>
+                            <code className={classes.inlineControlBtn} onClick={handleDeletePoint({ id: p.id })} style={{ color: 'red' }}>
+                              [ Del ]
+                            </code>
+                          </div>
+                        )
+                      }
                     </div>
                     {
                       !!p.descr && (

@@ -13,7 +13,7 @@ import { useLocation } from 'react-router-dom'
 import AppsIcon from '@mui/icons-material/Apps'
 // import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import clsx from 'clsx'
-import { ResponsiveBlock } from '~/shared/components'
+import { ResponsiveBlock, SearchWidget } from '~/shared/components'
 // import SegmentIcon from '@mui/icons-material/Segment'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedPinnedJoblist, FixedScrollTopBtn } from './components'
@@ -28,6 +28,7 @@ import { vi } from '~/shared/utils/vi'
 import LensBlurIcon from '@mui/icons-material/LensBlur'
 import LensIcon from '@mui/icons-material/Lens'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { TopLevelContext } from '~/shared/xstate'
 
 type TProps = {
   children: React.ReactNode;
@@ -96,6 +97,8 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
   const handleOpenSpeedDial = () => setSpeedDialOpened(true)
   const handleCloseSpeedDial = () => setSpeedDialOpened(false)
   const debugViSnap = useSnapshot(vi.common.devtools)
+
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
 
   return (
     <ParamsInspectorContextWrapper>
@@ -179,6 +182,11 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
       {
         !noPinnedJoblistBtn && (
           <FixedPinnedJoblist />
+        )
+      }
+      {
+        jobs.length > 0 && (
+          <SearchWidget position='left-side-center-bottom' />
         )
       }
     </ParamsInspectorContextWrapper>

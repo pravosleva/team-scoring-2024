@@ -13,23 +13,24 @@
 export const delayedCallFactory = <R, A extends unknown[]>(
   fn: (...args: A) => R,
   delay: number
-): [(...args: A) => void] => {
-  let latestExecution: undefined | number = undefined;
+): [(...args: A) => void, () => void] => {
+  let latestExecution: undefined | number = undefined
+  let timeout: NodeJS.Timeout
 
   return [
     function throttled(...args: A) {
-      const now = performance.now();
+      const now = performance.now()
 
       // Check if function has been called before
       if (typeof latestExecution === 'number') {
         // Check if next allowable function call is in the future
-        const nextExecution = latestExecution + delay;
+        const nextExecution = latestExecution + delay
 
         if (nextExecution > now) {
           // Next allowed call is in the future,
           // so queue it up and advance latestExecution
           latestExecution = nextExecution;
-          setTimeout(() => fn(...args), nextExecution - now);
+          timeout = setTimeout(() => fn(...args), nextExecution - now)
 
           return;
         }
@@ -41,5 +42,12 @@ export const delayedCallFactory = <R, A extends unknown[]>(
       latestExecution = now;
       fn(...args);
     },
+    () => {
+      if (!!timeout) {
+        // const now = performance.now()
+        // latestExecution = now
+        clearTimeout(timeout)
+      }
+    }
   ]
 }

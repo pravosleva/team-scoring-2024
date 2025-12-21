@@ -28,6 +28,7 @@ export type TPICFilters = {
   estimateReached: boolean;
   isProject: boolean;
   isTargetJobsRequested: boolean;
+  // isBasicSearchRequired: boolean;
   values: {
     targetJobsRequested: number[];
     jobStatusFilter: null | EJobsStatusFilter;
@@ -35,6 +36,7 @@ export type TPICFilters = {
     estimateReached: null | 0 | 1;
     isProject: null | 0 | 1;
     isNew: null | 0 | 1;
+    // basicSearchText: string | null;
   },
 };
 type TUserRouteControlsItem = {
@@ -79,6 +81,7 @@ const initialState: TPICStore = {
     estimateReached: false,
     isProject: false,
     isTargetJobsRequested: false,
+    // isBasicSearchRequired: false,
     values: {
       targetJobsRequested: [],
       jobStatusFilter: null,
@@ -86,6 +89,7 @@ const initialState: TPICStore = {
       estimateReached: null,
       isProject: null,
       isNew: null,
+      // basicSearchText: null,
     },
   },
   filteredJobs: [],
@@ -179,6 +183,10 @@ const Logic = ({ children }: TProps) => {
       !!params.job_ids
       && params.job_ids.split(',').filter((id) => !Number.isNaN(Number(id))).length > 0
 
+    // const hasBasicSearchText =
+    //   !!params.q_basic_search
+    //   && typeof params.q_basic_search === 'string'
+
     let filteredJobs: TJob[] = []
     const activeFilters: TPICFilters = {
       isAnyFilterActive: hasJobStatusFilter || hasAssignedToFilter || hasEstimateReachedFilter || hasIsProjectFilterValue || hasIsNewFilterValue || isTargetJobsRequested,
@@ -187,6 +195,7 @@ const Logic = ({ children }: TProps) => {
       estimateReached: hasEstimateReachedFilter,
       isProject: hasIsProjectFilterValue,
       isTargetJobsRequested: isTargetJobsRequested,
+      // isBasicSearchRequired: hasBasicSearchText,
       values: {
         targetJobsRequested: isTargetJobsRequested
           ? [
@@ -200,6 +209,7 @@ const Logic = ({ children }: TProps) => {
         assignedTo: null,
         estimateReached: null,
         isNew: null,
+        // basicSearchText: hasBasicSearchText ? (params.q_basic_search || null) : null,
       },
     }
     const counters: TPICCounters = {
@@ -406,7 +416,7 @@ const Logic = ({ children }: TProps) => {
     setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })
 
     // if () send({ type: 'filter.jobStatus.change', filter: jobStatusFilterValue as EJobsStatusFilter })
-  }, [urlSearchParams, location.pathname, allJobs, setStore, params.user_id, params.job_ids])
+  }, [urlSearchParams, location.pathname, allJobs, setStore, params.user_id, params.job_ids, params.q_basic_search])
 
   // NOTE: 2. Persist todos
   useLayoutEffect(() => {

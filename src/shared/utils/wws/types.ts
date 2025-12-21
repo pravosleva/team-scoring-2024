@@ -4,21 +4,15 @@ export namespace NWService {
     DIE_WORKER = 'c-w:die-worker',
     RESET_WORKER_HISTORY = 'c-w:reset-worker-history',
     MESSAGE = 'c-w:message',
-
     GET_WORST_CALC = 'c-w:taro-worst-calc:sorted-speeds:get',
     GET_PROJECTS_TREE_CALC = 'c-w:projects-tree-calc:get',
     GET_POINTSET_TREE_CALC = 'c-w:pointset-tree-calc:get',
-
     EXPERIMENTAL_PING = 'c-w:experimental:ping',
-
     GET_JOBS_PAGER = 'c-w:jobs-pager:ping:get',
-
     GET_SORTED_JOBS_PAGER = 'c-w:sorted-jobs-pager:ping:get',
-
     GET_SORTED_LOGS_PAGER = 'c-w:sorted-logs-pager:ping:get',
-
     GET_SORTED_REPORT_PAGER = 'c-w:sorted-report-pager:ping:get',
-
+    GET_SEARCH_BASIC_PAGER = 'c-w:search-pager-basic:ping:get',
     // NOTE: 1/2 Others...
   }
   export enum EWorkerToClientEvent {
@@ -47,6 +41,9 @@ export namespace NWService {
 
     SORTED_REPORT_PAGER_OK = 'w-c:sorted-report-pager:pong:ok',
     SORTED_REPORT_PAGER_ERR = 'w-c:sorted-report-pager:pong:err',
+
+    SEARCH_BASIC_REPORT_PAGER_OK = 'w-c:search-pager-basic:pong:ok',
+    SEARCH_BASIC_PAGER_ERR = 'w-c:search-pager-basic:pong:err',
 
     // NOTE: 2/2 Others...
 

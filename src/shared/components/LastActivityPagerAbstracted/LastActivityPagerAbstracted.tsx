@@ -127,7 +127,6 @@ export const LastActivityPagerAbstracted = memo(({
         url === pagerControlsHardcodedPath
         && !!query?.lastSeenLogKey
       ) {
-        console.log(1)
         specialScroll({
           id: `log_list_item_${query.lastSeenLogKey}`,
           cb: {
@@ -137,17 +136,13 @@ export const LastActivityPagerAbstracted = memo(({
               setSearchParams(urlSearchParams)
             },
             onErr: ({ reason }) => {
-              console.log(2)
               console.log(reason)
               // 2. Иначе переход на другую страницу
               navigate(getFullUrl({ url, query, queryKeysToremove }))
             },
           },
         })
-      } else {
-        console.log(3)
-        navigate(getFullUrl({ url, query, queryKeysToremove }))
-      }
+      } else navigate(getFullUrl({ url, query, queryKeysToremove }))
     },
     [navigate, getFullUrl, pagerControlsHardcodedPath, urlSearchParams, setSearchParams]
   )

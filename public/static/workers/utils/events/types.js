@@ -132,7 +132,16 @@ const NES = {
           PONG_ERR: 'w-c:sorted-report-pager:pong:err',
         },
       },
-      // Others...
+      SarchPagerBasic: {
+        EClientToWorkerEvent: {
+          PING_GET: 'c-w:search-pager-basic:ping:get',
+        },
+        EWorkerToClientEvent: {
+          PONG_OK: 'w-c:search-pager-basic:pong:ok',
+          PONG_ERR: 'w-c:search-pager-basic:pong:err',
+        },
+      },
+      // Whatever...
       // --
     }
   },
