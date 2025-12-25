@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 import { useParams } from 'react-router-dom'
 // import { DialogAsButton } from '~/shared/components/Dialog'
 import { Box, Button, Rating } from '@mui/material'
@@ -22,8 +22,11 @@ import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { SingleTextManager } from '~/shared/components'
 import { CommentManager } from './components'
+import clsx from 'clsx'
 
-export const LogPage = () => {
+const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
+
+export const LogPage = memo(() => {
   const params = useParams()
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
 
@@ -40,16 +43,15 @@ export const LogPage = () => {
     user: targetUser,
   }), [targetJob, targetUser])
   const targetLog = useMemo<TLogsItem | undefined>(() => {
-    const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
     switch (true) {
-      case !targetJob:
+      case !targetJob || !params.log_ts || !params.job_id:
         return undefined
       case isNumber(params.log_ts):
         return targetJob.logs.items.find(({ ts }) => ts === Number(params.log_ts))
       default:
         return undefined
     }
-  }, [targetJob, params.log_ts])
+  }, [targetJob, params.log_ts, params.job_id])
 
   const jobsActorRef = TopLevelContext.useActorRef()
 
@@ -195,6 +197,7 @@ export const LogPage = () => {
                 )
               }
               <SingleTextManager
+                key={`log-text-${params.job_id}--${params.log_ts}`}
                 infoLabel='Log text'
                 buttonText='Add log text'
                 initialState={{ text: targetLog?.text || '' }}
@@ -210,7 +213,7 @@ export const LogPage = () => {
               {
                 !!targetJob && !!targetLog && (
                   <SimpleCheckList
-                    key={targetJob.ts.update}
+                    key={`checklist-${params.job_id}--${params.log_ts}--${targetJob.ts.update}`}
                     // _additionalInfo={{ message: 'No helpful info' }}
                     isMiniVariant
                     items={targetLog.checklist || []}
@@ -258,7 +261,6 @@ export const LogPage = () => {
 
       {
         !!targetJob && !!targetLog && (
-
           <Grid
             size={12}
           >
@@ -446,4 +448,4 @@ export const LogPage = () => {
 
     </Grid>
   )
-}
+})

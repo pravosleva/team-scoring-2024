@@ -27,6 +27,7 @@ const getIsJobNew = ({ job }) => !job.forecast.estimate
       "isNew": null,
 
       basicSearchText: string | null,
+      enhancedSearchText: string | null,
     }
   }
 */
@@ -34,6 +35,10 @@ const getIsJobNew = ({ job }) => !job.forecast.estimate
 const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
   const result = {
     items: [],
+    _service: {
+      logsMapping: {},
+      // NOTE: { [key: String(job.id)]: { original: TLog, _service: { commonMessage?: string; logLocalLinks: { relativeUrl: string; ui: string }[] } }[] }
+    },
   }
   const jobStatusFilterValue = activeFilters.values.jobStatusFilter
   const hasJobStatusFilter = !!jobStatusFilterValue
@@ -60,6 +65,9 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
 
   const isBasicSearchRequired = activeFilters.isBasicSearchRequired
   const basicSearchText = activeFilters.values?.basicSearchText
+
+  const isEnhancedSearchRequired = activeFilters.isEnhancedSearchRequired
+  const enhancedSearchText = activeFilters.values?.enhancedSearchText
 
   const nowDate = new Date().getTime()
 
@@ -105,7 +113,8 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
         if (hasAssignedToFilter) {
           const normalizedValue = Number(assignedToFilterValue)
           activeFilters.values.assignedTo = normalizedValue
-          if (job.forecast.assignedTo === normalizedValue) jobIsReady.push(true)
+          if (job.forecast.assignedTo === normalizedValue)
+            jobIsReady.push(true)
           else
             jobIsReady.push(false)
         }
@@ -182,18 +191,143 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
         }
 
         // NOTE: 1.6. isBasicSearchRequired
-        // console.log(`isBasicSearchRequired -> ${isBasicSearchRequired}`)
-        // console.log(`!!basicSearchText -> ${!!basicSearchText}`)
-
+        let searchCriteryBasic = false
         if (isBasicSearchRequired && !!basicSearchText) {
           const isMatched = getMatchedByAllStrings({
             tested: clsx(job.title, job.descr, ...(job.pointset?.map(p => clsx(p.title, p.descr)) || [])),
             expected: basicSearchText.split(' '),
           })
 
-          if (isMatched) jobIsReady.push(true)
+          if (isMatched) {
+            searchCriteryBasic = true
+            jobIsReady.push(true)
+          } else jobIsReady.push(false)
+        }
+
+        // -- NOTE: 1.7. isEnhancedSearchRequired
+        if (isEnhancedSearchRequired && !!enhancedSearchText) {
+          // NOTE: Logs should be analyzed
+          const getIsLogRequired = ({ log, jobId }) => {
+            const analyzed = { ok: false, reason: 'Not modified', __logLocalLinks: [], __logExternalLinks: [] }
+            const msgs = new Set()
+
+            // 1.7.1 Log text
+            const isMatchedText = getMatchedByAllStrings({
+              tested: clsx(log.text),
+              expected: enhancedSearchText.split(' '),
+            })
+            if (isMatchedText) {
+              analyzed.ok = true
+              msgs.add('Matched with log text')
+            }
+
+            // 1.7.2 Log links item url, title, descr
+            if (log.links?.length > 0) {
+              for (const { id: _id, url, title, descr } of log.links) {
+                const isMatched = getMatchedByAnyString({
+                  tested: clsx(title, descr, url),
+                  expected: enhancedSearchText.split(' '),
+                })
+                if (isMatched) {
+                  analyzed.ok = true
+                  msgs.add('Matched with link props (title, descr, url)')
+                  analyzed.__logExternalLinks.push({
+                    url,
+                    ui: title,
+                    descr,
+                    logTs: log.ts,
+                    jobId,
+                  })
+                }
+              }
+            }
+
+            // 1.7.3 Log checklist item title, descr
+            if (log.checklist?.length > 0) {
+              analyzed.__logLocalLinks = log.checklist
+                .reduce((acc, cur) => {
+                  const { title, descr, ts, isDone, id, isDisabled, links } = cur
+                  /* NOTE: TLogChecklistItem
+                    title: string;
+                    descr: string;
+                    isDone: boolean;
+                    isDisabled: boolean;
+                    links?: TLogLink[];
+                    id: number;
+                    ts: {
+                      createdAt: number;
+                      updatedAt: number;
+                    };
+                  */
+                  const isCheckListItemOk = getMatchedByAnyString({
+                    tested: clsx(title, descr),
+                    expected: enhancedSearchText.split(' '),
+                  })
+                  if (isCheckListItemOk) {
+                    analyzed.ok = true
+                    msgs.add('Matched with checklist item (title, descr)')
+                    acc.push({
+                      id,
+                      relativeUrl: `/jobs/${jobId}/logs/${log.ts}?lastSeenLogKey=job-${jobId}-log-${log.ts}`,
+                      ui: `${isDisabled
+                          ? isDone
+                            ? '🔲'
+                            : '⬛'
+                          : isDone
+                            ? '🟩'
+                            : '🟥'
+                        } ${title}`,
+                      descr,
+                      updatedAgo: getTimeAgo({ dateInput: ts.updatedAt }),
+                      links,
+                    })
+                  }
+
+                  return acc
+                }, [])
+            }
+
+            if (analyzed.ok) {
+              analyzed.reason = [...msgs].join(', ')
+            }
+
+            return analyzed
+          }
+          let searchCriteryEnhanced = false
+          for (const log of job.logs.items) {
+            const matchAnalysis = getIsLogRequired({ log, jobId: job.id })
+            if (matchAnalysis.ok) {
+              searchCriteryEnhanced = true
+
+              // NOTE: { [key: String(job.id)]: { original: TLog[]; _service?: { commonMessage: string; logLocalLinks: { id; relativUrl, descr, ui, updatedAgo }[] } } }
+              if (!result._service.logsMapping[String(job.id)] || !Array.isArray(result._service.logsMapping[String(job.id)]))
+                result._service.logsMapping[String(job.id)] = [
+                  {
+                    original: log,
+                    _service: {
+                      commonMessage: matchAnalysis.reason,
+                      logLocalLinks: matchAnalysis.__logLocalLinks,
+                      logExternalLinks: matchAnalysis.__logExternalLinks,
+                    },
+                  }
+                ]
+              else
+                result._service.logsMapping[String(job.id)]
+                  .push({
+                    original: log,
+                    _service: {
+                      commonMessage: matchAnalysis.reason,
+                      logLocalLinks: matchAnalysis.__logLocalLinks,
+                      logExternalLinks: matchAnalysis.__logExternalLinks,
+                    }
+                  })
+            }
+          }
+
+          if (searchCriteryEnhanced || searchCriteryBasic) jobIsReady.push(true)
           else jobIsReady.push(false)
         }
+        // --
 
         if (jobIsReady.every(v => v === true))
           result.items.push(job)

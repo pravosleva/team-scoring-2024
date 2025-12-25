@@ -56,7 +56,7 @@ export const EmployeesPage = () => {
                 gridSize: 12,
                 isRequired: true,
                 validator: ({ value }) => {
-                  const alreadyExists = !!users.find(({ displayName }) => value.trim().replace(/\s+/g,' ') === displayName)
+                  const alreadyExists = !!users.find(({ displayName }) => value.trim().replace(/\s+/g, ' ') === displayName)
                   const res: { ok: boolean; message?: string } = { ok: true }
                   switch (true) {
                     case typeof value !== 'string':
@@ -84,19 +84,19 @@ export const EmployeesPage = () => {
         <Grid size={12}>
           {
             users.length > 0
-            ? (
-              <List>
-                {
-                  users.map((user) => (
-                    <Employee
-                      key={user.id}
-                      user={user}
-                      onDelete={handleUserDelete({ id: user.id })}
-                    />
-                  ))
-                }
-              </List>
-            ) : <em>No items</em>
+              ? (
+                <List>
+                  {
+                    users.map((user) => (
+                      <Employee
+                        key={user.id}
+                        user={user}
+                        onDelete={handleUserDelete({ id: user.id })}
+                      />
+                    ))
+                  }
+                </List>
+              ) : <em>No items</em>
           }
         </Grid>
       </Grid>

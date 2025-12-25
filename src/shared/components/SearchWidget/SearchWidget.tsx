@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react'
+import { memo, useState, useCallback, useRef, useEffect } from 'react'
 import clsx from 'clsx'
 // import ExpandLessIcon from '@mui/icons-material/ArrowLeft'
 import SearchIcon from '@mui/icons-material/Search'
@@ -6,28 +6,20 @@ import SearchOffIcon from '@mui/icons-material/SearchOff'
 import baseClasses from '~/App.module.scss'
 import { Alert, Button, Grid2 as Grid, IconButton, TextField } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { TJob, TopLevelContext } from '~/shared/xstate'
+import { TJob, TLogsItem, TopLevelContext } from '~/shared/xstate'
 import { debugFactory, NWService } from '~/shared/utils'
 import classes from './SearchWidget.module.scss'
 import { useSearchBasicWorker } from './hooks'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
-import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { delayedCallFactory } from '~/shared/utils/web-api-ops'
-import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { getMatchedByAnyString } from '~/shared/utils/string-ops'
-import { getIsNumeric } from '~/shared/utils/number-ops'
-import ConstructionIcon from '@mui/icons-material/Construction'
-import AccountTreeIcon from '@mui/icons-material/AccountTree'
-import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
-import HiveIcon from '@mui/icons-material/Hive'
-import ExtensionIcon from '@mui/icons-material/Extension'
+import { useParams } from 'react-router-dom'
+// import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import CircularProgress from '@mui/material/CircularProgress'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-import { SimpleJobPointsetChecker } from '../SimpleJobPointsetChecker'
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
 import { ResponsiveBlock } from '../ResponsiveBlock'
 import { useLocalStorageState } from '~/shared/hooks'
+import { CurrentPageGridItem } from './components'
 
 type TProps = {
   position: 'left-side-center-bottom';
@@ -56,6 +48,29 @@ type TTargetResultByWorker = {
   currentPage: TJob[] | null;
   nextPage: TJob[] | null;
   prevPage: TJob[] | null;
+
+  filteredJobsLogsMapping?: {
+    [key: string]: {
+      original: TLogsItem;
+      _service: {
+        commonMessage?: string;
+        logLocalLinks: {
+          relativeUrl: string;
+          ui: string;
+          descr?: string;
+          id: number;
+          updatedAgo: string;
+        }[];
+        logExternalLinks: {
+          url: string;
+          ui: string;
+          descr?: string;
+          logTs: number;
+          jobId: number;
+        }[];
+      };
+    }[];
+  };
 }
 // type TWorkerServiceReport = {
 //   message?: string;
@@ -65,31 +80,6 @@ const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null,
   label: '👉 SearchWidget EXP',
 })
 const getNormalizedPage = (index: number): number => index + 1
-
-const stickyElementHeight2 = 58
-const _specialNavigate = {
-  getOffsetTop: ({ targetElm }: { targetElm: HTMLElement }) => {
-    const classList = targetElm.className.split(' ')
-    const informativeClass = classList.find((val) => getMatchedByAnyString({ tested: val, expected: ['projects-tree-level_'] }))
-    if (!!informativeClass) {
-      const level = informativeClass.split('_')[1]
-      if (typeof level !== 'undefined' && getIsNumeric(level)) {
-        const normalizedLevel = Number(level)
-        return normalizedLevel === 1
-          ? 0 + 16
-          : normalizedLevel === 2
-            ? (normalizedLevel - 1) * stickyElementHeight2 + 8
-            : (normalizedLevel - 1) * stickyElementHeight2
-      }
-      return undefined
-    }
-  },
-}
-const specialScroll = scrollToIdFactory({
-  timeout: 250,
-  offsetTop: 16,
-  elementHeightCritery: 550,
-})
 
 export const SearchWidget = memo((ps: TProps) => {
   const [isWidgetOpened, setIsWidgetOpened] = useState<boolean>(false)
@@ -104,8 +94,9 @@ export const SearchWidget = memo((ps: TProps) => {
   const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
   const [_outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
 
-  // -- NOTE: Init basic search text; Update in LS for F5 restore (or target link load)
-  const [qBasicSearch, saveQBasicSearch] = useLocalStorageState<string | null>({
+  // -- NOTE: Init Search text fields; Update in LS for F5 restore (or target link load)
+  // 1. Basic
+  const [qBasicSearchLs, saveQBasicSearchLs] = useLocalStorageState<string | null>({
     key: 'teamScoring2024:q_basic_search',
     initialValue: null,
   })
@@ -113,17 +104,63 @@ export const SearchWidget = memo((ps: TProps) => {
   const [searchValueBasic, setSearchValueBasic] = useState(
     typeof params.q_basic_search === 'string'
       ? decodeURIComponent(params.q_basic_search)
-      : (qBasicSearch || '')
+      : (qBasicSearchLs || '')
   )
+
   useEffect(() => {
-    saveQBasicSearch(searchValueBasic)
-  }, [searchValueBasic])
+    saveQBasicSearchLs(searchValueBasic)
+  }, [searchValueBasic, saveQBasicSearchLs])
   useEffect(() => {
     if (isWidgetOpened && !searchValueBasic) {
       qBasicSearchRef.current?.focus()
     }
   }, [isWidgetOpened, searchValueBasic])
+
+  // 2. Enhanced
+  const [qEnhancedSearchLs, saveQEnhancedSearchLs] = useLocalStorageState<string | null>({
+    key: 'teamScoring2024:q_enhanced_search',
+    initialValue: null,
+  })
+  // const qEnhancedSearchRef = useRef<HTMLInputElement | null>(null)
+  const [searchValueEnhanced, setSearchValueEnhanced] = useState(
+    typeof params.q_enhanced_search === 'string'
+      ? decodeURIComponent(params.q_enhanced_search)
+      : (qEnhancedSearchLs || '')
+  )
+  const handleCleanupEnhancedSearch = () => {
+    setSearchValueEnhanced('')
+
+    setOutputWorkerData(null)
+    setOutputWorkerErrMsg(null)
+    setOutputWorkerDebugMsg(null)
+  }
+  useEffect(() => {
+    saveQEnhancedSearchLs(searchValueEnhanced)
+  }, [searchValueEnhanced, saveQEnhancedSearchLs])
   // --
+
+  const [counter, _setCounter] = useState(0)
+  // useEffect(() => {
+  //   const listener = (event: CustomEvent<LocalStorageChangeDetail>) => {
+  //     switch (event.detail.key) {
+  //       // case 'teamScoring2024:q_basic_search':
+  //       // case 'teamScoring2024:q_enhanced_search':
+  //       case 'teamScoring2024:topLevel':
+  //         console.log(`localStorage item "${event.detail.key}" changed in the same tab`)
+  //         console.log('New value:', event.detail.newValue)
+  //         // Your logic here
+  //         setCounter((v) => v + 1)
+  //         break
+  //       default:
+  //         break
+  //     }
+  //   }
+  //   // Listening for our custom event
+  //   window.addEventListener('localStorageChange', listener);
+  //   return () => {
+  //     window.removeEventListener('localStorageChange', listener)
+  //   }
+  // }, [])
 
   const handleCleanupAndClose = ({ shouldWidgetBeClosed }: { shouldWidgetBeClosed: boolean }) => () => {
     setSearchValueBasic('')
@@ -138,7 +175,7 @@ export const SearchWidget = memo((ps: TProps) => {
   const [requiredPage, setRequiredPage] = useState<null | number>(null)
   useEffect(() => {
     setRequiredPage(null)
-  }, [searchValueBasic])
+  }, [searchValueBasic, searchValueEnhanced])
   useEffect(() => {
     setOutputWorkerData(null)
     setOutputWorkerErrMsg(null)
@@ -147,14 +184,18 @@ export const SearchWidget = memo((ps: TProps) => {
 
   useSearchBasicWorker<TTargetResultByWorker, any>({
     debugName: 'SearchWidget',
-    isEnabled: !!searchValueBasic,
+    isEnabled: !!searchValueBasic || !!searchValueEnhanced,
     isDebugEnabled: true,
     deps: {
-      searchQuery: searchValueBasic,
+      searchQuery: {
+        basic: searchValueBasic,
+        enhanced: searchValueEnhanced,
+      },
       jobs: jobs,
       activeFilters,
       activeJobId: !!params.job_id ? Number(params.job_id) : null,
       requiredPage,
+      counter,
     },
     cb: {
       onEachSuccessItemData: (data) => {
@@ -181,7 +222,6 @@ export const SearchWidget = memo((ps: TProps) => {
     workerName: 'search-pager-basic',
   })
 
-  // const navigate = useNavigate()
   // const handleNavigate = useCallback((relativeUrl: string) => () => navigate(relativeUrl), [navigate])
 
   return (
@@ -202,11 +242,12 @@ export const SearchWidget = memo((ps: TProps) => {
         }
       </button>
       <div
+        style={{ backgroundColor: '#FFF' }}
         className={clsx(
           classes.wrapper,
           // baseClasses.stack2,
           // classes.fixedBox,
-          baseClasses.backdropBlurLite,
+          // baseClasses.backdropBlurLite,
           {
             [classes.leftSideCenterBottom]: ps.position === 'left-side-center-bottom',
             [classes.isClosed]: !isWidgetOpened,
@@ -235,7 +276,7 @@ export const SearchWidget = memo((ps: TProps) => {
             <TextField
               slotProps={{
                 input: {
-                  startAdornment: <SearchIcon />,
+                  startAdornment: <SearchIcon sx={{ mr: 1 }} />,
                 },
               }}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6 } }}
@@ -251,8 +292,6 @@ export const SearchWidget = memo((ps: TProps) => {
               }
               error={!!searchValueBasic && !!outputWorkerData && !outputWorkerData.currentPage}
               type='text'
-              // ref={inputRef}
-              // placeholder='Search'
               label={
                 !!params.job_id
                   ? `Search for the job #${params.job_id}`
@@ -261,25 +300,66 @@ export const SearchWidget = memo((ps: TProps) => {
                     : 'Search'
               }
               variant='outlined'
-              // error={!!__errsState[key]}
-              // helperText={__errsState[key] || undefined}
-              onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
-                if (ev.key === 'Enter') {
-                  // TODO: send to worker... (ev.target as HTMLInputElement).value
-                  // if (typeof onCreateNew === 'function') onCreateNew()
-                }
-              }}
+              // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
+              //   if (ev.key === 'Enter') {
+              //     // TODO: send to worker... (ev.target as HTMLInputElement).value
+              //     // if (typeof onCreateNew === 'function') onCreateNew()
+              //   }
+              // }}
               onChange={(ev) => {
                 setSearchValueBasic((ev.target as HTMLInputElement).value)
               }}
               value={searchValueBasic}
-              // defaultValue={params.q_basic_search}
               size='small'
               ref={qBasicSearchRef}
             />
             {
               !!searchValueBasic && (
                 <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupAndClose({ shouldWidgetBeClosed: false })}>
+                  <CloseIcon />
+                </IconButton>
+              )
+            }
+          </Grid>
+          <Grid
+            size={12}
+            sx={{
+              position: 'sticky',
+              top: '0px',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              pr: 2,
+              pl: 2,
+            }}
+          >
+            <TextField
+              slotProps={{
+                input: {
+                  startAdornment: <MonitorHeartIcon sx={{ mr: 1 }} />,
+                },
+              }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6 } }}
+              autoComplete='off'
+              enterKeyHint='search'
+              helperText='Search in logs'
+              // error={}
+              type='text'
+              label='Enhanced search'
+              variant='outlined'
+              // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
+              //   if (ev.key === 'Enter') {
+              //     // TODO: send to worker... (ev.target as HTMLInputElement).value
+              //     // if (typeof onCreateNew === 'function') onCreateNew()
+              //   }
+              // }}
+              onChange={(ev) => setSearchValueEnhanced((ev.target as HTMLInputElement).value)}
+              value={searchValueEnhanced}
+              size='small'
+            />
+            {
+              !!qEnhancedSearchLs && (
+                <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupEnhancedSearch}>
                   <CloseIcon />
                 </IconButton>
               )
@@ -299,7 +379,7 @@ export const SearchWidget = memo((ps: TProps) => {
             )
           }
           {
-            !!searchValueBasic && !!outputWorkerData && !outputWorkerData.currentPage
+            (!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && !outputWorkerData.currentPage
               ? (
                 <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
                   <b>NOT FOUND</b>
@@ -314,14 +394,14 @@ export const SearchWidget = memo((ps: TProps) => {
                 : null
           }
           {
-            !!searchValueBasic && !outputWorkerData && (
+            (!!searchValueBasic || !!searchValueEnhanced) && !outputWorkerData && (
               <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
                 <CircularProgress />
               </Grid>
             )
           }
           {
-            !!searchValueBasic && !!outputWorkerData && (
+            (!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && (
               <Grid
                 size={12}
                 sx={{
@@ -336,7 +416,10 @@ export const SearchWidget = memo((ps: TProps) => {
                 <Grid
                   container
                   spacing={4}
-                  sx={{ height: '100%' }}
+                  sx={{
+                    // height: '100%',
+                    // alignContent: 'start',
+                  }}
                 >
                   {/*
                     !!outputWorkerDebugMsg && (
@@ -361,93 +444,13 @@ export const SearchWidget = memo((ps: TProps) => {
                       <>
                         {
                           outputWorkerData.currentPage.map((j) => (
-                            <Grid
+                            <CurrentPageGridItem
+                              testedValue={searchValueBasic || searchValueEnhanced || ''}
                               key={j.id}
-                              size={12}
-                              sx={{
-                                // padding: '8px',
-                                // border: '1px solid red',
-                                pl: 2,
-                                pr: 2,
-                              }}
-                            >
-                              <div className={baseClasses.stack1}>
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    gap: '8px',
-                                  }}
-                                >
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <div>
-                                      <b
-                                        style={{
-                                          color: !!params.job_id && Number(params.job_id) === j.id ? 'red' : 'inherit',
-                                        }}
-                                      >{j.title}</b>
-                                    </div>
-                                    {
-                                      !!j.descr && (
-                                        <div>
-                                          <b style={{ color: '#959eaa' }}>{j.descr}</b>
-                                        </div>
-                                      )
-                                    }
-                                    <div
-                                      style={{ display: 'flex', flexDirection: 'row', gap: '16px', flexWrap: 'wrap' }}
-                                    >
-                                      <Link to={`/last-activity/${j.id}?q_basic_search=${encodeURIComponent(searchValueBasic)}`}>
-                                        <Button sx={{ borderRadius: 4 }} size='small'
-                                          variant='outlined'
-                                          // startIcon={<NewReleasesIcon />}
-                                          // onClick={() => navigate(`/last-activity/${j.id}`)}
-                                          startIcon={<SportsBasketballIcon />}
-                                        >
-                                          Activity
-                                        </Button>
-                                      </Link>
-                                      <Link to={`/jobs/${j.id}?q_basic_search=${encodeURIComponent(searchValueBasic)}`}>
-                                        <Button sx={{ borderRadius: 4 }} size='small'
-                                          variant='contained'
-                                          // startIcon={<NewReleasesIcon />}
-                                          // onClick={handleNavigateToJobNode({ jobId: j.id })}
-                                          startIcon={
-                                            !!j.relations.parent
-                                              ? <ExtensionIcon />
-                                              : <ConstructionIcon />
-                                          }
-                                          endIcon={
-                                            j.relations.children.length > 0
-                                              ? <HiveIcon />
-                                              : undefined}
-                                          disabled={!!params.job_id && Number(params.job_id) === j.id}
-                                        >
-                                          Job
-                                        </Button>
-                                      </Link>
-                                    </div>
-                                  </div>
-                                </div>
-                                {
-                                  !!j.pointset && j.pointset.length > 0 && (
-                                    <CollapsibleText
-                                      briefText='Roadmap'
-                                      isClickableBrief
-                                      contentRender={() => (
-                                        <SimpleJobPointsetChecker
-                                          noFixedNavigateBtn
-                                          isCreatable={false}
-                                          isEditable={false}
-                                          jobId={j.id}
-                                        />
-                                      )}
-                                    />
-                                  )
-                                }
-                              </div>
-                            </Grid>
+                              job={j}
+                              filteredJobsLogsMappingChunk={outputWorkerData.filteredJobsLogsMapping?.[String(j.id)] || []}
+                              onClickCb={toggleWigget}
+                            />
                           ))
                         }
                       </>
@@ -499,65 +502,80 @@ export const SearchWidget = memo((ps: TProps) => {
                     )
                   */}
                   {
-                    !!outputWorkerData?.pagination && (
-                      <ResponsiveBlock
-                        className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
-                        style={{
-                          padding: '16px 16px 16px 16px',
-                          // border: '1px dashed red',
-                          boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-                          position: 'sticky',
-                          bottom: 0,
-                          backgroundColor: '#fff',
-                          zIndex: 3,
-                          marginTop: 'auto',
-                          // borderRadius: '16px 16px 0px 0px',
-                        }}
-                      >
-                        <ResponsiveBlock
-                          className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
-                        >
-                          <Button
-                            sx={{ borderRadius: 4 }}
-                            size='small'
-                            color='gray'
-                            variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
-                            fullWidth
-                            // startIcon={<ArrowBackIosIcon />}
-                            onClick={() => setRequiredPage(outputWorkerData?.pagination?.prevPage)}
-                            disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
-                          >
-                            {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                            <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
-                          </Button>
+                    // NOTE: Has pagination obj
+                    !!outputWorkerData?.pagination
+                    // NOTE: And not disabled prev of next btn
+                    && (
+                      <>
+                        {
+                          (
+                            !(outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number')
+                            || !(outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number')
+                          ) ? (
+                            <ResponsiveBlock
+                              className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+                              style={{
+                                padding: '16px 16px 16px 16px',
+                                // border: '1px dashed red',
+                                boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+                                position: 'sticky',
+                                bottom: 0,
+                                backgroundColor: '#fff',
+                                zIndex: 3,
+                                marginTop: 'auto',
+                                // alignSelf: 'end',
+                                // borderRadius: '16px 16px 0px 0px',
+                              }}
+                            >
+                              <ResponsiveBlock
+                                className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
+                              >
+                                <Button
+                                  sx={{ borderRadius: 4 }}
+                                  size='small'
+                                  color='gray'
+                                  variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                                  fullWidth
+                                  // startIcon={<ArrowBackIosIcon />}
+                                  onClick={() => setRequiredPage(outputWorkerData?.pagination?.prevPage)}
+                                  disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
+                                >
+                                  {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                                  <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
+                                </Button>
 
-                          <Button
-                            sx={{ borderRadius: 4 }}
-                            size='small'
-                            color='gray'
-                            variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
-                            fullWidth
-                            // endIcon={<ArrowForwardIosIcon />}
-                            onClick={() => setRequiredPage(outputWorkerData?.pagination?.nextPage)}
-                            disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
-                          >
-                            {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                            <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
-                          </Button>
+                                <Button
+                                  sx={{ borderRadius: 4 }}
+                                  size='small'
+                                  color='gray'
+                                  variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                                  fullWidth
+                                  // endIcon={<ArrowForwardIosIcon />}
+                                  onClick={() => setRequiredPage(outputWorkerData?.pagination?.nextPage)}
+                                  disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
+                                >
+                                  {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                                  <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
+                                </Button>
 
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'flex-start',
-                              alignItems: 'center',
-                              color: 'gray',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            {getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / {outputWorkerData.pagination.totalPages}
-                          </div>
-                        </ResponsiveBlock>
-                      </ResponsiveBlock>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    color: 'gray',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / {outputWorkerData.pagination.totalPages}
+                                </div>
+                              </ResponsiveBlock>
+                            </ResponsiveBlock>
+                          ) : (
+                            <div style={{ borderBottom: '1px solid transparent' }} />
+                          )
+                        }
+                      </>
                     )
                   }
                 </Grid>

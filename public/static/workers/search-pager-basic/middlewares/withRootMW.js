@@ -1,6 +1,6 @@
 // importScripts('./middlewares/for-ts-tree-lib/calc.v4.js')
 
-console.log('[LOADED] searsh-pager-basic/middlewares/withRootMW')
+console.log('[LOADED] search-pager-basic/middlewares/withRootMW')
 
 // NOTE: compose fn should be imported already
 // NOTE: delay fn should be imported already
@@ -15,7 +15,7 @@ const withRootMW = (arg) => compose([
     const { __eType, input } = eventData
 
     if (debugConfig.workerEvs.mwsInternalLogs.isEnabled) log({
-      label: 'searsh-pager-basic/middlewares/withRootMW [MW] exp',
+      label: 'search-pager-basic/middlewares/withRootMW [MW] exp',
       msgs: [
         'eventData:',
         eventData,
@@ -45,7 +45,8 @@ const withRootMW = (arg) => compose([
                 // -- TODO: getMatchedByAllStrings
                 // input.activeFilters
                 // input.jobs
-                // input.searchQuery
+                // input.searchQuery.basic
+                // input.searchQuery.enhanced
                 // input.activeJobId
 
                 const mutableDefaultFiltersConfig = {
@@ -56,6 +57,7 @@ const withRootMW = (arg) => compose([
                   isProject: false,
                   isTargetJobsRequested: false,
                   isBasicSearchRequired: false,
+                  isEnhancedSearchRequired: false,
                   values: {
                     targetJobsRequested: [],
                     jobStatusFilter: null,
@@ -64,6 +66,7 @@ const withRootMW = (arg) => compose([
                     isProject: null,
                     isNew: null,
                     basicSearchText: null,
+                    enhancedSearchText: null,
                   },
                 }
                 if (isFiltersRequired) {
@@ -73,7 +76,7 @@ const withRootMW = (arg) => compose([
                     removeIfUndefined: false,
                   })
                 }
-                if (typeof eventData?.input?.searchQuery && !!eventData?.input?.searchQuery) {
+                if (typeof eventData?.input?.searchQuery?.basic === 'string' && !!eventData?.input?.searchQuery?.basic) {
                   isFiltersRequired = true
                   mutateObject({
                     target: mutableDefaultFiltersConfig,
@@ -81,7 +84,21 @@ const withRootMW = (arg) => compose([
                       isAnyFilterActive: true,
                       isBasicSearchRequired: true,
                       values: {
-                        basicSearchText: eventData.input.searchQuery,
+                        basicSearchText: eventData.input.searchQuery.basic,
+                      },
+                    },
+                    removeIfUndefined: false,
+                  })
+                }
+                if (typeof eventData?.input?.searchQuery?.enhanced === 'string' && !!eventData?.input?.searchQuery?.enhanced) {
+                  isFiltersRequired = true
+                  mutateObject({
+                    target: mutableDefaultFiltersConfig,
+                    source: {
+                      isAnyFilterActive: true,
+                      isEnhancedSearchRequired: true,
+                      values: {
+                        enhancedSearchText: eventData.input.searchQuery.enhanced,
                       },
                     },
                     removeIfUndefined: false,
@@ -163,6 +180,8 @@ const withRootMW = (arg) => compose([
                     // jobsMinimalData: eventData?.input?.jobs?.map(getMinimalData),
                     // targetJobId: eventData?.input?.activeJobId,
                   },
+
+                  filteredJobsLogsMapping: filteredJobs._service.logsMapping,
                 }
 
                 // ---
@@ -190,7 +209,7 @@ const withRootMW = (arg) => compose([
               if (!res.ok) throw new Error(res.reason)
             } catch (err) {
               output.ok = false
-              output.message = `Worker error: ${err?.message || 'No message'}; searsh-pager-basic/middlewares/withRootMW`
+              output.message = `Worker error: ${err?.message || 'No message'}; search-pager-basic/middlewares/withRootMW`
 
               if (debugConfig.workerEvs.mwsInternalLogs.isEnabled) log({
                 label: `c->(worker):port:listener:opsEventType:${eventData?.input?.opsEventType}->[cb]`,

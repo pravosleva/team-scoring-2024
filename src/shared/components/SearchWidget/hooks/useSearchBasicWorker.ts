@@ -9,12 +9,16 @@ import { TPICFilters } from '~/shared/xstate/topLevelMachine/v2/context/ParamsIn
 
 type TWorkerDeps = {
   // counter: number;
-  searchQuery: string;
+  searchQuery: {
+    basic: string;
+    enhanced: string;
+  };
   jobs: TJob[];
   activeJobId: number | null;
   // requiredPage?: number;
   activeFilters?: TPICFilters;
   requiredPage: null | number;
+  counter: number;
 }
 
 type TProps<TTargetResult> = {
@@ -156,7 +160,8 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
     cb,
     // deps.counter,
     deps.jobs,
-    deps.searchQuery,
+    deps.searchQuery.basic,
+    deps.searchQuery.enhanced,
     deps.requiredPage,
     debugName,
     workerName,
@@ -166,7 +171,10 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
     input: {
       opsEventType: NWService.EClientToWorkerEvent;
       jobs: TJob[];
-      searchQuery: string;
+      searchQuery: {
+        basic: string;
+        enhanced: string;
+      };
       requiredPage: number | null;
       _activeFilters?: TPICFilters;
       activeJobId?: number | null;
@@ -177,7 +185,10 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
         appVersion: string;
         opsEventType: string;
         jobs: TJob[];
-        searchQuery: string;
+        searchQuery: {
+          basic: string;
+          enhanced: string;
+        };
         requiredPage: number | null;
         _activeFilters?: TPICFilters;
         activeJobId?: number | null;
@@ -211,7 +222,10 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
         input: {
           opsEventType: NWService.EClientToWorkerEvent.GET_SEARCH_BASIC_PAGER,
           jobs: deps.jobs,
-          searchQuery: deps.searchQuery,
+          searchQuery: {
+            basic: deps.searchQuery.basic.trim().replace(/\s+/g, ' '),
+            enhanced: deps.searchQuery.enhanced.trim().replace(/\s+/g, ' '),
+          },
           _activeFilters: deps.activeFilters,
           requiredPage: deps.requiredPage,
           activeJobId: deps.activeJobId,
@@ -227,11 +241,13 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
   }, [
     isEnabled,
     isDebugEnabled,
-    deps.searchQuery,
+    deps.searchQuery.basic,
+    deps.searchQuery.enhanced,
     deps.jobs,
     deps.activeFilters,
     deps.activeJobId,
     deps.requiredPage,
+    deps.counter,
     debugName,
     workerName,
   ])
