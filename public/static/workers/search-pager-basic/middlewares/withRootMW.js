@@ -200,7 +200,7 @@ const withRootMW = (arg) => compose([
               const res = await delay({
                 ms: 1500,
                 signal: controller.signal,
-                customAbortMessage: 'Just a moment, plz'
+                customAbortMessage: '[SPECIAL_ERRROR=Just a moment, plz]'
               })
                 .then(targetAction)
                 .then(() => ({ ok: true }))

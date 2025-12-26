@@ -224,7 +224,7 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
             // 1.7.2 Log links item url, title, descr
             if (log.links?.length > 0) {
               for (const { id: _id, url, title, descr } of log.links) {
-                const isMatched = getMatchedByAnyString({
+                const isMatched = getMatchedByAllStrings({
                   tested: clsx(title, descr, url),
                   expected: enhancedSearchText.split(' '),
                 })
@@ -259,7 +259,7 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
                       updatedAt: number;
                     };
                   */
-                  const isCheckListItemOk = getMatchedByAnyString({
+                  const isCheckListItemOk = getMatchedByAllStrings({
                     tested: clsx(title, descr),
                     expected: enhancedSearchText.split(' '),
                   })
@@ -270,12 +270,12 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
                       id,
                       relativeUrl: `/jobs/${jobId}/logs/${log.ts}?lastSeenLogKey=job-${jobId}-log-${log.ts}`,
                       ui: `${isDisabled
-                          ? isDone
-                            ? '🔲'
-                            : '⬛'
-                          : isDone
-                            ? '🟩'
-                            : '🟥'
+                        ? isDone
+                          ? '🔲'
+                          : '⬛'
+                        : isDone
+                          ? '🟩'
+                          : '🟥'
                         } ${title}`,
                       descr,
                       updatedAgo: getTimeAgo({ dateInput: ts.updatedAt }),

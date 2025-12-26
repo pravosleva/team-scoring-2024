@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import baseClasses from '~/App.module.scss'
 
 namespace NSHighlighedText {
@@ -29,6 +29,30 @@ const getEscapedRegExpChars = (string: string): string => {
 }
 
 export const HighlightedText: React.FC<NSHighlighedText.IProps> = ({ comparedValue, testedValue, style }) => {
+  const words = useMemo(() => getEscapedRegExpChars(testedValue).split(' '), [testedValue])
+  useEffect(() => {
+    console.log('---')
+    console.log(words)
+
+    // const results = []
+
+    // const regex = new RegExp(`\\[${expectedKey}=(?<value>\\d+)\\]`, 'g');
+
+    // const regexp = new RegExp(`^(.*?)(${words.join('|')})(.*)$`, 'g')
+    const regexp = new RegExp(`${words.join('|')}`, 'g')
+    for (let i = 0, max = words.length; i < max; i++) {
+      const t = words[i]
+
+      for (const n of t.matchAll(regexp)) {
+        console.log(n.groups)
+      }
+    }
+
+    // console.log(results);
+
+    console.log('---')
+  }, [words])
+
   const inputValueRegExp = useMemo(() => new RegExp(`^(.*?)(${getEscapedRegExpChars(testedValue)})(.*)$`, 'i'), [testedValue])
   const match = comparedValue.match(inputValueRegExp)
 

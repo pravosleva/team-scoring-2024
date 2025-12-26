@@ -1,2 +1,1 @@
 export * from './SearchWidgetDataLayer'
-export * from './TopLevelContext'

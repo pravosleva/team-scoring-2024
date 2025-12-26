@@ -1,9 +1,10 @@
 import { createRoot } from 'react-dom/client'
 import { App } from './App.tsx'
-import { TopLevelContext } from './shared/xstate/topLevelMachine/v2'
+import { SearchWidgetDataLayer, TopLevelContext } from './shared/xstate/topLevelMachine/v2'
 import { ClientPerfWidget } from '~/shared/components/ClientPerfWidget'
 import { SnackbarProvider, closeSnackbar } from 'notistack'
 import CloseIcon from '@mui/icons-material/Close'
+
 import './special-experimental-styles.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -41,8 +42,10 @@ createRoot(document.getElementById('root')!).render(
     )}
   >
     <TopLevelContext.Provider>
-      <ClientPerfWidget position='right-side-center-bottom' />
-      <App />
+      <SearchWidgetDataLayer>
+        <ClientPerfWidget position='right-side-center-bottom' />
+        <App />
+      </SearchWidgetDataLayer>
     </TopLevelContext.Provider>
   </SnackbarProvider>,
 )

@@ -1,12 +1,13 @@
-import { memo, useState, useCallback, useRef, useEffect } from 'react'
+import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import clsx from 'clsx'
 // import ExpandLessIcon from '@mui/icons-material/ArrowLeft'
 import SearchIcon from '@mui/icons-material/Search'
+import WarningIcon from '@mui/icons-material/Warning'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 import baseClasses from '~/App.module.scss'
 import { Alert, Button, Grid2 as Grid, IconButton, TextField } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { TJob, TLogsItem, TopLevelContext } from '~/shared/xstate'
+import { TJob, TLogsItem, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { debugFactory, NWService } from '~/shared/utils'
 import classes from './SearchWidget.module.scss'
 import { useSearchBasicWorker } from './hooks'
@@ -18,8 +19,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
 import { ResponsiveBlock } from '../ResponsiveBlock'
-import { useLocalStorageState } from '~/shared/hooks'
 import { CurrentPageGridItem } from './components'
+import { getExtractedValues } from '~/shared/utils/string-ops'
 
 type TProps = {
   position: 'left-side-center-bottom';
@@ -82,10 +83,27 @@ const logger = debugFactory<NWService.TDataResult<TTargetResultByWorker> | null,
 const getNormalizedPage = (index: number): number => index + 1
 
 export const SearchWidget = memo((ps: TProps) => {
-  const [isWidgetOpened, setIsWidgetOpened] = useState<boolean>(false)
+  // const [isWidgetOpened, setIsWidgetOpened] = useState<boolean>(false)
+  const [isWidgetOpened, setSearchWidgetDataLayerContextStore] = useSearchWidgetDataLayerContextStore((s) => s.isWidgetOpened)
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
+
+  const setSearchValueBasic = (v: string) => {
+    setSearchWidgetDataLayerContextStore({ searchValueBasic: v })
+  }
+  const setSearchValueEnhanced = (v: string) => {
+    setSearchWidgetDataLayerContextStore({ searchValueEnhanced: v })
+  }
+
+  const closeWidget = () => {
+    setSearchWidgetDataLayerContextStore({ isWidgetOpened: false })
+  }
   const toggleWigget = useCallback(() => {
-    setIsWidgetOpened((s) => !s)
-  }, [setIsWidgetOpened])
+    setSearchWidgetDataLayerContextStore({ isWidgetOpened: !isWidgetOpened })
+  }, [isWidgetOpened])
+  // const toggleWigget = useCallback(() => {
+  //   setIsWidgetOpened((s) => !s)
+  // }, [setIsWidgetOpened])
   // const [searchValue, setSearchValue] = useState('')
   const params = useParams()
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
@@ -94,49 +112,61 @@ export const SearchWidget = memo((ps: TProps) => {
   const [outputWorkerErrMsg, setOutputWorkerErrMsg] = useState<string | null>(null)
   const [_outputWorkerDebugMsg, setOutputWorkerDebugMsg] = useState<string | null>(null)
 
+  const preparedWorkerErrorMsg = useMemo(() => {
+    if (!outputWorkerErrMsg) return outputWorkerErrMsg
+
+    const specialMsgs = getExtractedValues({
+      tested: [outputWorkerErrMsg],
+      expectedKey: 'SPECIAL_ERRROR',
+      valueType: 'string',
+    })
+    console.log(specialMsgs)
+    return specialMsgs.length > 0 ? specialMsgs[0] : outputWorkerErrMsg
+  }, [outputWorkerErrMsg])
+
   // -- NOTE: Init Search text fields; Update in LS for F5 restore (or target link load)
   // 1. Basic
-  const [qBasicSearchLs, saveQBasicSearchLs] = useLocalStorageState<string | null>({
-    key: 'teamScoring2024:q_basic_search',
-    initialValue: null,
-  })
+  // const [qBasicSearchLs, saveQBasicSearchLs] = useLocalStorageState<string | null>({
+  //   key: 'teamScoring2024:q_basic_search',
+  //   initialValue: null,
+  // })
   const qBasicSearchRef = useRef<HTMLInputElement | null>(null)
-  const [searchValueBasic, setSearchValueBasic] = useState(
-    typeof params.q_basic_search === 'string'
-      ? decodeURIComponent(params.q_basic_search)
-      : (qBasicSearchLs || '')
-  )
+  // const [searchValueBasic, setSearchValueBasic] = useState(
+  //   typeof params.q_basic_search === 'string'
+  //     ? decodeURIComponent(params.q_basic_search)
+  //     : (qBasicSearchLs || '')
+  // )
 
-  useEffect(() => {
-    saveQBasicSearchLs(searchValueBasic)
-  }, [searchValueBasic, saveQBasicSearchLs])
-  useEffect(() => {
-    if (isWidgetOpened && !searchValueBasic) {
-      qBasicSearchRef.current?.focus()
-    }
-  }, [isWidgetOpened, searchValueBasic])
+  // useEffect(() => {
+  //   saveQBasicSearchLs(searchValueBasic)
+  // }, [searchValueBasic, saveQBasicSearchLs])
+  // useEffect(() => {
+  //   if (isWidgetOpened && !searchValueBasic) {
+  //     qBasicSearchRef.current?.focus()
+  //   }
+  // }, [isWidgetOpened, searchValueBasic])
 
   // 2. Enhanced
-  const [qEnhancedSearchLs, saveQEnhancedSearchLs] = useLocalStorageState<string | null>({
-    key: 'teamScoring2024:q_enhanced_search',
-    initialValue: null,
-  })
+  // const [qEnhancedSearchLs, saveQEnhancedSearchLs] = useLocalStorageState<string | null>({
+  //   key: 'teamScoring2024:q_enhanced_search',
+  //   initialValue: null,
+  // })
   // const qEnhancedSearchRef = useRef<HTMLInputElement | null>(null)
-  const [searchValueEnhanced, setSearchValueEnhanced] = useState(
-    typeof params.q_enhanced_search === 'string'
-      ? decodeURIComponent(params.q_enhanced_search)
-      : (qEnhancedSearchLs || '')
-  )
+  // const [searchValueEnhanced, setSearchValueEnhanced] = useState(
+  //   typeof params.q_enhanced_search === 'string'
+  //     ? decodeURIComponent(params.q_enhanced_search)
+  //     : (qEnhancedSearchLs || '')
+  // )
   const handleCleanupEnhancedSearch = () => {
-    setSearchValueEnhanced('')
+    setSearchWidgetDataLayerContextStore({ searchValueEnhanced: '' })
 
     setOutputWorkerData(null)
     setOutputWorkerErrMsg(null)
     setOutputWorkerDebugMsg(null)
   }
-  useEffect(() => {
-    saveQEnhancedSearchLs(searchValueEnhanced)
-  }, [searchValueEnhanced, saveQEnhancedSearchLs])
+  // useEffect(() => {
+  //   saveQEnhancedSearchLs(searchValueEnhanced)
+  // }, [searchValueEnhanced, saveQEnhancedSearchLs])
   // --
 
   const [counter, _setCounter] = useState(0)
@@ -163,8 +193,8 @@ export const SearchWidget = memo((ps: TProps) => {
   // }, [])
 
   const handleCleanupAndClose = ({ shouldWidgetBeClosed }: { shouldWidgetBeClosed: boolean }) => () => {
-    setSearchValueBasic('')
-    if (shouldWidgetBeClosed) setIsWidgetOpened(false)
+    setSearchWidgetDataLayerContextStore({ searchValueBasic: '' })
+    if (shouldWidgetBeClosed) closeWidget()
     else qBasicSearchRef.current?.focus()
 
     setOutputWorkerData(null)
@@ -175,7 +205,7 @@ export const SearchWidget = memo((ps: TProps) => {
   const [requiredPage, setRequiredPage] = useState<null | number>(null)
   useEffect(() => {
     setRequiredPage(null)
-  }, [searchValueBasic, searchValueEnhanced])
+  }, [searchValueBasic])
   useEffect(() => {
     setOutputWorkerData(null)
     setOutputWorkerErrMsg(null)
@@ -241,187 +271,201 @@ export const SearchWidget = memo((ps: TProps) => {
             : <SearchIcon style={{ fontSize: '24px' }} />
         }
       </button>
-      <div
-        style={{ backgroundColor: '#FFF' }}
-        className={clsx(
-          classes.wrapper,
-          // baseClasses.stack2,
-          // classes.fixedBox,
-          // baseClasses.backdropBlurLite,
-          {
-            [classes.leftSideCenterBottom]: ps.position === 'left-side-center-bottom',
-            [classes.isClosed]: !isWidgetOpened,
-            [classes.isOpened]: isWidgetOpened,
-          },
-          // classes.backdropBlur,
-        )}
-      >
-        <Grid
-          container
-          spacing={2}
+      <>
+        <div
+          style={{
+            backgroundColor: '#FFF'
+          }}
+          className={clsx(
+            classes.wrapper,
+            // baseClasses.stack2,
+            // classes.fixedBox,
+            // baseClasses.backdropBlurLite,
+            {
+              [classes.leftSideCenterBottom]: ps.position === 'left-side-center-bottom',
+              [classes.isClosed]: !isWidgetOpened,
+              [classes.isOpened]: isWidgetOpened,
+            },
+            // classes.backdropBlur,
+          )}
         >
           <Grid
-            size={12}
-            sx={{
-              position: 'sticky',
-              top: '0px',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              pr: 2,
-              pl: 2,
-              // pb: !outputWorkerData?.pagination ? 4 : 0,
-            }}
+            container
+            spacing={2}
           >
-            <TextField
-              slotProps={{
-                input: {
-                  startAdornment: <SearchIcon sx={{ mr: 1 }} />,
-                },
+            <Grid
+              size={12}
+              sx={{
+                position: 'sticky',
+                top: '0px',
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '8px',
+                pr: 2,
+                pl: 2,
+                // pb: !outputWorkerData?.pagination ? 4 : 0,
               }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6 } }}
-              // NOTE: Deprecated -> InputProps={}
-              autoComplete='off'
-              enterKeyHint='search'
-              helperText={
-                !!params.job_id
-                  ? 'You have search for target single job'
-                  : !!params.job_ids
-                    ? `You have search for target ${params.job_ids.split(',').length} job${params.job_ids.split(',').length > 1 ? 's' : ''}`
-                    : 'Search by title, descr, pointset'
+            >
+              <TextField
+                slotProps={{
+                  input: {
+                    startAdornment: (!!params.job_id || !!params.job_ids)
+                      ? <WarningIcon sx={{ mr: 1 }} htmlColor='gray' />
+                      : <SearchIcon sx={{ mr: 1 }} htmlColor='gray' />,
+                  },
+                }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6, fontWeight: 'bold', fontFamily: 'system-ui' } }}
+                // NOTE: Deprecated -> InputProps={}
+                autoComplete='off'
+                enterKeyHint='search'
+                helperText={
+                  !!params.job_id
+                    ? 'You have search for target single job'
+                    : !!params.job_ids
+                      ? `You have search for target ${params.job_ids.split(',').length} job${params.job_ids.split(',').length > 1 ? 's' : ''}`
+                      : 'Search by title, descr, pointset'
+                }
+                error={!!searchValueBasic && !!outputWorkerData && !outputWorkerData.currentPage}
+                type='text'
+                label={
+                  !!params.job_id
+                    ? `Search for the job #${params.job_id}`
+                    : !!params.job_ids
+                      ? `Search for the jobs (${params.job_ids.split(',').length})`
+                      : 'Search'
+                }
+                variant='outlined'
+                // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
+                //   if (ev.key === 'Enter') {
+                //     // TODO: send to worker... (ev.target as HTMLInputElement).value
+                //     // if (typeof onCreateNew === 'function') onCreateNew()
+                //   }
+                // }}
+                onChange={(ev) => {
+                  setSearchValueBasic((ev.target as HTMLInputElement).value)
+                }}
+                value={searchValueBasic}
+                size='small'
+                ref={qBasicSearchRef}
+              />
+              {
+                !!searchValueBasic && (
+                  <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupAndClose({ shouldWidgetBeClosed: false })}>
+                    <CloseIcon />
+                  </IconButton>
+                )
               }
-              error={!!searchValueBasic && !!outputWorkerData && !outputWorkerData.currentPage}
-              type='text'
-              label={
-                !!params.job_id
-                  ? `Search for the job #${params.job_id}`
-                  : !!params.job_ids
-                    ? `Search for the jobs (${params.job_ids.split(',').length})`
-                    : 'Search'
+            </Grid>
+            <Grid
+              size={12}
+              sx={{
+                position: 'sticky',
+                top: '0px',
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '8px',
+                pr: 2,
+                pl: 2,
+              }}
+            >
+              <TextField
+                slotProps={{
+                  input: {
+                    startAdornment: <MonitorHeartIcon htmlColor='gray' sx={{ mr: 1 }} />,
+                  },
+                }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6, fontWeight: 'bold', fontFamily: 'system-ui' } }}
+                autoComplete='off'
+                enterKeyHint='search'
+                helperText='Search in logs, checklist, links'
+                // error={}
+                type='text'
+                label='Enhanced search'
+                variant='outlined'
+                // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
+                //   if (ev.key === 'Enter') {
+                //     // TODO: send to worker... (ev.target as HTMLInputElement).value
+                //     // if (typeof onCreateNew === 'function') onCreateNew()
+                //   }
+                // }}
+                onChange={(ev) => setSearchValueEnhanced((ev.target as HTMLInputElement).value)}
+                value={searchValueEnhanced}
+                size='small'
+              />
+              {
+                !!searchValueEnhanced && (
+                  <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupEnhancedSearch}>
+                    <CloseIcon />
+                  </IconButton>
+                )
               }
-              variant='outlined'
-              // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
-              //   if (ev.key === 'Enter') {
-              //     // TODO: send to worker... (ev.target as HTMLInputElement).value
-              //     // if (typeof onCreateNew === 'function') onCreateNew()
-              //   }
-              // }}
-              onChange={(ev) => {
-                setSearchValueBasic((ev.target as HTMLInputElement).value)
-              }}
-              value={searchValueBasic}
-              size='small'
-              ref={qBasicSearchRef}
-            />
+            </Grid>
             {
-              !!searchValueBasic && (
-                <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupAndClose({ shouldWidgetBeClosed: false })}>
-                  <CloseIcon />
-                </IconButton>
-              )
-            }
-          </Grid>
-          <Grid
-            size={12}
-            sx={{
-              position: 'sticky',
-              top: '0px',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              pr: 2,
-              pl: 2,
-            }}
-          >
-            <TextField
-              slotProps={{
-                input: {
-                  startAdornment: <MonitorHeartIcon sx={{ mr: 1 }} />,
-                },
-              }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6 } }}
-              autoComplete='off'
-              enterKeyHint='search'
-              helperText='Search in logs'
-              // error={}
-              type='text'
-              label='Enhanced search'
-              variant='outlined'
-              // onKeyUp={(ev: React.KeyboardEvent<HTMLInputElement>) => {
-              //   if (ev.key === 'Enter') {
-              //     // TODO: send to worker... (ev.target as HTMLInputElement).value
-              //     // if (typeof onCreateNew === 'function') onCreateNew()
-              //   }
-              // }}
-              onChange={(ev) => setSearchValueEnhanced((ev.target as HTMLInputElement).value)}
-              value={searchValueEnhanced}
-              size='small'
-            />
-            {
-              !!qEnhancedSearchLs && (
-                <IconButton sx={{ alignSelf: 'flex-start' }} onClick={handleCleanupEnhancedSearch}>
-                  <CloseIcon />
-                </IconButton>
-              )
-            }
-          </Grid>
-          {
-            !!outputWorkerErrMsg && (
-              <Grid size={12} sx={{ pr: 2, pl: 2 }} className={baseClasses.fadeIn}>
-                <Alert
-                  severity='error'
-                  variant='filled'
+              !!preparedWorkerErrorMsg && (
+                <Grid
+                  size={12}
+                  sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}
+                  className={clsx(baseClasses.fadeIn)}
                 >
-                  {outputWorkerErrMsg}
-                </Alert>
-              </Grid>
-
-            )
-          }
-          {
-            (!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && !outputWorkerData.currentPage
-              ? (
-                <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
-                  <b>NOT FOUND</b>
+                  <Alert
+                    severity='error'
+                    variant='filled'
+                  >
+                    {preparedWorkerErrorMsg}
+                  </Alert>
                 </Grid>
               )
-              : !!outputWorkerData?.pagination.itemsRangeInfo
-                ? (
-                  <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
-                    <b>{outputWorkerData?.pagination.itemsRangeInfo}</b>
-                  </Grid>
-                )
-                : null
-          }
-          {
-            (!!searchValueBasic || !!searchValueEnhanced) && !outputWorkerData && (
-              <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
-                <CircularProgress />
-              </Grid>
-            )
-          }
-          {
-            (!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && (
-              <Grid
-                size={12}
-                sx={{
-                  // pt: 2,
-                  // pr: 2,
-                }}
-                className={clsx(
-                  classes.contentLimited,
-                  // baseClasses.boxShadowTop
-                )}
-              >
+            }
+            {
+              !preparedWorkerErrorMsg && (
+                <>
+                  {
+                    ((!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && !outputWorkerData.currentPage)
+                      ? (
+                        <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
+                          <b>NOT FOUND</b>
+                        </Grid>
+                      )
+                      : !!outputWorkerData?.pagination.itemsRangeInfo
+                        ? (
+                          <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
+                            <b>{outputWorkerData?.pagination.itemsRangeInfo}</b>
+                          </Grid>
+                        )
+                        : null
+                  }
+                </>
+              )
+            }
+            {
+              (!!searchValueBasic || !!searchValueEnhanced) && !outputWorkerData && (
+                <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
+                  <CircularProgress />
+                </Grid>
+              )
+            }
+            {
+              (!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && (
                 <Grid
-                  container
-                  spacing={4}
+                  size={12}
                   sx={{
-                    // height: '100%',
-                    // alignContent: 'start',
+                    // pt: 2,
+                    // pr: 2,
                   }}
+                  className={clsx(
+                    classes.contentLimited,
+                    // baseClasses.boxShadowTop
+                  )}
                 >
-                  {/*
+                  <Grid
+                    container
+                    spacing={4}
+                    sx={{
+                      // height: '100%',
+                      // alignContent: 'start',
+                    }}
+                  >
+                    {/*
                     !!outputWorkerDebugMsg && (
                       <Grid size={12}>
                         <Alert
@@ -439,24 +483,24 @@ export const SearchWidget = memo((ps: TProps) => {
                       </Grid>
                     )
                   */}
-                  {
-                    !!outputWorkerData?.currentPage && outputWorkerData.currentPage.length > 0 && (
-                      <>
-                        {
-                          outputWorkerData.currentPage.map((j) => (
-                            <CurrentPageGridItem
-                              testedValue={searchValueBasic || searchValueEnhanced || ''}
-                              key={j.id}
-                              job={j}
-                              filteredJobsLogsMappingChunk={outputWorkerData.filteredJobsLogsMapping?.[String(j.id)] || []}
-                              onClickCb={toggleWigget}
-                            />
-                          ))
-                        }
-                      </>
-                    )
-                  }
-                  {/*
+                    {
+                      !!outputWorkerData?.currentPage && outputWorkerData.currentPage.length > 0 && (
+                        <>
+                          {
+                            outputWorkerData.currentPage.map((j) => (
+                              <CurrentPageGridItem
+                                testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                                key={j.id}
+                                job={j}
+                                filteredJobsLogsMappingChunk={outputWorkerData.filteredJobsLogsMapping?.[String(j.id)] || []}
+                                onClickCb={toggleWigget}
+                              />
+                            ))
+                          }
+                        </>
+                      )
+                    }
+                    {/*
                     !!outputWorkerData && (
                       <Grid
                         size={12}
@@ -501,89 +545,90 @@ export const SearchWidget = memo((ps: TProps) => {
                       </Grid>
                     )
                   */}
-                  {
-                    // NOTE: Has pagination obj
-                    !!outputWorkerData?.pagination
-                    // NOTE: And not disabled prev of next btn
-                    && (
-                      <>
-                        {
-                          (
-                            !(outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number')
-                            || !(outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number')
-                          ) ? (
-                            <ResponsiveBlock
-                              className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
-                              style={{
-                                padding: '16px 16px 16px 16px',
-                                // border: '1px dashed red',
-                                boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-                                position: 'sticky',
-                                bottom: 0,
-                                backgroundColor: '#fff',
-                                zIndex: 3,
-                                marginTop: 'auto',
-                                // alignSelf: 'end',
-                                // borderRadius: '16px 16px 0px 0px',
-                              }}
-                            >
+                    {
+                      // NOTE: Has pagination obj
+                      !!outputWorkerData?.pagination
+                      // NOTE: And not disabled prev of next btn
+                      && (
+                        <>
+                          {
+                            (
+                              !(outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number')
+                              || !(outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number')
+                            ) ? (
                               <ResponsiveBlock
-                                className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
+                                className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+                                style={{
+                                  padding: '16px 16px 16px 16px',
+                                  // border: '1px dashed red',
+                                  boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+                                  position: 'sticky',
+                                  bottom: 0,
+                                  backgroundColor: '#fff',
+                                  zIndex: 3,
+                                  marginTop: 'auto',
+                                  // alignSelf: 'end',
+                                  // borderRadius: '16px 16px 0px 0px',
+                                }}
                               >
-                                <Button
-                                  sx={{ borderRadius: 4 }}
-                                  size='small'
-                                  color='gray'
-                                  variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
-                                  fullWidth
-                                  // startIcon={<ArrowBackIosIcon />}
-                                  onClick={() => setRequiredPage(outputWorkerData?.pagination?.prevPage)}
-                                  disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
+                                <ResponsiveBlock
+                                  className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
                                 >
-                                  {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                                  <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
-                                </Button>
+                                  <Button
+                                    sx={{ borderRadius: 4 }}
+                                    size='small'
+                                    color='gray'
+                                    variant={outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                                    fullWidth
+                                    // startIcon={<ArrowBackIosIcon />}
+                                    onClick={() => setRequiredPage(outputWorkerData?.pagination?.prevPage)}
+                                    disabled={outputWorkerData?.pagination.isCurrentPageFirst || typeof outputWorkerData?.pagination.prevPageIndex !== 'number'}
+                                  >
+                                    {/*`Prev${!outputWorkerData?.pagination.isCurrentPageFirst && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex - 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                                    <ArrowBackIosIcon sx={{ fontSize: '14px' }} />
+                                  </Button>
 
-                                <Button
-                                  sx={{ borderRadius: 4 }}
-                                  size='small'
-                                  color='gray'
-                                  variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
-                                  fullWidth
-                                  // endIcon={<ArrowForwardIosIcon />}
-                                  onClick={() => setRequiredPage(outputWorkerData?.pagination?.nextPage)}
-                                  disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
-                                >
-                                  {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
-                                  <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
-                                </Button>
+                                  <Button
+                                    sx={{ borderRadius: 4 }}
+                                    size='small'
+                                    color='gray'
+                                    variant={!outputWorkerData?.pagination.isCurrentPageLast ? 'contained' : 'outlined'}
+                                    fullWidth
+                                    // endIcon={<ArrowForwardIosIcon />}
+                                    onClick={() => setRequiredPage(outputWorkerData?.pagination?.nextPage)}
+                                    disabled={outputWorkerData?.pagination.isCurrentPageLast || typeof outputWorkerData?.pagination.nextPageIndex !== 'number'}
+                                  >
+                                    {/*`Next${!outputWorkerData?.pagination.isCurrentPageLast && typeof outputWorkerData?.pagination.currentPageIndex === 'number' ? ` (${getNormalizedPage(outputWorkerData?.pagination.currentPageIndex + 1)} of ${outputWorkerData?.pagination.total})` : ''}`*/}
+                                    <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
+                                  </Button>
 
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-start',
-                                    alignItems: 'center',
-                                    color: 'gray',
-                                    fontWeight: 'bold',
-                                  }}
-                                >
-                                  {getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / {outputWorkerData.pagination.totalPages}
-                                </div>
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      justifyContent: 'flex-start',
+                                      alignItems: 'center',
+                                      color: 'gray',
+                                      fontWeight: 'bold',
+                                    }}
+                                  >
+                                    {getNormalizedPage(outputWorkerData.pagination.currentPageIndex)} / {outputWorkerData.pagination.totalPages}
+                                  </div>
+                                </ResponsiveBlock>
                               </ResponsiveBlock>
-                            </ResponsiveBlock>
-                          ) : (
-                            <div style={{ borderBottom: '1px solid transparent' }} />
-                          )
-                        }
-                      </>
-                    )
-                  }
+                            ) : (
+                              <div style={{ borderBottom: '1px solid transparent' }} />
+                            )
+                          }
+                        </>
+                      )
+                    }
+                  </Grid>
                 </Grid>
-              </Grid>
-            )
-          }
-        </Grid>
-      </div>
+              )
+            }
+          </Grid>
+        </div>
+      </>
     </>
   )
 })

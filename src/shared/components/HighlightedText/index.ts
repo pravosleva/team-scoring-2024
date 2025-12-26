@@ -1,1 +1,2 @@
-export * from './HighlightedText'
+// export * from './v1'
+export * from './v2'
