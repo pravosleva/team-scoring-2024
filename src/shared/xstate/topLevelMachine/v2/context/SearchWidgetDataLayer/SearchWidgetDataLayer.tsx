@@ -57,9 +57,7 @@ const Logic = ({ children }: TProps) => {
 
   // TODO: Get query param -> auto open?
   return (
-    <>
-      {children}
-    </>
+    <>{children}</>
   )
 }
 

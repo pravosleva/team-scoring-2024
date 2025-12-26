@@ -305,7 +305,13 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                         />
                                         <a href={url} target='_blank'>{`${url} ↗️`}</a>
                                         {
-                                          !!descr && <span style={{ color: '#959eaa' }}>{descr}</span>
+                                          !!descr && (
+                                            <HighlightedText
+                                              comparedValue={descr}
+                                              testedValue={testedValue}
+                                              style={{ color: '#959eaa' }}
+                                            />
+                                          )
                                         }
                                         <span className={baseClasses.truncate}>
                                           <CopyToClipboardWrapper

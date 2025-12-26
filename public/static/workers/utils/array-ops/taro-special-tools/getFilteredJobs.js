@@ -271,8 +271,8 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
                       relativeUrl: `/jobs/${jobId}/logs/${log.ts}?lastSeenLogKey=job-${jobId}-log-${log.ts}`,
                       ui: `${isDisabled
                         ? isDone
-                          ? '🔲'
-                          : '⬛'
+                          ? '⬛'
+                          : '💀'
                         : isDone
                           ? '🟩'
                           : '🟥'

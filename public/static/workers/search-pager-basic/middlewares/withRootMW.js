@@ -6,6 +6,7 @@ console.log('[LOADED] search-pager-basic/middlewares/withRootMW')
 // NOTE: delay fn should be imported already
 
 let controller = new AbortController()
+// let finalOutputErrorController = new AbortController()
 
 const withRootMW = (arg) => compose([
   // NOTE: You can add your middlewares below...
@@ -30,7 +31,7 @@ const withRootMW = (arg) => compose([
           case NES.Common.ClientService.SarchPagerBasic.EClientToWorkerEvent.PING_GET: {
             const output = {
               ok: false,
-              message: 'Output data not modified',
+              message: 'initial',
             }
 
             try {
@@ -206,7 +207,20 @@ const withRootMW = (arg) => compose([
                 .then(() => ({ ok: true }))
                 .catch((err) => ({ ok: false, reason: err?.message || 'No err?.message' }))
 
-              if (!res.ok) throw new Error(res.reason)
+              if (!res.ok) {
+                // NOTE: v1
+                throw new Error(res.reason)
+
+                // NOTE: v2 Поставим задержку чтоб не спамить фронт
+                // finalOutputErrorController.abort()
+                // finalOutputErrorController = new AbortController()
+                // const finalThrowConfirmed = await delay({ ms: 2000, signal: finalOutputErrorController.signal })
+                //   .then(() => ({ ok: true }))
+                //   .catch((err) => ({ ok: false, reason: err?.message || 'No err?.message' }))
+
+                // if (finalThrowConfirmed.ok) throw new Error(res.reason)
+                // else return
+              }
             } catch (err) {
               output.ok = false
               output.message = `Worker error: ${err?.message || 'No message'}; search-pager-basic/middlewares/withRootMW`
