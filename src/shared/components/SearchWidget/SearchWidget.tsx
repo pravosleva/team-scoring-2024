@@ -87,7 +87,10 @@ export const SearchWidget = memo((ps: TProps) => {
   const [isWidgetOpened, setSearchWidgetDataLayerContextStore] = useSearchWidgetDataLayerContextStore((s) => s.isWidgetOpened)
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
   const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
-  const hasAnySearchValue = !!searchValueBasic || !!searchValueEnhanced
+  const hasAnySearchValue = useMemo(() => !!searchValueBasic || !!searchValueEnhanced, [searchValueBasic, searchValueEnhanced])
+
+  const params = useParams()
+  const isSpecificSearchMode = useMemo(() => !!params.job_id || !!params.job_ids || !!params.log_ts, [params.job_id, params.job_ids, params.log_ts])
 
   const setSearchValueBasic = (v: string) => {
     setSearchWidgetDataLayerContextStore({ searchValueBasic: v })
@@ -106,7 +109,7 @@ export const SearchWidget = memo((ps: TProps) => {
   //   setIsWidgetOpened((s) => !s)
   // }, [setIsWidgetOpened])
   // const [searchValue, setSearchValue] = useState('')
-  const params = useParams()
+
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const [activeFilters] = useParamsInspectorContextStore((ctx) => ctx.activeFilters)
   const [outputWorkerData, setOutputWorkerData] = useState<TTargetResultByWorker | null>(null)
@@ -264,7 +267,8 @@ export const SearchWidget = memo((ps: TProps) => {
           // 'backdrop-blur--lite',
           classes.fixedToggler,
           {
-            [classes.isActive]: hasAnySearchValue,
+            [classes.isSimpleSearchModeActive]: hasAnySearchValue && !isSpecificSearchMode,
+            [classes.isSpecificSearchModeActive]: hasAnySearchValue && isSpecificSearchMode,
           },
         )}
         onClick={toggleWigget}

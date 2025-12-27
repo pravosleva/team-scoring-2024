@@ -2,7 +2,13 @@
   font-family: system-ui;
   font-weight: bold;
   padding: 2px 5px;
-  background: #959eaa;
+  background-color: #959eaa;
   border-radius: 6px;
   color: yellow;
+  text-decoration: none !important;
+}
+
+.highlighted-inline-code--simple {}
+.highlighted-inline-code--special {
+  background-color: #ff5733;
 }

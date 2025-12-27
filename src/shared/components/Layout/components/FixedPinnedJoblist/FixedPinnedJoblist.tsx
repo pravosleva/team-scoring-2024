@@ -6,7 +6,7 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import TurnedInIcon from '@mui/icons-material/TurnedIn'
 import classes from './FixedPinnedJoblist.module.scss'
-import { TJob, TopLevelContext } from '~/shared/xstate'
+import { TJob, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getFullUrl, getMatchedByAnyString } from '~/shared/utils/string-ops'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
@@ -14,6 +14,7 @@ import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { soundManager } from '~/shared/soundManager'
 import { UserAva } from '~/shared/components/Job/components'
+import { HighlightedText } from '~/shared/components/HighlightedText'
 // import { getJobsIntuitiveSummaryInfo } from '~/shared/components/Job/utils'
 
 type TProps = {
@@ -126,6 +127,7 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   // const summaryInfo = useMemo(() => getJobsIntuitiveSummaryInfo({ jobs:  }), [])
 
   const isWidgetReqired = useMemo(() => typeof window !== 'undefined' && pinnedJobsIds.length > 0, [typeof window, pinnedJobsIds.length])
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   if (location.pathname === `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`)
     return null
@@ -248,7 +250,9 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                           })}
                           // baseClasses.truncate
                           className={clsx(baseClasses.rowsLimited3)}
-                        >{modifiedPinnedJobs[id].title}</a>
+                        >
+                          <HighlightedText comparedValue={modifiedPinnedJobs[id].title} testedValue={searchValueBasic} />
+                        </a>
                         {/* !!modifiedPinnedJobs[id].descr && (
                           <span
                             style={{

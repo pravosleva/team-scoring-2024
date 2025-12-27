@@ -1,11 +1,11 @@
 import { memo, useState, useMemo, useCallback } from 'react'
 import baseClasses from '~/App.module.scss'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
-import { LastActivityPagerAbstracted, ResponsiveBlock } from '~/shared/components'
+import { HighlightedText, LastActivityPagerAbstracted, ResponsiveBlock } from '~/shared/components'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { useLogsPagerWorker } from './hooks'
 import { debugFactory } from '~/shared/utils'
-import { TLogsItem, TopLevelContext } from '~/shared/xstate'
+import { TLogsItem, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { NWService } from '~/shared/utils/wws/types'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getFullUrl } from '~/shared/utils/string-ops'
@@ -187,6 +187,8 @@ export const LastJobActivityPage = memo(() => {
       ].join(',')}`
       : '/last-activity'
   }
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  // const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   return (
     <>
@@ -283,7 +285,12 @@ export const LastJobActivityPage = memo(() => {
                             {!!job.relations.parent && (
                               <CollapsibleText
                                 // briefPrefix='├─'
-                                briefText={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
+                                briefText={
+                                  <HighlightedText
+                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
+                                    testedValue={clsx(searchValueBasic)}
+                                  />
+                                }
                                 contentRender={() => (
                                   <div style={{ fontSize: 'small', paddingLeft: '24px' }}>
                                     <Link
@@ -294,7 +301,10 @@ export const LastJobActivityPage = memo(() => {
                                         },
                                       })}
                                     >
-                                      {getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                      <HighlightedText
+                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                        testedValue={clsx(searchValueBasic)}
+                                      />
                                     </Link>
                                   </div>
                                 )}
@@ -352,7 +362,12 @@ export const LastJobActivityPage = memo(() => {
                               >
                                 <CloseIcon sx={{ fontSize: 'inherit' }} />
                               </Link>
-                              <div style={{ color: '#000' }}>{job.title}</div>
+                              <div style={{ color: '#000' }}>
+                                <HighlightedText
+                                  comparedValue={job.title}
+                                  testedValue={clsx(searchValueBasic)}
+                                />
+                              </div>
                               {
                                 !!job.forecast.assignedTo && (
                                   <div
@@ -410,7 +425,10 @@ export const LastJobActivityPage = memo(() => {
                                             },
                                           })}
                                         >
-                                          {a.length - i}. {getModifiedJobLogText({ text: `[job=${j}]`, jobs, users: users.items })}
+                                          <HighlightedText
+                                            comparedValue={`${a.length - i}. ${getModifiedJobLogText({ text: `[job=${j}]`, jobs, users: users.items })}`}
+                                            testedValue={clsx(searchValueBasic)}
+                                          />
                                         </Link>
                                       ))
                                     }
@@ -424,7 +442,11 @@ export const LastJobActivityPage = memo(() => {
                                 briefPrefix='└─'
                                 briefText='Description'
                                 contentRender={() => (
-                                  <div style={{ fontSize: 'small', paddingLeft: '24px' }}>{job.descr}</div>
+                                  <HighlightedText
+                                    style={{ fontSize: 'small', paddingLeft: '24px' }}
+                                    comparedValue={job.descr as string}
+                                    testedValue={clsx(searchValueBasic)}
+                                  />
                                 )}
                                 isClickableBrief
                               />
@@ -441,7 +463,6 @@ export const LastJobActivityPage = memo(() => {
               />
             </Grid>
           }
-
         </Grid>
       </div>
 

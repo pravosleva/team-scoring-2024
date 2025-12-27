@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import clsx from 'clsx';
 import { useMemo, memo } from 'react'
+import { useParams } from 'react-router-dom';
+// import { useSearchWidgetDataLayerContextStore } from '~/shared/xstate';
 
 // Основная функция для подсветки совпадений
-const HighlightMatches = ({ text, searchWords }: { text: string, searchWords: string[] }) => {
+const HighlightMatches = ({ text, searchWords, isSpecial }: { text: string, searchWords: string[]; isSpecial: boolean }) => {
   if (!text || !searchWords || searchWords.length === 0) {
     return text;
   }
@@ -18,7 +21,7 @@ const HighlightMatches = ({ text, searchWords }: { text: string, searchWords: st
 
   // Создаем регулярное выражение для поиска целых слов
   const regex = new RegExp(`(${filteredWords.join('|')})`, 'gi')
-  const html = text.replace(regex, `<b class="highlighted-inline-code">$&</b>`)
+  const html = text.replace(regex, `<b class="${clsx('highlighted-inline-code', isSpecial ? 'highlighted-inline-code--special' : 'highlighted-inline-code--simple')}">$&</b>`)
 
   return (
     <span dangerouslySetInnerHTML={{ __html: html }} />
@@ -30,14 +33,21 @@ namespace NSHighlighedText {
     comparedValue: string;
     style?: React.CSSProperties;
     testedValue: string;
+    className?: string;
   }
 }
 
 // React компонент для подсветки текста
-export const HighlightedText = memo(({ comparedValue: text, testedValue: searchQuery, style }: NSHighlighedText.IProps) => {
+export const HighlightedText = memo(({ comparedValue: text, testedValue: searchQuery, style, className }: NSHighlighedText.IProps) => {
+  // const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  // const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
+
   // Разбиваем поисковый запрос на слова
   const searchWords = useMemo(() => searchQuery ? searchQuery.split(/\s+/) : [], [searchQuery])
-  const highlightedText = useMemo(() => HighlightMatches({ text, searchWords }), [text, searchWords])
+  const params = useParams()
+  const isSpecificSearchMode = useMemo(() => !!params.job_id || !!params.job_ids || !!params.log_ts, [params.job_id, params.job_ids, params.log_ts])
 
-  return <span style={style}>{highlightedText}</span>;
+  const highlightedText = useMemo(() => HighlightMatches({ text, searchWords, isSpecial: isSpecificSearchMode }), [text, searchWords, isSpecificSearchMode])
+
+  return <span style={style} className={className}>{highlightedText}</span>;
 })

@@ -5,13 +5,13 @@ import baseClasses from '~/App.module.scss'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
 import clsx from 'clsx'
 import classes from './ReportPagerAbstracted.module.scss'
-import { TJob, TopLevelContext } from '~/shared/xstate'
+import { TJob, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { useReportPagerWorker } from './hooks'
 import { debugFactory, NWService } from '~/shared/utils'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 // import { getFullUrl } from '~/shared/utils/string-ops'
-import { CollapsibleBox, CopyToClipboardWrapper, ResponsiveBlock } from '~/shared/components'
+import { CollapsibleBox, CopyToClipboardWrapper, HighlightedText, ResponsiveBlock } from '~/shared/components'
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -209,6 +209,8 @@ export const ReportPagerAbstracted = ({
   //   [handleNavigate, pagerControlsHardcodedPath, queryParams.page]
   // )
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   return (
     <>
@@ -291,7 +293,10 @@ export const ReportPagerAbstracted = ({
                           )}
                           style={{ overflowY: 'auto' }}
                         >
-                          {outputWorkerData.output.targetActiveCheckboxTree.result}
+                          <HighlightedText
+                            comparedValue={outputWorkerData.output.targetActiveCheckboxTree.result}
+                            testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                          />
                         </pre>
                       </>
                     )}
@@ -328,7 +333,10 @@ export const ReportPagerAbstracted = ({
                         )}
                         style={{ overflowY: 'auto' }}
                       >
-                        {outputWorkerData.output.fullDoneLast1DaysCheckboxesTree?.result}
+                        <HighlightedText
+                          comparedValue={outputWorkerData.output.fullDoneLast1DaysCheckboxesTree.result}
+                          testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                        />
                       </pre>
                       <div>
                         <CopyToClipboardWrapper
@@ -364,7 +372,10 @@ export const ReportPagerAbstracted = ({
                         )}
                         style={{ overflowY: 'auto' }}
                       >
-                        {outputWorkerData.output.fullDoneLast7DaysCheckboxesTree?.result}
+                        <HighlightedText
+                          comparedValue={outputWorkerData.output.fullDoneLast7DaysCheckboxesTree.result}
+                          testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                        />
                       </pre>
                       <div>
                         <CopyToClipboardWrapper
@@ -400,7 +411,10 @@ export const ReportPagerAbstracted = ({
                         )}
                         style={{ overflowY: 'auto' }}
                       >
-                        {outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.result}
+                        <HighlightedText
+                          comparedValue={outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree.result}
+                          testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                        />
                       </pre>
                       <div>
                         <CopyToClipboardWrapper
@@ -440,7 +454,10 @@ export const ReportPagerAbstracted = ({
                           backgroundColor: '#000',
                         }}
                       >
-                        {outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.result}
+                        <HighlightedText
+                          comparedValue={outputWorkerData.output.targetIncompletedWichCreatedEarlyThan1MonthsCheckboxesTree.result}
+                          testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                        />
                       </pre>
                       <div>
                         <CopyToClipboardWrapper
@@ -498,7 +515,10 @@ export const ReportPagerAbstracted = ({
                           )}
                           style={{ overflowY: 'auto' }}
                         >
-                          {outputWorkerData.output.fullActiveCheckboxesTree.result}
+                          <HighlightedText
+                            comparedValue={outputWorkerData.output.fullActiveCheckboxesTree.result}
+                            testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                          />
                         </pre>
                         <div>
                           <CopyToClipboardWrapper
@@ -562,7 +582,10 @@ export const ReportPagerAbstracted = ({
                     )}
                     style={{ overflowY: 'auto' }}
                   >
-                    {outputWorkerData.output.fullJobsTree.result}
+                    <HighlightedText
+                      comparedValue={outputWorkerData.output.fullJobsTree.result}
+                      testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                    />
                   </pre>
                 </Grid>
               </>

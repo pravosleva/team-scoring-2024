@@ -1,12 +1,12 @@
 import { memo, useEffect, useCallback, useMemo } from 'react'
-import { TLogsItem, EJobsStatusFilter, TopLevelContext } from '~/shared/xstate/topLevelMachine/v2'
+import { TLogsItem, EJobsStatusFilter, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate/topLevelMachine/v2'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import baseClasses from '~/App.module.scss'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { CopyToClipboardWrapper, SimpleCheckList } from '~/shared/components'
+import { CopyToClipboardWrapper, HighlightedText, SimpleCheckList } from '~/shared/components'
 import { scrollTopExtra } from '~/shared/components/Layout/utils'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
@@ -148,6 +148,9 @@ export const LastActivityPagerAbstracted = memo(({
   )
 
   const jobsActorRef = TopLevelContext.useActorRef()
+
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   return (
     <Grid container spacing={2}>
@@ -560,7 +563,12 @@ export const LastActivityPagerAbstracted = memo(({
                             </Link>
                           </span>
                         </div>
-                        <div style={{ fontSize: '14px' }}>{log.text}</div>
+                        <div style={{ fontSize: '14px' }}>
+                          <HighlightedText
+                            comparedValue={log.text}
+                            testedValue={clsx(searchValueEnhanced)}
+                          />
+                        </div>
                         {
                           Array.isArray(log.links) && log.links?.length > 0 && (
                             log.links.map((link) => (
@@ -575,7 +583,14 @@ export const LastActivityPagerAbstracted = memo(({
                                     showNotifOnCopy
                                   />
                                 </div>
-                                {!!link.descr && <em style={{ fontSize: 'small', textAlign: 'right' }}>{link.descr}</em>}
+                                {!!link.descr && (
+                                  <em style={{ fontSize: 'small', textAlign: 'right' }}>
+                                    <HighlightedText
+                                      comparedValue={link.descr}
+                                      testedValue={clsx(searchValueEnhanced)}
+                                    />
+                                  </em>
+                                )}
                               </div>
                             ))
                           )
@@ -652,7 +667,10 @@ export const LastActivityPagerAbstracted = memo(({
                           })}
                           className={classes.btnAsLink}
                         >
-                          {log.jobTitle}
+                          <HighlightedText
+                            comparedValue={log.jobTitle}
+                            testedValue={clsx(searchValueBasic)}
+                          />
                         </button>
 
                         {/* <Link
@@ -710,7 +728,11 @@ export const LastActivityPagerAbstracted = memo(({
                                       width: '100%',
                                     }}
                                   >
-                                    <span className={baseClasses.rowsLimited10}>{log.__nextLog.text}</span>
+                                    <HighlightedText
+                                      className={baseClasses.rowsLimited10}
+                                      comparedValue={log.__nextLog.text}
+                                      testedValue={clsx(searchValueEnhanced)}
+                                    />
                                     {/* <Link
                                       to={getFullUrl({
                                         url: pagerControlsHardcodedPath,
@@ -824,9 +846,11 @@ export const LastActivityPagerAbstracted = memo(({
                                       // textAlign: 'right',
                                     }}
                                   >
-                                    <span
+                                    <HighlightedText
                                       className={baseClasses.rowsLimited10}
-                                    >{log.__prevLog.text}</span>
+                                      comparedValue={log.__prevLog.text}
+                                      testedValue={clsx(searchValueEnhanced)}
+                                    />
                                     {/* <Link
                                       style={{
                                         marginTop: 'auto',

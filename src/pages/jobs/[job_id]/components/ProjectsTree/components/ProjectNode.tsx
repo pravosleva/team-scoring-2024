@@ -21,7 +21,7 @@ import dayjs from 'dayjs'
 import baseClasses from '~/App.module.scss'
 import { TEnchancedJobByWorker } from '~/pages/jobs/[job_id]/components/ProjectsTree/types'
 import { getArithmeticalMean } from '~/shared/utils/number-ops'
-import { TJob, TopLevelContext } from '~/shared/xstate'
+import { TJob, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { getFullUrl } from '~/shared/utils/string-ops'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components/CollapsibleText'
@@ -44,6 +44,7 @@ import BioTechIcon from '@mui/icons-material/Biotech'
 import __TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
+import { HighlightedText } from '~/shared/components'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -114,6 +115,8 @@ export const ProjectNode = ({
   const topLevelActorRef = TopLevelContext.useActorRef()
   const { send } = topLevelActorRef
   const handlePin = () => send({ type: 'todo.pin', value: { jobId: projectsTree.model.id } })
+
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
     <div
@@ -208,7 +211,7 @@ export const ProjectNode = ({
                 })}
                 className={baseClasses.truncate}
               >
-                {projectsTree.model.title}{projectsTree.model.relations?.children?.length > 0 ? ` (${projectsTree.model.relations?.children.length} subjobs)` : ''}
+                <HighlightedText comparedValue={projectsTree.model.title} testedValue={searchValueBasic} />
               </Link>
               {
                 !!projectsTree.model.relations?.parent && (
@@ -279,7 +282,7 @@ export const ProjectNode = ({
                 }}
                 className={baseClasses.truncate}
               >
-                {projectsTree.model.title}
+                <HighlightedText comparedValue={projectsTree.model.title} testedValue={searchValueBasic} />
               </b>
               <span
                 style={{
@@ -374,8 +377,12 @@ export const ProjectNode = ({
                   wordBreak: 'break-word',
                 }}
                 className={baseClasses.specialText}
-              >{projectsTree.model.title}</b>
-              {!!projectsTree.model.descr && (<div className={classes.descr}>{targetText}</div>)}
+              >
+                <HighlightedText comparedValue={projectsTree.model.title} testedValue={searchValueBasic} />
+              </b>
+              {!!targetText && (
+                <HighlightedText className={classes.descr} comparedValue={targetText} testedValue={searchValueBasic} />
+              )}
               {/*
               !isPinned && (
                 <Button
@@ -719,9 +726,7 @@ export const ProjectNode = ({
                                             : <HardwareIcon sx={{ fontSize: 'inherit' }} />
                                     }
                                   </span>
-                                  <span
-                                  // className={baseClasses.truncate}
-                                  >{originalJob.title}</span>
+                                  <HighlightedText comparedValue={originalJob.title} testedValue={searchValueBasic} />
                                   <span
                                     style={{
                                       paddingRight: '3px',
@@ -796,7 +801,7 @@ export const ProjectNode = ({
                             job={itemData.originalJob as TJob}
                             delay={1000}
                           />
-                          <b className={baseClasses.rowsLimited3}>{itemData.originalJob.title}</b>
+                          <HighlightedText comparedValue={itemData.originalJob.title} testedValue={searchValueBasic} className={baseClasses.rowsLimited3} />
                           {
                             !!itemData.originalJob.forecast.assignedTo && (
                               <span
@@ -822,12 +827,11 @@ export const ProjectNode = ({
                         >
                           {
                             !!itemData.originalJob.descr && (
-                              <span
-                                // style={{ border: '1px solid red' }}
+                              <HighlightedText
+                                comparedValue={itemData.originalJob.descr}
+                                testedValue={searchValueBasic}
                                 className={baseClasses.rowsLimited1}
-                              >
-                                {itemData.originalJob.descr}
-                              </span>
+                              />
                             )
                           }
                           <a

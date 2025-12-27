@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import classes from './SimpleCheckList.module.scss'
-import { TLogChecklistItem } from '~/shared/xstate';
+import { TLogChecklistItem, useSearchWidgetDataLayerContextStore } from '~/shared/xstate';
 import { Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { CustomizedTextField } from '~/shared/components/Input'
@@ -25,6 +25,7 @@ import FaRegCopy from '@mui/icons-material/FileCopy'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowDropUp'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown'
 import { throttleFactory } from '~/shared/utils'
+import { HighlightedText } from '../HighlightedText/v2';
 
 type TLinkBtn = {
   label: string;
@@ -268,6 +269,7 @@ function SimpleCheckListFn<TAddInfo>({
 
   const [copiedText, setParamsInspectorContextStore] = useParamsInspectorContextStore((s) => s._auxState.copiedText)
   const handleCopy = useCallback((text: string) => setParamsInspectorContextStore({ _auxState: { copiedText: text } }), [setParamsInspectorContextStore])
+  const [searchValue] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   return (
     <>
@@ -479,9 +481,7 @@ function SimpleCheckListFn<TAddInfo>({
                               </div>
                             </div>
 
-
                             <div className={classes.checklistItemControls}>
-
                               {
                                 isCopiable && (
                                   <CopyToClipboardWrapperUniversal
@@ -608,8 +608,20 @@ function SimpleCheckListFn<TAddInfo>({
                           </div>
 
                           <div className={classes.infoStack}>
-                            <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>{checklistItem.title}</em>
-                            {!!checklistItem.descr && <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>{checklistItem.descr}</code>}
+                            <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>
+                              <HighlightedText
+                                comparedValue={checklistItem.title}
+                                testedValue={searchValue}
+                              />
+                            </em>
+                            {!!checklistItem.descr && (
+                              <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>
+                                <HighlightedText
+                                  comparedValue={checklistItem.descr}
+                                  testedValue={searchValue}
+                                />
+                              </code>
+                            )}
                           </div>
 
                         </div>
