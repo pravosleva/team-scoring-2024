@@ -610,6 +610,26 @@ export const LastActivityPagerAbstracted = memo(({
                                 })
                                 cleanup()
                               }}
+                              onChecklistItemOrderInc={({ checklistItemId }) => {
+                                jobsActorRef.send({
+                                  type: 'todo.editChecklistItemInLog.orderInc',
+                                  value: {
+                                    jobId: log.jobId,
+                                    logTs: log.ts,
+                                    checklistItemId,
+                                  },
+                                })
+                              }}
+                              onChecklistItemOrderDec={({ checklistItemId }) => {
+                                jobsActorRef.send({
+                                  type: 'todo.editChecklistItemInLog.orderDec',
+                                  value: {
+                                    jobId: log.jobId,
+                                    logTs: log.ts,
+                                    checklistItemId,
+                                  },
+                                })
+                              }}
                             />
                           )
                         }

@@ -31,6 +31,7 @@ export type TLogChecklistItem = {
     createdAt: number;
     updatedAt: number;
   };
+  order: number;
 }
 export type TLogsItem = {
   ts: number;

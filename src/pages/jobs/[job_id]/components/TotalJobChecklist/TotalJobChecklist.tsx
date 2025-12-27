@@ -54,6 +54,26 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
       {
         !!targetJob && Object.keys(targetJobTotalChecklistMaping).map((checklistKey, i) => (
           <SimpleCheckList
+            onChecklistItemOrderInc={({ checklistItemId }) => {
+              jobsActorRef.send({
+                type: 'todo.editChecklistItemInLog.orderInc',
+                value: {
+                  jobId: targetJob.id,
+                  logTs: targetJobTotalChecklistMaping[checklistKey].logTs,
+                  checklistItemId,
+                },
+              })
+            }}
+            onChecklistItemOrderDec={({ checklistItemId }) => {
+              jobsActorRef.send({
+                type: 'todo.editChecklistItemInLog.orderDec',
+                value: {
+                  jobId: targetJob.id,
+                  logTs: targetJobTotalChecklistMaping[checklistKey].logTs,
+                  checklistItemId,
+                },
+              })
+            }}
             isCopiable
             addLogLinkBtns={[
               {

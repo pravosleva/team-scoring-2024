@@ -5,6 +5,8 @@ import { getWorstCalc } from '~/shared/utils/team-scoring'
 import { getRounded } from '~/shared/utils/number-ops'
 import dayjs from 'dayjs'
 import { soundManager } from '~/shared/soundManager'
+import { getBinarySearchedIndexByDotNotation } from '~/shared/utils/array-ops'
+import { getNestedValue, setNestedValue } from '~/shared/utils/object-ops'
 
 const getSpeed = (job: TJob): number =>
   (
@@ -50,6 +52,8 @@ export const topLevelMachine = setup({
     | { type: 'todo.editLinkInLog'; value: { jobId: number; logTs: number; linkId: number; state: Pick<TLogLink, 'url' | 'title' | 'descr'> } }
     | { type: 'todo.addChecklistItemInLog'; value: { jobId: number; logTs: number; state: Pick<TLogChecklistItem, 'title' | 'descr'> } }
     | { type: 'todo.editChecklistItemInLog'; value: { jobId: number; logTs: number; checklistItemId: number; state: Pick<TLogChecklistItem, 'title' | 'descr' | 'isDisabled' | 'isDone'> } }
+    | { type: 'todo.editChecklistItemInLog.orderInc'; value: { jobId: number; logTs: number; checklistItemId: number; } }
+    | { type: 'todo.editChecklistItemInLog.orderDec'; value: { jobId: number; logTs: number; checklistItemId: number; } }
     | { type: 'todo.deleteChecklistFromLog'; value: { jobId: number; logTs: number } }
     | { type: 'todo.deleteChecklistItemFromLog'; value: { jobId: number; logTs: number; checklistItemId: number; } }
     | { type: 'todo.pin'; value: { jobId: number; } }
@@ -282,6 +286,7 @@ export const topLevelMachine = setup({
                         createdAt: tsCreate,
                         updatedAt: tsCreate,
                       },
+                      order: log.checklist.length,
                     }
                     if (log.checklist.length >= checklistItemsLimit) log.checklist.pop()
 
@@ -391,6 +396,131 @@ export const topLevelMachine = setup({
               return todo
             })
           }
+        },
+      }),
+    },
+    'todo.editChecklistItemInLog.orderInc': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const modifiedJobsItems = [...context.jobs.items]
+          const { jobId, checklistItemId, logTs } = event.value
+          const targetJobIndex = getBinarySearchedIndexByDotNotation({
+            items: modifiedJobsItems,
+            target: {
+              value: jobId,
+              propPath: 'id',
+            },
+            sorted: 'DESC',
+          })
+          if (targetJobIndex !== -1) {
+            const targetJob = modifiedJobsItems[targetJobIndex]
+            const targetLogList = targetJob.logs.items
+            const targetLogIndex = getBinarySearchedIndexByDotNotation({
+              items: targetLogList,
+              target: {
+                value: logTs,
+                propPath: 'ts',
+              },
+              sorted: 'DESC',
+            })
+            if (targetLogIndex !== -1) {
+              const targetLog = targetLogList[targetLogIndex]
+              const targetChecklist = targetLog.checklist
+              if (!!targetChecklist) {
+                const targetChecklistItemIndex = targetChecklist.findIndex((e) => e.id === checklistItemId)
+                if (targetChecklistItemIndex !== -1) {
+                  const mutatedChecklistItem = targetChecklist[targetChecklistItemIndex]
+                  const currentOrder = mutatedChecklistItem.order || 0
+                  console.log(`-- [+] NEW TARGET ORDER: ${getNestedValue({ obj: mutatedChecklistItem, path: 'order' })}`)
+                  const nextOrderElementIndex = targetChecklist.findIndex((e) => e.order === currentOrder + 1 || 0)
+                  if (nextOrderElementIndex !== -1) {
+                    const mutatedNextChecklistItem = targetChecklist[nextOrderElementIndex]
+                    setNestedValue(
+                      mutatedNextChecklistItem,
+                      'order',
+                      currentOrder,
+                    )
+                    targetChecklist[nextOrderElementIndex] = mutatedNextChecklistItem
+                  }
+                  // -- NOTE: Update state
+                  setNestedValue(
+                    mutatedChecklistItem,
+                    'order',
+                    currentOrder + 1,
+                  )
+                  targetChecklist[targetChecklistItemIndex] = mutatedChecklistItem
+                  targetLog.checklist = targetChecklist
+                  targetLogList[targetLogIndex] = targetLog
+                  targetJob.logs.items = targetLogList
+                  modifiedJobsItems[targetJobIndex] = targetJob
+                  // --
+                } else console.log(`-- [+] CHECKLIST ITEM NOT FOUND`)
+              } else console.log(`-- [+] CHECKLIST NOT FOUND`)
+            } else console.log(`-- [+] LOG NOT FOUND`)
+          } else console.log(`-- [+] JOB NOT FOUND`)
+          return { ...context.jobs, items: modifiedJobsItems }
+        },
+      }),
+    },
+    'todo.editChecklistItemInLog.orderDec': {
+      actions: assign({
+        jobs: ({ context, event }) => {
+          const modifiedJobsItems = [...context.jobs.items]
+          const { jobId, checklistItemId, logTs } = event.value
+          const targetJobIndex = getBinarySearchedIndexByDotNotation({
+            items: modifiedJobsItems,
+            target: {
+              value: jobId,
+              propPath: 'id',
+            },
+            sorted: 'DESC',
+          })
+          if (targetJobIndex !== -1) {
+            const targetJob = modifiedJobsItems[targetJobIndex]
+            const targetLogList = targetJob.logs.items
+            const targetLogIndex = getBinarySearchedIndexByDotNotation({
+              items: targetLogList,
+              target: {
+                value: logTs,
+                propPath: 'ts',
+              },
+              sorted: 'DESC',
+            })
+            if (targetLogIndex !== -1) {
+              const targetLog = targetLogList[targetLogIndex]
+              const targetChecklist = targetLog.checklist
+              if (!!targetChecklist) {
+                const targetChecklistItemIndex = targetChecklist.findIndex((e) => e.id === checklistItemId)
+                if (targetChecklistItemIndex !== -1) {
+                  const mutatedChecklistItem = targetChecklist[targetChecklistItemIndex]
+                  const currentOrder = mutatedChecklistItem.order || 0
+                  const prevOrderElementIndex = targetChecklist.findIndex((e) => e.order === currentOrder - 1 || 0)
+                  if (prevOrderElementIndex !== -1) {
+                    const mutatedPrevChecklistItem = targetChecklist[prevOrderElementIndex]
+                    setNestedValue(
+                      mutatedPrevChecklistItem,
+                      'order',
+                      currentOrder,
+                    )
+                    targetChecklist[prevOrderElementIndex] = mutatedPrevChecklistItem
+                  }
+                  // -- NOTE: Update state
+                  setNestedValue(
+                    mutatedChecklistItem,
+                    'order',
+                    currentOrder - 1,
+                  )
+                  targetChecklist[targetChecklistItemIndex] = mutatedChecklistItem
+                  targetLog.checklist = targetChecklist
+                  targetLogList[targetLogIndex] = targetLog
+                  targetJob.logs.items = targetLogList
+                  modifiedJobsItems[targetJobIndex] = targetJob
+                  // --
+                }
+              }
+            }
+          }
+          return { ...context.jobs, items: modifiedJobsItems }
         },
       }),
     },
