@@ -46,9 +46,9 @@ export const setNestedValue = <TObjectFormat, TValueFormat>({ target, path, valu
 // console.log('Before:', JSON.stringify(myObject));
 
 // // Set a nested value that already exists
-// setNestedValue(myObject, 'user.address.city', 'San Francisco');
+// setNestedValue({ target: myObject, path: 'user.address.city', value: 'San Francisco' });
 // console.log('After existing path:', JSON.stringify(myObject));
 
 // // Set a value for a new path, creating intermediate objects
-// setNestedValue(myObject, 'user.address.zipCode.primary', 94105);
+// setNestedValue({ target: myObject, path: 'user.address.zipCode.primary', value: 94105 });
 // console.log('After new path:', JSON.stringify(myObject));
