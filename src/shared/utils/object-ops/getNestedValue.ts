@@ -5,17 +5,17 @@
  * 
  * @source Get object prop value by path
  *
- * @param {Object} arg For example: { obj: unknown; path: string; }
- * @param {*} arg.obj Целевой объект
+ * @param {object} arg Argument
+ * @param {object} arg.source Целевой объект
  * @param {string} arg.path Путь до поля
  * @returns {unknown} Значение поля
  */
-export const getNestedValue = <T>({ obj, path }: {
-  obj: T;
+export const getNestedValue = <T>({ source, path }: {
+  source: T;
   path: string;
 }) => {
   const arr = path.split(/[.[]['"]?/)
-  let o = obj;
+  let o = source;
   // @ts-ignore
   while (arr.length && o) o = o[arr.shift().replace(/['"]?]$/, '')]
   return o

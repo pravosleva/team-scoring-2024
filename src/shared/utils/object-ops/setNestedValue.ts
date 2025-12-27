@@ -1,10 +1,16 @@
 /**
  * Sets a value in a nested object using a dot-separated string path.
- * @param {object} obj The object to modify.
- * @param {string} path The dot-separated path to the property.
- * @param {*} value The value to set.
+ * @param {object} arg Argument
+ * @param {string} arg.target The object to modify
+ * @param {string} arg.path Target path to prop for mutation
+ * @param {string} arg.value Target value
+ * @param {void} value The value to set
  */
-export const setNestedValue = <TObjectFormat, TValueFormat>(obj: TObjectFormat, path: string, value: TValueFormat) => {
+export const setNestedValue = <TObjectFormat, TValueFormat>({ target, path, value }: {
+  target: TObjectFormat;
+  path: string;
+  value: TValueFormat;
+}) => {
   // Split the path string into an array of keys
   const keys = path.split('.');
 
@@ -12,9 +18,9 @@ export const setNestedValue = <TObjectFormat, TValueFormat>(obj: TObjectFormat, 
   // to find the parent object
   // TODO: По возможности типизировать корректно
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let current: any = obj;
+  let current: any = target;
   for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i];
+    const key = keys[i] as string;
     // If the current property doesn't exist or is not an object, create a new object
     if (!current[key] || typeof current[key] !== 'object') {
       current[key] = {};

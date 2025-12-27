@@ -431,15 +431,11 @@ export const topLevelMachine = setup({
                 if (targetChecklistItemIndex !== -1) {
                   const mutatedChecklistItem = targetChecklist[targetChecklistItemIndex]
                   const currentOrder = mutatedChecklistItem.order || 0
-                  console.log(`-- [+] NEW TARGET ORDER: ${getNestedValue({ obj: mutatedChecklistItem, path: 'order' })}`)
+                  console.log(`-- [+] NEW TARGET ORDER: ${getNestedValue({ source: mutatedChecklistItem, path: 'order' })}`)
                   const nextOrderElementIndex = targetChecklist.findIndex((e) => e.order === currentOrder + 1 || 0)
                   if (nextOrderElementIndex !== -1) {
                     const mutatedNextChecklistItem = targetChecklist[nextOrderElementIndex]
-                    setNestedValue(
-                      mutatedNextChecklistItem,
-                      'order',
-                      currentOrder,
-                    )
+                    setNestedValue({ target: mutatedNextChecklistItem, path: 'order', value: currentOrder })
                     targetChecklist[nextOrderElementIndex] = mutatedNextChecklistItem
                     soundManager.playDelayedSoundConfigurable({
                       soundCode: 'click-33',
@@ -451,11 +447,7 @@ export const topLevelMachine = setup({
                     })
                   }
                   // -- NOTE: Update state
-                  setNestedValue(
-                    mutatedChecklistItem,
-                    'order',
-                    currentOrder + 1,
-                  )
+                  setNestedValue({ target: mutatedChecklistItem, path: 'order', value: currentOrder + 1 })
                   targetChecklist[targetChecklistItemIndex] = mutatedChecklistItem
                   targetLog.checklist = targetChecklist
                   targetLogList[targetLogIndex] = targetLog
@@ -505,11 +497,7 @@ export const topLevelMachine = setup({
                   const prevOrderElementIndex = targetChecklist.findIndex((e) => e.order === currentOrder - 1 || 0)
                   if (prevOrderElementIndex !== -1) {
                     const mutatedPrevChecklistItem = targetChecklist[prevOrderElementIndex]
-                    setNestedValue(
-                      mutatedPrevChecklistItem,
-                      'order',
-                      currentOrder,
-                    )
+                    setNestedValue({ target: mutatedPrevChecklistItem, path: 'order', value: currentOrder })
                     targetChecklist[prevOrderElementIndex] = mutatedPrevChecklistItem
                     soundManager.playDelayedSoundConfigurable({
                       soundCode: 'click-34',
@@ -521,11 +509,7 @@ export const topLevelMachine = setup({
                     })
                   }
                   // -- NOTE: Update state
-                  setNestedValue(
-                    mutatedChecklistItem,
-                    'order',
-                    currentOrder - 1,
-                  )
+                  setNestedValue({ target: mutatedChecklistItem, path: 'order', value: currentOrder - 1 })
                   targetChecklist[targetChecklistItemIndex] = mutatedChecklistItem
                   targetLog.checklist = targetChecklist
                   targetLogList[targetLogIndex] = targetLog
