@@ -1,5 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+/**
+ * Throttle
+ * 
+ * Функция возвращает абстракцию с настраиваемым таймером отмены лишних последующих вызовов
+ *
+ * @template R 
+ * @template {any[]} A 
+ * @param {(...args: A) => R} fn 
+ * @param {number} delay Значение задержки (ms)
+ * @returns {Function[]} Массив функций: [0] Целевая, [1] WIP, [2] Отмена ожидания
+ */
 export const throttleFactory = <R, A extends any[]>(
   fn: (...args: A) => R,
   delay: number
@@ -14,8 +25,16 @@ export const throttleFactory = <R, A extends any[]>(
 
   return [
     (...args: A) => {
-      if (cancelled) return undefined;
-      if (wait) return undefined;
+      console.log('-- [throttle] called')
+      if (cancelled) {
+        console.log('-- [throttle] cancelled.')
+        return undefined;
+      }
+      if (wait) {
+        console.log('-- [throttle] wait...')
+        return undefined;
+      }
+      console.log('-- [throttle] run...')
 
       const val = fn(...args);
 

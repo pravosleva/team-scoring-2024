@@ -441,6 +441,14 @@ export const topLevelMachine = setup({
                       currentOrder,
                     )
                     targetChecklist[nextOrderElementIndex] = mutatedNextChecklistItem
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'click-33',
+                      _debug: { msg: 'Checklist item order inc' },
+                      delay: {
+                        before: 0,
+                        after: 1000,
+                      },
+                    })
                   }
                   // -- NOTE: Update state
                   setNestedValue(
@@ -503,6 +511,14 @@ export const topLevelMachine = setup({
                       currentOrder,
                     )
                     targetChecklist[prevOrderElementIndex] = mutatedPrevChecklistItem
+                    soundManager.playDelayedSoundConfigurable({
+                      soundCode: 'click-34',
+                      _debug: { msg: 'Checklist item order dec' },
+                      delay: {
+                        before: 0,
+                        after: 1000,
+                      },
+                    })
                   }
                   // -- NOTE: Update state
                   setNestedValue(

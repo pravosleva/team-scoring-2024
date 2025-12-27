@@ -22,8 +22,9 @@ import ToggleOffIcon from '@mui/icons-material/ToggleOff'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper';
 import FaCopy from '@mui/icons-material/ContentCopy'
 import FaRegCopy from '@mui/icons-material/FileCopy'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowDropUp'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown'
+import { throttleFactory } from '~/shared/utils'
 
 type TLinkBtn = {
   label: string;
@@ -98,12 +99,25 @@ function SimpleCheckListFn<TAddInfo>({
       block: 'center',
     })
   })
-  const handleOrderInc = ({ checklistItemId }: { checklistItemId: number }) => () => {
+  const __handleOrderInc = ({ checklistItemId }: { checklistItemId: number }) => {
     onChecklistItemOrderInc?.({ checklistItemId })
   }
-  const handleOrderDec = ({ checklistItemId }: { checklistItemId: number }) => () => {
+  const orderIncThrottledRef = useRef(throttleFactory(
+    __handleOrderInc,
+    2000
+  ))
+  const handleOrderIncHOF = ({ checklistItemId }: { checklistItemId: number }) => () =>
+    orderIncThrottledRef.current[0]({ checklistItemId })
+
+  const __handleOrderDec = ({ checklistItemId }: { checklistItemId: number }) => {
     onChecklistItemOrderDec?.({ checklistItemId })
   }
+  const orderDecThrottledRef = useRef(throttleFactory(
+    __handleOrderDec,
+    2000
+  ))
+  const handleOrderDecHOF = ({ checklistItemId }: { checklistItemId: number }) => () =>
+    orderDecThrottledRef.current[0]({ checklistItemId })
 
   const [newLabel, setNewLabel] = useState<string>('')
   const [newDescr, setNewDescr] = useState<string>('')
@@ -434,15 +448,15 @@ function SimpleCheckListFn<TAddInfo>({
                                         gap: '5px',
                                         alignItems: 'center',
                                       }}
-                                      onClick={handleOrderDec({ checklistItemId: checklistItem.id })}
+                                      onClick={handleOrderDecHOF({ checklistItemId: checklistItem.id })}
                                     >
                                       <span>[</span>
-                                      <span><ArrowDownwardIcon sx={{ fontSize: '13px' }} /></span>
+                                      <span><ArrowDownwardIcon sx={{ fontSize: '15px' }} /></span>
                                       <span>]</span>
                                     </code>
                                   )
                                 }
-                                <span key={`${checklistItem.id}-${checklistItem.order}`}>{checklistItem.order || 0}</span>
+                                <code key={`${checklistItem.id}-${checklistItem.order}`}>{checklistItem.order || 0}</code>
                                 {
                                   typeof onChecklistItemOrderInc === 'function' && (
                                     <code
@@ -454,10 +468,10 @@ function SimpleCheckListFn<TAddInfo>({
                                         gap: '5px',
                                         alignItems: 'center',
                                       }}
-                                      onClick={handleOrderInc({ checklistItemId: checklistItem.id })}
+                                      onClick={handleOrderIncHOF({ checklistItemId: checklistItem.id })}
                                     >
                                       <span>[</span>
-                                      <span><ArrowUpwardIcon sx={{ fontSize: '13px' }} /></span>
+                                      <span><ArrowUpwardIcon sx={{ fontSize: '15px' }} /></span>
                                       <span>]</span>
                                     </code>
                                   )
