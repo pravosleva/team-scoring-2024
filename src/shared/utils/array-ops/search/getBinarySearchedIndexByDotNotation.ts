@@ -34,7 +34,7 @@ export const getBinarySearchedIndexByDotNotation = <TItemFormat>({ items, target
 
   while (left <= right) {
     mid = Math.round((right + left) / 2)
-    const _currentValue: unknown = getNestedValue({ obj: items[mid], path: propPath })
+    const _currentValue: unknown = getNestedValue({ source: items[mid], path: propPath })
 
     switch (sorted) {
       case 'DESC':

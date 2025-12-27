@@ -87,6 +87,7 @@ export const SearchWidget = memo((ps: TProps) => {
   const [isWidgetOpened, setSearchWidgetDataLayerContextStore] = useSearchWidgetDataLayerContextStore((s) => s.isWidgetOpened)
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
   const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
+  const hasAnySearchValue = !!searchValueBasic || !!searchValueEnhanced
 
   const setSearchValueBasic = (v: string) => {
     setSearchWidgetDataLayerContextStore({ searchValueBasic: v })
@@ -262,6 +263,9 @@ export const SearchWidget = memo((ps: TProps) => {
           // classes.absoluteToggler,
           // 'backdrop-blur--lite',
           classes.fixedToggler,
+          {
+            [classes.isActive]: hasAnySearchValue,
+          },
         )}
         onClick={toggleWigget}
       >
