@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import baseClasses from '~/App.module.scss'
-import { TJob, TopLevelContext, TPointsetItem } from '~/shared/xstate'
+import { TJob, TopLevelContext, TPointsetItem, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { CustomizedTextField } from '~/shared/components/Input'
-import { CopyToClipboardWrapper } from '~/shared/components'
+import { CopyToClipboardWrapper, HighlightedText } from '~/shared/components'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import CloseIcon from '@mui/icons-material/Close'
@@ -61,6 +61,9 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       default: getDefaultPointsetStatusListSpaceState(),
     },
   })
+
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   // -- EXP: Create new
   // const editFormRef = useRef<HTMLDivElement>(null)
@@ -321,7 +324,10 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
         !!reportText && (
           <>
             <pre className={baseClasses.preNormalized}>
-              {reportText}
+              <HighlightedText
+                comparedValue={reportText}
+                testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+              />
             </pre>
             <div>
               <CopyToClipboardWrapper
