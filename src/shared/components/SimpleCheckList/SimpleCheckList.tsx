@@ -27,6 +27,11 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown'
 import { throttleFactory } from '~/shared/utils'
 import { HighlightedText } from '../HighlightedText/v2';
 
+const getPadStart = ({ value, minLength }: {
+  value: number;
+  minLength: number;
+}) => String(value).padStart(minLength, '0')
+
 type TLinkBtn = {
   label: string;
   relativeUrl: string;
@@ -397,235 +402,239 @@ function SimpleCheckListFn<TAddInfo>({
                     className={clsx(classes.checklistWrapper)}
                   >
                     {
-                      items.sort((e1, e2) => ((e2.order || 0) - (e1.order || 0))).map((checklistItem) => (
-                        <div
-                          key={checklistItem.id}
-                          className={clsx(classes.checklistItemWrapper, {
-                            [classes.activeChecklistItem]: activeChecklistId === checklistItem.id,
-                            [classes.disabledBox]: checklistItem.isDisabled,
-                          })}
-                        >
-                          <div className={classes.checkerAndControls}>
-                            <div
-                              style={{
-                                display: 'inline-flex',
-                                justifyContent: 'flex-start',
-                                alignItems: 'center',
-                                gap: '8px'
-                              }}
-                            >
-                              <button
-                                className={classes.actionIconWrapper}
-                                onClick={handleDoneToggle({
-                                  checklistItemId: checklistItem.id,
-                                  title: checklistItem.title,
-                                  descr: checklistItem.descr,
-                                  isDoneCurrentValue: checklistItem.isDone,
-                                  isDisabledCurrentValue: checklistItem.isDisabled,
-                                })}
-                              >
-                                {
-                                  checklistItem.isDone && <CheckBoxIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
-                                }
-                                {
-                                  !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
-                                }
-                              </button>
+                      items
+                        .sort((e1, e2) => ((e2.order || 0) - (e1.order || 0)))
+                        .map((checklistItem) => (
+                          <div
+                            key={checklistItem.id}
+                            className={clsx(classes.checklistItemWrapper, {
+                              [classes.activeChecklistItem]: activeChecklistId === checklistItem.id,
+                              [classes.disabledBox]: checklistItem.isDisabled,
+                            })}
+                          >
+                            <div className={classes.checkerAndControls}>
                               <div
                                 style={{
-                                  // border: '1px solid red',
                                   display: 'inline-flex',
                                   justifyContent: 'flex-start',
                                   alignItems: 'center',
+                                  gap: '8px'
                                 }}
                               >
+                                <button
+                                  className={classes.actionIconWrapper}
+                                  onClick={handleDoneToggle({
+                                    checklistItemId: checklistItem.id,
+                                    title: checklistItem.title,
+                                    descr: checklistItem.descr,
+                                    isDoneCurrentValue: checklistItem.isDone,
+                                    isDisabledCurrentValue: checklistItem.isDisabled,
+                                  })}
+                                >
+                                  {
+                                    checklistItem.isDone && <CheckBoxIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
+                                  }
+                                  {
+                                    !checklistItem.isDone && <CheckBoxOutlineBlankIcon htmlColor={!hasNotActiveItems ? '#959eaa' : '#02c39a'} />
+                                  }
+                                </button>
+                                <div
+                                  style={{
+                                    // border: '1px solid red',
+                                    display: 'inline-flex',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <code key={`${checklistItem.id}-${checklistItem.order}`}>
+                                    {getPadStart({ value: checklistItem.order || 0, minLength: 2 })}
+                                  </code>
+                                  {
+                                    typeof onChecklistItemOrderDec === 'function' && typeof checklistItem.order === 'number' && checklistItem.order !== 0 && (
+                                      <code
+                                        className={classes.inlineControlBtn}
+                                        style={{
+                                          color: 'inherit',
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          gap: '5px',
+                                          alignItems: 'center',
+                                        }}
+                                        onClick={handleOrderDecHOF({ checklistItemId: checklistItem.id })}
+                                      >
+                                        <span>[</span>
+                                        <span><ArrowDownwardIcon sx={{ fontSize: '16px' }} /></span>
+                                        <span>]</span>
+                                      </code>
+                                    )
+                                  }
+                                  {
+                                    typeof onChecklistItemOrderInc === 'function' && (
+                                      <code
+                                        className={classes.inlineControlBtn}
+                                        style={{
+                                          color: 'inherit',
+                                          display: 'inline-flex',
+                                          flexDirection: 'row',
+                                          gap: '5px',
+                                          alignItems: 'center',
+                                        }}
+                                        onClick={handleOrderIncHOF({ checklistItemId: checklistItem.id })}
+                                      >
+                                        <span>[</span>
+                                        <span><ArrowUpwardIcon sx={{ fontSize: '16px' }} /></span>
+                                        <span>]</span>
+                                      </code>
+                                    )
+                                  }
+                                </div>
+                              </div>
+
+                              <div className={classes.checklistItemControls}>
                                 {
-                                  typeof onChecklistItemOrderDec === 'function' && typeof checklistItem.order === 'number' && checklistItem.order !== 0 && (
-                                    <code
-                                      className={classes.inlineControlBtn}
-                                      style={{
-                                        color: 'inherit',
-                                        display: 'inline-flex',
-                                        flexDirection: 'row',
-                                        gap: '5px',
-                                        alignItems: 'center',
-                                      }}
-                                      onClick={handleOrderDecHOF({ checklistItemId: checklistItem.id })}
-                                    >
-                                      <span>[</span>
-                                      <span><ArrowDownwardIcon sx={{ fontSize: '15px' }} /></span>
-                                      <span>]</span>
+                                  isCopiable && (
+                                    <CopyToClipboardWrapperUniversal
+                                      showNotifOnCopy
+                                      onCopy={handleCopy}
+                                      text={clsx(checklistItem.title, {
+                                        [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                      })}
+                                      renderer={({ isCopied }) => (
+                                        <code
+                                          className={classes.inlineControlBtn}
+                                          style={{
+                                            color: isCopied && copiedText === clsx(checklistItem.title, {
+                                              [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                            })
+                                              ? '#02c39a'
+                                              : 'inherit',
+                                            display: 'inline-flex',
+                                            flexDirection: 'row',
+                                            gap: '5px',
+                                            alignItems: 'center',
+                                          }}
+                                        >
+                                          <span>[</span>
+                                          {
+                                            isCopied && copiedText === clsx(checklistItem.title, {
+                                              [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
+                                            })
+                                              ? (
+                                                <FaRegCopy sx={{ fontSize: '18px' }} />
+                                              )
+                                              : (
+                                                <FaCopy sx={{ fontSize: '18px' }} />
+                                              )
+                                          }
+                                          <span>all</span>
+                                          <span>]</span>
+                                        </code>
+                                      )}
+                                    />
+                                  )
+                                }
+                                {
+                                  isCopiable && !!checklistItem.descr && (
+                                    <CopyToClipboardWrapperUniversal
+                                      showNotifOnCopy
+                                      onCopy={handleCopy}
+                                      text={checklistItem.descr}
+                                      renderer={({ isCopied }) => (
+                                        <code
+                                          className={classes.inlineControlBtn}
+                                          style={{
+                                            color: isCopied && copiedText === checklistItem.descr ? '#02c39a' : 'inherit',
+                                            display: 'inline-flex',
+                                            flexDirection: 'row',
+                                            gap: '5px',
+                                            alignItems: 'center',
+                                          }}
+                                        >
+                                          <span>[</span>
+                                          {
+                                            isCopied && copiedText === checklistItem.descr
+                                              ? (
+                                                <FaRegCopy sx={{ fontSize: '18px' }} />
+                                              )
+                                              : (
+                                                <FaCopy sx={{ fontSize: '18px' }} />
+                                              )
+                                          }
+                                          <span>descr</span>
+                                          <span>]</span>
+                                        </code>
+                                      )}
+                                    />
+                                  )
+                                }
+                                {
+                                  !!onDeleteChecklistItem && (
+                                    <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>
+                                      [ Del ]
                                     </code>
                                   )
                                 }
-                                <code key={`${checklistItem.id}-${checklistItem.order}`}>{checklistItem.order || 0}</code>
+                                <code
+                                  className={classes.inlineControlBtn}
+                                  onClick={handleDisabledToggle({
+                                    checklistItemId: checklistItem.id,
+                                    title: checklistItem.title,
+                                    descr: checklistItem.descr,
+                                    isDoneCurrentValue: checklistItem.isDone,
+                                    isDisabledCurrentValue: checklistItem.isDisabled,
+                                  })}
+                                  style={{
+                                    display: 'inline-flex',
+                                    flexDirection: 'row',
+                                    gap: '5px',
+                                    alignItems: 'center',
+                                    // border: '1px solid red'
+                                  }}
+                                >
+                                  <span>[</span>
+                                  {
+                                    checklistItem.isDisabled
+                                      ? (
+                                        <ToggleOffIcon sx={{ fontSize: '20px' }} />
+                                      )
+                                      : (
+                                        <ToggleOnIcon sx={{ fontSize: '20px' }} />
+                                      )
+                                  }
+                                  <span>]</span>
+                                </code>
                                 {
-                                  typeof onChecklistItemOrderInc === 'function' && (
+                                  isEditable && (
                                     <code
                                       className={classes.inlineControlBtn}
-                                      style={{
-                                        color: 'inherit',
-                                        display: 'inline-flex',
-                                        flexDirection: 'row',
-                                        gap: '5px',
-                                        alignItems: 'center',
-                                      }}
-                                      onClick={handleOrderIncHOF({ checklistItemId: checklistItem.id })}
+                                      onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
                                     >
-                                      <span>[</span>
-                                      <span><ArrowUpwardIcon sx={{ fontSize: '15px' }} /></span>
-                                      <span>]</span>
+                                      [ Edit ]
                                     </code>
                                   )
                                 }
                               </div>
                             </div>
 
-                            <div className={classes.checklistItemControls}>
-                              {
-                                isCopiable && (
-                                  <CopyToClipboardWrapperUniversal
-                                    showNotifOnCopy
-                                    onCopy={handleCopy}
-                                    text={clsx(checklistItem.title, {
-                                      [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
-                                    })}
-                                    renderer={({ isCopied }) => (
-                                      <code
-                                        className={classes.inlineControlBtn}
-                                        style={{
-                                          color: isCopied && copiedText === clsx(checklistItem.title, {
-                                            [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
-                                          })
-                                            ? '#02c39a'
-                                            : 'inherit',
-                                          display: 'inline-flex',
-                                          flexDirection: 'row',
-                                          gap: '5px',
-                                          alignItems: 'center',
-                                        }}
-                                      >
-                                        <span>[</span>
-                                        {
-                                          isCopied && copiedText === clsx(checklistItem.title, {
-                                            [`\n\n${checklistItem.descr}`]: !!checklistItem.descr,
-                                          })
-                                            ? (
-                                              <FaRegCopy sx={{ fontSize: '18px' }} />
-                                            )
-                                            : (
-                                              <FaCopy sx={{ fontSize: '18px' }} />
-                                            )
-                                        }
-                                        <span>all</span>
-                                        <span>]</span>
-                                      </code>
-                                    )}
-                                  />
-                                )
-                              }
-                              {
-                                isCopiable && !!checklistItem.descr && (
-                                  <CopyToClipboardWrapperUniversal
-                                    showNotifOnCopy
-                                    onCopy={handleCopy}
-                                    text={checklistItem.descr}
-                                    renderer={({ isCopied }) => (
-                                      <code
-                                        className={classes.inlineControlBtn}
-                                        style={{
-                                          color: isCopied && copiedText === checklistItem.descr ? '#02c39a' : 'inherit',
-                                          display: 'inline-flex',
-                                          flexDirection: 'row',
-                                          gap: '5px',
-                                          alignItems: 'center',
-                                        }}
-                                      >
-                                        <span>[</span>
-                                        {
-                                          isCopied && copiedText === checklistItem.descr
-                                            ? (
-                                              <FaRegCopy sx={{ fontSize: '18px' }} />
-                                            )
-                                            : (
-                                              <FaCopy sx={{ fontSize: '18px' }} />
-                                            )
-                                        }
-                                        <span>descr</span>
-                                        <span>]</span>
-                                      </code>
-                                    )}
-                                  />
-                                )
-                              }
-                              {
-                                !!onDeleteChecklistItem && (
-                                  <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>
-                                    [ Del ]
-                                  </code>
-                                )
-                              }
-                              <code
-                                className={classes.inlineControlBtn}
-                                onClick={handleDisabledToggle({
-                                  checklistItemId: checklistItem.id,
-                                  title: checklistItem.title,
-                                  descr: checklistItem.descr,
-                                  isDoneCurrentValue: checklistItem.isDone,
-                                  isDisabledCurrentValue: checklistItem.isDisabled,
-                                })}
-                                style={{
-                                  display: 'inline-flex',
-                                  flexDirection: 'row',
-                                  gap: '5px',
-                                  alignItems: 'center',
-                                  // border: '1px solid red'
-                                }}
-                              >
-                                <span>[</span>
-                                {
-                                  checklistItem.isDisabled
-                                    ? (
-                                      <ToggleOffIcon sx={{ fontSize: '20px' }} />
-                                    )
-                                    : (
-                                      <ToggleOnIcon sx={{ fontSize: '20px' }} />
-                                    )
-                                }
-                                <span>]</span>
-                              </code>
-                              {
-                                isEditable && (
-                                  <code
-                                    className={classes.inlineControlBtn}
-                                    onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
-                                  >
-                                    [ Edit ]
-                                  </code>
-                                )
-                              }
-                            </div>
-                          </div>
-
-                          <div className={classes.infoStack}>
-                            <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>
-                              <HighlightedText
-                                comparedValue={checklistItem.title}
-                                testedValue={searchValue}
-                              />
-                            </em>
-                            {!!checklistItem.descr && (
-                              <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>
+                            <div className={classes.infoStack}>
+                              <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>
                                 <HighlightedText
-                                  comparedValue={checklistItem.descr}
+                                  comparedValue={checklistItem.title}
                                   testedValue={searchValue}
                                 />
-                              </code>
-                            )}
-                          </div>
+                              </em>
+                              {!!checklistItem.descr && (
+                                <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>
+                                  <HighlightedText
+                                    comparedValue={checklistItem.descr}
+                                    testedValue={searchValue}
+                                  />
+                                </code>
+                              )}
+                            </div>
 
-                        </div>
-                      ))
+                          </div>
+                        ))
                     }
                     {
                       items.length === 0 && (

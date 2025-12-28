@@ -246,8 +246,9 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
             if (log.checklist?.length > 0) {
               analyzed.__logLocalLinks = log.checklist
                 .reduce((acc, cur) => {
-                  const { title, descr, ts, isDone, id, isDisabled, links } = cur
+                  const { title, descr, ts, isDone, id, isDisabled, links, order } = cur
                   /* NOTE: TLogChecklistItem
+                    order?: number;
                     title: string;
                     descr: string;
                     isDone: boolean;
@@ -280,11 +281,12 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
                       descr,
                       updatedAgo: getTimeAgo({ dateInput: ts.updatedAt }),
                       links,
+                      order,
                     })
                   }
-
                   return acc
                 }, [])
+                .sort((e1, e2) => ((e2.order || 0) - (e1.order || 0)))
             }
 
             if (analyzed.ok) {

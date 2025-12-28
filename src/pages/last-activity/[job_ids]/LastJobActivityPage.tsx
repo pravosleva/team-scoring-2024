@@ -362,12 +362,11 @@ export const LastJobActivityPage = memo(() => {
                               >
                                 <CloseIcon sx={{ fontSize: 'inherit' }} />
                               </Link>
-                              <div style={{ color: '#000' }}>
-                                <HighlightedText
-                                  comparedValue={job.title}
-                                  testedValue={clsx(searchValueBasic)}
-                                />
-                              </div>
+                              <HighlightedText
+                                comparedValue={job.title}
+                                testedValue={clsx(searchValueBasic)}
+                                style={{ display: 'block', color: '#000' }}
+                              />
                               {
                                 !!job.forecast.assignedTo && (
                                   <div
@@ -443,7 +442,7 @@ export const LastJobActivityPage = memo(() => {
                                 briefText='Description'
                                 contentRender={() => (
                                   <HighlightedText
-                                    style={{ fontSize: 'small', paddingLeft: '24px' }}
+                                    style={{ display: 'block', fontSize: 'small', paddingLeft: '24px' }}
                                     comparedValue={job.descr as string}
                                     testedValue={clsx(searchValueBasic)}
                                   />

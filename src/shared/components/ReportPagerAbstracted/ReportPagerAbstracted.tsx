@@ -278,7 +278,7 @@ export const ReportPagerAbstracted = ({
 
                 <Grid size={12}>
                   <CollapsibleText
-                    briefText={`🔥 In progress (${outputWorkerData.output.targetActiveCheckboxTree.counters.adds})`}
+                    briefText={`🔥 In progress (${outputWorkerData.output.targetActiveCheckboxTree.counters.adds}) 👉 Checklist sorted by priority`}
                     isClickableBrief
                     contentRender={() => (
                       <>
@@ -358,7 +358,7 @@ export const ReportPagerAbstracted = ({
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds})</span>}
+                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds}) 👉 Sorted by priority</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre

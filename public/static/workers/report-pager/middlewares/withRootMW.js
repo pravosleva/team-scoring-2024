@@ -396,23 +396,26 @@ const withRootMW = (arg) => compose([
                   }
                 },
                 getDescriptionMessagesByModel: ({ model, __incCounter }) =>
-                  model.logs.items.reduce((acc, cur) => {
-                    if (cur.checklist?.length > 0) {
-                      for (const microtask of cur.checklist) {
-                        if (!microtask.isDone && !microtask.isDisabled) {
-                          const msgs = [
-                            `${microtask.title}`,
-                          ]
-                          if (!!microtask.descr) {
-                            msgs.push(`(${microtask.descr})`)
+                  model.logs.items
+                    .reduce((acc, cur) => {
+                      if (cur.checklist?.length > 0) {
+                        for (const microtask of cur.checklist) {
+                          if (!microtask.isDone && !microtask.isDisabled) {
+                            const msgs = [
+                              `${microtask.title}`,
+                            ]
+                            if (!!microtask.descr) {
+                              msgs.push(`(${microtask.descr})`)
+                            }
+                            if (typeof __incCounter === 'function') __incCounter()
+                            acc.push({ msg: msgs.join(' '), order: microtask.order || 0 })
                           }
-                          if (typeof __incCounter === 'function') __incCounter()
-                          acc.push(msgs.join(' '))
                         }
                       }
-                    }
-                    return acc
-                  }, []),
+                      return acc
+                    }, [])
+                    .sort((e1, e2) => ((e2.order || 0) - (e1.order || 0)))
+                    .map(({ msg }) => msg),
               })
               // --
               // -- NOTE: Aux info
@@ -514,31 +517,34 @@ const withRootMW = (arg) => compose([
                   }
                 },
                 getDescriptionMessagesByModel: ({ model, validateFn, __incCounter }) =>
-                  model.logs.items.reduce((acc, cur) => {
-                    if (cur.checklist?.length > 0) {
-                      for (const microtask of cur.checklist) {
-                        if (typeof validateFn === 'function' && validateFn(microtask)) {
-                          const msgs = [
-                            `[${getTimeAgo({ dateInput: microtask.ts.updatedAt })}]`,
-                            `${microtask.title}`,
-                          ]
-                          if (!!microtask.descr) {
-                            msgs.push(`(${microtask.descr})`)
+                  model.logs.items
+                    .reduce((acc, cur) => {
+                      if (cur.checklist?.length > 0) {
+                        for (const microtask of cur.checklist) {
+                          if (typeof validateFn === 'function' && validateFn(microtask)) {
+                            const msgs = [
+                              `[${getTimeAgo({ dateInput: microtask.ts.updatedAt })}]`,
+                              `${microtask.title}`,
+                            ]
+                            if (!!microtask.descr) {
+                              msgs.push(`(${microtask.descr})`)
+                            }
+                            if (typeof __incCounter === 'function') __incCounter()
+                            acc.push({ msg: msgs.join(' '), order: microtask.order || 0 })
                           }
-                          if (typeof __incCounter === 'function') __incCounter()
-                          acc.push(msgs.join(' '))
+                          // else {
+                          //   acc.push([
+                          //     'DEBUG:',
+                          //     `validateFn is ${typeof validateFn}`,
+                          //     `validateFn -> ${validateFn(microtask)}`,
+                          //   ].join(' '))
+                          // }
                         }
-                        // else {
-                        //   acc.push([
-                        //     'DEBUG:',
-                        //     `validateFn is ${typeof validateFn}`,
-                        //     `validateFn -> ${validateFn(microtask)}`,
-                        //   ].join(' '))
-                        // }
                       }
-                    }
-                    return acc
-                  }, []),
+                      return acc
+                    }, [])
+                    .sort((e1, e2) => ((e2.order || 0) - (e1.order || 0)))
+                    .map(({ msg }) => msg),
               })
 
               // 3. Created eary than 1 month ago and not completed

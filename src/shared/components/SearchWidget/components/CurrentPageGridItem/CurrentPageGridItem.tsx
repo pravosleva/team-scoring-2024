@@ -154,7 +154,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
           && filteredJobsLogsMappingChunk.length > 0
           && (
             <CollapsibleText
-              briefText={`Logs (${filteredJobsLogsMappingChunk.length})`}
+              briefText={`Logs (${filteredJobsLogsMappingChunk.length}) 👉 Sorted by date`}
               isClickableBrief
               contentRender={() => (
                 <ul className={baseClasses.compactList2}>
@@ -239,7 +239,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                           {
                             log._service.logLocalLinks.length > 0 && (
                               <>
-                                <b>Checklist</b>
+                                <b>Checklist 👉 Sorted by priority (order DESC)</b>
                                 <ul className={baseClasses.compactList2}>
                                   {
                                     log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo }) => (

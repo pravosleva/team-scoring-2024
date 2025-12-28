@@ -801,7 +801,12 @@ export const ProjectNode = ({
                             job={itemData.originalJob as TJob}
                             delay={1000}
                           />
-                          <HighlightedText comparedValue={itemData.originalJob.title} testedValue={searchValueBasic} className={baseClasses.rowsLimited3} />
+                          <HighlightedText
+                            comparedValue={itemData.originalJob.title}
+                            testedValue={searchValueBasic}
+                            className={baseClasses.rowsLimited3}
+                            style={{ fontWeight: 'bold' }}
+                          />
                           {
                             !!itemData.originalJob.forecast.assignedTo && (
                               <span

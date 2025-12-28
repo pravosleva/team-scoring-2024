@@ -4,7 +4,7 @@ import { memo, useCallback, useState, useMemo } from 'react'
 //   // useSelector,
 // } from '@xstate/react'
 import { styled } from '@mui/material/styles'
-import { TopLevelContext, TJob } from '~/shared/xstate'
+import { TopLevelContext, TJob, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 // import { jobEditorMachine } from '~/shared/xstate'
 import { ScoringSettings } from './components'
 import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Rating } from '@mui/material'
@@ -16,6 +16,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import baseClasses from '~/App.module.scss'
+import { HighlightedText } from '../HighlightedText/v2'
 // import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 
 type TProps = {
@@ -100,6 +101,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
     : undefined,
     [job.forecast.assignedTo, users]
   )
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
     <>
@@ -170,15 +172,15 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                 sx={{ my: 0 }}
                 id={String(id)}
                 primary={
-                  <span
+                  <HighlightedText
+                    comparedValue={job.title}
+                    testedValue={searchValueBasic}
                     className={baseClasses.truncate}
                     style={{
                       display: 'block',
                       fontSize: 'small',
                     }}
-                  >
-                    {job.title}
-                  </span>
+                  />
                 }
                 secondary={
                   <div
@@ -239,9 +241,6 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                 jobsActorRef.send({ type: 'todo.addTimeToFinishDate', hours, comment: commentByUser || '', id })
               }}
               onSave={({ state }) => {
-                // console.log('-state')
-                // console.log(state)
-                // console.log('-')
                 if (!!state?.title) {
                   let comment = ''
                   if (state.logs.isEnabled) {

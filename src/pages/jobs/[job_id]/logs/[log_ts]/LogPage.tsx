@@ -4,14 +4,14 @@ import { useParams } from 'react-router-dom'
 import { Box, Button, Rating } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import dayjs from 'dayjs'
-import { TJob, TLogsItem, TopLevelContext, TUser } from '~/shared/xstate'
+import { TJob, TLogsItem, TopLevelContext, TUser, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components/JobResultReviewShort'
 import { getJobStatusText } from '~/pages/jobs/[job_id]/utils'
-import { ResponsiveBlock, SimpleCheckList, TimeAgo } from '~/shared/components'
+import { HighlightedText, ResponsiveBlock, SimpleCheckList, TimeAgo } from '~/shared/components'
 import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -22,7 +22,6 @@ import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import { SingleTextManager } from '~/shared/components'
 import { CommentManager } from './components'
-import clsx from 'clsx'
 
 const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
 
@@ -67,6 +66,7 @@ export const LogPage = memo(() => {
       })
     }
   }, [targetJob?.id, targetLog?.ts, jobsActorRef])
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
     <Grid container spacing={2}>
@@ -154,7 +154,12 @@ export const LogPage = memo(() => {
             gap: 2,
           }}
         >
-          <div style={{ fontWeight: 'bold' }} className={baseClasses.truncate}>{targetJob?.title || `Job not found #${params.job_id}`}</div>
+          <HighlightedText
+            comparedValue={targetJob?.title || `Job not found #${params.job_id}`}
+            testedValue={searchValueBasic}
+            className={baseClasses.truncate}
+            style={{ display: 'block', fontWeight: 'bold' }}
+          />
           {
             !!targetJob?.ts.create && (
               <TimeAgo
@@ -167,9 +172,11 @@ export const LogPage = memo(() => {
           {
             !!targetJob && (
               // TODO: <SingleTextManager buttonText='Edit job description'
-              <em style={{ fontSize: 'small', color: '#959eaa', fontWeight: 'bold' }}>
-                {targetJob.descr || 'No description'}
-              </em>
+              <HighlightedText
+                comparedValue={targetJob.descr || 'No description'}
+                testedValue={searchValueBasic}
+                style={{ fontSize: 'small', color: '#959eaa', fontWeight: 'bold' }}
+              />
             )
           }
         </Box>
@@ -250,6 +257,26 @@ export const LogPage = memo(() => {
                         },
                       })
                       cleanup()
+                    }}
+                    onChecklistItemOrderInc={({ checklistItemId }) => {
+                      jobsActorRef.send({
+                        type: 'todo.editChecklistItemInLog.orderInc',
+                        value: {
+                          jobId: targetJob.id,
+                          logTs: targetLog.ts,
+                          checklistItemId,
+                        },
+                      })
+                    }}
+                    onChecklistItemOrderDec={({ checklistItemId }) => {
+                      jobsActorRef.send({
+                        type: 'todo.editChecklistItemInLog.orderDec',
+                        value: {
+                          jobId: targetJob.id,
+                          logTs: targetLog.ts,
+                          checklistItemId,
+                        },
+                      })
                     }}
                   />
                 )

@@ -320,12 +320,13 @@ export const SearchWidget = memo((ps: TProps) => {
                     startAdornment: (!!params.job_id || !!params.job_ids)
                       ? <WarningIcon sx={{ mr: 1 }} htmlColor='gray' />
                       : <SearchIcon sx={{ mr: 1 }} htmlColor='gray' />,
+                    enterKeyHint: 'search',
                   },
                 }}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6, fontWeight: 'bold', fontFamily: 'system-ui' } }}
                 // NOTE: Deprecated -> InputProps={}
                 autoComplete='off'
-                enterKeyHint='search'
+                // enterKeyHint='search'
                 helperText={
                   !!params.job_id
                     ? 'You have search for target single job'
@@ -380,11 +381,12 @@ export const SearchWidget = memo((ps: TProps) => {
                 slotProps={{
                   input: {
                     startAdornment: <MonitorHeartIcon htmlColor='gray' sx={{ mr: 1 }} />,
+                    enterKeyHint: 'search',
                   },
                 }}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 6, fontWeight: 'bold', fontFamily: 'system-ui' } }}
                 autoComplete='off'
-                enterKeyHint='search'
+                // enterKeyHint='search'
                 helperText='Search in logs, checklist, links'
                 // error={}
                 type='text'

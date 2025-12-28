@@ -1,11 +1,12 @@
 import { useMemo, memo } from 'react'
 // import { Layout } from '~/shared/components/Layout'
 import { useParams } from 'react-router-dom'
-import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
+import { TJob, TopLevelContext, TUser, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import Grid from '@mui/material/Grid2'
 import {
   CollapsibleBox,
   DistributionFunctionGraph,
+  HighlightedText,
   ResponsiveBlock,
   SimpleJobPointsetChecker,
   SpeedsFunctionGraph,
@@ -105,6 +106,7 @@ export const JobPage = memo(() => {
   // const urlSearchParamFrom = useMemo(() => urlSearchParams.get('from'), [urlSearchParams])
   // const urlSearchParamBackActionUiText = useMemo(() => urlSearchParams.get('backActionUiText'), [urlSearchParams])
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
     <Grid container spacing={2}>
@@ -167,12 +169,12 @@ export const JobPage = memo(() => {
           </Box>
           {/* <em style={{ fontSize: 'small' }}>Status: {statusText}</em> */}
 
-          <div
-            style={{ fontSize: 'small', fontWeight: 'bold' }}
+          <HighlightedText
+            comparedValue={targetJob?.title || `Not found #${params.job_id}`}
+            testedValue={clsx(searchValueBasic)}
+            style={{ display: 'block', fontSize: 'small', fontWeight: 'bold' }}
             className={baseClasses.truncate}
-          >
-            {targetJob?.title || `Not found #${params.job_id}`}
-          </div>
+          />
 
           <div
             style={{
@@ -199,8 +201,19 @@ export const JobPage = memo(() => {
             gap: 2,
           }}
         >
-          <div style={{ fontWeight: 'bold' }}>{targetJob?.title || `Not found #${params.job_id}`}</div>
-          {!!targetJob?.descr && <em style={{ color: 'gray', fontSize: 'small' }}>{targetJob?.descr}</em>}
+          <HighlightedText
+            comparedValue={targetJob?.title || `Not found #${params.job_id}`}
+            testedValue={clsx(searchValueBasic)}
+            style={{ display: 'block', fontWeight: 'bold' }}
+          />
+
+          {!!targetJob?.descr && (
+            <HighlightedText
+              comparedValue={targetJob.descr}
+              testedValue={clsx(searchValueBasic)}
+              style={{ display: 'block', fontSize: 'small', fontStyle: 'italic', color: '#959eaa' }}
+            />
+          )}
         </Box>
       </Grid>
 

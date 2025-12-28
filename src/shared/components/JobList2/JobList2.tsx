@@ -16,7 +16,8 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import { getFullUrl as _getFullUrl } from '~/shared/utils/string-ops'
-import AddIcon from '@mui/icons-material/Add';
+// import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 // import clsx from 'clsx'
 
 // const { useStore: useParamsInspectorContextWrapper } = ParamsInspectoreContext
@@ -160,7 +161,7 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
                   <TextField
                     slotProps={{
                       input: {
-                        startAdornment: <AddIcon htmlColor='gray' sx={{ mr: 0 }} />,
+                        startAdornment: <AddCircleIcon htmlColor='gray' sx={{ mr: 1 }} />,
                       },
                     }}
                     sx={{ '& .MuiOutlinedInput-root': { fontWeight: 'bold', fontFamily: 'system-ui' } }}

@@ -20,6 +20,8 @@ import classes from './SingleTextManager.module.scss'
 import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import baseClasses from '~/App.module.scss'
+import { HighlightedText } from '../HighlightedText/v2'
+import { useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 
 type TProps<T> = {
   initialState: T;
@@ -106,6 +108,8 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
   const hasUpdated = useMemo(() => {
     return localText !== initialState.text
   }, [localText, initialState.text])
+  const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+  const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
 
   return (
     <>
@@ -179,7 +183,12 @@ export const SingleTextManager: React.FC<TProps<{ text: string }>> = ({
                           // backgroundColor: 'lightgray',
                         }}
                         className={baseClasses.preNormalized}
-                      >{localText}</pre>
+                      >
+                        <HighlightedText
+                          comparedValue={localText}
+                          testedValue={clsx(searchValueBasic, searchValueEnhanced)}
+                        />
+                      </pre>
                     </div>
                     {
                       isEditable && (

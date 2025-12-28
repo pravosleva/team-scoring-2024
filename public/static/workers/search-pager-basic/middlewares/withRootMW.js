@@ -6,6 +6,8 @@ console.log('[LOADED] search-pager-basic/middlewares/withRootMW')
 // NOTE: delay fn should be imported already
 
 let controller = new AbortController()
+let isWaiting = false
+const resetWaiting = () => isWaiting = false
 // let finalOutputErrorController = new AbortController()
 
 const withRootMW = (arg) => compose([
@@ -35,10 +37,11 @@ const withRootMW = (arg) => compose([
             }
 
             try {
-              if (!!controller) {
+              if (isWaiting && !controller.signal.aborted) {
                 controller.abort()
                 controller = new AbortController()
-              }
+              } else isWaiting = true
+
               const targetAction = () => {
                 // console.log(eventData.input.xxx.sa)
                 let isFiltersRequired = !!eventData?.input?._activeFilters && eventData.input._activeFilters.isAnyFilterActive
@@ -235,6 +238,7 @@ const withRootMW = (arg) => compose([
                 input,
                 // _service,
               })
+              setTimeout(resetWaiting, 2000)
             }
 
             break

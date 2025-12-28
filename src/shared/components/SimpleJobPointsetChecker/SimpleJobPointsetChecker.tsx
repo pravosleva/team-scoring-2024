@@ -318,7 +318,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
           gap: '6px',
         }}
       >
-        Pointset | Roadmap
+        Roadmap | Pointset info
       </div>
       {
         !!reportText && (
