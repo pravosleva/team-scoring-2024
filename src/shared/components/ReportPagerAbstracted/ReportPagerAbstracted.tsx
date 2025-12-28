@@ -358,7 +358,7 @@ export const ReportPagerAbstracted = ({
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds}) 👉 Sorted by priority</span>}
+                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds}) 👉 Checklist sorted by priority</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre
