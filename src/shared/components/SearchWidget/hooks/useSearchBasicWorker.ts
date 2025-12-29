@@ -216,7 +216,6 @@ export const useSearchBasicWorker = <TTargetResult, TWorkerServiceReport>({
 
   // NOTE: 2. Send event for each change of deps
   useLayoutEffect(() => {
-    console.log(`-- EFF isEnabled -> ${isEnabled}`)
     if (isEnabled)
       sendSignalToWorkerFnRef.current({
         input: {

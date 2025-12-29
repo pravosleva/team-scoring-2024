@@ -2,18 +2,40 @@
 
 console.log('[LOADED] search-pager-basic/middlewares/withRootMW')
 
-// NOTE: compose fn should be imported already
-// NOTE: delay fn should be imported already
+// NOTE: External deps: compose, delay
 
 let controller = new AbortController()
+// NOTE: THROTTLE 1/4 Сброс ожидания
 let isWaiting = false
 const resetWaiting = () => isWaiting = false
-// let finalOutputErrorController = new AbortController()
+
+/**
+ * @typedef {object} TJob Работа
+ * @property {number} id ID
+ * @property {string} title Title
+ */
 
 const withRootMW = (arg) => compose([
   // NOTE: You can add your middlewares below...
 
-  // - NOTE: For example
+  /**
+   * Middleware
+   *
+   * @async
+   * @param {object} arg Middleware argument 
+   * @param {object} arg.eventData Middleware event data
+   * @param {object} arg.eventData.__eType Event type
+   * @param {object} arg.eventData.input Event input data
+   * @param {object} arg.eventData.input.activeFilters Input filters config
+   * @param {TJob[]} arg.eventData.input.jobs Joblist
+   * @param {object} arg.eventData.input.searchQuery Input search query config
+   * @param {object} arg.eventData.input.searchQuery.basic Input search query (basic)
+   * @param {object} arg.eventData.input.searchQuery.enhanced Input search query (enhanced)
+   * @param {object} arg.eventData.input.activeJobId Active job id (if necessary)
+   * @param {object} arg.cb Middleware callback
+   * @returns {object} Result
+   * @source
+   */
   async ({ eventData, cb }) => {
     const { __eType, input } = eventData
 
@@ -37,22 +59,16 @@ const withRootMW = (arg) => compose([
             }
 
             try {
+              // NOTE: THROTTLE 2/4 Сброс ожидания запланированной операции при каждом запросе
               if (isWaiting && !controller.signal.aborted) {
                 controller.abort()
                 controller = new AbortController()
               } else isWaiting = true
 
               const targetAction = () => {
-                // console.log(eventData.input.xxx.sa)
                 let isFiltersRequired = !!eventData?.input?._activeFilters && eventData.input._activeFilters.isAnyFilterActive
 
-                // -- TODO: getMatchedByAllStrings
-                // input.activeFilters
-                // input.jobs
-                // input.searchQuery.basic
-                // input.searchQuery.enhanced
-                // input.activeJobId
-
+                // -- NOTE: (v0) Внешний функционал не готов, поэтому донастроим конфиг
                 const mutableDefaultFiltersConfig = {
                   isAnyFilterActive: false,
                   jobStatusFilter: false,
@@ -113,7 +129,7 @@ const withRootMW = (arg) => compose([
                 const filteredJobs = isFiltersRequired
                   ? getFilteredJobs({
                     jobs: eventData?.input?.jobs || [],
-                    activeFilters: mutableDefaultFiltersConfig, // eventData?.input?._activeFilters,
+                    activeFilters: mutableDefaultFiltersConfig,
                   })
                   : { items: (eventData?.input?.jobs || []) }
                 const sortedJobs = getSortedArray({
@@ -121,7 +137,6 @@ const withRootMW = (arg) => compose([
                   keys: ['tsUpdate'],
                   order: -1,
                 })
-                // console.log(sortedJobs)
                 const targetJob = !!eventData?.input?.activeJobId
                   ? filteredJobs.items.find(({ id }) => id === eventData?.input?.activeJobId)
                   : undefined
@@ -178,13 +193,7 @@ const withRootMW = (arg) => compose([
                         }
                       }
                     */
-
-                    // requiredPage: eventData?.input?.requiredPage,
-                    // jobsLen: eventData?.input?.jobs?.length,
-                    // jobsMinimalData: eventData?.input?.jobs?.map(getMinimalData),
-                    // targetJobId: eventData?.input?.activeJobId,
                   },
-
                   filteredJobsLogsMapping: filteredJobs._service.logsMapping,
                 }
 
@@ -201,29 +210,18 @@ const withRootMW = (arg) => compose([
                   })
                 }
               }
+              // NOTE: THROTTLE 3/4 Sync delay (revertable)
               const res = await delay({
-                ms: 1500,
+                ms: 3000,
                 signal: controller.signal,
-                customAbortMessage: '[SPECIAL_ERRROR=Just a moment, plz]'
+                customAbortMessage: '[SPECIAL_ERRROR=Just a moment, plz...]'
               })
                 .then(targetAction)
                 .then(() => ({ ok: true }))
                 .catch((err) => ({ ok: false, reason: err?.message || 'No err?.message' }))
 
-              if (!res.ok) {
-                // NOTE: v1
+              if (!res.ok)
                 throw new Error(res.reason)
-
-                // NOTE: v2 Поставим задержку чтоб не спамить фронт
-                // finalOutputErrorController.abort()
-                // finalOutputErrorController = new AbortController()
-                // const finalThrowConfirmed = await delay({ ms: 2000, signal: finalOutputErrorController.signal })
-                //   .then(() => ({ ok: true }))
-                //   .catch((err) => ({ ok: false, reason: err?.message || 'No err?.message' }))
-
-                // if (finalThrowConfirmed.ok) throw new Error(res.reason)
-                // else return
-              }
             } catch (err) {
               output.ok = false
               output.message = `Worker error: ${err?.message || 'No message'}; search-pager-basic/middlewares/withRootMW`
@@ -238,13 +236,13 @@ const withRootMW = (arg) => compose([
                 input,
                 // _service,
               })
-              setTimeout(resetWaiting, 2000)
+              // NOTE: THROTTLE 4/4
+              resetWaiting()
             }
-
             break
           }
           default:
-            console.log('[DEBUG] Default case')
+            // NOTE: Whatever
             break
         }
         // --
@@ -263,5 +261,4 @@ const withRootMW = (arg) => compose([
         break
     }
   },
-  // -
 ], arg)
