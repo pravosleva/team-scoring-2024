@@ -358,7 +358,7 @@ export const ReportPagerAbstracted = ({
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 7 days ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds}) 👉 Checklist sorted by priority</span>}
+                  header={<span>✅ Done last week ({outputWorkerData?.output.fullDoneLast7DaysCheckboxesTree?.counters.adds}) 👉 Checklist sorted by priority</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre
@@ -397,7 +397,7 @@ export const ReportPagerAbstracted = ({
             && (
               <Grid size={12}>
                 <CollapsibleBox
-                  header={<span>✅ Done last 1 month ({outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counters.adds})</span>}
+                  header={<span>✅ Done last 1 Mo. ({outputWorkerData?.output.fullDoneLast3MonthsCheckboxesTree?.counters.adds})</span>}
                   text={(
                     <div className={baseClasses.stack1}>
                       <pre

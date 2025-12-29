@@ -174,7 +174,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                               // justifyContent: 'space-between',
                             }}
                           >
-                            <span>{dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(log.original.ts)})</span>
+                            <span>LOG | {dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(log.original.ts)})</span>
                             {/* <span
                               style={{
                                 display: 'flex',
@@ -244,7 +244,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                   {
                                     log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo }) => (
                                       <li key={id} className={baseClasses.stack1}>
-                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>Updated {updatedAgo}</b>
+                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>CHECKLIST ITEM | Updated {updatedAgo}</b>
                                         {/* <a target='_blank' href={`${PUBLIC_URL}/#${relativeUrl}`}>{ui} ↗️</a> */}
 
                                         <HighlightedText
@@ -294,7 +294,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                   {
                                     log._service.logExternalLinks.map(({ url, ui, descr, logTs, jobId }) => (
                                       <li key={`${jobId}--${logTs}`} className={baseClasses.stack1}>
-                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>Link Created {timeAgo.format(logTs)}</b>
+                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>LINK | Created {timeAgo.format(logTs)}</b>
                                         <HighlightedText
                                           comparedValue={ui}
                                           testedValue={testedValue}
