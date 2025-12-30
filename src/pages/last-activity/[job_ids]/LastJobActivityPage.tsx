@@ -282,35 +282,6 @@ export const LastJobActivityPage = memo(() => {
                               fontSize: 'small'
                             }}
                           >
-                            {!!job.relations.parent && (
-                              <CollapsibleText
-                                // briefPrefix='├─'
-                                briefText={
-                                  <HighlightedText
-                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
-                                    testedValue={clsx(searchValueBasic)}
-                                  />
-                                }
-                                contentRender={() => (
-                                  <div style={{ fontSize: 'small', paddingLeft: '24px' }}>
-                                    <Link
-                                      to={getFullUrl({
-                                        url: `/last-activity/${job.relations.parent}`,
-                                        query: {
-                                          ...queryParams,
-                                        },
-                                      })}
-                                    >
-                                      <HighlightedText
-                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
-                                        testedValue={clsx(searchValueBasic)}
-                                      />
-                                    </Link>
-                                  </div>
-                                )}
-                                isClickableBrief
-                              />
-                            )}
                             <div
                               style={{
                                 display: 'flex',
@@ -385,6 +356,40 @@ export const LastJobActivityPage = memo(() => {
                                 )
                               }
                             </div>
+                            {!!job.relations.parent && (
+                              <CollapsibleText
+                                briefPrefix={(job.relations.children.length > 0 || !!job.descr) ? '├─' : '└─'}
+                                briefText={
+                                  <HighlightedText
+                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
+                                    testedValue={clsx(searchValueBasic)}
+                                  />
+                                }
+                                contentRender={() => (
+                                  <div
+                                    style={{
+                                      fontSize: 'small', paddingLeft: '24px',
+                                      display: 'block',
+                                    }}
+                                  >
+                                    <Link
+                                      to={getFullUrl({
+                                        url: `/last-activity/${job.relations.parent}`,
+                                        query: {
+                                          ...queryParams,
+                                        },
+                                      })}
+                                    >
+                                      <HighlightedText
+                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                        testedValue={clsx(searchValueBasic)}
+                                      />
+                                    </Link>
+                                  </div>
+                                )}
+                                isClickableBrief
+                              />
+                            )}
                             {job.relations.children.length > 0 && (
                               <CollapsibleText
                                 briefPrefix={!!job.descr ? '├─' : '└─'}

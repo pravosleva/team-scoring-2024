@@ -7,6 +7,8 @@ const sounds = {
   'click-8': '/click/click-8.mp3',
   'click-12': '/click/click-12.mp3',
   'click-27': '/click/click-27.mp3',
+  'click-28': '/click/click-28.mp3',
+  'click-28-kassa': '/click/click-28-kassa.mp3',
   'click-30-kassa': '/click/click-30-kassa.mp3',
   'click-33': '/click/click-33-otto_lock.mp3',
   'click-34': '/click/click-34-otto_unlock.mp3',

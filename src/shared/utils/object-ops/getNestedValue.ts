@@ -10,13 +10,13 @@
  * @param {string} arg.path Путь до поля
  * @returns {unknown} Значение поля
  */
-export const getNestedValue = <T>({ source, path }: {
+export const getNestedValue = <T, V>({ source, path }: {
   source: T;
   path: string;
-}) => {
+}): V => {
   const arr = path.split(/[.[]['"]?/)
-  let o = source;
+  let o: unknown = source;
   // @ts-ignore
   while (arr.length && o) o = o[arr.shift().replace(/['"]?]$/, '')]
-  return o
+  return o as V
 }

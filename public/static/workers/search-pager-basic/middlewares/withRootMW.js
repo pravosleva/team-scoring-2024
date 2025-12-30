@@ -10,9 +10,9 @@ let isWaiting = false
 const resetWaiting = () => isWaiting = false
 
 /**
- * @typedef {object} TJob Работа
- * @property {number} id ID
- * @property {string} title Title
+ * @typedef {Object} TJob Работа
+ * @property {Number} id ID
+ * @property {String} title Title
  */
 
 const withRootMW = (arg) => compose([
@@ -22,18 +22,18 @@ const withRootMW = (arg) => compose([
    * Middleware
    *
    * @async
-   * @param {object} arg Middleware argument 
-   * @param {object} arg.eventData Middleware event data
-   * @param {object} arg.eventData.__eType Event type
-   * @param {object} arg.eventData.input Event input data
-   * @param {object} arg.eventData.input.activeFilters Input filters config
+   * @param {Object} arg Middleware argument 
+   * @param {Object} arg.eventData Middleware event data
+   * @param {Object} arg.eventData.__eType Event type
+   * @param {Object} arg.eventData.input Event input data
+   * @param {Object} arg.eventData.input.activeFilters Input filters config
    * @param {TJob[]} arg.eventData.input.jobs Joblist
-   * @param {object} arg.eventData.input.searchQuery Input search query config
-   * @param {object} arg.eventData.input.searchQuery.basic Input search query (basic)
-   * @param {object} arg.eventData.input.searchQuery.enhanced Input search query (enhanced)
-   * @param {object} arg.eventData.input.activeJobId Active job id (if necessary)
-   * @param {object} arg.cb Middleware callback
-   * @returns {object} Result
+   * @param {Object} arg.eventData.input.searchQuery Input search query config
+   * @param {Object} arg.eventData.input.searchQuery.basic Input search query (basic)
+   * @param {Object} arg.eventData.input.searchQuery.enhanced Input search query (enhanced)
+   * @param {Object} arg.eventData.input.activeJobId Active job id (if necessary)
+   * @param {Object} arg.cb Middleware callback
+   * @returns {Object} Result
    * @source
    */
   async ({ eventData, cb }) => {

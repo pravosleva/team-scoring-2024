@@ -2,8 +2,8 @@ import { getNestedValue } from './getNestedValue';
 
 describe('Тестирование извлечения свойства', () => {
   test('case 1', () => {
-    const tested = getNestedValue({
-      obj: {
+    const tested = getNestedValue<{ a: { b: { c: number } } }, number>({
+      source: {
         a: {
           b: {
             c: 1
@@ -19,7 +19,7 @@ describe('Тестирование извлечения свойства', () =>
 
   test('case 2', () => {
     const tested = getNestedValue({
-      obj: {
+      source: {
         a: {
           b: {
             c: [1, 2, 3]
@@ -35,7 +35,7 @@ describe('Тестирование извлечения свойства', () =>
 
   test('case 3', () => {
     const tested = getNestedValue({
-      obj: {
+      source: {
         a: {
           b: {
             c: [1, 2, 3]
@@ -51,7 +51,7 @@ describe('Тестирование извлечения свойства', () =>
 
   test('case 4', () => {
     const tested = getNestedValue({
-      obj: {
+      source: {
         a: {
           b: {
             c: [1, 2, 3]
@@ -69,7 +69,7 @@ describe('Тестирование извлечения свойства', () =>
 
   test('case 5', () => {
     const tested = getNestedValue({
-      obj: {
+      source: {
         a: {
           b: {
             c: [1, 2, 3]

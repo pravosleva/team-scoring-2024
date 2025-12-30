@@ -148,33 +148,37 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
             />
           )
         }
+
         {
           !!filteredJobsLogsMappingChunk
           && Array.isArray(filteredJobsLogsMappingChunk)
           && filteredJobsLogsMappingChunk.length > 0
           && (
             <CollapsibleText
+              briefPrefix='└─'
               briefText={`Logs (${filteredJobsLogsMappingChunk.length}) 👉 Sorted by date`}
               isClickableBrief
               contentRender={() => (
-                <ul className={baseClasses.compactList2}>
+                <div
+                  className={baseClasses.stack1}
+                  style={{ paddingLeft: '24px' }}
+                >
                   {
                     filteredJobsLogsMappingChunk
                       .map((log) => (
-                        <li key={`logs-item-${j.id}-${log.original.ts}`} className={baseClasses.stack1}>
+                        <div key={`logs-item-${j.id}-${log.original.ts}`} className={baseClasses.stack1}>
                           <span
                             style={{
                               color: '#959eaa',
                               // whiteSpace: 'pre-wrap',
                               fontSize: 'x-small',
                               fontWeight: 'bold',
-                              paddingTop: '3px',
                               display: 'flex',
                               flexDirection: 'row',
                               // justifyContent: 'space-between',
                             }}
                           >
-                            <span>LOG | {dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(log.original.ts)})</span>
+                            <span>{dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(log.original.ts)})</span>
                             {/* <span
                               style={{
                                 display: 'flex',
@@ -239,98 +243,115 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                           {
                             log._service.logLocalLinks.length > 0 && (
                               <>
-                                <b>Checklist 👉 Sorted by priority (order DESC)</b>
-                                <ul className={baseClasses.compactList2}>
-                                  {
-                                    log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo }) => (
-                                      <li key={id} className={baseClasses.stack1}>
-                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>CHECKLIST ITEM | Updated {updatedAgo}</b>
-                                        {/* <a target='_blank' href={`${PUBLIC_URL}/#${relativeUrl}`}>{ui} ↗️</a> */}
+                                <CollapsibleText
+                                  briefPrefix={log._service.logExternalLinks.length > 0 ? '├─' : '└─'}
+                                  briefText={`Checklist (${log._service.logLocalLinks.length}) 👉 Sorted by priority (order DESC)`}
+                                  isClickableBrief
+                                  contentRender={() => (
+                                    <div
+                                      className={baseClasses.stack1}
+                                      style={{ paddingLeft: '24px' }}
+                                    >
+                                      {
+                                        log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo }) => (
+                                          <div key={id} className={baseClasses.stack1}>
+                                            <b style={{ color: '#959eaa', fontSize: 'x-small' }}>Updated {updatedAgo}</b>
+                                            {/* <a target='_blank' href={`${PUBLIC_URL}/#${relativeUrl}`}>{ui} ↗️</a> */}
 
-                                        <HighlightedText
-                                          comparedValue={ui}
-                                          testedValue={testedValue}
-                                          style={{
-                                            borderLeft: '4px solid #959eaa',
-                                            paddingLeft: '8px',
-                                            fontWeight: 'bold',
-                                          }}
-                                        />
-                                        {/* <Button
-                                          disabled={!!params.log_ts && Number(params.log_ts) === log.original.ts && isLogPage}
-                                          onClick={handleGoActivity({ jobId: j.id, logTs: log.original.ts, relativeUrl })}
-                                          sx={{ borderRadius: 4 }}
-                                          size='small'
-                                          variant='text'
-                                          // startIcon={<NewReleasesIcon />}
-                                          // onClick={() => navigate(`/last-activity/${j.id}`)}
-                                          startIcon={<MonitorHeartIcon />}
-                                        >
-                                          Log
-                                        </Button> */}
-                                        {
-                                          !!descr && (
                                             <HighlightedText
-                                              comparedValue={descr}
+                                              comparedValue={ui}
                                               testedValue={testedValue}
                                               style={{
-                                                color: '#959eaa'
+                                                borderLeft: '4px solid #959eaa',
+                                                paddingLeft: '8px',
+                                                fontWeight: 'bold',
                                               }}
                                             />
-                                          )
-                                        }
-                                      </li>
-                                    ))
-                                  }
-                                </ul>
+                                            {/* <Button
+                                              disabled={!!params.log_ts && Number(params.log_ts) === log.original.ts && isLogPage}
+                                              onClick={handleGoActivity({ jobId: j.id, logTs: log.original.ts, relativeUrl })}
+                                              sx={{ borderRadius: 4 }}
+                                              size='small'
+                                              variant='text'
+                                              // startIcon={<NewReleasesIcon />}
+                                              // onClick={() => navigate(`/last-activity/${j.id}`)}
+                                              startIcon={<MonitorHeartIcon />}
+                                            >
+                                              Log
+                                            </Button> */}
+                                            {
+                                              !!descr && (
+                                                <HighlightedText
+                                                  comparedValue={descr}
+                                                  testedValue={testedValue}
+                                                  style={{
+                                                    color: '#959eaa'
+                                                  }}
+                                                />
+                                              )
+                                            }
+                                          </div>
+                                        ))
+                                      }
+                                    </div>
+                                  )}
+                                />
                               </>
                             )
                           }
                           {
                             log._service.logExternalLinks.length > 0 && (
                               <>
-                                <b>External links</b>
-                                <ul className={baseClasses.compactList2}>
-                                  {
-                                    log._service.logExternalLinks.map(({ url, ui, descr, logTs, jobId }) => (
-                                      <li key={`${jobId}--${logTs}`} className={baseClasses.stack1}>
-                                        <b style={{ color: '#959eaa', fontSize: 'x-small', paddingTop: '3px' }}>LINK | Created {timeAgo.format(logTs)}</b>
-                                        <HighlightedText
-                                          comparedValue={ui}
-                                          testedValue={testedValue}
-                                          style={{
-                                            borderLeft: '4px solid #959eaa',
-                                            paddingLeft: '8px',
-                                          }}
-                                        />
-                                        <a href={url} target='_blank'>{`${url} ↗️`}</a>
-                                        {
-                                          !!descr && (
+                                <CollapsibleText
+                                  briefPrefix='└─'
+                                  briefText={`External links (${log._service.logExternalLinks.length})`}
+                                  isClickableBrief
+                                  contentRender={() => (
+                                    <div
+                                      className={baseClasses.stack1}
+                                      style={{ paddingLeft: '24px' }}
+                                    >
+                                      {
+                                        log._service.logExternalLinks.map(({ url, ui, descr, logTs, jobId }) => (
+                                          <div key={`${jobId}--${logTs}`} className={baseClasses.stack1}>
+                                            <b style={{ color: '#959eaa', fontSize: 'x-small' }}>Created {timeAgo.format(logTs)}</b>
                                             <HighlightedText
-                                              comparedValue={descr}
+                                              comparedValue={ui}
                                               testedValue={testedValue}
-                                              style={{ color: '#959eaa' }}
+                                              style={{
+                                                borderLeft: '4px solid #959eaa',
+                                                paddingLeft: '8px',
+                                              }}
                                             />
-                                          )
-                                        }
-                                        <span className={baseClasses.truncate}>
-                                          <CopyToClipboardWrapper
-                                            text={url}
-                                            uiText={ui}
-                                            showNotifOnCopy
-                                          />
-                                        </span>
-                                      </li>
-                                    ))
-                                  }
-                                </ul>
+                                            <a href={url} target='_blank'>{`${url} ↗️`}</a>
+                                            {
+                                              !!descr && (
+                                                <HighlightedText
+                                                  comparedValue={descr}
+                                                  testedValue={testedValue}
+                                                  style={{ color: '#959eaa' }}
+                                                />
+                                              )
+                                            }
+                                            <span className={baseClasses.truncate}>
+                                              <CopyToClipboardWrapper
+                                                text={url}
+                                                uiText={ui}
+                                                showNotifOnCopy
+                                              />
+                                            </span>
+                                          </div>
+                                        ))
+                                      }
+                                    </div>)}
+                                />
                               </>
                             )
                           }
-                        </li>
+                        </div>
                       ))
                   }
-                </ul>
+                </div>
               )}
             />
           )

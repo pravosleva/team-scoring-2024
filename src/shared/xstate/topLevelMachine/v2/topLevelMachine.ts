@@ -442,7 +442,7 @@ export const topLevelMachine = setup({
                       _debug: { msg: 'Checklist item order inc' },
                       delay: {
                         before: 0,
-                        after: 1000,
+                        after: 500,
                       },
                     })
                   }
@@ -454,6 +454,14 @@ export const topLevelMachine = setup({
                   targetJob.logs.items = targetLogList
                   modifiedJobsItems[targetJobIndex] = targetJob
                   // --
+                  soundManager.playDelayedSoundConfigurable({
+                    soundCode: 'click-28',
+                    _debug: { msg: 'Checklist item was replaced' },
+                    delay: {
+                      before: 0,
+                      after: 1000,
+                    },
+                  })
                 } else console.log(`-- [+] CHECKLIST ITEM NOT FOUND`)
               } else console.log(`-- [+] CHECKLIST NOT FOUND`)
             } else console.log(`-- [+] LOG NOT FOUND`)
@@ -504,7 +512,7 @@ export const topLevelMachine = setup({
                       _debug: { msg: 'Checklist item order dec' },
                       delay: {
                         before: 0,
-                        after: 1000,
+                        after: 500,
                       },
                     })
                   }
@@ -516,6 +524,14 @@ export const topLevelMachine = setup({
                   targetJob.logs.items = targetLogList
                   modifiedJobsItems[targetJobIndex] = targetJob
                   // --
+                  soundManager.playDelayedSoundConfigurable({
+                    soundCode: 'click-28',
+                    _debug: { msg: 'Checklist item was replaced' },
+                    delay: {
+                      before: 0,
+                      after: 1000,
+                    },
+                  })
                 }
               }
             }
