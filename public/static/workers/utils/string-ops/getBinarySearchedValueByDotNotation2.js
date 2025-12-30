@@ -1,16 +1,9 @@
-import { getNestedValue } from "~/shared/utils/object-ops"
-
-type TProps<TItemFormat> = {
-  items: TItemFormat[];
-  target: {
-    path: string;
-    critery: {
-      value: number;
-      path: string;
-    };
-  };
-  sorted: 'DESC' | 'ASC';
-}
+/**
+ * @typedef {unknown} TTargetValue Целевое (искомое) значение
+ */
+/**
+ * @typedef {unknown} TItemFormat Формат единицы массива
+ */
 
 /**
  * Бинарный поиск (поиск по сортированному списку элементов)
@@ -29,7 +22,7 @@ type TProps<TItemFormat> = {
  * - ASC - по возрастанию;
  * @returns {TTargetValue | undefined} Hайденный элемент:
  */
-export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>({ items, target, sorted }: TProps<TItemFormat>): TTargetValue | undefined => {
+export const getBinarySearchedValueByDotNotation2 = ({ items, target, sorted }) => {
   const {
     critery: {
       value: criteryValue,
@@ -38,32 +31,32 @@ export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>(
     path,
   } = target
   let __resultIndex = -1
-  let __result: TTargetValue | undefined = undefined
+  let __result = undefined
   let left = 0
   let right = items.length - 1
   let mid
 
   while (left <= right) {
     mid = Math.round((right + left) / 2)
-    const _currentValue = getNestedValue<TItemFormat, number>({ source: items[mid], path: criteryPropPath })
+    const _currentValue = getNestedValue({ source: items[mid], path: criteryPropPath })
 
     switch (sorted) {
       case 'DESC':
         if (criteryValue === _currentValue) {
           __resultIndex = mid
-          __result = getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
+          __result = getNestedValue({ source: items[__resultIndex], path })
           return __result
         }
-        else if (criteryValue > (_currentValue as number)) right = mid - 1
+        else if (criteryValue > _currentValue) right = mid - 1
         else left = mid + 1
         break
       case 'ASC':
         if (criteryValue === _currentValue) {
           __resultIndex = mid
-          __result = getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
+          __result = getNestedValue({ source: items[__resultIndex], path })
           return __result
         }
-        else if (criteryValue < (_currentValue as number)) right = mid - 1
+        else if (criteryValue < _currentValue) right = mid - 1
         else left = mid + 1
         break
       default:

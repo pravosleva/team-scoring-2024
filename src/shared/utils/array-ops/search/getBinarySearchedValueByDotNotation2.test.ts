@@ -111,7 +111,7 @@ describe('Тестирование способов разбить массив 
     expect(tested).toStrictEqual(expected)
   })
 
-  test('getBinarySearchedValueByDotNotation2: case 5', () => {
+  test('getBinarySearchedValueByDotNotation2: case 6', () => {
     const tested = getBinarySearchedValueByDotNotation2<{ ts: number; v: { a: string; p: number; } }, number>({
       items: [
         { ts: 1, v: { a: 'one', p: 101 } },
@@ -132,7 +132,7 @@ describe('Тестирование способов разбить массив 
     expect(tested).toStrictEqual(expected)
   })
 
-  test('getBinarySearchedValueByDotNotation2: case 5', () => {
+  test('getBinarySearchedValueByDotNotation2: case 7', () => {
     const tested = getBinarySearchedValueByDotNotation2<{ ts: number; v: { a: string; p: number; } }, number>({
       items: [
         { ts: 1, v: { a: 'one', p: 101 } },
@@ -150,6 +150,33 @@ describe('Тестирование способов разбить массив 
       sorted: 'ASC'
     })
     const expected = undefined
+    expect(tested).toStrictEqual(expected)
+  })
+
+  test('getBinarySearchedValueByDotNotation2: case 8', () => {
+    const tested = getBinarySearchedValueByDotNotation2<
+      {
+        x: { id: number; ts: number; };
+        v: { a: string; p: number; };
+      },
+      number
+    >({
+      items: [
+        { x: { id: 0, ts: 1 }, v: { a: 'one', p: 101 } },
+        { x: { id: 0, ts: 2 }, v: { a: 'two', p: 100 } },
+        { x: { id: 7, ts: 3 }, v: { a: 'three', p: 102 } },
+        { x: { id: 0, ts: 4 }, v: { a: 'four', p: 99 } },
+      ],
+      target: {
+        path: 'v.p',
+        critery: {
+          value: 3,
+          path: 'x.ts',
+        },
+      },
+      sorted: 'ASC'
+    })
+    const expected = 102
     expect(tested).toStrictEqual(expected)
   })
 })
