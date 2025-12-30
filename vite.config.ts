@@ -6,6 +6,7 @@ import pkg from './package.json'
 import slugify from 'slugify'
 import browserslistToEsbuild from 'browserslist-to-esbuild'
 import { VitePWA } from 'vite-plugin-pwa'
+import markdownItAnchor from 'markdown-it-anchor'
 
 const defaultNodeEnv = 'production'
 process.env = {
@@ -160,4 +161,20 @@ export default defineConfig({
       },
     },
   },
+  markdown: {
+    // options for markdown-it-anchor
+    // https://github.com/valeriangalliat/markdown-it-anchor#usage
+    anchor: {
+      permalink: markdownItAnchor.permalink.headerLink()
+    },
+
+    // options for @mdit-vue/plugin-toc
+    // https://github.com/mdit-vue/mdit-vue/tree/main/packages/plugin-toc#options
+    toc: { level: [1, 2] },
+
+    // config: (md) => {
+    //   // use more markdown-it plugins!
+    //   md.use(markdownItFoo)
+    // }
+  }
 })

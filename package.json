@@ -46,6 +46,7 @@
     "javascript-time-ago": "^2.5.11",
     "json-edit-react": "^1.26.2",
     "json-size": "^1.0.0",
+    "markdown-it-anchor": "^9.2.0",
     "math-interpolate": "^5.0.0",
     "notistack": "^3.0.2",
     "react": "^18.3.1",

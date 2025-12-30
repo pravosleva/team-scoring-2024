@@ -32,6 +32,18 @@ export default {
 }
 ```
 
+**Code focus**
+
+```js
+export default {
+  data () {
+    return {
+      msg: 'Highlighted!' // [!code focus]
+    }
+  }
+}
+```
+
 ## Custom Containers
 
 **Input**

@@ -3,12 +3,12 @@
 layout: home
 
 hero:
-  name: "Estimate Corrector 2024"
+  name: "Estimate Corrector"
   text: "What's the price of your prediction, dude?"
   tagline: Probability Theory in action
   actions:
     - theme: brand
-      text: Инструкция на русском
+      text: Инструкция на русском (RU)
       link: /ru/doc
     - theme: alt
       text: Documentation (EN)
@@ -22,4 +22,3 @@ features:
   - title: Progress bars for 3 scenarios
     details: 🤌 Estimated, ⚖️ Sensed, 👎 Worst
 ---
-

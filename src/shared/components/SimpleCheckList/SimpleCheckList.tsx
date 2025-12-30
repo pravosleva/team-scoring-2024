@@ -442,11 +442,13 @@ function SimpleCheckListFn<TAddInfo>({
                                   style={{
                                     // border: '1px solid red',
                                     display: 'inline-flex',
+                                    flexDirection: 'row',
                                     justifyContent: 'flex-start',
                                     alignItems: 'center',
+                                    gap: '1px',
                                   }}
                                 >
-                                  <code key={`${checklistItem.id}-${checklistItem.order}`}>
+                                  <code key={`${checklistItem.id}-${checklistItem.order}`} style={{ whiteSpace: 'nowrap' }}>
                                     {getPadStart({ value: checklistItem.order || 0, minLength: 2 })}
                                   </code>
                                   {
@@ -617,14 +619,14 @@ function SimpleCheckListFn<TAddInfo>({
                             </div>
 
                             <div className={classes.infoStack}>
-                              <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })}>
+                              <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
                                 <HighlightedText
                                   comparedValue={checklistItem.title}
                                   testedValue={searchValue}
                                 />
                               </em>
                               {!!checklistItem.descr && (
-                                <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })}>
+                                <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
                                   <HighlightedText
                                     comparedValue={checklistItem.descr}
                                     testedValue={searchValue}
