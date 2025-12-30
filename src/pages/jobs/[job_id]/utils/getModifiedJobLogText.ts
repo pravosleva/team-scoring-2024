@@ -1,4 +1,5 @@
 // import { getMatchedByRegExp } from '~/shared/utils'
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2';
 import { TJob, TUser } from '~/shared/xstate';
 
 export const getModifiedJobLogText = ({ text, jobs, users }: {
@@ -26,7 +27,18 @@ export const getModifiedJobLogText = ({ text, jobs, users }: {
         switch (true) {
           case prefix === 'job' && !Number.isNaN(Number(id)): {
             const targetJobId = Number(id)
-            const targetJob = jobs.find(({ id }) => id === targetJobId)
+            // const targetJob = jobs.find(({ id }) => id === targetJobId)
+            const targetJob = getBinarySearchedValueByDotNotation2<TJob, TJob>({
+              items: jobs,
+              target: {
+                path: '',
+                critery: {
+                  path: 'id',
+                  value: targetJobId
+                },
+              },
+              sorted: 'DESC',
+            }).result
             if (!!targetJob)
               result = result.replace(foundItem, targetJob.title)
             break

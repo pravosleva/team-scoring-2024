@@ -15,6 +15,7 @@ import { getIsNumeric } from '~/shared/utils/number-ops'
 import { soundManager } from '~/shared/soundManager'
 import { UserAva } from '~/shared/components/Job/components'
 import { HighlightedText } from '~/shared/components/HighlightedText'
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 // import { getJobsIntuitiveSummaryInfo } from '~/shared/components/Job/utils'
 
 type TProps = {
@@ -86,7 +87,18 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
 
   const modifiedPinnedJobs: { [key: string]: TPartialModifiedJob } = useMemo(
     () => pinnedJobsIds.reduce((acc: { [key: string]: TPartialModifiedJob }, curId) => {
-      const targetJob = allJobs.find(({ id }) => id === curId)
+      // const targetJob = allJobs.find(({ id }) => id === curId)
+      const targetJob = getBinarySearchedValueByDotNotation2<TJob, TJob>({
+        items: allJobs,
+        target: {
+          path: '',
+          critery: {
+            path: 'id',
+            value: curId
+          },
+        },
+        sorted: 'DESC',
+      }).result
       if (!!targetJob) acc[String(curId)] = {
         id: curId,
         title: targetJob.title,

@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { soundManager } from '~/shared/soundManager'
 import { getBinarySearchedIndexByDotNotation } from '~/shared/utils/array-ops'
 import { getNestedValue, setNestedValue } from '~/shared/utils/object-ops'
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 
 const getSpeed = (job: TJob): number =>
   (
@@ -25,6 +26,7 @@ export const topLevelMachine = setup({
         pinned: number[];
         items: TJob[];
         // filter: EJobsStatusFilter;
+        __auxJoblistUpdateSensor: number;
       };
       users: {
         items: TUser[];
@@ -70,6 +72,7 @@ export const topLevelMachine = setup({
       pinned: [],
       items: [],
       filter: EJobsStatusFilter.ALL,
+      __auxJoblistUpdateSensor: 0,
     },
     users: {
       items: [],
@@ -160,30 +163,53 @@ export const topLevelMachine = setup({
     'todo.editLog': {
       actions: assign({
         jobs: ({ context, event }) => {
-          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
-          if (!targetJob) {
+          const mutatedJobsItems = context.jobs.items
+          const mutatedJob = getBinarySearchedValueByDotNotation2<TJob, TJob>({
+            items: context.jobs.items,
+            target: {
+              path: '',
+              critery: {
+                path: 'id',
+                value: event.value.jobId
+              },
+            },
+            sorted: 'DESC',
+          })
+          if (mutatedJob.index === -1 || !mutatedJob.result)
             return context.jobs
-          }
+
+          const mutatedLogs = mutatedJob.result?.logs
+          const targetLog = getBinarySearchedValueByDotNotation2<TLogsItem, TLogsItem>({
+            items: (mutatedJob.result as TJob).logs.items,
+            target: {
+              path: '',
+              critery: {
+                path: 'ts',
+                value: event.value.logTs
+              },
+            },
+            sorted: 'DESC',
+          })
+          if (!targetLog)
+            throw new Error('LOG NOT FOUND')
+
+          const updateTs = new Date().getTime()
+          mutatedLogs.items[targetLog.index].text = event.value.text
+          mutatedJobsItems[mutatedJob.index].logs.items = mutatedLogs.items
+          mutatedJobsItems[mutatedJob.index].ts.update = updateTs
+          soundManager.playDelayedSoundConfigurable({
+            soundCode: 'mech-78-step',
+            _debug: { msg: 'Log edited' },
+            delay: {
+              before: 0,
+              after: 1000,
+            },
+          })
 
           return {
             ...context.jobs,
-            items: context.jobs.items.map((todo) => {
-              if (todo.id === event.value.jobId) {
-                const targetLogIndex = todo.logs.items.findIndex((log) => log.ts === event.value.logTs)
-                if (targetLogIndex !== -1) {
-                  todo.logs.items[targetLogIndex].text = event.value.text
-                  soundManager.playDelayedSoundConfigurable({
-                    soundCode: 'mech-78-step',
-                    _debug: { msg: 'Log edited' },
-                    delay: {
-                      before: 0,
-                      after: 1000,
-                    },
-                  })
-                }
-              }
-              return todo
-            })
+            items: mutatedJobsItems,
+            __auxJoblistUpdateSensor: updateTs,
           }
         },
       }),
@@ -191,27 +217,54 @@ export const topLevelMachine = setup({
     'todo.deleteLog': {
       actions: assign({
         jobs: ({ context, event }) => {
-          const targetJob = context.jobs.items.find(({ id }) => id === event.value.jobId)
-          if (!targetJob) {
+          const mutatedJobsItems = context.jobs.items
+          const mutatedJob = getBinarySearchedValueByDotNotation2<TJob, TJob>({
+            items: context.jobs.items,
+            target: {
+              path: '',
+              critery: {
+                path: 'id',
+                value: event.value.jobId
+              },
+            },
+            sorted: 'DESC',
+          })
+          if (mutatedJob.index === -1 || !mutatedJob.result)
             return context.jobs
-          }
+
+          const mutatedLogs = mutatedJob.result?.logs
+          const targetLog = getBinarySearchedValueByDotNotation2<TLogsItem, TLogsItem>({
+            items: (mutatedJob.result as TJob).logs.items,
+            target: {
+              path: '',
+              critery: {
+                path: 'ts',
+                value: event.value.logTs
+              },
+            },
+            sorted: 'DESC',
+          })
+
+          if (!targetLog)
+            throw new Error('LOG NOT FOUND')
+
+          const updateTs = new Date().getTime()
+          mutatedLogs.items = mutatedLogs.items.filter(({ ts }) => ts !== event.value.logTs)
+          mutatedJobsItems[mutatedJob.index].logs.items = mutatedLogs.items
+          mutatedJobsItems[mutatedJob.index].ts.update = updateTs
+          soundManager.playDelayedSoundConfigurable({
+            soundCode: 'switch-3-epic',
+            _debug: { msg: 'Log deleted' },
+            delay: {
+              before: 0,
+              after: 250,
+            },
+          })
 
           return {
             ...context.jobs,
-            items: context.jobs.items.map((todo) => {
-              if (todo.id === event.value.jobId) {
-                todo.logs.items = todo.logs.items.filter(({ ts }) => ts !== event.value.logTs)
-                soundManager.playDelayedSoundConfigurable({
-                  soundCode: 'switch-3-epic',
-                  _debug: { msg: 'Log deleted' },
-                  delay: {
-                    before: 0,
-                    after: 250,
-                  },
-                })
-              }
-              return todo
-            })
+            items: mutatedJobsItems,
+            __auxJoblistUpdateSensor: updateTs,
           }
         },
       }),

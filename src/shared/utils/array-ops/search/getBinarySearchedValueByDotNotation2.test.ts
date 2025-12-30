@@ -18,7 +18,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 1
     expect(tested).toStrictEqual(expected)
   })
@@ -40,7 +40,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 'a'
     expect(tested).toStrictEqual(expected)
   })
@@ -64,7 +64,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = '_3'
     expect(tested).toStrictEqual(expected)
   })
@@ -85,7 +85,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 'one'
     expect(tested).toStrictEqual(expected)
   })
@@ -106,7 +106,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 'one'
     expect(tested).toStrictEqual(expected)
   })
@@ -127,7 +127,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 100
     expect(tested).toStrictEqual(expected)
   })
@@ -148,7 +148,7 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = undefined
     expect(tested).toStrictEqual(expected)
   })
@@ -175,8 +175,35 @@ describe('Тестирование способов разбить массив 
         },
       },
       sorted: 'ASC'
-    })
+    }).result
     const expected = 102
+    expect(tested).toStrictEqual(expected)
+  })
+
+  test('getBinarySearchedValueByDotNotation2: case 9', () => {
+    const tested = getBinarySearchedValueByDotNotation2<
+      {
+        x: { id: number; ts: number; };
+        v: { a: string; p: number; };
+      },
+      number
+    >({
+      items: [
+        { x: { id: 0, ts: 1 }, v: { a: 'one', p: 101 } },
+        { x: { id: 0, ts: 2 }, v: { a: 'two', p: 100 } },
+        { x: { id: 7, ts: 3 }, v: { a: 'three', p: 102 } },
+        { x: { id: 0, ts: 4 }, v: { a: 'four', p: 99 } },
+      ],
+      target: {
+        path: '',
+        critery: {
+          value: 3,
+          path: 'x.ts',
+        },
+      },
+      sorted: 'ASC'
+    }).result
+    const expected = { x: { id: 7, ts: 3 }, v: { a: 'three', p: 102 } }
     expect(tested).toStrictEqual(expected)
   })
 })

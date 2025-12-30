@@ -1,7 +1,8 @@
+import { memo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Layout, ReportPagerAbstracted } from '~/shared/components'
 
-export const TotalReport = () => {
+export const TotalReport = memo(() => {
   const params = useParams()
   return (
     <Layout>
@@ -11,4 +12,4 @@ export const TotalReport = () => {
       />
     </Layout>
   )
-}
+})

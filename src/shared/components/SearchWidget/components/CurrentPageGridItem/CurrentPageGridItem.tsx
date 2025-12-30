@@ -18,6 +18,7 @@ import { TFilteredJobsLogsMappingChunk } from './types'
 import { CopyToClipboardWrapper } from '~/shared/components/CopyToClipboardWrapper'
 import { getMatchedByAllStrings } from '~/shared/utils/string-ops'
 import { HighlightedText } from '~/shared/components'
+import clsx from 'clsx'
 
 __TimeAgo.addDefaultLocale(en)
 __TimeAgo.addLocale(ru)
@@ -175,10 +176,24 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                               fontWeight: 'bold',
                               display: 'flex',
                               flexDirection: 'row',
+                              gap: '6px',
+                              alignItems: 'center',
                               // justifyContent: 'space-between',
                             }}
                           >
-                            <span>{dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')} ({timeAgo.format(log.original.ts)})</span>
+                            <span
+                              style={{
+                                color: '#FFF',
+                                borderRadius: '16px',
+                                padding: '1px 6px',
+                                // backgroundColor: 'black',
+                                lineHeight: '16px',
+                              }}
+                              className={clsx(baseClasses.backdropBlurDark)}
+                            >
+                              {dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')}
+                            </span>
+                            <span>({timeAgo.format(log.original.ts)})</span>
                             {/* <span
                               style={{
                                 display: 'flex',
@@ -253,9 +268,8 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                       style={{ paddingLeft: '24px' }}
                                     >
                                       {
-                                        log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo }) => (
+                                        log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo: _updatedAgo }) => (
                                           <div key={id} className={baseClasses.stack1}>
-                                            <b style={{ color: '#959eaa', fontSize: 'x-small' }}>Updated {updatedAgo}</b>
                                             {/* <a target='_blank' href={`${PUBLIC_URL}/#${relativeUrl}`}>{ui} ↗️</a> */}
 
                                             <HighlightedText
@@ -314,7 +328,6 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                       {
                                         log._service.logExternalLinks.map(({ url, ui, descr, logTs, jobId }) => (
                                           <div key={`${jobId}--${logTs}`} className={baseClasses.stack1}>
-                                            <b style={{ color: '#959eaa', fontSize: 'x-small' }}>Created {timeAgo.format(logTs)}</b>
                                             <HighlightedText
                                               comparedValue={ui}
                                               testedValue={testedValue}

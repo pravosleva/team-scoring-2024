@@ -33,7 +33,6 @@ export const FixedScrollTopBtn = memo(() => {
         setTimeout(() => {
           const targetElm = document.getElementById(`job_list_item_${jobIdToScroll}`)
           if (!!targetElm) {
-            console.log(targetElm)
             targetElm.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
         }, 0)

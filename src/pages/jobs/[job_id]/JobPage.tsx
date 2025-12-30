@@ -38,6 +38,7 @@ import { ProductivityAnalysisGraph } from '~/shared/components/Job/components/Jo
 import { JobTimingStandartInfo } from '~/shared/components/Job/components/JobStats/components/SubjobsList/components/JobTimingStandartInfo'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 
 const specialScroll = scrollToIdFactory({
   timeout: 200,
@@ -51,8 +52,19 @@ export const JobPage = memo(() => {
   const params = useParams()
   const users = TopLevelContext.useSelector((s) => s.context.users.items)
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
-  const targetJob = useMemo<TJob | null>(() => jobs
-    .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
+  // const targetJob = useMemo<TJob | null>(() => jobs
+  //   .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
+  const targetJob = useMemo(() => getIsNumeric(params.job_id) ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
+    items: jobs,
+    target: {
+      path: '',
+      critery: {
+        path: 'id',
+        value: Number(params.job_id),
+      },
+    },
+    sorted: 'DESC',
+  }).result || null : null, [jobs, params.job_id])
   const targetUser = useMemo<TUser | null>(() => {
     const userId = Number(targetJob?.forecast.assignedTo)
     return users?.find(({ id }) => id === userId) || null

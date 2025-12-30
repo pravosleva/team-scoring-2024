@@ -16,6 +16,7 @@ import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 
 type TPros = {
   job: TJob;
+  // jobTsUpdate: TJob['ts']['update'];
 }
 
 const specialScroll = scrollToIdFactory({
@@ -31,6 +32,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
   } = job
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const users = TopLevelContext.useSelector((s) => s.context.users)
+  const __auxJoblistUpdateSensor = TopLevelContext.useSelector((s) => s.context.jobs.__auxJoblistUpdateSensor)
 
   const jobsActorRef = TopLevelContext.useActorRef()
   const handleDeleteLog = useCallback(({ logTs, text }: { logTs: number; text: string }) => () => {
@@ -56,7 +58,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
       },
     })
   }, [job.id])
-  const handleOpenLogEditor = useCallback(({ logTs, text }: { logTs: number, text: string }) => () => {
+  const _handleOpenLogEditor = useCallback(({ logTs, text }: { logTs: number, text: string }) => () => {
     const isConfirmed = window.confirm(`✒️ Редактировать лог от ${dayjs(logTs).format('DD.MM.YYYY HH:mm')}?\n\n${text}`)
     if (!isConfirmed)
       return
@@ -102,6 +104,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
 
               <ResponsiveBlock
                 className={baseClasses.stack1}
+                key={__auxJoblistUpdateSensor}
               >
                 <div>
                   {
@@ -114,7 +117,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                 </div>
                 <ul className={baseClasses.compactList2}>
                   {logs.items.map(({ ts, text, links, checklist }) => (
-                    <li key={ts}>
+                    <li key={`${__auxJoblistUpdateSensor}-${ts}`}>
                       <em
                         style={{
                           color: '#959eaa',
@@ -136,7 +139,7 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
                             justifyContent: 'flex-start',
                           }}
                         >
-                          <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a>
+                          {/* <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleOpenLogEditor({ logTs: ts, text })}>EDIT</a> */}
                           <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleDeleteLog({ logTs: ts, text })}>DELETE</a>
                           {/* <a style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={goToLogPage({ ts })}>GO LOG PAGE ➡️</a> */}
                           <Link to={`/jobs/${job.id}/logs/${ts}`}>LOG PAGE ➡️</Link>

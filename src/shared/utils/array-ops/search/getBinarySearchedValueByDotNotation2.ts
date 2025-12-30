@@ -11,6 +11,10 @@ type TProps<TItemFormat> = {
   };
   sorted: 'DESC' | 'ASC';
 }
+type TResult<TTargetValueFormat> = {
+  result: TTargetValueFormat | undefined;
+  index: number;
+}
 
 /**
  * Бинарный поиск (поиск по сортированному списку элементов)
@@ -27,9 +31,9 @@ type TProps<TItemFormat> = {
  * @param {"DESC"|"ASC"} arg.sorted Тип сортировки исходного массива:
  * - DESC - по убыванию;
  * - ASC - по возрастанию;
- * @returns {TTargetValue | undefined} Hайденный элемент:
+ * @returns {{ result: TTargetValue | undefined, index: number }} Hайденный элемент:
  */
-export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>({ items, target, sorted }: TProps<TItemFormat>): TTargetValue | undefined => {
+export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>({ items, target, sorted }: TProps<TItemFormat>): TResult<TTargetValue> => {
   const {
     critery: {
       value: criteryValue,
@@ -38,7 +42,7 @@ export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>(
     path,
   } = target
   let __resultIndex = -1
-  let __result: TTargetValue | undefined = undefined
+  let __result: unknown = undefined
   let left = 0
   let right = items.length - 1
   let mid
@@ -51,8 +55,10 @@ export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>(
       case 'DESC':
         if (criteryValue === _currentValue) {
           __resultIndex = mid
-          __result = getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
-          return __result
+          __result = !!path
+            ? getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
+            : items[__resultIndex]
+          return { result: __result as TTargetValue, index: __resultIndex }
         }
         else if (criteryValue > (_currentValue as number)) right = mid - 1
         else left = mid + 1
@@ -60,8 +66,10 @@ export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>(
       case 'ASC':
         if (criteryValue === _currentValue) {
           __resultIndex = mid
-          __result = getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
-          return __result
+          __result = !!path
+            ? getNestedValue<TItemFormat, TTargetValue>({ source: items[__resultIndex], path })
+            : items[__resultIndex]
+          return { result: __result as TTargetValue, index: __resultIndex }
         }
         else if (criteryValue < (_currentValue as number)) right = mid - 1
         else left = mid + 1
@@ -71,5 +79,8 @@ export const getBinarySearchedValueByDotNotation2 = <TItemFormat, TTargetValue>(
     }
   }
 
-  return __result
+  return {
+    result: __result as TTargetValue | undefined,
+    index: __resultIndex,
+  }
 }

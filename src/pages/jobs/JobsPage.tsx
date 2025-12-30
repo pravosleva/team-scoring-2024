@@ -7,6 +7,7 @@ import { TJob, TopLevelContext } from '~/shared/xstate'
 import { ActiveJobContent } from './components'
 import { useSearchParams } from 'react-router-dom'
 import { soundManager } from '~/shared'
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 
 export const JobsPage = memo(() => {
   const [isOpened, setIsOpened] = useState(false)
@@ -40,7 +41,18 @@ export const JobsPage = memo(() => {
   }, [setIsOpened, setActiveJobId])
 
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
-  const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? jobs.find(({ id }) => id === activeJobId) : undefined, [jobs, activeJobId])
+  // const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? jobs.find(({ id }) => id === activeJobId) : undefined, [jobs, activeJobId])
+  const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
+    items: jobs,
+    target: {
+      path: '',
+      critery: {
+        path: 'id',
+        value: activeJobId,
+      },
+    },
+    sorted: 'DESC',
+  }).result : undefined, [jobs, activeJobId])
 
   const possibleDefaultActiveJobId = useMemo(
     () => shouldDrawerBeOpened && lastSeenJobID ? lastSeenJobID : null,

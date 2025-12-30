@@ -410,7 +410,7 @@ export const SearchWidget = memo((ps: TProps) => {
                 )
               }
             </Grid>
-            {
+            {/*
               !!preparedWorkerErrorMsg && (
                 <Grid
                   size={12}
@@ -425,6 +425,13 @@ export const SearchWidget = memo((ps: TProps) => {
                   </Alert>
                 </Grid>
               )
+            */}
+            {
+              !!preparedWorkerErrorMsg && (
+                <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa', fontWeight: 'bold', textAlign: 'center' }}>
+                  {preparedWorkerErrorMsg}
+                </Grid>
+              )
             }
             {
               !preparedWorkerErrorMsg && (
@@ -432,8 +439,8 @@ export const SearchWidget = memo((ps: TProps) => {
                   {
                     ((!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && !outputWorkerData.currentPage)
                       ? (
-                        <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa' }}>
-                          <b>NOT FOUND</b>
+                        <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa', fontWeight: 'bold' }}>
+                          NOT FOUND
                         </Grid>
                       )
                       : !!outputWorkerData?.pagination.itemsRangeInfo
