@@ -1,6 +1,6 @@
 ---
 title: Probability Theory in action
-description: Instrction
+description: Instruction
 lang: en-EN
 layout: home
 hero:
