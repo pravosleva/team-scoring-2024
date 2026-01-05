@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import WarningIcon from '@mui/icons-material/Warning'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 import baseClasses from '~/App.module.scss'
-import { Alert, Button, Grid2 as Grid, IconButton, TextField } from '@mui/material'
+import { Button, Grid2 as Grid, IconButton, TextField } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { TJob, TLogsItem, TopLevelContext, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { debugFactory, NWService } from '~/shared/utils'
@@ -21,6 +21,7 @@ import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
 import { ResponsiveBlock } from '../ResponsiveBlock'
 import { CurrentPageGridItem } from './components'
 import { getExtractedValues } from '~/shared/utils/string-ops'
+import { useDebounce } from '~/shared/hooks'
 
 type TProps = {
   position: 'left-side-center-bottom';
@@ -216,14 +217,17 @@ export const SearchWidget = memo((ps: TProps) => {
     setOutputWorkerDebugMsg(null)
   }, [requiredPage])
 
+  const debouncedBasicSearchValue = useDebounce(searchValueBasic, 1000)
+  const debouncedEnhancedSearchValue = useDebounce(searchValueEnhanced, 1000)
+
   useSearchBasicWorker<TTargetResultByWorker, any>({
     debugName: 'SearchWidget',
-    isEnabled: !!searchValueBasic || !!searchValueEnhanced,
+    isEnabled: !!debouncedBasicSearchValue || !!debouncedEnhancedSearchValue,
     isDebugEnabled: true,
     deps: {
       searchQuery: {
-        basic: searchValueBasic,
-        enhanced: searchValueEnhanced,
+        basic: debouncedBasicSearchValue,
+        enhanced: debouncedEnhancedSearchValue,
       },
       jobs: jobs,
       activeFilters,
@@ -437,7 +441,7 @@ export const SearchWidget = memo((ps: TProps) => {
               !preparedWorkerErrorMsg && (
                 <>
                   {
-                    ((!!searchValueBasic || !!searchValueEnhanced) && !!outputWorkerData && !outputWorkerData.currentPage)
+                    ((!!debouncedBasicSearchValue || !!debouncedEnhancedSearchValue) && !!outputWorkerData && !outputWorkerData.currentPage)
                       ? (
                         <Grid className={clsx(baseClasses.fadeIn)} size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', pr: 2, pl: 2, color: '#959eaa', fontWeight: 'bold' }}>
                           NOT FOUND
@@ -456,7 +460,7 @@ export const SearchWidget = memo((ps: TProps) => {
             }
             {
               (!!searchValueBasic || !!searchValueEnhanced) && !outputWorkerData && (
-                <Grid size={12} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
+                <Grid size={12} className={clsx(baseClasses.fadeIn)} sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: 6 }}>
                   <CircularProgress />
                 </Grid>
               )
@@ -470,6 +474,7 @@ export const SearchWidget = memo((ps: TProps) => {
                     // pr: 2,
                   }}
                   className={clsx(
+                    baseClasses.fadeIn,
                     classes.contentLimited,
                     // baseClasses.boxShadowTop
                   )}

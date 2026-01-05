@@ -1,4 +1,6 @@
 # Team Scoring 2024
+Team Scoring 2024 is a web-based task forecasting and estimation system that applies probability theory to predict task completion times based on historical employee performance data. The application implements Evidence-Based Scheduling principles to provide adjusted forecasts by analyzing deviations in past task estimates, enabling more predictable project delivery timelines.
+
 Mechanism that allows obtaining an adjusted forecast for the completion of a particular task based on an analysis of deviations in forecasting similar tasks.
 
 ## Demo

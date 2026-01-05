@@ -26,6 +26,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowDropUp'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown'
 import { throttleFactory } from '~/shared/utils'
 import { HighlightedText } from '../HighlightedText/v2';
+// import { soundManager } from '~/shared/soundManager';
 
 const getPadStart = ({ value, minLength }: {
   value: number;

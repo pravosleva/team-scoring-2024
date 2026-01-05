@@ -59,12 +59,6 @@ const withRootMW = (arg) => compose([
             }
 
             try {
-              // NOTE: THROTTLE 2/4 Сброс ожидания запланированной операции при каждом запросе
-              if (isWaiting && !controller.signal.aborted) {
-                controller.abort()
-                controller = new AbortController()
-              } else isWaiting = true
-
               const targetAction = () => {
                 let isFiltersRequired = !!eventData?.input?._activeFilters && eventData.input._activeFilters.isAnyFilterActive
 
@@ -210,13 +204,22 @@ const withRootMW = (arg) => compose([
                   })
                 }
               }
+
+              if (isWaiting) {
+                controller.abort()
+                controller = new AbortController()
+              }
+
+              // NOTE: THROTTLE 2/4 Сброс ожидания запланированной операции при каждом запросе
+              isWaiting = true
               // NOTE: THROTTLE 3/4 Sync delay (revertable)
               const res = await delay({
-                ms: 3000,
+                ms: 5000,
                 signal: controller.signal,
                 customAbortMessage: '[SPECIAL_ERRROR=Just a moment, plz...]'
               })
                 .then(targetAction)
+                .then(resetWaiting)
                 .then(() => ({ ok: true }))
                 .catch((err) => ({ ok: false, reason: err?.message || 'No err?.message' }))
 
@@ -236,8 +239,6 @@ const withRootMW = (arg) => compose([
                 input,
                 // _service,
               })
-              // NOTE: THROTTLE 4/4
-              resetWaiting()
             }
             break
           }

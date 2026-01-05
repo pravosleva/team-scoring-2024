@@ -17,6 +17,8 @@ import { useLocalStorageState } from '~/shared/hooks/use[any]Storage/useLocalSto
 import { TLocalSettingsStatusOption } from '~/pages/local-settings/types'
 import { getDefaultPointsetStatusListSpaceState } from './utils'
 import clsx from 'clsx'
+import { Link } from 'react-router-dom'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 
 slugify.extend({ '/': '_' })
 
@@ -174,9 +176,24 @@ export const LocalSettings = memo(() => {
         <Grid container spacing={2}>
           <Grid size={12}>
             <h1 className={baseClasses.inlineH1}>
-              <SettingsIcon fontSize='inherit' /><span>Local settings</span>
+              <SettingsIcon fontSize='inherit' />
+              <span>Local settings</span>
             </h1>
-
+            <ResponsiveBlock
+              isPaddedMobile
+              isLimited
+              className={clsx(baseClasses.pagesGrid)}
+            >
+              <Link to='/business-time'>
+                <Button
+                  color='secondary'
+                  variant='outlined'
+                  endIcon={<ArrowForwardIcon />}
+                >
+                  Business time
+                </Button>
+              </Link>
+            </ResponsiveBlock>
           </Grid>
           <Grid size={12}>
             <ResponsiveBlock

@@ -59,6 +59,7 @@ const sounds = {
   'transition-5-dj': '/transition/transition-5-dj.mp3',
   'transition-11-kiberpank-2077-notif': '/transition/transition-11-kiberpank-2077-notif.mp3',
 
+  'whoosh-7-end': '/whoosh/whoosh-7-end.mp3',
   'whoosh-16-rev': '/whoosh/whoosh-16-rev.mp3',
 }
 
@@ -73,7 +74,7 @@ type TPlaySoundProps = {
   _debug?: {
     msg: string;
   };
-  soundCode: string;
+  soundCode: keyof typeof sounds;
   cb?: {
     onLoadStart: (ev: Event) => void;
     onLoadProgress: (ev: Event) => void;

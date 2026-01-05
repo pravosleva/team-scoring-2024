@@ -729,7 +729,7 @@ export const LastActivityPagerAbstracted = memo(({
                                     }}
                                   >
                                     <HighlightedText
-                                      className={baseClasses.rowsLimited10}
+                                      className={baseClasses.rowsLimited3}
                                       comparedValue={log.__nextLog.text}
                                       testedValue={clsx(searchValueEnhanced)}
                                     />
@@ -847,7 +847,7 @@ export const LastActivityPagerAbstracted = memo(({
                                     }}
                                   >
                                     <HighlightedText
-                                      className={baseClasses.rowsLimited10}
+                                      className={baseClasses.rowsLimited3}
                                       comparedValue={log.__prevLog.text}
                                       testedValue={clsx(searchValueEnhanced)}
                                     />

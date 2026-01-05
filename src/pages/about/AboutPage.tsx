@@ -41,8 +41,9 @@ export const AboutPage = () => {
               <a href={`${PUBLIC_URL}/vitepress/output/`} target='_blank'>
                 <Button
                   sx={{ borderRadius: 4 }}
-                  size='small'
-                  variant='contained'
+                  // size='small'
+                  color='salmon'
+                  variant='outlined'
                   fullWidth
                   endIcon={<ArrowForwardIcon />}
                 >
