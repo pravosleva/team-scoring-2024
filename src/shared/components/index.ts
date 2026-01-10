@@ -1,6 +1,7 @@
 export * from './CollapsibleBox'
 export * from './CopyToClipboardWrapper'
 export * from './DistributionFunctionGraph'
+export * from './FileSteperExample'
 export * from './HighlightedText'
 export * from './JobList'
 export * from './JobList2'

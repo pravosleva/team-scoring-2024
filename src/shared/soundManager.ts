@@ -33,7 +33,10 @@ const sounds = {
   'fail-116': '/fail/fail-116-sheep.mp3',
   'fail-154': '/fail/fail-154-trailer.mp3',
   'gong-6': '/gong/gong-6.mp3',
+
   'load-24': '/load/load-24.mp3',
+  'load-203-saved': '/load/load-203-saved.mp3',
+
   'mech-3': '/mech/mech-3-energy-off.mp3',
   'mech-50-end-of-work': '/mech/mech-50-end-of-work.mp3',
   'mech-51-muted-noisy-short': '/mech/mech-51-muted-noisy-short.mp3',

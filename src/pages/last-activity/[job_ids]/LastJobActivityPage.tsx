@@ -309,7 +309,7 @@ export const LastJobActivityPage = memo(() => {
                                   queryKeysToremove: ['from'],
                                 })}
                               >
-                                <ArrowBackIcon sx={{ fontSize: '12px' }} />
+                                {/* <ArrowBackIcon sx={{ fontSize: '12px' }} /> */}
                                 <span>Job</span>
                               </Link>
                               <Link

@@ -40,14 +40,14 @@ export const getModifiedJobLogText = ({ text, jobs, users }: {
               sorted: 'DESC',
             }).result
             if (!!targetJob)
-              result = result.replace(foundItem, targetJob.title)
+              result = result.replace(`[${foundItem}]`, targetJob.title)
             break
           }
           case prefix === 'user' && !Number.isNaN(Number(id)): {
             const targetUserId = Number(id)
             const targetUser = users.find(({ id }) => id === targetUserId)
             if (!!targetUser)
-              result = result.replace(foundItem, targetUser.displayName)
+              result = result.replace(`[${foundItem}]`, targetUser.displayName)
             break
           }
           default:

@@ -30,6 +30,7 @@ dist-ssr
 ## Aux tools
 _aux-tool.*
 _git-training.*
+src/shared/_tmp
 
 ## Docs (jsdoc)
 jsdoc

@@ -1,0 +1,28 @@
+.descriptionBox {
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #737B8C;
+}
+
+.descriptionBox.isErrored {
+  color: red;
+}
+
+.hiddenInput {
+  display: none;
+
+  &:hover {
+    border: 1px solid red;
+  }
+
+  &:active {
+    border: 1px dotted red;
+  }
+
+  &:focus {
+    border: 1px dashed red;
+  }
+}

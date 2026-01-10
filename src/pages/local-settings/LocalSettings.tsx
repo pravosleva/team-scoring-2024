@@ -19,6 +19,8 @@ import { getDefaultPointsetStatusListSpaceState } from './utils'
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ImageIcon from '@mui/icons-material/Image'
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 
 slugify.extend({ '/': '_' })
 
@@ -188,9 +190,20 @@ export const LocalSettings = memo(() => {
                 <Button
                   color='secondary'
                   variant='outlined'
+                  startIcon={<WorkHistoryIcon />}
                   endIcon={<ArrowForwardIcon />}
                 >
                   Business time
+                </Button>
+              </Link>
+              <Link to='/local-images'>
+                <Button
+                  color='secondary'
+                  variant='outlined'
+                  startIcon={<ImageIcon />}
+                  endIcon={<ArrowForwardIcon />}
+                >
+                  Local images
                 </Button>
               </Link>
             </ResponsiveBlock>

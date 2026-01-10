@@ -4,7 +4,7 @@ import { SearchWidgetDataLayer, TopLevelContext } from './shared/xstate/topLevel
 import { ClientPerfWidget } from '~/shared/components/ClientPerfWidget'
 import { SnackbarProvider, closeSnackbar } from 'notistack'
 import CloseIcon from '@mui/icons-material/Close'
-
+import 'react-photo-view/dist/react-photo-view.css'
 import './special-experimental-styles.css'
 
 createRoot(document.getElementById('root')!).render(

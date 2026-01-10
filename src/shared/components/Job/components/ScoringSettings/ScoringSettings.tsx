@@ -29,6 +29,7 @@ import { useTheme } from '@mui/material/styles'
 // import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
+import { FileSteperExample } from '~/shared/components'
 // import { soundManager } from '~/shared/soundManager'
 
 type TProps = {
@@ -711,9 +712,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             <Box sx={{ pt: 1 }}>
               <Grid container spacing={1}>
                 {/* <Grid size={12}>
-                <DatesStepper />
-              </Grid> */}
-                <Grid size={12}>
+                  <DatesStepper />
+                </Grid> */}
+                {/* <Grid size={12}>
                   <pre
                     className={baseClasses.preNormalized}
                   >
@@ -724,6 +725,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                       }, null, 2)
                     }
                   </pre>
+                </Grid> */}
+                <Grid size={12}>
+                  <FileSteperExample isEditable={false} idbKey={`job_id-${job.id}`} />
                 </Grid>
               </Grid>
             </Box>

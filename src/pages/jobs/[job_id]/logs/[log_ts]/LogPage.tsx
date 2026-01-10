@@ -11,7 +11,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components/JobResultReviewShort'
 import { getJobStatusText } from '~/pages/jobs/[job_id]/utils'
-import { HighlightedText, ResponsiveBlock, SimpleCheckList, TimeAgo } from '~/shared/components'
+import { FileSteperExample, HighlightedText, ResponsiveBlock, SimpleCheckList, TimeAgo } from '~/shared/components'
 import baseClasses from '~/App.module.scss'
 import { Link } from 'react-router-dom'
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -300,10 +300,16 @@ export const LogPage = memo(() => {
       }
 
       {
+        !!params.job_id && !!params.log_ts && (
+          <Grid size={12}>
+            <FileSteperExample isEditable={true} idbKey={`job_id-${params.job_id}--log_ts-${params.log_ts}`} />
+          </Grid>
+        )
+      }
+
+      {
         !!targetJob && !!targetLog && (
-          <Grid
-            size={12}
-          >
+          <Grid size={12}>
             <CommentManager
               infoLabel='Link'
               initialState={{

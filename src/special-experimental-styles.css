@@ -24,3 +24,7 @@ a:focus {
 a:active {
   color: #00a47d;
 }
+
+.PhotoView-Slider__Counter {
+  white-space: nowrap;
+}

@@ -1,7 +1,7 @@
 import { createHashRouter } from 'react-router-dom'
 import {
   AboutPage, BusinessTime, HomePage, EmployeePage2, EmployeesPage,
-  JobPage, JobsPage, LogPage, LastActivityPage, LastJobActivityPage,
+  JobPage, JobsPage, LocalImages, LogPage, LastActivityPage, LastJobActivityPage,
   LocalSettings,
   OnlineExpPage, SoundCheckPage,
   TotalReport,
@@ -91,6 +91,10 @@ export const router = createHashRouter(
     {
       path: '/local-settings',
       element: <LocalSettings />
+    },
+    {
+      path: '/local-images',
+      element: <LocalImages />
     },
   ]
 )

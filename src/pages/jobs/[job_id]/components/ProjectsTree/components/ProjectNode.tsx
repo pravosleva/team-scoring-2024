@@ -44,7 +44,7 @@ import BioTechIcon from '@mui/icons-material/Biotech'
 import __TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
-import { HighlightedText } from '~/shared/components'
+import { FileSteperExample, HighlightedText } from '~/shared/components'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -370,7 +370,7 @@ export const ProjectNode = ({
           // isOpenedByDefault={true}
           targetText={projectsTree.model.descr}
           contentRender={({ targetText }) => (
-            <>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <b
                 style={{
                   // fontSize: 'normal',
@@ -383,6 +383,7 @@ export const ProjectNode = ({
               {!!targetText && (
                 <HighlightedText className={classes.descr} comparedValue={targetText} testedValue={searchValueBasic} />
               )}
+              <FileSteperExample isEditable={true} idbKey={`job_id-${projectsTree.model.id}`} />
               {/*
               !isPinned && (
                 <Button
@@ -395,7 +396,7 @@ export const ProjectNode = ({
                 </Button>
               )
             */}
-            </>
+            </div>
           )}
         />
       </div>

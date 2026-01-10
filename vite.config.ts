@@ -39,6 +39,7 @@ const modulesToSeparate = [
   'javascript-time-ago',
   'json-edit-react',
   'ts-tree-lib',
+  'react-photo-view',
 ]
 const _chunksMap = new Map()
 

@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid2'
 import { TCountersPack, useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 import baseClasses from '~/App.module.scss'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { CopyToClipboardWrapper, HighlightedText, SimpleCheckList } from '~/shared/components'
+import { CopyToClipboardWrapper, FileSteperExample, HighlightedText, SimpleCheckList } from '~/shared/components'
 import { scrollTopExtra } from '~/shared/components/Layout/utils'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
@@ -596,6 +596,30 @@ export const LastActivityPagerAbstracted = memo(({
                           )
                         }
 
+                        <button
+                          onClick={goPage({
+                            url: `/jobs/${log.jobId}`,
+                            query: {
+                              to: [
+                                '/last-activity',
+                                '?',
+                                [
+                                  `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
+                                  `lastSeenJob=${log.jobId}`,
+                                ].join('&')
+                              ].join(''),
+                              forwardActionUiText: 'Last activity',
+                            },
+                            // queryKeysToremove: ['isProject', 'jobStatusFilter', 'estimateReached']
+                          })}
+                          className={classes.btnAsLink}
+                        >
+                          <HighlightedText
+                            comparedValue={log.jobTitle}
+                            testedValue={clsx(searchValueBasic)}
+                          />
+                        </button>
+
                         {
                           !!log.checklist && log.checklist?.length > 0 && (
                             <SimpleCheckList
@@ -649,29 +673,7 @@ export const LastActivityPagerAbstracted = memo(({
                           )
                         }
 
-                        <button
-                          onClick={goPage({
-                            url: `/jobs/${log.jobId}`,
-                            query: {
-                              to: [
-                                '/last-activity',
-                                '?',
-                                [
-                                  `lastSeenLogKey=job-${log.jobId}-log-${log.ts}`,
-                                  `lastSeenJob=${log.jobId}`,
-                                ].join('&')
-                              ].join(''),
-                              forwardActionUiText: 'Last activity',
-                            },
-                            // queryKeysToremove: ['isProject', 'jobStatusFilter', 'estimateReached']
-                          })}
-                          className={classes.btnAsLink}
-                        >
-                          <HighlightedText
-                            comparedValue={log.jobTitle}
-                            testedValue={clsx(searchValueBasic)}
-                          />
-                        </button>
+                        <FileSteperExample isEditable={false} idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`} />
 
                         {/* <Link
                           // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}

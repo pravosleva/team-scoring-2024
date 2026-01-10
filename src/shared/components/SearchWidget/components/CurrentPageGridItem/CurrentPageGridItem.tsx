@@ -17,7 +17,7 @@ import ru from 'javascript-time-ago/locale/ru'
 import { TFilteredJobsLogsMappingChunk } from './types'
 import { CopyToClipboardWrapper } from '~/shared/components/CopyToClipboardWrapper'
 import { getMatchedByAllStrings } from '~/shared/utils/string-ops'
-import { HighlightedText } from '~/shared/components'
+import { FileSteperExample, HighlightedText } from '~/shared/components'
 import clsx from 'clsx'
 
 __TimeAgo.addDefaultLocale(en)
@@ -218,6 +218,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                               paddingLeft: '8px',
                             }}
                           />
+                          <FileSteperExample isEditable={false} idbKey={`job_id-${j.id}--log_ts-${log.original.ts}`} />
                           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: '16px' }}>
                             <Button
                               // disabled={!!params.log_ts && Number(params.log_ts) === log.original.ts}

@@ -1,4 +1,5 @@
 export * from './getArithmeticalMean'
+export * from './getBytesFromMiB'
 export * from './getIsNumeric'
 export * from './getHumanReadableSize'
 export * from './getMedian'
