@@ -13,7 +13,12 @@ import { SingleReadyFile } from './components';
 import { PlusIcon } from './components/SingleReadyFile/icons';
 // import { DescriptionBox, HiddenInput } from './styles';
 import classes from './UploadDocumentsStepper.module.scss'
-import { CommonInfoProvider, useCommonInfoStore } from './context';
+import {
+  CommonInfoProvider,
+  useCommonInfoStore,
+  LoadedProvider,
+  useLoadedStore,
+} from './context';
 import singleFileClasses from './components/SingleReadyFile/SingleReadyFile.module.scss'
 
 enum ApiResponseStatus {
@@ -77,17 +82,7 @@ type TProps = {
   onRemove?: () => void;
 }
 
-const {
-  Provider: LoadedProvider, useStore: useLoadedStore,
-} = createFastContext<{
-  [key: string]: {
-    // NOTE: Key -> localDocumentId: string;
-    fileStoreId: string;
-    fileName: string;
-    size: number;
-    previewUrl: string;
-  } | null;
-}>({});
+
 const {
   Provider: RequiredProvider, useStore: useRequiredStore,
 } = createFastContext<{
@@ -396,7 +391,7 @@ const Logic = memo(({
                             top: '8px',
                             left: '8px',
                             borderRadius: '16px',
-                            border: '1px solid #DCE1EF',
+                            border: '2px solid #DCE1EF',
                             padding: '4px 8px',
                             zIndex: 1,
                             fontSize: 'small',

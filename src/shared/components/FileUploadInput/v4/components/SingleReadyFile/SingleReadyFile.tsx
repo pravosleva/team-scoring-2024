@@ -10,6 +10,8 @@ import {
 import CircularProgress from '@mui/material/CircularProgress'
 import classes from './SingleReadyFile.module.scss'
 import clsx from 'clsx';
+import { useLoadedStore } from '../../context'
+import { getHumanReadableSize } from '~/shared/utils/number-ops';
 
 type TProps = {
   isLoadedAlready?: boolean;
@@ -127,6 +129,7 @@ const WrappedSingleReadyFile = memo(({
   }, []);
 
   const dontAllowRetry = MultistepFSMScenarioContext.useSelector((s) => s.context.common.dontAllowRetry);
+  const [loadedStore] = useLoadedStore((s) => s);
 
   return (
     <div
@@ -142,6 +145,25 @@ const WrappedSingleReadyFile = memo(({
       }}
       className={clsx(classes.shadowWrapper, classes.roundedWrapper)}
     >
+      {
+        !!loadedStore[documentId]?.size && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              borderRadius: '16px',
+              border: '2px solid #15BC3A',
+              padding: '4px 8px',
+              zIndex: 1,
+              fontSize: 'small',
+              backgroundColor: '#FFF',
+            }}
+          >
+            {getHumanReadableSize({ bytes: loadedStore[documentId]?.size || 0, decimals: 0 })}
+          </div>
+        )
+      }
       <div
         // @ts-ignore
         // onClick={handleClickForOpenSlot}

@@ -13,3 +13,15 @@ export const {
   errQuantityMessage: null,
   errTotalSizeMessage: null,
 });
+
+export const {
+  Provider: LoadedProvider, useStore: useLoadedStore,
+} = createFastContext<{
+  [key: string]: {
+    // NOTE: Key -> localDocumentId: string;
+    fileStoreId: string;
+    fileName: string;
+    size: number;
+    previewUrl: string;
+  } | null;
+}>({});
