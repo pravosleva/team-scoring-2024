@@ -13,7 +13,7 @@ import { CopyToClipboardWrapper } from '~/shared/components'
 import { FixedNavControlsSpace } from '../ActiveJobContent/components'
 import { useInView } from 'react-hook-inview'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { idbInstance } from '~/shared/components/FileSteperExample/utils'
+import { idbInstance } from '~/shared/utils/indexed-db-ops'
 
 type TPros = {
   job: TJob;

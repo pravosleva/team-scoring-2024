@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { getAllKeys, getIndexedDbSize } from '~/shared/utils/indexed-db-ops'
+
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 let db
 
@@ -9,7 +12,7 @@ type TProps = {
 
 class IDBSingleton {
   private static instance: IDBSingleton
-  db: unknown;
+  db: unknown; // IDBObjectStore | undefined;
   error: unknown;
   DB_NAME: string;
   STORE_NAME: string;
@@ -18,13 +21,34 @@ class IDBSingleton {
     this.DB_NAME = DB_NAME
     this.STORE_NAME = STORE_NAME
     this.#openDB()
-      .then((db) => this.db = db)
+      .then((db) => {
+        this.db = db
+      })
       .catch((err) => this.error = err)
   }
 
   public static getInstance({ DB_NAME, STORE_NAME }: TProps): IDBSingleton {
     if (!IDBSingleton.instance) IDBSingleton.instance = new IDBSingleton({ DB_NAME, STORE_NAME })
     return IDBSingleton.instance
+  }
+
+  public getAsyncSizeInfo() {
+    return getIndexedDbSize()
+  }
+
+  public async getAllKeys() {
+    if (!!this.db) {
+      // @ts-ignore
+      return getAllKeys({ db: this.db, storeName: this.STORE_NAME })
+    } else {
+      return await this.#openDB()
+        .then((_db) => getAllKeys({
+          // @ts-ignore
+          db: this.db,
+          storeName: this.STORE_NAME
+        }))
+        .catch(() => null)
+    }
   }
 
   #openDB() {

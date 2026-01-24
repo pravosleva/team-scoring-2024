@@ -17,8 +17,8 @@ hero:
 features:
   - title: Task tracking and release estimation for more predictable future (individually for each employee)
     details: Probability Theory in action
-  - title: Checklist for each log in task
+  - title: Checklist and overall task tree completion percentage
     details: Do you remember what happened a week ago?
-  - title: Progress bars for 3 scenarios
-    details: 🤌 Estimated, ⚖️ Sensed, 👎 Worst
+  - title: Progressbars for 3 scenarios
+    details: 🤌 Estimated / ⚖️ Sensed / 👎 Worst
 ---

@@ -16,9 +16,12 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import baseClasses from '~/App.module.scss'
-import { HighlightedText } from '../HighlightedText/v2'
-import { idbInstance } from '../FileSteperExample/utils'
+import { FileSteperExample } from '~/shared/components'
 // import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
+import { HighlightedText } from '../HighlightedText/v2'
+import { idbInstance } from '~/shared/utils/indexed-db-ops'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 
 type TProps = {
   isLastSeen?: boolean;
@@ -118,7 +121,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
-    <>
+    <div className={baseClasses.stack1}>
       <Box
         sx={{
           display: 'flex',
@@ -285,6 +288,36 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
         {/* <pre>{JSON.stringify(job, null, 2)}</pre> */}
       </Box>
 
+      <FileSteperExample
+        isEditable={false}
+        idbKey={`job_id-${job.id}`}
+        renderer={({ counter, documents }) => counter === 0 ? null : (
+          <CollapsibleText
+            // briefPrefix={log._service.logLocalLinks.length > 0 || log._service.logExternalLinks.length > 0 ? '├─' : '└─'}
+            briefText={`Local images (${counter})`}
+            isClickableBrief
+            contentRender={() => (
+              <PhotoProvider>
+                <div
+                  className={baseClasses.galleryWrapperGrid1}
+                // style={{ paddingRight: '24px' }}
+                >
+                  {documents.map((item, index) => (
+                    <PhotoView key={index} src={item.preview}>
+                      <img
+                        src={item.preview}
+                        style={{ objectFit: 'cover' }}
+                        alt=""
+                      />
+                    </PhotoView>
+                  ))}
+                </div>
+              </PhotoProvider>
+            )}
+          />
+        )}
+      />
+
       {/* <div className='view'>
         <input
           className='toggle'
@@ -343,6 +376,6 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
         }}
         ref={inputRef}
       /> */}
-    </>
+    </div>
   )
 })

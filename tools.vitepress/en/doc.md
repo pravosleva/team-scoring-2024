@@ -12,7 +12,9 @@ hero:
 ---
 
 ::: info
-Mechanism that allows obtaining an adjusted forecast for the completion of a particular task based on an analysis of deviations in forecasting similar tasks
+Mechanism that allows obtaining an adjusted forecast for the completion of a particular task based on an analysis of deviations in forecasting similar tasks.
+See also:
+- [Evidence Based Scheduling ↗️](https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/) by [Joel Spolsky ↗️](https://en.wikipedia.org/wiki/Joel_Spolsky)
 :::
 
 [[toc]]
@@ -20,7 +22,7 @@ Mechanism that allows obtaining an adjusted forecast for the completion of a par
 ## About this app
 Team Scoring 2024 is a web-based task forecasting and estimation system that applies probability theory to predict task completion times based on historical employee performance data. The application implements Evidence-Based Scheduling principles to provide adjusted forecasts by analyzing deviations in past task estimates, enabling more predictable project delivery timelines.
 
-This tool should give us a complete understanding of when the release is most likely to happen. [See also](https://pravosleva.pro/p/estimate-corrector-2024)
+This tool should give us a complete understanding of when the release is most likely to happen. [See also ↗️](https://pravosleva.pro/p/estimate-corrector-2024)
 
 ## Core Problem & Solution
 The system addresses the challenge of unreliable task estimation by tracking actual completion times against initial estimates. For each employee, it builds a statistical model of their estimation accuracy across tasks of varying complexity, producing three forecast scenarios:
@@ -52,7 +54,7 @@ Checklists provide structured task tracking, allowing users to break down log en
 Jobs can be linked together to form hierarchical structures where parent jobs represent projects containing child jobs as sub-tasks.
 
 ### Users & Employees
-Jobs are assigned to employees through the TForecast structure embedded in each job.
+Jobs are assigned to employees through the `TForecast` structure embedded in each job.
 
 ## Instructions
 1. Create new ticket

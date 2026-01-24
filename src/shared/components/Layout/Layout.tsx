@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import SpeedDial from '@mui/material/SpeedDial'
 import Backdrop from '@mui/material/Backdrop'
 // import BioTechIcon from '@mui/icons-material/Biotech'
@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom'
 // import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay'
 import PeopleIcon from '@mui/icons-material/People'
 import classes from './Layout.module.scss'
-import { useLocation } from 'react-router-dom'
 import AppsIcon from '@mui/icons-material/Apps'
 // import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import clsx from 'clsx'
@@ -18,17 +17,13 @@ import { ResponsiveBlock, SearchWidget } from '~/shared/components'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { FixedPinnedJoblist, FixedScrollTopBtn } from './components'
 import { ParamsInspectorContextWrapper } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
-import { useLocalStorageState } from '~/shared/hooks'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import jsonSize from 'json-size'
-import { getHumanReadableSize } from '~/shared/utils/number-ops'
 import { useSnapshot } from 'valtio/react'
 import { vi } from '~/shared/utils/vi'
 import LensBlurIcon from '@mui/icons-material/LensBlur'
 import LensIcon from '@mui/icons-material/Lens'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { TopLevelContext } from '~/shared/xstate'
+import { CommonInfoContext } from '~/shared/context'
 
 type TProps = {
   children: React.ReactNode;
@@ -74,31 +69,21 @@ const allActions: TSpeedDialMenuItem[] = [
   // },
 ]
 
-const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'No VITE_APP_VERSION'
-const BRAND_NAME = import.meta.env.VITE_BRAND_NAME || 'No VITE_BRAND_NAME'
-const GIT_SHA1 = import.meta.env.VITE_GIT_SHA1 || 'No Git VITE_GIT_SHA1'
-const GIT_BRANCH_NAME = import.meta.env.VITE_GIT_BRANCH_NAME || 'No VITE_GIT_BRANCH_NAME'
-
 export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps) => {
-  const location = useLocation()
-  const currentYear = useMemo(() => new Date().getFullYear(), [])
-  const createdYear = 2019
-  const isCreactedCurrentYear = useMemo(() => currentYear === createdYear, [createdYear, currentYear])
-  const [fullMainLSState] = useLocalStorageState({
-    key: 'teamScoring2024:topLevel',
-    initialValue: null,
-    isReadOnly: true,
-  })
-  const sizeInfo = useMemo(
-    () => getHumanReadableSize({ bytes: jsonSize(fullMainLSState), decimals: 2 }),
-    [fullMainLSState]
-  )
   const [speedDialOpened, setSpeedDialOpened] = useState(false)
   const handleOpenSpeedDial = () => setSpeedDialOpened(true)
   const handleCloseSpeedDial = () => setSpeedDialOpened(false)
   const debugViSnap = useSnapshot(vi.common.devtools)
-
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const [appVersion] = CommonInfoContext.useStore((s) => s.appVersion)
+  const [brandName] = CommonInfoContext.useStore((s) => s.brandName)
+  const [createdYear] = CommonInfoContext.useStore((s) => s.createdYear)
+  const [currentYear] = CommonInfoContext.useStore((s) => s.currentYear)
+  const [gitBranchName] = CommonInfoContext.useStore((s) => s.gitBranchName)
+  const [gitSHA1] = CommonInfoContext.useStore((s) => s.gitSHA1)
+  const [isCreactedCurrentYear] = CommonInfoContext.useStore((s) => s.isCreactedCurrentYear)
+  const [ls] = CommonInfoContext.useStore((s) => s.ls)
+  const [idb] = CommonInfoContext.useStore((s) => s.idb)
 
   return (
     <ParamsInspectorContextWrapper>
@@ -124,11 +109,12 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
             flexWrap: 'wrap',
           }}
         >
-          <b>© {BRAND_NAME}, {isCreactedCurrentYear ? currentYear : `${createdYear} — ${currentYear}`}</b>
-          <div>App version <code className={classes.code}>{APP_VERSION}</code></div>
-          <div>GIT SHA-1 <code className={classes.code}>{GIT_SHA1}</code></div>
-          <div>GIT branch name <code className={classes.code}>{GIT_BRANCH_NAME}</code></div>
-          {!!sizeInfo && <div>LS size used <code className={classes.code}>{sizeInfo}</code></div>}
+          <b>© {brandName}, {isCreactedCurrentYear ? currentYear : `${createdYear} — ${currentYear}`}</b>
+          <div>App version <code className={classes.code}>{appVersion}</code></div>
+          <div>GIT SHA-1 <code className={classes.code}>{gitSHA1}</code></div>
+          <div>GIT branch name <code className={classes.code}>{gitBranchName}</code></div>
+          {!!ls.sizeInfo && <div>LS size used <code className={classes.code}>{ls.sizeInfo}</code></div>}
+          {!!idb && <div>IndexedDB size used <code className={classes.code}>{idb.used.humanized} ({idb.used.percentage.toFixed(2)}%)</code></div>}
         </ResponsiveBlock>
       </div>
 

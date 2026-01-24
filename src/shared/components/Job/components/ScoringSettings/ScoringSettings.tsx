@@ -29,7 +29,7 @@ import { useTheme } from '@mui/material/styles'
 // import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
-import { FileSteperExample } from '~/shared/components'
+// import { FileSteperExample } from '~/shared/components'
 // import { soundManager } from '~/shared/soundManager'
 
 type TProps = {
@@ -726,9 +726,9 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
                     }
                   </pre>
                 </Grid> */}
-                <Grid size={12}>
+                {/* <Grid size={12}>
                   <FileSteperExample isEditable={false} idbKey={`job_id-${job.id}`} />
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
           )}

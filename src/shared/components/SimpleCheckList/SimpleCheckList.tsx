@@ -579,7 +579,7 @@ function SimpleCheckListFn<TAddInfo>({
                                         isClickableBrief
                                         contentRender={() => (
                                           <PhotoProvider>
-                                            <div className={baseClasses.galleryWrapperGrid2}>
+                                            <div className={baseClasses.galleryWrapperGrid1}>
                                               {documents.map((item, index) => (
                                                 <PhotoView key={index} src={item.preview}>
                                                   <img

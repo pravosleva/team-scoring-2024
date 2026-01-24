@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { App } from './App.tsx'
-import { SearchWidgetDataLayer, TopLevelContext } from './shared/xstate/topLevelMachine/v2'
+import { CommonInfoLayer } from '~/shared/context'
+import { SearchWidgetDataLayer, TopLevelContext } from '~/shared/xstate/topLevelMachine/v2'
 import { ClientPerfWidget } from '~/shared/components/ClientPerfWidget'
 import { SnackbarProvider, closeSnackbar } from 'notistack'
 import CloseIcon from '@mui/icons-material/Close'
@@ -41,11 +42,13 @@ createRoot(document.getElementById('root')!).render(
       </button>
     )}
   >
-    <TopLevelContext.Provider>
-      <SearchWidgetDataLayer>
-        <ClientPerfWidget position='right-side-center-bottom' />
-        <App />
-      </SearchWidgetDataLayer>
-    </TopLevelContext.Provider>
+    <CommonInfoLayer>
+      <TopLevelContext.Provider>
+        <SearchWidgetDataLayer>
+          <ClientPerfWidget position='right-side-center-bottom' />
+          <App />
+        </SearchWidgetDataLayer>
+      </TopLevelContext.Provider>
+    </CommonInfoLayer>
   </SnackbarProvider>,
 )

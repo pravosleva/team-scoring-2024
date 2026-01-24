@@ -9,8 +9,11 @@ import { ResponsiveBlock } from '~/shared/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import SaveIcon from '@mui/icons-material/Save'
 // import ImageIcon from '@mui/icons-material/Image'
-import { idbInstance } from './utils'
+import { idbInstance } from '~/shared/utils/indexed-db-ops'
 import { soundManager } from '~/shared'
+import { CommonInfoContext } from '~/shared/context'
+import { getHumanReadableSize } from '~/shared/utils/number-ops'
+// import { useLoadedStore } from '../FileUploadInput/v4/context'
 
 export type TState = {
   // TODO: #backlog По возможности описать корректно
@@ -26,6 +29,10 @@ type TProps = {
   renderer?: (_ps: {
     counter: number;
     documents: { file: Blob; preview?: string }[];
+    size: {
+      bytes: number;
+      humanized: string;
+    };
   }) => React.ReactNode;
   dontShowIdbKey?: boolean;
 }
@@ -56,7 +63,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
   // const [currentSelectTs, setCurrentSelectTs] = useState<null | number>(null)
   // const [wasLoadedFirstly, setWasLoadedFirstly] = useState(true)
 
-  const auxSensor = useRef<number>(0)
+  // const auxSensor = useRef<number>(0)
   useEffect(() => {
     // NOTE: 1. Get from indexed db
     idbInstance.loadImages({
@@ -97,6 +104,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
   }, [idbKey])
 
   const [isUpdated, setIsUpdated] = useState(false)
+  const [_c, setCommonInfoContext] = CommonInfoContext.useStore((s) => s)
   const setImagePackToIDB = useCallback(() => {
     idbInstance.setImagesPack({
       key: idbKey,
@@ -116,16 +124,34 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
           // setLoadedTsUpdate(ps.ts)
           // setWasLoadedFirstly(false)
           setIsUpdated(false)
+
+          idbInstance.getAsyncSizeInfo()
+            .then(({ result }) => setCommonInfoContext({ idb: result }))
+            .catch(console.warn)
         },
         onFuckup: console.warn,
       },
     })
   }, [idbKey, setIsUpdated])
+  // const [loadedStore] = useLoadedStore((s) => s);
+  // const totalSize = useMemo(() => {}, [])
+  const totalBytes = [...watch('documents').values()].reduce((acc, cur) => {
+    if (typeof cur.file.size === 'number')
+      acc += cur.file.size
+    return acc
+  }, 0)
 
   if (!!renderer)
     return renderer({
       counter: [...watch('documents').values()].length,
       documents: [...watch('documents').values()],
+      size: {
+        bytes: totalBytes,
+        humanized: getHumanReadableSize({
+          bytes: totalBytes,
+          decimals: 2,
+        })
+      },
     })
 
   if (!isEditable && [...watch('documents').values()].length == 0)
@@ -142,7 +168,9 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
     >
       {
         isEditable && !dontShowIdbKey && (
-          <code style={{ fontSize: 'small' }}>IndexedDB key: {idbKey}</code>
+          <code style={{ fontSize: 'small' }}>
+            ({getHumanReadableSize({ bytes: totalBytes, decimals: 2 })}) IndexedDB key: {idbKey}
+          </code>
         )
       }
 

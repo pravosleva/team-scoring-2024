@@ -25,6 +25,8 @@ import dayjs from 'dayjs'
 import __TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -563,10 +565,47 @@ export const LastActivityPagerAbstracted = memo(({
                             </Link>
                           </span>
                         </div>
-                        <div style={{ fontSize: '14px' }}>
-                          <HighlightedText
-                            comparedValue={log.text}
-                            testedValue={clsx(searchValueEnhanced)}
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                          }}
+                        >
+                          <div style={{ fontSize: '14px' }}>
+                            <HighlightedText
+                              comparedValue={log.text}
+                              testedValue={clsx(searchValueEnhanced)}
+                            />
+                          </div>
+                          <FileSteperExample
+                            isEditable={false}
+                            idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`}
+                            renderer={({ counter, documents }) => counter === 0 ? null : (
+                              <CollapsibleText
+                                briefPrefix='└─'
+                                briefText={`Local images (${counter})`}
+                                isClickableBrief
+                                contentRender={() => (
+                                  <PhotoProvider>
+                                    <div
+                                      className={baseClasses.galleryWrapperGrid1}
+                                    // style={{ paddingRight: '24px' }}
+                                    >
+                                      {documents.map((item, index) => (
+                                        <PhotoView key={index} src={item.preview}>
+                                          <img
+                                            src={item.preview}
+                                            style={{ objectFit: 'cover' }}
+                                            alt=""
+                                          />
+                                        </PhotoView>
+                                      ))}
+                                    </div>
+                                  </PhotoProvider>
+                                )}
+                              />
+                            )}
                           />
                         </div>
                         {
@@ -675,7 +714,7 @@ export const LastActivityPagerAbstracted = memo(({
                           )
                         }
 
-                        <FileSteperExample isEditable={false} idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`} />
+                        {/* <FileSteperExample isEditable={false} idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`} /> */}
 
                         {/* <Link
                           // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}

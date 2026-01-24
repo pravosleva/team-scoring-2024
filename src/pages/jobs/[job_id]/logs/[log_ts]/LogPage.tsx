@@ -24,7 +24,7 @@ import { SingleTextManager } from '~/shared/components'
 import { CommentManager } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
-import { idbInstance } from '~/shared/components/FileSteperExample/utils'
+import { idbInstance } from '~/shared/utils/indexed-db-ops'
 // import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 
 const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
