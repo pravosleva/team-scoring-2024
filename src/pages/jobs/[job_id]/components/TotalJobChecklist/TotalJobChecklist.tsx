@@ -107,7 +107,9 @@ export const TotalJobChecklist = memo(({ job_id }: TProps) => {
             createBtnLabel='Create checklist'
             isCreatable={false}
             isDeletable={false}
-            isEditable={true}
+            isEditable={false}
+            jobId={targetJob.id}
+            logTs={targetJobTotalChecklistMaping[checklistKey].logTs}
             // onDeleteChecklist={console.info}
             onCreateNewChecklistItem={({ state }) => {
               // console.log(state)

@@ -23,9 +23,14 @@ const initialState: TState = {
 type TProps = {
   isEditable?: boolean;
   idbKey: string;
+  renderer?: (_ps: {
+    counter: number;
+    documents: { file: Blob; preview?: string }[];
+  }) => React.ReactNode;
+  dontShowIdbKey?: boolean;
 }
 
-export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
+export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowIdbKey }: TProps) => {
   const {
     watch,
     control,
@@ -45,10 +50,11 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
     defaultValues: initialState,
   });
 
-  const [loadedTsUpdate, setLoadedTsUpdate] = useState<null | number>(null)
-  const [savedTsUpdate, setSavedTsUpdate] = useState<null | number>(null)
-  const [currentSelectTs, setCurrentSelectTs] = useState<null | number>(null)
-  const [wasLoadedFirstly, setWasLoadedFirstly] = useState(true)
+  // NOTE: 1/4
+  // const [loadedTsUpdate, setLoadedTsUpdate] = useState<null | number>(null)
+  // const [savedTsUpdate, setSavedTsUpdate] = useState<null | number>(null)
+  // const [currentSelectTs, setCurrentSelectTs] = useState<null | number>(null)
+  // const [wasLoadedFirstly, setWasLoadedFirstly] = useState(true)
 
   const auxSensor = useRef<number>(0)
   useEffect(() => {
@@ -74,12 +80,13 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
             // console.log(res)
             if (!!res) setValue('documents', res)
 
+            /* NOTE: 2/4
             if (!!ps.data?.ts) {
               setLoadedTsUpdate(ps.data?.ts)
-              // setSelectedTs(ps.data?.ts)
               setSavedTsUpdate(ps.data?.ts)
               auxSensor.current += 1
             }
+            */
           }
         },
         onFuckup: console.warn,
@@ -104,16 +111,22 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
             },
             _debug: { msg: 'Saved to IndexedDB' }
           })
-          setSavedTsUpdate(ps.ts)
-          setCurrentSelectTs(ps.ts)
-          setLoadedTsUpdate(ps.ts)
-          setWasLoadedFirstly(false)
+          // setSavedTsUpdate(ps.ts)
+          // setCurrentSelectTs(ps.ts)
+          // setLoadedTsUpdate(ps.ts)
+          // setWasLoadedFirstly(false)
           setIsUpdated(false)
         },
         onFuckup: console.warn,
       },
     })
   }, [idbKey, setIsUpdated])
+
+  if (!!renderer)
+    return renderer({
+      counter: [...watch('documents').values()].length,
+      documents: [...watch('documents').values()],
+    })
 
   if (!isEditable && [...watch('documents').values()].length == 0)
     return null
@@ -128,7 +141,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
       }}
     >
       {
-        isEditable && (
+        isEditable && !dontShowIdbKey && (
           <code style={{ fontSize: 'small' }}>IndexedDB key: {idbKey}</code>
         )
       }
@@ -143,7 +156,10 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
           //   </>
           // )}
           >
-            <div className={baseClasses.galleryWrapperRounded}>
+            <div
+              // className={baseClasses.galleryWrapperRounded}
+              className={baseClasses.galleryWrapperGrid2}
+            >
               {[...watch('documents').values()].map((item, index) => (
                 <PhotoView key={index} src={item.preview}>
                   <img
@@ -166,13 +182,14 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
           <>
             <UploadDocumentsStepper
               control={control}
-              filesQuantityLimit={5}
+              filesQuantityLimit={10}
               totalSizeLimitMiB={25}
               // onResetInternalErrors={handleResetInternalErrors}
               onResetInternalErrors={() => undefined}
-              onUpdateFileStorageIds={() => {
-                setCurrentSelectTs(new Date().getTime())
-              }}
+              // NOTE: 3/4
+              // onUpdateFileStorageIds={() => {
+              //   setCurrentSelectTs(new Date().getTime())
+              // }}
               onAdd={() => setIsUpdated(true)}
               onRemove={() => setIsUpdated(true)}
             />
@@ -194,12 +211,12 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
                 >
                   <Button
                     onClick={setImagePackToIDB}
-                    color='gray'
+                    color='primary'
                     variant='outlined'
-                    disabled={
-                      watch('documents').length === 0
-                      || (currentSelectTs === savedTsUpdate && !wasLoadedFirstly)
-                    }
+                    // disabled={
+                    //   watch('documents').length === 0
+                    //   || (currentSelectTs === savedTsUpdate && !wasLoadedFirstly)
+                    // }
                     startIcon={<SaveIcon />}
                   // endIcon={<ImageIcon />}
                   >
@@ -209,7 +226,8 @@ export const FileSteperExample = memo(({ idbKey, isEditable }: TProps) => {
               )
             }
 
-            {/* <pre className={baseClasses.preNormalized}>
+            {/* NOTE: 4/4
+            <pre className={baseClasses.preNormalized}>
               {JSON.stringify({
                 // isSubmitBtnDisabled: !isValid || isFormLoading || isTopicsLoading || !topicsResponseIsValidated.ok || !!errors?.message?.message || !!errors?.questionTheme?.message,
                 // isTopicsLoading,

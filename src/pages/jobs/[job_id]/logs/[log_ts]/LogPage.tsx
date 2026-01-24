@@ -24,6 +24,8 @@ import { SingleTextManager } from '~/shared/components'
 import { CommentManager } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
+import { idbInstance } from '~/shared/components/FileSteperExample/utils'
+// import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 
 const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
 
@@ -242,6 +244,8 @@ export const LogPage = memo(() => {
                     isCreatable
                     isDeletable
                     isEditable
+                    jobId={targetJob.id}
+                    logTs={targetLog.ts}
                     onDeleteChecklist={() => {
                       jobsActorRef.send({ type: 'todo.deleteChecklistFromLog', value: { jobId: targetJob.id, logTs: targetLog.ts } })
                     }}
@@ -261,15 +265,26 @@ export const LogPage = memo(() => {
                       cleanup()
                     }}
                     onDeleteChecklistItem={({ checklistItemId, cleanup }) => {
-                      jobsActorRef.send({
-                        type: 'todo.deleteChecklistItemFromLog',
-                        value: {
-                          jobId: targetJob.id,
-                          logTs: targetLog.ts,
-                          checklistItemId,
+                      idbInstance.removeImagesPack({
+                        key: `job_id-${targetJob.id}--log_ts-${targetLog.ts}--checklist--checklist_item_id-${checklistItemId}`,
+                        cb: {
+                          onSuccess: ({ ok: _ok, message }) => {
+                            console.log(`☑️ OK: ${message || 'No message'}`)
+                            jobsActorRef.send({
+                              type: 'todo.deleteChecklistItemFromLog',
+                              value: {
+                                jobId: targetJob.id,
+                                logTs: targetLog.ts,
+                                checklistItemId,
+                              },
+                            })
+                            cleanup()
+                          },
+                          onFuckup: ({ ok: _ok, message }) => {
+                            console.log(`⛔ ERR: ${message || 'No message'}`)
+                          }
                         },
                       })
-                      cleanup()
                     }}
                     onChecklistItemOrderInc={({ checklistItemId }) => {
                       jobsActorRef.send({
@@ -427,40 +442,35 @@ export const LogPage = memo(() => {
                 )
               */}
               {
-                !!userRouteControls.from
-                  ? (
-                    <Link
-                      to={userRouteControls.from.value}
-                      target='_self'
+                !!userRouteControls.from && (
+                  <Link
+                    to={userRouteControls.from.value}
+                    target='_self'
+                  >
+                    <Button variant='contained' startIcon={<ArrowBack />} fullWidth>
+                      {userRouteControls.from.uiText}
+                    </Button>
+                  </Link>
+                )
+              }
+
+              {
+                !!targetLog && (
+                  <Link
+                    // to={`/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}`}
+                    to={`/last-activity/${targetJob.id}?lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}`}
+                    target='_self'
+                  >
+                    <Button
+                      variant='outlined'
+                      color='salmon'
+
+                      fullWidth
                     >
-                      <Button variant='contained' startIcon={<ArrowBack />} fullWidth>
-                        {userRouteControls.from.uiText}
-                      </Button>
-                    </Link>
-                  )
-                  : (
-                    <Link
-                      to={
-                        !!targetLog
-                          ? `/jobs?lastSeenJob=${targetJob.id}&from=${encodeURIComponent(
-                            `/jobs/${targetJob.id}/logs/${targetLog.ts}?from=/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}&backActionUiText=Last Activity`
-                            // `/jobs/${targetJob.id}/logs/${targetLog.ts}`
-                          )
-                          }&backActionUiText=${encodeURIComponent('Log page')}`
-                          : '/jobs'
-                      }
-                      target='_self'
-                    >
-                      <Button
-                        variant='outlined'
-                        color='salmon'
-                        startIcon={<ArrowBack />}
-                        fullWidth
-                      >
-                        {!!targetLog ? 'Jobs pager' : 'All Jobs'}
-                      </Button>
-                    </Link>
-                  )
+                      Go to activity
+                    </Button>
+                  </Link>
+                )
               }
 
               {

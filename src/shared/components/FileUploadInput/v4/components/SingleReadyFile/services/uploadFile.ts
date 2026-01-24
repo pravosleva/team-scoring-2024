@@ -66,7 +66,7 @@ export const uploadFile = async ({ input }: {
     ok: boolean;
     status: number;
     responseBody: NSFileTemp.TBaseResponse;
-  } = await delay({ ms: 3000 })
+  } = await delay({ ms: 0 })
     .then(() => ({
       ok: true,
       status: 200,

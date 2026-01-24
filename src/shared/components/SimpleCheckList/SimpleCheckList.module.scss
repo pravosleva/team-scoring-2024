@@ -19,7 +19,7 @@
 .checklistItemWrapper {
   display: flex;
   flex-direction: column;
-  gap: 0px;
+  gap: 8px;
 
   .checkerAndControls {
     // border: 1px solid red;
@@ -48,10 +48,10 @@
   }
 
   .infoStack {
-    padding-top: 2px;
+    // padding-top: 2px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
 
     word-break: break-word;
 
@@ -163,6 +163,11 @@
 
 .noActions {
   padding: 8px 8px 24px 8px;
+}
+
+.paddedBottom3 {
+  padding-bottom: 48px;
+  border-color: red;
 }
 
 .absoluteBadgeTopRight {

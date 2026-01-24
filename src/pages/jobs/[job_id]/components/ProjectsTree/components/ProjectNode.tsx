@@ -251,6 +251,7 @@ export const ProjectNode = ({
               gap: '2px',
 
               paddingRight: '8px',
+              // borderTopRightRadius: level === 1 ? '16px' : 'inherit',
 
               position: 'sticky',
               height: `${stickyElementHeight}px`,
@@ -383,7 +384,7 @@ export const ProjectNode = ({
               {!!targetText && (
                 <HighlightedText className={classes.descr} comparedValue={targetText} testedValue={searchValueBasic} />
               )}
-              <FileSteperExample isEditable={true} idbKey={`job_id-${projectsTree.model.id}`} />
+              <FileSteperExample isEditable={true} idbKey={`job_id-${projectsTree.model.id}`} dontShowIdbKey />
               {/*
               !isPinned && (
                 <Button
@@ -607,9 +608,7 @@ export const ProjectNode = ({
                       {
                         projectsTree.model._service.aboutJob.existingChecklists
                           .map(({ logText: _logText, uniqueChecklistKey, logTs, completePercentage }) => (
-                            <li
-                              key={uniqueChecklistKey}
-                            >
+                            <li key={uniqueChecklistKey}>
                               <span
                                 style={{
                                   // border: '1px solid red',

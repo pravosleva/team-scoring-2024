@@ -633,6 +633,8 @@ export const LastActivityPagerAbstracted = memo(({
                               isCreatable={false}
                               isDeletable={false}
                               isEditable={false}
+                              jobId={log.jobId}
+                              logTs={log.ts}
                               // onDeleteChecklist={console.info}
                               // onCreateNewChecklistItem={({ state }) => {
                               //   jobsActorRef.send({ type: 'todo.addChecklistItemInLog', value: { jobId: log.jobId, logTs: log.ts, state } })

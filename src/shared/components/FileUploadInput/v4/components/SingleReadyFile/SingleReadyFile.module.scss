@@ -1,3 +1,30 @@
+@use '~/shared/components/scss-vars/monitors.scss' as *;
+@use '~/shared/components/scss-vars/colors.scss' as *;
+@use '~/shared/components/scss-vars/sizes.scss' as *;
+@use '~/shared/components/scss-vars/common.scss' as *;
+
+@media(max-width: 465px) {
+  .shadowWrapper {
+    box-shadow: 4px 4px 8px rgb(163, 177, 198, 0.6),
+      -4px -4px 8px rgba(255, 255, 255, 0.5);
+  }
+}
+
+@media(min-width: 466px) {
+  .shadowWrapper {
+    box-shadow: 9px 9px 16px rgb(163, 177, 198, 0.6),
+      -9px -9px 16px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.roundedWrapper {
+  border-radius: 24px;
+}
+
+// @media(max-width: #{$monitor-xs}px) {}
+// @media(max-width: 465px) {}
+// @media(min-width: 466px) {}
+
 .absoluteBluredLayout {
   animation: 0.3s ease-in-out fade-in;
 

@@ -19,6 +19,7 @@ import { CopyToClipboardWrapper } from '~/shared/components/CopyToClipboardWrapp
 import { getMatchedByAllStrings } from '~/shared/utils/string-ops'
 import { FileSteperExample, HighlightedText } from '~/shared/components'
 import clsx from 'clsx'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 
 __TimeAgo.addDefaultLocale(en)
 __TimeAgo.addLocale(ru)
@@ -149,6 +150,31 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
             />
           )
         }
+        <FileSteperExample
+          isEditable={false}
+          idbKey={`job_id-${j.id}`}
+          renderer={({ counter, documents }) => counter === 0 ? null : (
+            <CollapsibleText
+              briefText={`Local images (${counter})`}
+              isClickableBrief
+              contentRender={() => (
+                <PhotoProvider>
+                  <div className={baseClasses.galleryWrapperRounded}>
+                    {documents.map((item, index) => (
+                      <PhotoView key={index} src={item.preview}>
+                        <img
+                          src={item.preview}
+                          style={{ objectFit: 'cover', maxWidth: '100%' }}
+                          alt=""
+                        />
+                      </PhotoView>
+                    ))}
+                  </div>
+                </PhotoProvider>
+              )}
+            />
+          )}
+        />
 
         {
           !!filteredJobsLogsMappingChunk
@@ -218,7 +244,6 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                               paddingLeft: '8px',
                             }}
                           />
-                          <FileSteperExample isEditable={false} idbKey={`job_id-${j.id}--log_ts-${log.original.ts}`} />
                           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: '16px' }}>
                             <Button
                               // disabled={!!params.log_ts && Number(params.log_ts) === log.original.ts}
@@ -256,6 +281,37 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                               <em style={{ color: '#959eaa' }}>{log._service.commonMessage}</em>
                             )
                           }
+
+                          <FileSteperExample
+                            isEditable={false}
+                            idbKey={`job_id-${j.id}--log_ts-${log.original.ts}`}
+                            renderer={({ counter, documents }) => counter === 0 ? null : (
+                              <CollapsibleText
+                                briefPrefix={log._service.logLocalLinks.length > 0 || log._service.logExternalLinks.length > 0 ? '├─' : '└─'}
+                                briefText={`Local images (${counter})`}
+                                isClickableBrief
+                                contentRender={() => (
+                                  <PhotoProvider>
+                                    <div
+                                      className={baseClasses.galleryWrapperGrid2}
+                                      style={{ paddingRight: '24px' }}
+                                    >
+                                      {documents.map((item, index) => (
+                                        <PhotoView key={index} src={item.preview}>
+                                          <img
+                                            src={item.preview}
+                                            style={{ objectFit: 'cover' }}
+                                            alt=""
+                                          />
+                                        </PhotoView>
+                                      ))}
+                                    </div>
+                                  </PhotoProvider>
+                                )}
+                              />
+                            )}
+                          />
+
                           {
                             log._service.logLocalLinks.length > 0 && (
                               <>
@@ -305,6 +361,35 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                                 />
                                               )
                                             }
+                                            <FileSteperExample
+                                              isEditable={false}
+                                              idbKey={`job_id-${j.id}--log_ts-${log.original.ts}--checklist--checklist_item_id-${id}`}
+                                              renderer={({ counter, documents }) => counter === 0 ? null : (
+                                                <CollapsibleText
+                                                  briefPrefix='└─'
+                                                  briefText={`Local images (${counter})`}
+                                                  isClickableBrief
+                                                  contentRender={() => (
+                                                    <PhotoProvider>
+                                                      <div
+                                                        className={baseClasses.galleryWrapperGrid2}
+                                                        style={{ paddingRight: '48px' }}
+                                                      >
+                                                        {documents.map((item, index) => (
+                                                          <PhotoView key={index} src={item.preview}>
+                                                            <img
+                                                              src={item.preview}
+                                                              style={{ objectFit: 'cover', maxWidth: '100%' }}
+                                                              alt=""
+                                                            />
+                                                          </PhotoView>
+                                                        ))}
+                                                      </div>
+                                                    </PhotoProvider>
+                                                  )}
+                                                />
+                                              )}
+                                            />
                                           </div>
                                         ))
                                       }

@@ -11,7 +11,7 @@ import { debugFactory, NWService } from '~/shared/utils'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useParamsInspectorContextStore } from '~/shared/xstate/topLevelMachine/v2/context/ParamsInspectorContextWrapper'
 // import { getFullUrl } from '~/shared/utils/string-ops'
-import { CollapsibleBox, CopyToClipboardWrapper, HighlightedText, ResponsiveBlock } from '~/shared/components'
+import { CollapsibleBox, CopyToClipboardWrapper, FileSteperExample, HighlightedText, ResponsiveBlock } from '~/shared/components'
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -20,8 +20,9 @@ import BioTechIcon from '@mui/icons-material/Biotech'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { BrainJsExp, EfficiencyAnalysisExp } from './components'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
-import { getArithmeticalMean } from '~/shared/utils/number-ops'
+import { getArithmeticalMean, getIsNumeric } from '~/shared/utils/number-ops'
 import { BaseProgressBar } from '../ProgressBar/BaseProgressBar'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -211,6 +212,7 @@ export const ReportPagerAbstracted = ({
   const [userRouteControls] = useParamsInspectorContextStore((ctx) => ctx.userRouteControls)
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
   const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
+  const isNumericJodIdInParams = useMemo(() => getIsNumeric(params.job_id), [params.job_id])
 
   return (
     <>
@@ -310,6 +312,40 @@ export const ReportPagerAbstracted = ({
                   />
                 </Grid>
               </>
+            )
+          }
+
+          {
+            !!isNumericJodIdInParams && (
+              <FileSteperExample
+                key={params.job_id}
+                isEditable={false}
+                idbKey={`job_id-${params.job_id}`}
+                renderer={({ counter, documents }) => counter === 0 ? null : (
+                  <Grid size={12}>
+                    <CollapsibleText
+                      // briefPrefix={!!targetJob.relations.parent || targetJob.relations.children.length > 0 || !!targetJob.descr ? '├─' : '└─'}
+                      briefText={`Local images (${counter})`}
+                      isClickableBrief
+                      contentRender={() => (
+                        <PhotoProvider>
+                          <div className={baseClasses.galleryWrapperRounded}>
+                            {documents.map((item, index) => (
+                              <PhotoView key={`${params.job_id}---${index}`} src={item.preview}>
+                                <img
+                                  src={item.preview}
+                                  style={{ objectFit: 'cover', maxWidth: '100%' }}
+                                  alt=""
+                                />
+                              </PhotoView>
+                            ))}
+                          </div>
+                        </PhotoProvider>
+                      )}
+                    />
+                  </Grid>
+                )}
+              />
             )
           }
 

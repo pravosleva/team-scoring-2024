@@ -1,3 +1,8 @@
+@use '~/shared/components/scss-vars/monitors.scss' as *;
+@use '~/shared/components/scss-vars/colors.scss' as *;
+@use '~/shared/components/scss-vars/sizes.scss' as *;
+@use '~/shared/components/scss-vars/common.scss' as *;
+
 .descriptionBox {
   font-family: system-ui;
   font-style: normal;
@@ -24,5 +29,50 @@
 
   &:focus {
     border: 1px dashed red;
+  }
+}
+
+// @media(max-width: #{$monitor-xs}px) {}
+@media(max-width: 465px) {
+  .slotsGrid {
+    // NOTE: v1
+    // display: flex;
+    // flex-direction: row;
+    // flex-wrap: wrap;
+    // gap: 16px;
+
+    // NOTE: v2
+    display: grid;
+    column-gap: #{$size-pad-1}px;
+    row-gap: #{$size-pad-1}px;
+    // grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+
+  .slotAsGridItem {
+    aspect-ratio: 1 / 1;
+    // width: 148px;
+  }
+}
+
+@media(min-width: 466px) {
+  .slotsGrid {
+    // NOTE: v1
+    // display: flex;
+    // flex-direction: column;
+    // gap: 8px;
+
+    // NOTE: v2
+    display: grid;
+    column-gap: #{$size-pad-2}px;
+    row-gap: #{$size-pad-2}px;
+    // grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+  }
+
+  .slotAsGridItem {
+    aspect-ratio: 1 / 1;
   }
 }

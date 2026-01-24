@@ -17,6 +17,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import StarIcon from '@mui/icons-material/Star'
 import baseClasses from '~/App.module.scss'
 import { HighlightedText } from '../HighlightedText/v2'
+import { idbInstance } from '../FileSteperExample/utils'
 // import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 
 type TProps = {
@@ -89,7 +90,20 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
 
   const handleDeleteJob = useCallback(({ id }: { id: number }) => () => {
     const isConfirmed = window.confirm('⚡ Sure? This job will be deleted!')
-    if (isConfirmed) jobsActorRef.send({ type: 'todo.delete', id })
+    if (isConfirmed) {
+      idbInstance.removeImagesPack({
+        key: `job_id-${id}`,
+        cb: {
+          onSuccess: ({ ok: _ok, message }) => {
+            console.log(`☑️ OK: ${message || 'No message'}`)
+            jobsActorRef.send({ type: 'todo.delete', id })
+          },
+          onFuckup: ({ ok: _ok, message }) => {
+            console.log(`⛔ ERR: ${message || 'No message'}`)
+          }
+        },
+      })
+    }
   }, [jobsActorRef])
   const isStartedAndEstimated = useMemo(() =>
     !!job.forecast?.start && !!job.forecast?.estimate,

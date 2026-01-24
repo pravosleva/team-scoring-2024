@@ -13,6 +13,7 @@ import { CopyToClipboardWrapper } from '~/shared/components'
 import { FixedNavControlsSpace } from '../ActiveJobContent/components'
 import { useInView } from 'react-hook-inview'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+import { idbInstance } from '~/shared/components/FileSteperExample/utils'
 
 type TPros = {
   job: TJob;
@@ -40,11 +41,22 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
     if (!isConfirmed)
       return
 
-    jobsActorRef.send({
-      type: 'todo.deleteLog',
-      value: {
-        jobId: job.id,
-        logTs,
+    idbInstance.removeImagesPack({
+      key: `job_id-${job.id}--log_ts-${logTs}`,
+      cb: {
+        onSuccess: ({ ok: _ok, message }) => {
+          console.log(`☑️ OK: ${message || 'No message'}`)
+          jobsActorRef.send({
+            type: 'todo.deleteLog',
+            value: {
+              jobId: job.id,
+              logTs,
+            },
+          })
+        },
+        onFuckup: ({ ok: _ok, message }) => {
+          console.log(`⛔ ERR: ${message || 'No message'}`)
+        }
       },
     })
   }, [job.id])

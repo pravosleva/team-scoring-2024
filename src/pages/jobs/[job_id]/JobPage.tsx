@@ -6,6 +6,7 @@ import Grid from '@mui/material/Grid2'
 import {
   CollapsibleBox,
   DistributionFunctionGraph,
+  FileSteperExample,
   HighlightedText,
   ResponsiveBlock,
   SimpleJobPointsetChecker,
@@ -39,6 +40,8 @@ import { JobTimingStandartInfo } from '~/shared/components/Job/components/JobSta
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
+import { CollapsibleText } from './components/ProjectsTree/components'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 
 const specialScroll = scrollToIdFactory({
   timeout: 200,
@@ -54,17 +57,22 @@ export const JobPage = memo(() => {
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   // const targetJob = useMemo<TJob | null>(() => jobs
   //   .filter((j) => String(j.id) === params.job_id)?.[0] || null, [jobs, params.job_id])
-  const targetJob = useMemo(() => getIsNumeric(params.job_id) ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
-    items: jobs,
-    target: {
-      path: '',
-      critery: {
-        path: 'id',
-        value: Number(params.job_id),
-      },
-    },
-    sorted: 'DESC',
-  }).result || null : null, [jobs, params.job_id])
+  const targetJob = useMemo(
+    () => getIsNumeric(params.job_id)
+      ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
+        items: jobs,
+        target: {
+          path: '',
+          critery: {
+            path: 'id',
+            value: Number(params.job_id),
+          },
+        },
+        sorted: 'DESC',
+      }).result || null
+      : null,
+    [jobs, params.job_id]
+  )
   const targetUser = useMemo<TUser | null>(() => {
     const userId = Number(targetJob?.forecast.assignedTo)
     return users?.find(({ id }) => id === userId) || null
@@ -228,6 +236,40 @@ export const JobPage = memo(() => {
           )}
         </Box>
       </Grid>
+
+      {
+        !!targetJob && (
+          <FileSteperExample
+            key={targetJob.id}
+            isEditable={false}
+            idbKey={`job_id-${targetJob.id}`}
+            renderer={({ counter, documents }) => counter === 0 ? null : (
+              <Grid size={12}>
+                <CollapsibleText
+                  // briefPrefix={!!targetJob.relations.parent || targetJob.relations.children.length > 0 || !!targetJob.descr ? '├─' : '└─'}
+                  briefText={`Local images (${counter}) #${targetJob.id}`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <PhotoProvider>
+                      <div className={baseClasses.galleryWrapperRounded}>
+                        {documents.map((item, index) => (
+                          <PhotoView key={`${targetJob.id}---${index}`} src={item.preview}>
+                            <img
+                              src={item.preview}
+                              style={{ objectFit: 'cover', maxWidth: '100%' }}
+                              alt=""
+                            />
+                          </PhotoView>
+                        ))}
+                      </div>
+                    </PhotoProvider>
+                  )}
+                />
+              </Grid>
+            )}
+          />
+        )
+      }
 
       {
         !!targetJob && (

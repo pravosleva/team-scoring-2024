@@ -9,6 +9,7 @@ import {
 } from './icons';
 import CircularProgress from '@mui/material/CircularProgress'
 import classes from './SingleReadyFile.module.scss'
+import clsx from 'clsx';
 
 type TProps = {
   isLoadedAlready?: boolean;
@@ -132,11 +133,14 @@ const WrappedSingleReadyFile = memo(({
       key={documentId}
       style={{
         backgroundColor: '#F1F2F6',
-        borderRadius: '24px',
-        width: '148px',
-        height: '148px',
+        // width: '148px',
+        // height: '148px',
+        width: '100%',
+        // minWidth: '120px',
+        height: '100%',
         position: 'relative',
       }}
+      className={clsx(classes.shadowWrapper, classes.roundedWrapper)}
     >
       <div
         // @ts-ignore
@@ -175,14 +179,17 @@ const WrappedSingleReadyFile = memo(({
               alignItems: 'flex-end',
               padding: '8px',
 
-              border: '1px solid #DCE1EF',
+              // border: '2px solid #DCE1EF',
               borderRadius: 'inherit',
             }}
           >
             <button
               className={classes.controlButton}
               onClick={handleClickForQuestion}
-              style={{ backgroundColor: '#15BC3A' }}
+              style={{
+                backgroundColor: '#15BC3A',
+                // backgroundColor: '#2cc194',
+              }}
             >
               <CheckIcon />
             </button>
@@ -239,7 +246,10 @@ const WrappedSingleReadyFile = memo(({
                 <button
                   className={classes.controlButton}
                   onClick={handleClickForRetry}
-                  style={{ backgroundColor: '#15BC3A' }}
+                  style={{
+                    backgroundColor: '#15BC3A',
+                    // backgroundColor: '#2cc194',
+                  }}
                 >
                   <RetryIcon
                     style={{
@@ -280,7 +290,10 @@ const WrappedSingleReadyFile = memo(({
               className={classes.controlButton}
               // onClick={handleClickForOpenSlot}
               // onClick={handleClickForQuestion}
-              style={{ backgroundColor: '#15BC3A' }}
+              style={{
+                backgroundColor: '#15BC3A',
+                // backgroundColor: '#2cc194',
+              }}
             >
               <CheckIcon />
             </button>
@@ -294,11 +307,11 @@ const WrappedSingleReadyFile = memo(({
               className={classes.absoluteBluredLayout}
               onClick={handleClickForReady}
               style={{
-                border: '1px solid #DCE1EF',
+                border: '2px solid #DCE1EF',
                 borderRadius: 'inherit',
               }}
             >
-              <div>Заменить?</div>
+              <div>Replace?</div>
               <div
                 style={{
                   display: 'flex',
@@ -323,7 +336,10 @@ const WrappedSingleReadyFile = memo(({
                   <button
                     className={classes.controlButton}
                     onClick={handleClickForOpenSlot}
-                    style={{ backgroundColor: '#15BC3A' }}
+                    style={{
+                      backgroundColor: '#15BC3A',
+                      // backgroundColor: '#2cc194',
+                    }}
                   >
                     <CheckIcon />
                   </button>

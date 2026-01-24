@@ -26,6 +26,9 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowDropUp'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDropDown'
 import { throttleFactory } from '~/shared/utils'
 import { HighlightedText } from '../HighlightedText/v2';
+import { FileSteperExample } from '../FileSteperExample';
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components';
+import { PhotoProvider, PhotoView } from 'react-photo-view';
 // import { soundManager } from '~/shared/soundManager';
 
 const getPadStart = ({ value, minLength }: {
@@ -39,6 +42,8 @@ type TLinkBtn = {
   arrowType?: 'forward';
 }
 type TProps<T, TAddInfo> = {
+  jobId?: number;
+  logTs?: number;
   addLogLinkBtns?: TLinkBtn[];
   checklistUniqueKey?: string;
   connectedOnThe?: ('top')[];
@@ -79,6 +84,8 @@ const genericMemo: <T>(component: T) => T = memo
 // }
 
 function SimpleCheckListFn<TAddInfo>({
+  jobId: jobIdFromProps,
+  logTs: logTsFromProps,
   addLogLinkBtns,
   checklistUniqueKey,
   connectedOnThe,
@@ -354,6 +361,7 @@ function SimpleCheckListFn<TAddInfo>({
                       [classes.editableCommentBox]: !isMiniVariant,
                       [classes.editableCommentBoxMini]: isEditable && isMiniVariant,
                       [classes.noActions]: !isEditable && isMiniVariant,
+                      [classes.paddedBottom3]: (addLogLinkBtns || []).length > 0,
                       [classes.rounded]: !connectedOnThe,
                       [classes.connectedOnTheTop]: connectedOnThe?.includes('top'),
                     }
@@ -495,6 +503,111 @@ function SimpleCheckListFn<TAddInfo>({
 
                               <div className={classes.checklistItemControls}>
                                 {
+                                  !!onDeleteChecklistItem && (
+                                    <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>
+                                      [ Del ]
+                                    </code>
+                                  )
+                                }
+                                <code
+                                  className={classes.inlineControlBtn}
+                                  onClick={handleDisabledToggle({
+                                    checklistItemId: checklistItem.id,
+                                    title: checklistItem.title,
+                                    descr: checklistItem.descr,
+                                    isDoneCurrentValue: checklistItem.isDone,
+                                    isDisabledCurrentValue: checklistItem.isDisabled,
+                                  })}
+                                  style={{
+                                    display: 'inline-flex',
+                                    flexDirection: 'row',
+                                    gap: '5px',
+                                    alignItems: 'center',
+                                    // border: '1px solid red'
+                                  }}
+                                >
+                                  <span>[</span>
+                                  {
+                                    checklistItem.isDisabled
+                                      ? (
+                                        <ToggleOffIcon sx={{ fontSize: '20px' }} />
+                                      )
+                                      : (
+                                        <ToggleOnIcon sx={{ fontSize: '20px' }} />
+                                      )
+                                  }
+                                  <span>]</span>
+                                </code>
+                                {
+                                  isEditable && (
+                                    <code
+                                      className={classes.inlineControlBtn}
+                                      onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
+                                    >
+                                      [ Edit ]
+                                    </code>
+                                  )
+                                }
+                              </div>
+                            </div>
+
+                            <div className={classes.infoStack}>
+                              <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
+                                <HighlightedText
+                                  comparedValue={checklistItem.title}
+                                  testedValue={searchValue}
+                                />
+                              </em>
+                              {!!checklistItem.descr && (
+                                <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
+                                  <HighlightedText
+                                    comparedValue={checklistItem.descr}
+                                    testedValue={searchValue}
+                                  />
+                                </code>
+                              )}
+                              {
+                                !!jobIdFromProps && !!logTsFromProps && (
+                                  <FileSteperExample
+                                    isEditable={isEditable}
+                                    dontShowIdbKey
+                                    idbKey={`job_id-${jobIdFromProps}--log_ts-${logTsFromProps}--checklist--checklist_item_id-${checklistItem.id}`}
+                                    renderer={isEditable ? undefined : ({ counter, documents }) => counter === 0 ? null : (
+                                      <CollapsibleText
+                                        briefPrefix='└─'
+                                        briefText={`Local images (${counter})`}
+                                        isClickableBrief
+                                        contentRender={() => (
+                                          <PhotoProvider>
+                                            <div className={baseClasses.galleryWrapperGrid2}>
+                                              {documents.map((item, index) => (
+                                                <PhotoView key={index} src={item.preview}>
+                                                  <img
+                                                    src={item.preview}
+                                                    style={{ objectFit: 'cover', maxWidth: '100%' }}
+                                                    alt=""
+                                                  />
+                                                </PhotoView>
+                                              ))}
+                                            </div>
+                                          </PhotoProvider>
+                                        )}
+                                      />
+                                    )}
+                                  />
+                                )
+                              }
+
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  justifyContent: 'flex-end',
+                                  alignItems: 'center',
+                                  gap: '1px',
+                                }}
+                              >
+                                {
                                   isCopiable && (
                                     <CopyToClipboardWrapperUniversal
                                       showNotifOnCopy
@@ -570,70 +683,7 @@ function SimpleCheckListFn<TAddInfo>({
                                     />
                                   )
                                 }
-                                {
-                                  !!onDeleteChecklistItem && (
-                                    <code className={classes.inlineControlBtn} onClick={handleDeleteChecklistItem({ checklistItemId: checklistItem.id })} style={{ color: 'red' }}>
-                                      [ Del ]
-                                    </code>
-                                  )
-                                }
-                                <code
-                                  className={classes.inlineControlBtn}
-                                  onClick={handleDisabledToggle({
-                                    checklistItemId: checklistItem.id,
-                                    title: checklistItem.title,
-                                    descr: checklistItem.descr,
-                                    isDoneCurrentValue: checklistItem.isDone,
-                                    isDisabledCurrentValue: checklistItem.isDisabled,
-                                  })}
-                                  style={{
-                                    display: 'inline-flex',
-                                    flexDirection: 'row',
-                                    gap: '5px',
-                                    alignItems: 'center',
-                                    // border: '1px solid red'
-                                  }}
-                                >
-                                  <span>[</span>
-                                  {
-                                    checklistItem.isDisabled
-                                      ? (
-                                        <ToggleOffIcon sx={{ fontSize: '20px' }} />
-                                      )
-                                      : (
-                                        <ToggleOnIcon sx={{ fontSize: '20px' }} />
-                                      )
-                                  }
-                                  <span>]</span>
-                                </code>
-                                {
-                                  isEditable && (
-                                    <code
-                                      className={classes.inlineControlBtn}
-                                      onClick={handleEditItem({ checklistId: checklistItem.id, titleForEdit: checklistItem.title, descrForEdit: checklistItem.descr })}
-                                    >
-                                      [ Edit ]
-                                    </code>
-                                  )
-                                }
                               </div>
-                            </div>
-
-                            <div className={classes.infoStack}>
-                              <em className={clsx({ [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
-                                <HighlightedText
-                                  comparedValue={checklistItem.title}
-                                  testedValue={searchValue}
-                                />
-                              </em>
-                              {!!checklistItem.descr && (
-                                <code className={clsx(classes.descr, { [classes.throughText]: checklistItem.isDisabled })} style={{ display: 'block' }}>
-                                  <HighlightedText
-                                    comparedValue={checklistItem.descr}
-                                    testedValue={searchValue}
-                                  />
-                                </code>
-                              )}
                             </div>
 
                           </div>

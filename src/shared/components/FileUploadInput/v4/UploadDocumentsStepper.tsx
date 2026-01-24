@@ -65,7 +65,6 @@ type TInputDebugEvent = {
 const originalInputLogger = debugFactory<TInputDebugEvent | null, string | null>({ label: '🇫 UploadDocumentsStepper:v4 | input' });
 
 type TProps = {
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>;
   // TODO: По возможности описать корректно
@@ -361,12 +360,13 @@ const Logic = memo(({
           key={`fields-${fields.length}-reqFields-${Object.values(requiredStore).length}-loadedActual-${Object.keys(loadedStore).filter((k) => !!loadedStore[k]).length}`}
         />
         <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: '16px',
-          }}
+          // style={{
+          //   display: 'flex',
+          //   flexDirection: 'row',
+          //   flexWrap: 'wrap',
+          //   gap: '16px',
+          // }}
+          className={classes.slotsGrid}
         >
           {
             fields.length > 0 && (
@@ -379,11 +379,12 @@ const Logic = memo(({
                 }, i) => (
                   <div
                     key={`${documentId}-${preview}-${i}`}
+                    className={classes.slotAsGridItem}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      maxWidth: '148px',
+                      // maxWidth: '148px',
                       position: 'relative',
                     }}
                   >
@@ -448,6 +449,7 @@ const Logic = memo(({
           {
             fields.length < filesQuantityLimit && (
               <div
+                className={clsx(singleFileClasses.shadowWrapper, classes.slotAsGridItem, singleFileClasses.roundedWrapper)}
                 onClick={preventExternalClick(handleAddDocs)}
                 style={{
                   boxSizing: 'border-box',
@@ -456,11 +458,13 @@ const Logic = memo(({
                   justifyContent: 'flex-end',
                   alignItems: 'flex-end',
                   gap: '8px',
-                  width: '148px',
-                  maxWidth: '148px',
-                  height: '148px',
-                  maxHeight: '148px',
-                  border: '1px dashed #DCE1EF',
+                  // width: '148px',
+                  // maxWidth: '148px',
+                  // height: '148px',
+                  // maxHeight: '148px',
+                  // border: '1px dashed #DCE1EF',
+                  // width: '100%',
+                  // height: '100%',
                   backgroundColor: '#F1F2F6',
                   borderRadius: '24px',
                   padding: '8px',
