@@ -284,6 +284,77 @@ export const LastJobActivityPage = memo(() => {
                               fontSize: 'small'
                             }}
                           >
+                            {!!job.relations.parent && (
+                              <CollapsibleText
+                                briefPrefix='┌─'
+                                briefText={
+                                  <HighlightedText
+                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
+                                    testedValue={clsx(searchValueBasic)}
+                                  />
+                                }
+                                contentRender={() => (
+                                  <div
+                                    style={{
+                                      fontSize: 'small',
+                                      paddingLeft: '24px',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '8px',
+                                    }}
+                                  >
+                                    <Link
+                                      to={getFullUrl({
+                                        url: `/last-activity/${job.relations.parent}`,
+                                        query: {
+                                          ...queryParams,
+                                        },
+                                      })}
+                                    >
+                                      <HighlightedText
+                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                        testedValue={clsx(searchValueBasic)}
+                                      />
+                                    </Link>
+                                    {
+                                      typeof job.relations.parent === 'number' && (
+                                        <FileSteperExample
+                                          isEditable={false}
+                                          // idbKey={`job_id-${job.relations.parent}`}
+                                          idbKey={getUniqueKey({ jobId: job.relations.parent })}
+                                          renderer={({ counter, documents }) => counter === 0 ? null : (
+                                            <CollapsibleText
+                                              briefPrefix='└─'
+                                              briefText={`Local images (${counter})`}
+                                              isClickableBrief
+                                              contentRender={() => (
+                                                <PhotoProvider>
+                                                  <div
+                                                    className={baseClasses.galleryWrapperRounded}
+                                                    style={{ paddingRight: '24px' }}
+                                                  >
+                                                    {documents.map((item, index) => (
+                                                      <PhotoView key={index} src={item.preview}>
+                                                        <img
+                                                          src={item.preview}
+                                                          style={{ objectFit: 'cover', maxWidth: '100%' }}
+                                                          alt=""
+                                                        />
+                                                      </PhotoView>
+                                                    ))}
+                                                  </div>
+                                                </PhotoProvider>
+                                              )}
+                                            />
+                                          )}
+                                        />
+                                      )
+                                    }
+                                  </div>
+                                )}
+                                isClickableBrief
+                              />
+                            )}
                             <div
                               style={{
                                 display: 'flex',
@@ -364,7 +435,7 @@ export const LastJobActivityPage = memo(() => {
                               idbKey={getUniqueKey({ jobId: job.id })}
                               renderer={({ counter, documents }) => counter === 0 ? null : (
                                 <CollapsibleText
-                                  briefPrefix={!!job.relations.parent || job.relations.children.length > 0 || !!job.descr ? '├─' : '└─'}
+                                  briefPrefix={(job.relations.children.length > 0 || !!job.descr) ? '├─' : '└─'}
                                   briefText={`Local images (${counter})`}
                                   isClickableBrief
                                   contentRender={() => (
@@ -385,77 +456,6 @@ export const LastJobActivityPage = memo(() => {
                                 />
                               )}
                             />
-                            {!!job.relations.parent && (
-                              <CollapsibleText
-                                briefPrefix={(job.relations.children.length > 0 || !!job.descr) ? '├─' : '└─'}
-                                briefText={
-                                  <HighlightedText
-                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
-                                    testedValue={clsx(searchValueBasic)}
-                                  />
-                                }
-                                contentRender={() => (
-                                  <div
-                                    style={{
-                                      fontSize: 'small',
-                                      paddingLeft: '24px',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '8px',
-                                    }}
-                                  >
-                                    <Link
-                                      to={getFullUrl({
-                                        url: `/last-activity/${job.relations.parent}`,
-                                        query: {
-                                          ...queryParams,
-                                        },
-                                      })}
-                                    >
-                                      <HighlightedText
-                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
-                                        testedValue={clsx(searchValueBasic)}
-                                      />
-                                    </Link>
-                                    {
-                                      typeof job.relations.parent === 'number' && (
-                                        <FileSteperExample
-                                          isEditable={false}
-                                          // idbKey={`job_id-${job.relations.parent}`}
-                                          idbKey={getUniqueKey({ jobId: job.relations.parent })}
-                                          renderer={({ counter, documents }) => counter === 0 ? null : (
-                                            <CollapsibleText
-                                              briefPrefix='└─'
-                                              briefText={`Local images (${counter})`}
-                                              isClickableBrief
-                                              contentRender={() => (
-                                                <PhotoProvider>
-                                                  <div
-                                                    className={baseClasses.galleryWrapperRounded}
-                                                    style={{ paddingRight: '24px' }}
-                                                  >
-                                                    {documents.map((item, index) => (
-                                                      <PhotoView key={index} src={item.preview}>
-                                                        <img
-                                                          src={item.preview}
-                                                          style={{ objectFit: 'cover', maxWidth: '100%' }}
-                                                          alt=""
-                                                        />
-                                                      </PhotoView>
-                                                    ))}
-                                                  </div>
-                                                </PhotoProvider>
-                                              )}
-                                            />
-                                          )}
-                                        />
-                                      )
-                                    }
-                                  </div>
-                                )}
-                                isClickableBrief
-                              />
-                            )}
                             {job.relations.children.length > 0 && (
                               <CollapsibleText
                                 briefPrefix={!!job.descr ? '├─' : '└─'}
