@@ -29,6 +29,7 @@ import { HighlightedText } from '../HighlightedText/v2';
 import { FileSteperExample } from '../FileSteperExample';
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops';
 // import { soundManager } from '~/shared/soundManager';
 
 const getPadStart = ({ value, minLength }: {
@@ -571,7 +572,8 @@ function SimpleCheckListFn<TAddInfo>({
                                   <FileSteperExample
                                     isEditable={isEditable}
                                     dontShowIdbKey
-                                    idbKey={`job_id-${jobIdFromProps}--log_ts-${logTsFromProps}--checklist--checklist_item_id-${checklistItem.id}`}
+                                    // idbKey={`job_id-${jobIdFromProps}--log_ts-${logTsFromProps}--checklist--checklist_item_id-${checklistItem.id}`}
+                                    idbKey={getUniqueKey({ jobId: jobIdFromProps, logTs: logTsFromProps, checklistItemId: checklistItem.id })}
                                     renderer={isEditable ? undefined : ({ counter, documents }) => counter === 0 ? null : (
                                       <CollapsibleText
                                         briefPrefix='└─'

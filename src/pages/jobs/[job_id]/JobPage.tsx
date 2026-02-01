@@ -42,6 +42,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 import { CollapsibleText } from './components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 
 const specialScroll = scrollToIdFactory({
   timeout: 200,
@@ -242,7 +243,7 @@ export const JobPage = memo(() => {
           <FileSteperExample
             key={targetJob.id}
             isEditable={false}
-            idbKey={`job_id-${targetJob.id}`}
+            idbKey={getUniqueKey({ jobId: targetJob.id })}
             renderer={({ counter, documents }) => counter === 0 ? null : (
               <Grid size={12}>
                 <CollapsibleText

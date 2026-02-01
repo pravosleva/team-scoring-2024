@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles'
 import { TopLevelContext, TJob, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 // import { jobEditorMachine } from '~/shared/xstate'
 import { ScoringSettings } from './components'
-import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Rating } from '@mui/material'
+import { Checkbox, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Rating } from '@mui/material'
 import { AutoRefreshedJobMuiAva } from './utils'
 import classes from './Job.module.scss'
 import clsx from 'clsx'
@@ -19,7 +19,7 @@ import baseClasses from '~/App.module.scss'
 import { FileSteperExample } from '~/shared/components'
 // import { JobResultReviewShort } from '~/pages/jobs/[id]/components'
 import { HighlightedText } from '../HighlightedText/v2'
-import { idbInstance } from '~/shared/utils/indexed-db-ops'
+import { getUniqueKey, idbInstance } from '~/shared/utils/indexed-db-ops'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 
@@ -95,7 +95,8 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
     const isConfirmed = window.confirm('⚡ Sure? This job will be deleted!')
     if (isConfirmed) {
       idbInstance.removeImagesPack({
-        key: `job_id-${id}`,
+        // key: `job_id-${id}`,
+        key: getUniqueKey({ jobId: id }),
         cb: {
           onSuccess: ({ ok: _ok, message }) => {
             console.log(`☑️ OK: ${message || 'No message'}`)
@@ -121,11 +122,11 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
   return (
-    <div className={baseClasses.stack1}>
-      <Box
-        sx={{
+    <>
+      <div
+        style={{
           display: 'flex',
-          gap: 0,
+          gap: '0px',
           flexDirection: 'column',
           position: 'relative',
         }}
@@ -213,6 +214,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                           display: 'flex',
                           gap: '16px',
                           alignItems: 'center',
+                          // width: '100%'
                         }}
                       >
                         <Rating
@@ -227,7 +229,7 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
                         {assignedToName && (
                           <span className={baseClasses.truncate}>{assignedToName}</span>
                         )}
-                        {job.logs.isEnabled && <SettingsIcon fontSize='small' htmlColor='gray' />}
+                        {job.logs.isEnabled && <SettingsIcon fontSize='small' htmlColor='gray' style={{ marginLeft: 'auto' }} />}
                       </div>
                     }
                   </div>
@@ -240,83 +242,91 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
 
         {/* <pre>{JSON.stringify(isLastSeen, null, 2)}</pre> */}
 
-        {
-          isProjectOpened && (
-            <ScoringSettings
-              isActive={isActive || false}
-              // onCreateUser={handleCreateUser}
-              onDeleteJob={handleDeleteJob({ id: job.id })}
-              onToggleDrawer={onToggleDrawer}
-              key={`${job.id}-${job.ts.update}`}
-              job={job}
-              onClearDates={({ id }) => {
-                jobsActorRef.send({ type: 'todo.clearDates', id })
-              }}
-              onAddTimeToFinishDate={({ hours }) => {
-                const commentByUser = window.prompt('Your comment about add time?')
+        <div className={baseClasses.stack2}>
 
-                jobsActorRef.send({ type: 'todo.addTimeToFinishDate', hours, comment: commentByUser || '', id })
-              }}
-              onSave={({ state }) => {
-                if (!!state?.title) {
-                  let comment = ''
-                  if (state.logs.isEnabled) {
-                    const commentByUser = window.prompt('Your comment?')
-
-                    if (typeof commentByUser === 'string') comment = commentByUser
-                    else return Promise.reject({ ok: false, message: 'Canceled' })
-                  }
-
-                  // send({
-                  //   type: 'change',
-                  //   value: state?.title,
-                  // })
-                  jobsActorRef.send({
-                    type: 'todo.commit',
-                    job: {
-                      ...state,
-                    },
-                    comment,
-                  })
-                }
-                return Promise.resolve({ ok: true })
-              }}
-            />
-          )
-        }
-
-        {/* <pre>{JSON.stringify(job, null, 2)}</pre> */}
-      </Box>
-
-      <FileSteperExample
-        isEditable={false}
-        idbKey={`job_id-${job.id}`}
-        renderer={({ counter, documents }) => counter === 0 ? null : (
-          <CollapsibleText
-            // briefPrefix={log._service.logLocalLinks.length > 0 || log._service.logExternalLinks.length > 0 ? '├─' : '└─'}
-            briefText={`Local images (${counter})`}
-            isClickableBrief
-            contentRender={() => (
-              <PhotoProvider>
-                <div
-                  className={baseClasses.galleryWrapperGrid1}
-                // style={{ paddingRight: '24px' }}
-                >
-                  {documents.map((item, index) => (
-                    <PhotoView key={index} src={item.preview}>
-                      <img
-                        src={item.preview}
-                        style={{ objectFit: 'cover' }}
-                        alt=""
-                      />
-                    </PhotoView>
-                  ))}
-                </div>
-              </PhotoProvider>
+          <FileSteperExample
+            isEditable={false}
+            // idbKey={`job_id-${job.id}`}
+            idbKey={getUniqueKey({ jobId: job.id })}
+            renderer={({ counter, documents }) => counter === 0 ? null : (
+              <div style={{ paddingLeft: '24px', paddingRight: '48px' }}>
+                <CollapsibleText
+                  briefPrefix='└─'
+                  briefText={`Local images (${counter})`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <PhotoProvider>
+                      <div
+                        className={baseClasses.galleryWrapperGrid1}
+                        style={{ paddingLeft: '24px' }}
+                      >
+                        {documents.map((item, index) => (
+                          <PhotoView key={index} src={item.preview}>
+                            <img
+                              src={item.preview}
+                              style={{ objectFit: 'cover' }}
+                              alt=""
+                            />
+                          </PhotoView>
+                        ))}
+                      </div>
+                    </PhotoProvider>
+                  )}
+                />
+              </div>
             )}
           />
-        )}
-      />
+
+          {
+            isProjectOpened && (
+              <div style={{ paddingLeft: '48px', paddingRight: '48px' }}>
+                <ScoringSettings
+                  isActive={isActive || false}
+                  // onCreateUser={handleCreateUser}
+                  onDeleteJob={handleDeleteJob({ id: job.id })}
+                  onToggleDrawer={onToggleDrawer}
+                  key={`${job.id}-${job.ts.update}`}
+                  job={job}
+                  onClearDates={({ id }) => {
+                    jobsActorRef.send({ type: 'todo.clearDates', id })
+                  }}
+                  onAddTimeToFinishDate={({ hours }) => {
+                    const commentByUser = window.prompt('Your comment about add time?')
+
+                    jobsActorRef.send({ type: 'todo.addTimeToFinishDate', hours, comment: commentByUser || '', id })
+                  }}
+                  onSave={({ state }) => {
+                    if (!!state?.title) {
+                      let comment = ''
+                      if (state.logs.isEnabled) {
+                        const commentByUser = window.prompt('Your comment?')
+
+                        if (typeof commentByUser === 'string') comment = commentByUser
+                        else return Promise.reject({ ok: false, message: 'Canceled' })
+                      }
+
+                      // send({
+                      //   type: 'change',
+                      //   value: state?.title,
+                      // })
+                      jobsActorRef.send({
+                        type: 'todo.commit',
+                        job: {
+                          ...state,
+                        },
+                        comment,
+                      })
+                    }
+                    return Promise.resolve({ ok: true })
+                  }}
+                />
+              </div>
+            )
+          }
+        </div>
+
+        {/* <pre>{JSON.stringify(job, null, 2)}</pre> */}
+      </div>
 
       {/* <div className='view'>
         <input
@@ -376,6 +386,6 @@ export const Job = memo(({ job, onToggleDrawer, isLastSeen, isActive }: TProps) 
         }}
         ref={inputRef}
       /> */}
-    </div>
+    </>
   )
 })

@@ -214,7 +214,7 @@ const withRootMW = (arg) => compose([
               isWaiting = true
               // NOTE: THROTTLE 3/4 Sync delay (revertable)
               const res = await delay({
-                ms: 5000,
+                ms: 3000,
                 signal: controller.signal,
                 customAbortMessage: '[SPECIAL_ERRROR=Just a moment, plz...]'
               })

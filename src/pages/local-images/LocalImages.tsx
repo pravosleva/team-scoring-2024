@@ -5,15 +5,20 @@ import ImageIcon from '@mui/icons-material/Image'
 import baseClasses from '~/App.module.scss'
 import { idbInstance } from '~/shared/utils/indexed-db-ops'
 import { CommonInfoContext } from '~/shared/context'
+import { NavBtnsBlock } from './components'
+
+const isDev = import.meta.env.NODE_ENV === 'development'
 
 export const LocalImages = memo(() => {
   const [idbKeys, setIdbKeys] = useState<string[]>([])
   useEffect(() => {
     idbInstance.getAllKeys()
       .then((res) => {
-        setIdbKeys(res as string[])
+        setIdbKeys(res as string[] || [])
       })
-      .catch(console.warn)
+      .catch((err) => {
+        if (isDev) console.warn(err)
+      })
   }, [])
 
   const [idb] = CommonInfoContext.useStore((s) => s.idb)
@@ -78,11 +83,23 @@ export const LocalImages = memo(() => {
             >
               {
                 idbKeys.map((k) => (
-                  <Grid size={12} key={k}>
-                    <FileSteperExample
-                      isEditable={true}
-                      idbKey={k}
-                    />
+                  <Grid
+                    container
+                    spacing={2}
+                    key={k}
+                  >
+                    <Grid size={12}>
+                      <FileSteperExample
+                        isEditable={true}
+                        idbKey={k}
+                        _hasGalleryContent
+                        isRemoveable
+                        isEditModeCollapsible
+                      />
+                    </Grid>
+                    <Grid size={12}>
+                      <NavBtnsBlock uniqueKey={k} />
+                    </Grid>
                   </Grid>
                 ))
               }

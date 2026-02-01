@@ -20,6 +20,7 @@ import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { UserAvaAutoDetected } from '~/shared/components/Job/components'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
@@ -359,7 +360,8 @@ export const LastJobActivityPage = memo(() => {
                             </div>
                             <FileSteperExample
                               isEditable={false}
-                              idbKey={`job_id-${job.id}`}
+                              // idbKey={`job_id-${job.id}`}
+                              idbKey={getUniqueKey({ jobId: job.id })}
                               renderer={({ counter, documents }) => counter === 0 ? null : (
                                 <CollapsibleText
                                   briefPrefix={!!job.relations.parent || job.relations.children.length > 0 || !!job.descr ? '├─' : '└─'}
@@ -415,35 +417,40 @@ export const LastJobActivityPage = memo(() => {
                                         testedValue={clsx(searchValueBasic)}
                                       />
                                     </Link>
-                                    <FileSteperExample
-                                      isEditable={false}
-                                      idbKey={`job_id-${job.relations.parent}`}
-                                      renderer={({ counter, documents }) => counter === 0 ? null : (
-                                        <CollapsibleText
-                                          briefPrefix='└─'
-                                          briefText={`Local images (${counter})`}
-                                          isClickableBrief
-                                          contentRender={() => (
-                                            <PhotoProvider>
-                                              <div
-                                                className={baseClasses.galleryWrapperRounded}
-                                                style={{ paddingRight: '24px' }}
-                                              >
-                                                {documents.map((item, index) => (
-                                                  <PhotoView key={index} src={item.preview}>
-                                                    <img
-                                                      src={item.preview}
-                                                      style={{ objectFit: 'cover', maxWidth: '100%' }}
-                                                      alt=""
-                                                    />
-                                                  </PhotoView>
-                                                ))}
-                                              </div>
-                                            </PhotoProvider>
+                                    {
+                                      typeof job.relations.parent === 'number' && (
+                                        <FileSteperExample
+                                          isEditable={false}
+                                          // idbKey={`job_id-${job.relations.parent}`}
+                                          idbKey={getUniqueKey({ jobId: job.relations.parent })}
+                                          renderer={({ counter, documents }) => counter === 0 ? null : (
+                                            <CollapsibleText
+                                              briefPrefix='└─'
+                                              briefText={`Local images (${counter})`}
+                                              isClickableBrief
+                                              contentRender={() => (
+                                                <PhotoProvider>
+                                                  <div
+                                                    className={baseClasses.galleryWrapperRounded}
+                                                    style={{ paddingRight: '24px' }}
+                                                  >
+                                                    {documents.map((item, index) => (
+                                                      <PhotoView key={index} src={item.preview}>
+                                                        <img
+                                                          src={item.preview}
+                                                          style={{ objectFit: 'cover', maxWidth: '100%' }}
+                                                          alt=""
+                                                        />
+                                                      </PhotoView>
+                                                    ))}
+                                                  </div>
+                                                </PhotoProvider>
+                                              )}
+                                            />
                                           )}
                                         />
-                                      )}
-                                    />
+                                      )
+                                    }
                                   </div>
                                 )}
                                 isClickableBrief

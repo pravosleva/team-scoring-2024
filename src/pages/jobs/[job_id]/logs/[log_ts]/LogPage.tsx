@@ -24,7 +24,7 @@ import { SingleTextManager } from '~/shared/components'
 import { CommentManager } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
-import { idbInstance } from '~/shared/utils/indexed-db-ops'
+import { getUniqueKey, idbInstance } from '~/shared/utils/indexed-db-ops'
 // import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 
 const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
@@ -185,10 +185,10 @@ export const LogPage = memo(() => {
             )
           }
           {
-            !!targetJob && (
+            !!targetJob?.descr && (
               // TODO: <SingleTextManager buttonText='Edit job description'
               <HighlightedText
-                comparedValue={targetJob.descr || 'No description'}
+                comparedValue={targetJob.descr}
                 testedValue={searchValueBasic}
                 style={{ fontSize: 'small', color: '#959eaa', fontWeight: 'bold' }}
               />
@@ -232,6 +232,20 @@ export const LogPage = memo(() => {
                   handleEditLog({ text: state.text })
                 }}
               />
+              {
+                !!params.job_id && getIsNumeric(params.job_id) && !!params.log_ts && (
+                  <Grid size={12}>
+                    <FileSteperExample
+                      isEditable={true}
+                      // idbKey={`job_id-${params.job_id}--log_ts-${params.log_ts}`}
+                      idbKey={getUniqueKey({
+                        jobId: Number(params.job_id),
+                        logTs: getIsNumeric(params.log_ts) ? Number(params.log_ts) : undefined
+                      })}
+                    />
+                  </Grid>
+                )
+              }
               {
                 !!targetJob && !!targetLog && (
                   <SimpleCheckList
@@ -310,14 +324,6 @@ export const LogPage = memo(() => {
                 )
               }
             </Box>
-          </Grid>
-        )
-      }
-
-      {
-        !!params.job_id && !!params.log_ts && (
-          <Grid size={12}>
-            <FileSteperExample isEditable={true} idbKey={`job_id-${params.job_id}--log_ts-${params.log_ts}`} />
           </Grid>
         )
       }

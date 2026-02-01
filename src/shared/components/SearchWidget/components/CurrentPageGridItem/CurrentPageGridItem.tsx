@@ -20,6 +20,7 @@ import { getMatchedByAllStrings } from '~/shared/utils/string-ops'
 import { FileSteperExample, HighlightedText } from '~/shared/components'
 import clsx from 'clsx'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 
 __TimeAgo.addDefaultLocale(en)
 __TimeAgo.addLocale(ru)
@@ -152,7 +153,8 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
         }
         <FileSteperExample
           isEditable={false}
-          idbKey={`job_id-${j.id}`}
+          // idbKey={`job_id-${j.id}`}
+          idbKey={getUniqueKey({ jobId: j.id })}
           renderer={({ counter, documents }) => counter === 0 ? null : (
             <CollapsibleText
               briefText={`Local images (${counter})`}
@@ -284,7 +286,8 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
 
                           <FileSteperExample
                             isEditable={false}
-                            idbKey={`job_id-${j.id}--log_ts-${log.original.ts}`}
+                            // idbKey={`job_id-${j.id}--log_ts-${log.original.ts}`}
+                            idbKey={getUniqueKey({ jobId: j.id, logTs: log.original.ts })}
                             renderer={({ counter, documents }) => counter === 0 ? null : (
                               <CollapsibleText
                                 briefPrefix={log._service.logLocalLinks.length > 0 || log._service.logExternalLinks.length > 0 ? '├─' : '└─'}
@@ -363,7 +366,8 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                             }
                                             <FileSteperExample
                                               isEditable={false}
-                                              idbKey={`job_id-${j.id}--log_ts-${log.original.ts}--checklist--checklist_item_id-${id}`}
+                                              // idbKey={`job_id-${j.id}--log_ts-${log.original.ts}--checklist--checklist_item_id-${id}`}
+                                              idbKey={getUniqueKey({ jobId: j.id, logTs: log.original.ts, checklistItemId: id })}
                                               renderer={({ counter, documents }) => counter === 0 ? null : (
                                                 <CollapsibleText
                                                   briefPrefix='└─'

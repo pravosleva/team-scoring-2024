@@ -6,7 +6,7 @@ import { FullScreenDialog } from '~/shared/components/Dialog'
 // import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { TJob, TJobForm } from '~/shared/xstate'
-import { Box, Grid2 as Grid } from '@mui/material'
+// import { Box, Grid2 as Grid } from '@mui/material'
 // import { DatesStepper } from './components'
 import SaveIcon from '@mui/icons-material/Save'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -16,9 +16,9 @@ import { TopLevelContext, TUser } from '~/shared/xstate/topLevelMachine/v2'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
 import { useNavigate } from 'react-router-dom'
 import { TOption } from '~/shared/components/Autocomplete'
-import { getJobStage } from '../../utils'
+// import { getJobStage } from '../../utils'
 import baseClasses from '~/App.module.scss'
-import { TimeAgo } from '~/shared/components/TimeAgo'
+// import { TimeAgo } from '~/shared/components/TimeAgo'
 // import EditIcon from '@mui/icons-material/Edit'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 // import StopCircleIcon from '@mui/icons-material/StopCircle'
@@ -27,7 +27,8 @@ import MoreTimeIcon from '@mui/icons-material/MoreTime'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 // import { ratingIcons } from '~/shared/components/RadioGroupRating/ratingIcons'
-import ConstructionIcon from '@mui/icons-material/Construction'
+// import ConstructionIcon from '@mui/icons-material/Construction'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 // import { FileSteperExample } from '~/shared/components'
 // import { soundManager } from '~/shared/soundManager'
@@ -492,10 +493,10 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
   }, [upSm, job.descr, job.forecast.assignedTo, job.forecast.complexity, job.forecast.estimate, job.forecast.finish, job.forecast.start, job.logs.isEnabled, job.ts.update, job.title, memoizedUserList, users, allJobs, memoizedJobList, job.relations?.parent])
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         display: 'flex',
-        gap: 0,
+        gap: '0px',
         flexDirection: 'column',
       }}
       className={baseClasses.fadeIn}
@@ -536,15 +537,20 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
             alignItems: 'center',
           }}
         >
-          <b
+          <em
+            className={baseClasses.truncate}
+            style={{ fontSize: 'small', margin: '0 auto', color: '#959eaa' }}>Job</em>
+          {/* <b
             className={baseClasses.truncate}
             style={{ fontSize: 'small' }}
-          >{getJobStage({ forecast: job.forecast }).descr}</b>
+          >
+            {getJobStage({ forecast: job.forecast }).descr}
+          </b>
           <TimeAgo
             date={job.ts.update}
-            prefix='Upd:'
-            style={{ fontSize: 'x-small', fontStyle: 'italic' }}
-          />
+            // prefix='Upd:'
+            style={{ fontSize: 'small', fontStyle: 'italic' }}
+          /> */}
         </div>
         <div
           className={clsx(classes.toggler, classes.blue, { [classes.active]: isActive })}
@@ -555,7 +561,7 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
           {
             !!job.relations?.parent || job.relations?.children.length > 0
               ? <AccountTreeIcon />
-              : <ConstructionIcon />
+              : <ArrowForwardIcon />
           }
         </div>
         <div
@@ -708,32 +714,32 @@ export const ScoringSettings = memo(({ job, isActive, onToggleDrawer, onSave, on
               </div>
             </div>
           )}
-          middleInfoRender={() => (
-            <Box sx={{ pt: 1 }}>
-              <Grid container spacing={1}>
-                {/* <Grid size={12}>
-                  <DatesStepper />
-                </Grid> */}
-                {/* <Grid size={12}>
-                  <pre
-                    className={baseClasses.preNormalized}
-                  >
-                    {
-                      JSON.stringify({
-                        relations: job.relations,
-                        pointset: job.pointset
-                      }, null, 2)
-                    }
-                  </pre>
-                </Grid> */}
-                {/* <Grid size={12}>
-                  <FileSteperExample isEditable={false} idbKey={`job_id-${job.id}`} />
-                </Grid> */}
-              </Grid>
-            </Box>
-          )}
+        // middleInfoRender={() => (
+        //   <Box sx={{ pt: 1 }}>
+        //     <Grid container spacing={1}>
+        //       {/* <Grid size={12}>
+        //         <DatesStepper />
+        //       </Grid> */}
+        //       {/* <Grid size={12}>
+        //         <pre
+        //           className={baseClasses.preNormalized}
+        //         >
+        //           {
+        //             JSON.stringify({
+        //               relations: job.relations,
+        //               pointset: job.pointset
+        //             }, null, 2)
+        //           }
+        //         </pre>
+        //       </Grid> */}
+        //       {/* <Grid size={12}>
+        //         <FileSteperExample isEditable={false} idbKey={getUniqueKey({ jobId: job.id })} />
+        //       </Grid> */}
+        //     </Grid>
+        //   </Box>
+        // )}
         />
       )}
-    </Box>
+    </div>
   )
 }, (prevPs, nextPs) => prevPs.job.ts.update !== nextPs.job.ts.update)

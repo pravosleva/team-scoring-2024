@@ -3,16 +3,18 @@ import { memo, useCallback, useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { UploadDocumentsStepper } from '~/shared/components/FileUploadInput/v4'
 import baseClasses from '~/App.module.scss'
-import { Button } from '@mui/material'
+import { Alert, Button } from '@mui/material'
 import { ResponsiveBlock } from '~/shared/components'
 // import { Link } from 'react-router-dom'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import SaveIcon from '@mui/icons-material/Save'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 // import ImageIcon from '@mui/icons-material/Image'
 import { idbInstance } from '~/shared/utils/indexed-db-ops'
 import { soundManager } from '~/shared'
 import { CommonInfoContext } from '~/shared/context'
 import { getHumanReadableSize } from '~/shared/utils/number-ops'
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 // import { useLoadedStore } from '../FileUploadInput/v4/context'
 
 export type TState = {
@@ -35,9 +37,12 @@ type TProps = {
     };
   }) => React.ReactNode;
   dontShowIdbKey?: boolean;
+  _hasGalleryContent?: boolean;
+  isRemoveable?: boolean;
+  isEditModeCollapsible?: boolean;
 }
 
-export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowIdbKey }: TProps) => {
+export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowIdbKey, _hasGalleryContent, isRemoveable, isEditModeCollapsible }: TProps) => {
   const {
     watch,
     control,
@@ -133,6 +138,26 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
       },
     })
   }, [idbKey, setIsUpdated])
+  const [isRemoved, setIsRemoved] = useState(false)
+  const removeKeyFromIDB = useCallback(() => {
+    const isConfirmed = window.confirm('⚡️ Will be removed forever. Yes?')
+    if (!isConfirmed) return
+    idbInstance.removeImagesPack({
+      key: idbKey,
+      cb: {
+        onFuckup: () => {
+          console.warn(`ERROR: idbKey: ${idbKey}`)
+        },
+        onSuccess: () => {
+          setIsUpdated(false)
+          setIsRemoved(true)
+          idbInstance.getAsyncSizeInfo()
+            .then(({ result }) => setCommonInfoContext({ idb: result }))
+            .catch(console.warn)
+        },
+      }
+    })
+  }, [idbKey])
   // const [loadedStore] = useLoadedStore((s) => s);
   // const totalSize = useMemo(() => {}, [])
   const totalBytes = [...watch('documents').values()].reduce((acc, cur) => {
@@ -141,10 +166,11 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
     return acc
   }, 0)
 
+
   if (!!renderer)
     return renderer({
-      counter: [...watch('documents').values()].length,
-      documents: [...watch('documents').values()],
+      counter: isRemoved ? 0 : [...watch('documents').values()].length,
+      documents: isRemoved ? [] : [...watch('documents').values()],
       size: {
         bytes: totalBytes,
         humanized: getHumanReadableSize({
@@ -157,7 +183,14 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
   if (!isEditable && [...watch('documents').values()].length == 0)
     return null
 
-  return (
+  return isRemoved ? (
+    <Alert
+      severity='info'
+      variant='outlined'
+    >
+      <code style={{ fontSize: 'small' }}>Deleted: {idbKey}</code>
+    </Alert>
+  ) : (
     <div
       style={{
         display: 'flex',
@@ -206,12 +239,107 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
         )
       }
       {
-        isEditable && (
+        isEditable && isEditModeCollapsible && (
+          <>
+            <CollapsibleText
+              // briefPrefix={!!targetJob.relations.parent || targetJob.relations.children.length > 0 || !!targetJob.descr ? '├─' : '└─'}
+              briefText='Edit images'
+              isClickableBrief
+              contentRender={() => (
+                <UploadDocumentsStepper
+                  control={control}
+                  filesQuantityLimit={12}
+                  totalSizeLimitMiB={10}
+                  // onResetInternalErrors={handleResetInternalErrors}
+                  onResetInternalErrors={() => undefined}
+                  // NOTE: 3/4
+                  // onUpdateFileStorageIds={() => {
+                  //   setCurrentSelectTs(new Date().getTime())
+                  // }}
+                  onAdd={() => setIsUpdated(true)}
+                  onRemove={() => setIsUpdated(true)}
+                />
+              )}
+            />
+            {
+              _hasGalleryContent && totalBytes > 0 && (
+                <PhotoProvider>
+                  <div
+                    // className={baseClasses.galleryWrapperRounded}
+                    className={baseClasses.galleryWrapperGrid1}
+                  >
+                    {[...watch('documents').values()].map((item, index) => (
+                      <PhotoView key={index} src={item.preview}>
+                        <img
+                          src={item.preview}
+                          style={{
+                            objectFit: 'cover',
+                            maxWidth: '100%',
+                            // borderRadius: (!isEditable && cfg?.readonlyMode.isImagesRounded) ? '16px' : '0px',
+                          }}
+                          alt=""
+                        />
+                      </PhotoView>
+                    ))}
+                  </div>
+                </PhotoProvider>
+              )
+            }
+            {
+              (isUpdated || isRemoveable) && (
+                <ResponsiveBlock
+                  className={baseClasses.specialActionsGrid}
+                  style={{
+                    // padding: '16px 0px 16px 0px',
+                    // border: '1px dashed red',
+                    // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+                    // position: 'sticky',
+                    // bottom: 0,
+                    backgroundColor: 'transparent',
+                    // zIndex: 3,
+                    marginTop: 'auto',
+                    // borderRadius: '16px 16px 0px 0px',
+                  }}
+                >
+                  {
+                    isUpdated && (
+                      <Button
+                        onClick={setImagePackToIDB}
+                        color='primary'
+                        variant='contained'
+                        // disabled={}
+                        startIcon={<SaveIcon />}
+                      >
+                        Save images
+                      </Button>
+                    )
+                  }
+                  {
+                    isRemoveable && (
+                      <Button
+                        onClick={removeKeyFromIDB}
+                        color='error'
+                        variant='outlined'
+                        // disabled={watch('documents').length === 0}
+                        startIcon={<DeleteForeverIcon />}
+                      >
+                        Delete key
+                      </Button>
+                    )
+                  }
+                </ResponsiveBlock>
+              )
+            }
+          </>
+        )
+      }
+      {
+        isEditable && !isEditModeCollapsible && (
           <>
             <UploadDocumentsStepper
               control={control}
-              filesQuantityLimit={10}
-              totalSizeLimitMiB={25}
+              filesQuantityLimit={12}
+              totalSizeLimitMiB={10}
               // onResetInternalErrors={handleResetInternalErrors}
               onResetInternalErrors={() => undefined}
               // NOTE: 3/4
@@ -222,60 +350,74 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
               onRemove={() => setIsUpdated(true)}
             />
             {
-              isUpdated && (
+              _hasGalleryContent && totalBytes > 0 && (
+                <PhotoProvider>
+                  <div
+                    // className={baseClasses.galleryWrapperRounded}
+                    className={baseClasses.galleryWrapperGrid1}
+                  >
+                    {[...watch('documents').values()].map((item, index) => (
+                      <PhotoView key={index} src={item.preview}>
+                        <img
+                          src={item.preview}
+                          style={{
+                            objectFit: 'cover',
+                            maxWidth: '100%',
+                            // borderRadius: (!isEditable && cfg?.readonlyMode.isImagesRounded) ? '16px' : '0px',
+                          }}
+                          alt=""
+                        />
+                      </PhotoView>
+                    ))}
+                  </div>
+                </PhotoProvider>
+              )
+            }
+            {
+              (isUpdated || isRemoveable) && (
                 <ResponsiveBlock
                   className={baseClasses.specialActionsGrid}
                   style={{
                     // padding: '16px 0px 16px 0px',
                     // border: '1px dashed red',
                     // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-                    position: 'sticky',
-                    bottom: 0,
+                    // position: 'sticky',
+                    // bottom: 0,
                     backgroundColor: 'transparent',
                     // zIndex: 3,
                     marginTop: 'auto',
                     // borderRadius: '16px 16px 0px 0px',
                   }}
                 >
-                  <Button
-                    onClick={setImagePackToIDB}
-                    color='primary'
-                    variant='outlined'
-                    // disabled={
-                    //   watch('documents').length === 0
-                    //   || (currentSelectTs === savedTsUpdate && !wasLoadedFirstly)
-                    // }
-                    startIcon={<SaveIcon />}
-                  // endIcon={<ImageIcon />}
-                  >
-                    Save images
-                  </Button>
+                  {
+                    isUpdated && (
+                      <Button
+                        onClick={setImagePackToIDB}
+                        color='primary'
+                        variant='contained'
+                        // disabled={}
+                        startIcon={<SaveIcon />}
+                      >
+                        Save images
+                      </Button>
+                    )
+                  }
+                  {
+                    isRemoveable && (
+                      <Button
+                        onClick={removeKeyFromIDB}
+                        color='error'
+                        variant='outlined'
+                        // disabled={watch('documents').length === 0}
+                        startIcon={<DeleteForeverIcon />}
+                      >
+                        Delete key
+                      </Button>
+                    )
+                  }
                 </ResponsiveBlock>
               )
             }
-
-            {/* NOTE: 4/4
-            <pre className={baseClasses.preNormalized}>
-              {JSON.stringify({
-                // isSubmitBtnDisabled: !isValid || isFormLoading || isTopicsLoading || !topicsResponseIsValidated.ok || !!errors?.message?.message || !!errors?.questionTheme?.message,
-                // isTopicsLoading,
-                // topicsData,
-                // ...restTopicsState,
-                // isValid,
-                // filesAdditionalInfo,
-                loadedTsUpdate,
-                savedTsUpdate,
-                currentSelectTs,
-                documents: {
-                  value: watch('documents'),
-                  err: errors?.documents?.message,
-                },
-                // errors,
-                //   data,
-                //   defaultValues,
-                // _ errors: Object.entries(errors),
-              }, null, 2)}
-            </pre> */}
           </>
         )
       }

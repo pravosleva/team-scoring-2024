@@ -388,11 +388,12 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
         jobs.length > 0 ? (
           <>
             <Grid size={12}>
-              <Box
-                sx={{
+              <div
+                style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 0,
+                  gap: '8px',
+                  // border: '1px solid red'
                 }}
               >
                 {jobs.map((job) =>
@@ -404,7 +405,7 @@ export const JobList2 = memo(({ counters: _counters, pageInfo, pagerControlsHard
                     isActive={activeJobId === job.id}
                   />
                 )}
-              </Box>
+              </div>
             </Grid>
           </>
         ) : (

@@ -13,7 +13,7 @@ import { CopyToClipboardWrapper } from '~/shared/components'
 import { FixedNavControlsSpace } from '../ActiveJobContent/components'
 import { useInView } from 'react-hook-inview'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { idbInstance } from '~/shared/utils/indexed-db-ops'
+import { getUniqueKey, idbInstance } from '~/shared/utils/indexed-db-ops'
 
 type TPros = {
   job: TJob;
@@ -42,7 +42,8 @@ export const JobAdditionalInfo = memo(({ job }: TPros) => {
       return
 
     idbInstance.removeImagesPack({
-      key: `job_id-${job.id}--log_ts-${logTs}`,
+      // key: `job_id-${job.id}--log_ts-${logTs}`,
+      key: getUniqueKey({ jobId: job.id, logTs }),
       cb: {
         onSuccess: ({ ok: _ok, message }) => {
           console.log(`☑️ OK: ${message || 'No message'}`)

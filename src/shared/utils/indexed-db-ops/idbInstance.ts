@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { getAllKeys, getIndexedDbSize } from '~/shared/utils/indexed-db-ops'
+import { getAllKeys, getIndexedDbSize, getUniqueKey } from '~/shared/utils/indexed-db-ops'
+import { debugFactory } from '~/shared/utils'
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 let db
+const logger = debugFactory<any, string | null>({
+  label: '👉 IDB instance',
+})
 
 type TProps = {
   DB_NAME: string;
@@ -16,14 +19,14 @@ class IDBSingleton {
   error: unknown;
   DB_NAME: string;
   STORE_NAME: string;
+  DB_VERSION: number;
 
   private constructor({ DB_NAME, STORE_NAME }: TProps) {
     this.DB_NAME = DB_NAME
     this.STORE_NAME = STORE_NAME
+    this.DB_VERSION = 1
     this.#openDB()
-      .then((db) => {
-        this.db = db
-      })
+      .then((db) => this.db = db)
       .catch((err) => this.error = err)
   }
 
@@ -54,30 +57,107 @@ class IDBSingleton {
   #openDB() {
     const self = window
     return new Promise((resolve, reject) => {
-      const request = self.indexedDB.open(this.DB_NAME, 1)
+      const request = self.indexedDB.open(this.DB_NAME, this.DB_VERSION)
 
       request.onupgradeneeded = (event) => {
+        const storeName = this.STORE_NAME
+
         // @ts-ignore
-        const db = event.target?.result
+        const { result: db, transaction } = event.target
+
+        logger.log({
+          err: null,
+          evt: { event, storeName, objectStoreNames: db.objectStoreNames },
+          label: 'onupgradeneeded',
+        })
+
         // NOTE: This event is fired if the database did not exist or the version number was higher
         if (!db.objectStoreNames.contains(this.STORE_NAME)) {
           // NOTE: Create an object store to hold information about images
-          const objectStore = db.createObjectStore([this.STORE_NAME], { keyPath: 'id' })
+          db.createObjectStore(this.STORE_NAME, { keyPath: 'id' })
 
           // NOTE: Create an index to search by item name
-          objectStore.createIndex(
-            'data',
-            'data',
-            { unique: false }
-          )
+          // objectStore.createIndex(
+          //   'data',
+          //   'data',
+          //   { unique: false }
+          // )
 
           // NOTE: After successfully opening a connection,
           // you interact with the database using the resulting IDBDatabase object
           // within the context of transactions
         }
+
+        const objectStore = transaction.objectStore(storeName)
+        // NOTE: Iterate through all existing object to remove keys
+        // @ts-ignore
+        objectStore.openCursor().onsucces = (__event) => {
+          const cursor = __event.target.result
+          if (!!cursor) {
+            console.log('case 1. !!cursor')
+            // switch (event.oldVersion) {
+            //   case 2: {
+            //     switch (event.newVersion) {
+            //       case 3: {
+            //         break
+            //       }
+            //       default:
+            //         break
+            //     }
+
+            //     break;
+            //   }
+            //   default:
+            //     break
+            // }
+
+            // -- NOTE: Migration
+            const makeMigration = () => {
+              const oldObject = cursor.value
+              // NOTE: Create new obj with the desired key names
+              const __splittedName = oldObject.oldKeyName.split('--')
+              const jobIdInfo = __splittedName[0] || undefined
+              const jobId: number | undefined = !!jobIdInfo
+                ? Number(jobIdInfo.split('-')?.[1])
+                : undefined
+              if (typeof jobId === 'number') {
+                console.log('case 1.1.1 jobId is number')
+                const logTsInfo = __splittedName[1] || undefined
+                const logTs: number | undefined = !!logTsInfo
+                  ? Number(logTsInfo.split('-')?.[1])
+                  : undefined
+                const checklistItemIdInfo = __splittedName[3] || undefined
+                const checklistItemId: number | undefined = !!checklistItemIdInfo
+                  ? Number(checklistItemIdInfo.split('-')?.[1])
+                  : undefined
+                const newKeyName = getUniqueKey({ jobId, logTs, checklistItemId })
+                console.log(`case 1.1.2 newKeyName -> ${newKeyName}`)
+                const newObject = { ...oldObject, newKeyName }
+                // NOTE: Delete old key
+                console.log(`case 1.1.3 oldKeyName will be removed: ${newObject.oldKeyName}`)
+                delete newObject.oldKeyName
+                // NOTE: Put the new object back into the store.
+                // Since the id (keyPath) remains the same, it overwrites the old entry.
+                cursor.update(newObject)
+                cursor.continue()
+              } else {
+                console.log(`case 1.2 Object not modified: ${oldObject.oldKeyName}`)
+              }
+            }
+            makeMigration()
+            // --
+          } else {
+            console.log('case 2. !cursor - All objects renamed')
+          }
+        }
       }
 
       request.onsuccess = (event) => {
+        logger.log({
+          err: null,
+          evt: { event, storeName: this.STORE_NAME },
+          label: 'onsuccess',
+        })
         // @ts-ignore
         db = event.target?.result
         // NOTE: Database connection is open and ready for transactions

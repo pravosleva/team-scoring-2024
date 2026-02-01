@@ -23,6 +23,7 @@ import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/c
 import { getArithmeticalMean, getIsNumeric } from '~/shared/utils/number-ops'
 import { BaseProgressBar } from '../ProgressBar/BaseProgressBar'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -320,7 +321,8 @@ export const ReportPagerAbstracted = ({
               <FileSteperExample
                 key={params.job_id}
                 isEditable={false}
-                idbKey={`job_id-${params.job_id}`}
+                // idbKey={`job_id-${params.job_id}`}
+                idbKey={getUniqueKey({ jobId: Number(params.job_id) })}
                 renderer={({ counter, documents }) => counter === 0 ? null : (
                   <Grid size={12}>
                     <CollapsibleText

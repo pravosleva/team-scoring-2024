@@ -27,6 +27,7 @@ import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -580,7 +581,8 @@ export const LastActivityPagerAbstracted = memo(({
                           </div>
                           <FileSteperExample
                             isEditable={false}
-                            idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`}
+                            // idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`}
+                            idbKey={getUniqueKey({ jobId: log.jobId, logTs: log.ts })}
                             renderer={({ counter, documents }) => counter === 0 ? null : (
                               <CollapsibleText
                                 briefPrefix='└─'
@@ -714,7 +716,7 @@ export const LastActivityPagerAbstracted = memo(({
                           )
                         }
 
-                        {/* <FileSteperExample isEditable={false} idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`} /> */}
+                        {/* <FileSteperExample isEditable={false} idbKey={getUniqueKey({ jobId: log.jobId, logTs: log.ts })} /> */}
 
                         {/* <Link
                           // to={`/jobs/${log.jobId}?from=${encodeURIComponent(`/last-activity?lastSeenLogKey=job-${log.jobId}-log-${log.ts}`)}&backActionUiText=${encodeURIComponent('Last activity')}`}

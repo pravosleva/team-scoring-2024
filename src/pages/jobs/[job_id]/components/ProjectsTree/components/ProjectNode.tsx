@@ -45,6 +45,7 @@ import __TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
 import { FileSteperExample, HighlightedText } from '~/shared/components'
+import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -384,7 +385,12 @@ export const ProjectNode = ({
               {!!targetText && (
                 <HighlightedText className={classes.descr} comparedValue={targetText} testedValue={searchValueBasic} />
               )}
-              <FileSteperExample isEditable={true} idbKey={`job_id-${projectsTree.model.id}`} dontShowIdbKey />
+              <FileSteperExample
+                isEditable={true}
+                // idbKey={`job_id-${projectsTree.model.id}`}
+                idbKey={getUniqueKey({ jobId: projectsTree.model.id })}
+                dontShowIdbKey
+              />
               {/*
               !isPinned && (
                 <Button
