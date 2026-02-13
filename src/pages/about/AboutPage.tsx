@@ -34,13 +34,13 @@ export const AboutPage = () => {
             <p>
               Bundle sizes analysis <a target='_blank' href={`${PUBLIC_URL}/stats.html`}>here</a>.
             </p>
-            <p>
+            {/* <p>
               JSDoc exp <a target='_blank' href={`${PUBLIC_URL}/jsdoc/clean-jsdoc-theme/`}>here</a>.
-            </p>
+            </p> */}
             <p>
               <a href={`${PUBLIC_URL}/vitepress/output/`} target='_blank'>
                 <Button
-                  sx={{ borderRadius: 4 }}
+                  // sx={{ borderRadius: 4 }}
                   // size='small'
                   color='salmon'
                   variant='outlined'
@@ -51,9 +51,9 @@ export const AboutPage = () => {
                 </Button>
               </a>
             </p>
-            <p>
+            {/* <p>
               Documentation (some interested moments in code) <a target='_blank' href={`${PUBLIC_URL}/typedoc/output/`}>here</a>.
-            </p>
+            </p> */}
             {
               !!BUILD_DATE && (
                 <p>

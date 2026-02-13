@@ -249,11 +249,11 @@ export class TaskEfficiencyAnalyzer {
     result.msgs.push('📋 Статистика по периодам:')
     result.msgs.push('· Недавний период:')
     result.msgs.push(
-      this.getPeriodStats(analysis.recentPeriod, 2).join('\n')
+      this.getPeriodStats(analysis.recentPeriod, 1).join('\n')
     )
     result.msgs.push('· Предыдущий период:')
     result.msgs.push(
-      this.getPeriodStats(analysis.previousPeriod, 2).join('\n')
+      this.getPeriodStats(analysis.previousPeriod, 1).join('\n')
     )
     result.msgs.push('🔍 Детали по сложности задач')
     // result.msgs.push(
@@ -292,10 +292,10 @@ export class TaskEfficiencyAnalyzer {
       // console.log(`\n${periodName}:`);
       Object.entries(stats.completionByComplexity).forEach(([complexity, data]) => {
         // console.log(`  Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`);
-        msgs.push(getMsg(`Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`, level + 2))
+        msgs.push(getMsg(`Сложность ${complexity}: ${data.count} задач, среднее ${data.avgDays.toFixed(1)} дней`, level + 1))
       });
       if (msgs.length === 1) {
-        msgs.push(getMsg('Нет данных', level + 2))
+        msgs.push(getMsg('Нет данных', level + 1))
       }
       return msgs
     };
