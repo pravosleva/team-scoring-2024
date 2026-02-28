@@ -25,7 +25,12 @@ import { CommentManager } from './components'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2'
 import { getUniqueKey, idbInstance } from '~/shared/utils/indexed-db-ops'
+import { useLocalStorageState } from '~/shared/hooks'
+import { TIDBSwitchers } from '~/shared/context'
 // import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
+import HideImageIcon from '@mui/icons-material/HideImage'
+import ImageIcon from '@mui/icons-material/Image'
+// import FormLabel from '@mui/material/FormLabel'
 
 const isNumber = (a: string | undefined | number) => !Number.isNaN(Number(a))
 
@@ -82,6 +87,28 @@ export const LogPage = memo(() => {
     }
   }, [targetJob?.id, targetLog?.ts, jobsActorRef])
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
+
+  const idbUniueKey = useMemo<string | null>(
+    () => (!!params.job_id && getIsNumeric(params.job_id) && !!params.log_ts && getIsNumeric(params.log_ts))
+      ? getUniqueKey({ jobId: Number(params.job_id), logTs: Number(params.log_ts) })
+      : null,
+    [params.job_id, params.log_ts]
+  )
+  const [idbSwitchersLSState, setIdbSwitchersLSState] = useLocalStorageState<TIDBSwitchers>({
+    key: 'teamScoring2024:idb-switchers',
+    initialValue: {},
+    isReadOnly: false,
+  })
+  const isImagesEnabled = useMemo(() => !!idbUniueKey ? idbSwitchersLSState[idbUniueKey]?.on === 1 : false, [idbUniueKey, idbSwitchersLSState])
+  const handleEnableImagePack = useCallback(
+    () => !!idbUniueKey && setIdbSwitchersLSState({ ...idbSwitchersLSState, [idbUniueKey]: { on: 1 } }),
+    [setIdbSwitchersLSState, idbUniueKey, idbSwitchersLSState]
+  )
+  const handleDisableImagePack = useCallback(
+    () => !!idbUniueKey && setIdbSwitchersLSState({ ...idbSwitchersLSState, [idbUniueKey]: { on: 0 } }),
+    [setIdbSwitchersLSState, idbUniueKey, idbSwitchersLSState]
+  )
+  // const [idbSwitchersCommonInfo] = IDBSwitchersContext.useStore((s) => s.commonInfo)
 
   return (
     <Grid container spacing={2}>
@@ -233,18 +260,55 @@ export const LogPage = memo(() => {
                 }}
               />
               {
-                !!params.job_id && getIsNumeric(params.job_id) && !!params.log_ts && (
-                  <Grid size={12}>
-                    <FileSteperExample
-                      isEditable={true}
-                      // idbKey={`job_id-${params.job_id}--log_ts-${params.log_ts}`}
-                      idbKey={getUniqueKey({
-                        jobId: Number(params.job_id),
-                        logTs: getIsNumeric(params.log_ts) ? Number(params.log_ts) : undefined
-                      })}
-                    />
-                  </Grid>
-                )
+                isImagesEnabled
+                  ? (
+                    <>
+                      {
+                        !!params.job_id && getIsNumeric(params.job_id) && !!params.log_ts && (
+                          <Grid size={12}>
+                            <FileSteperExample
+                              isEditable={true}
+                              // idbKey={`job_id-${params.job_id}--log_ts-${params.log_ts}`}
+                              idbKey={getUniqueKey({
+                                jobId: Number(params.job_id),
+                                logTs: getIsNumeric(params.log_ts) ? Number(params.log_ts) : undefined
+                              })}
+                            />
+                          </Grid>
+                        )
+                      }
+                      <Grid size={12}>
+                        <Button
+                          variant='outlined'
+                          color='error'
+                          fullWidth
+                          onClick={handleDisableImagePack}
+                          startIcon={<HideImageIcon />}
+                        >
+                          Disable images for log
+                        </Button>
+                      </Grid>
+                    </>
+                  )
+                  : (
+                    <>
+                      {
+                        !!params.job_id && getIsNumeric(params.job_id) && !!params.log_ts && (
+                          <Grid size={12}>
+                            <Button
+                              variant='outlined'
+                              color='gray'
+                              fullWidth
+                              onClick={handleEnableImagePack}
+                              startIcon={<ImageIcon />}
+                            >
+                              Enable images for log
+                            </Button>
+                          </Grid>
+                        )
+                      }
+                    </>
+                  )
               }
               {
                 !!targetJob && !!targetLog && (

@@ -194,11 +194,15 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
         let searchCriteryBasic = false
         if (isBasicSearchRequired && !!basicSearchText) {
           const isMatched = getMatchedByAllStrings({
-            tested: clsx(job.title, job.descr, ...(job.pointset?.map(p => clsx(p.title, p.descr)) || [])),
+            tested: clsx(job.descr, ...(job.pointset?.map(p => clsx(p.title, p.descr)) || [])),
+            expected: basicSearchText.split(' '),
+          })
+          const isMatchedByTitle = getMatchedByAnyString({
+            tested: job.title,
             expected: basicSearchText.split(' '),
           })
 
-          if (isMatched) {
+          if (isMatched || isMatchedByTitle) {
             searchCriteryBasic = true
             jobIsReady.push(true)
           } else jobIsReady.push(false)

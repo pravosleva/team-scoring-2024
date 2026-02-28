@@ -239,7 +239,6 @@ export const LastActivityPage = memo(() => {
               // subheader={targetUser.displayName}
               />
             </Grid>
-
           }
           {/*
             !outputWorkerData?.currentPage && (

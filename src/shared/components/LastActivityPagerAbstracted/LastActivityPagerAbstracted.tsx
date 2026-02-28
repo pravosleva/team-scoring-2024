@@ -28,6 +28,8 @@ import ru from 'javascript-time-ago/locale/ru'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
+import { useLocalStorageState } from '~/shared/hooks'
+import { TIDBSwitchers } from '~/shared/context'
 // --
 
 __TimeAgo.addDefaultLocale(en)
@@ -154,6 +156,29 @@ export const LastActivityPagerAbstracted = memo(({
 
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
   const [searchValueEnhanced] = useSearchWidgetDataLayerContextStore((s) => s.searchValueEnhanced)
+
+  const [idbSwitchersLSState] = useLocalStorageState<TIDBSwitchers>({
+    key: 'teamScoring2024:idb-switchers',
+    initialValue: {},
+    isReadOnly: true,
+  })
+  // const handleEnableImagePack = useCallback(
+  //   (idbKey: string) => () => !!idbKey && setIdbSwitchersLSState({ [idbKey]: { on: 1 } }),
+  //   [setIdbSwitchersLSState]
+  // )
+  // const handleDisableImagePack = useCallback(
+  //   (idbKey: string) => () => !!idbKey && setIdbSwitchersLSState({ [idbKey]: { on: 0 } }),
+  //   [setIdbSwitchersLSState]
+  // )
+  const enabledMap = useMemo(
+    () => modifiedLogs
+      .reduce((acc: { [key: string]: 0 | 1 }, cur) => {
+        const idbKey = getUniqueKey({ jobId: cur.jobId, logTs: cur.ts })
+        acc[idbKey] = idbSwitchersLSState[idbKey]?.on || 0
+        return acc
+      }, {}),
+    [modifiedLogs, idbSwitchersLSState]
+  )
 
   return (
     <Grid container spacing={2}>
@@ -422,6 +447,7 @@ export const LastActivityPagerAbstracted = memo(({
               >
                 {
                   modifiedLogs.map((log, i) => {
+                    const imgsEnabled = enabledMap[getUniqueKey({ jobId: log.jobId, logTs: log.ts })] === 1
                     return (
                       <div
                         id={`log_list_item_job-${log.jobId}-log-${log.ts}`}
@@ -579,36 +605,40 @@ export const LastActivityPagerAbstracted = memo(({
                               testedValue={clsx(searchValueEnhanced)}
                             />
                           </div>
-                          <FileSteperExample
-                            isEditable={false}
-                            // idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`}
-                            idbKey={getUniqueKey({ jobId: log.jobId, logTs: log.ts })}
-                            renderer={({ counter, documents }) => counter === 0 ? null : (
-                              <CollapsibleText
-                                briefPrefix='└─'
-                                briefText={`Local images (${counter})`}
-                                isClickableBrief
-                                contentRender={() => (
-                                  <PhotoProvider>
-                                    <div
-                                      className={baseClasses.galleryWrapperGrid1}
-                                    // style={{ paddingRight: '24px' }}
-                                    >
-                                      {documents.map((item, index) => (
-                                        <PhotoView key={index} src={item.preview}>
-                                          <img
-                                            src={item.preview}
-                                            style={{ objectFit: 'cover' }}
-                                            alt=""
-                                          />
-                                        </PhotoView>
-                                      ))}
-                                    </div>
-                                  </PhotoProvider>
+                          {
+                            imgsEnabled && (
+                              <FileSteperExample
+                                isEditable={false}
+                                // idbKey={`job_id-${log.jobId}--log_ts-${log.ts}`}
+                                idbKey={getUniqueKey({ jobId: log.jobId, logTs: log.ts })}
+                                renderer={({ counter, documents }) => counter === 0 ? null : (
+                                  <CollapsibleText
+                                    briefPrefix='└─'
+                                    briefText={`Local images (${counter})`}
+                                    isClickableBrief
+                                    contentRender={() => (
+                                      <PhotoProvider>
+                                        <div
+                                          className={baseClasses.galleryWrapperGrid1}
+                                        // style={{ paddingRight: '24px' }}
+                                        >
+                                          {documents.map((item, index) => (
+                                            <PhotoView key={index} src={item.preview}>
+                                              <img
+                                                src={item.preview}
+                                                style={{ objectFit: 'cover' }}
+                                                alt=""
+                                              />
+                                            </PhotoView>
+                                          ))}
+                                        </div>
+                                      </PhotoProvider>
+                                    )}
+                                  />
                                 )}
                               />
-                            )}
-                          />
+                            )
+                          }
                         </div>
                         {
                           Array.isArray(log.links) && log.links?.length > 0 && (

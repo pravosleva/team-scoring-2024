@@ -336,7 +336,7 @@ export const SearchWidget = memo((ps: TProps) => {
                     ? 'You have search for target single job'
                     : !!params.job_ids
                       ? `You have search for target ${params.job_ids.split(',').length} job${params.job_ids.split(',').length > 1 ? 's' : ''}`
-                      : 'Search by title, descr, pointset'
+                      : 'Search by title (any word), descr, pointset'
                 }
                 error={!!searchValueBasic && !!outputWorkerData && !outputWorkerData.currentPage}
                 type='text'

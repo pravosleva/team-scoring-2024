@@ -42,7 +42,7 @@ const initialState: TStore = {
 
 export const CommonInfoContext = createFastContext<TStore>(initialState)
 
-export const Logic = memo(({ children }: PropsWithChildren<unknown>) => {
+const Logic = memo(({ children }: PropsWithChildren<unknown>) => {
   const [createdYear, setCommonInfoContext] = CommonInfoContext.useStore((s) => s.createdYear)
   const [currentYear] = CommonInfoContext.useStore((s) => s.currentYear)
   // const location = useLocation()

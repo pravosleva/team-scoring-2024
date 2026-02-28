@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { App } from './App.tsx'
-import { CommonInfoLayer } from '~/shared/context'
+import { CommonInfoLayer, IDBSwitchersLayer } from '~/shared/context'
 import { SearchWidgetDataLayer, TopLevelContext } from '~/shared/xstate/topLevelMachine/v2'
 import { ClientPerfWidget } from '~/shared/components/ClientPerfWidget'
 import { SnackbarProvider, closeSnackbar } from 'notistack'
@@ -43,12 +43,14 @@ createRoot(document.getElementById('root')!).render(
     )}
   >
     <CommonInfoLayer>
-      <TopLevelContext.Provider>
-        <SearchWidgetDataLayer>
-          <ClientPerfWidget position='right-side-center-bottom' />
-          <App />
-        </SearchWidgetDataLayer>
-      </TopLevelContext.Provider>
+      <IDBSwitchersLayer>
+        <TopLevelContext.Provider>
+          <SearchWidgetDataLayer>
+            <ClientPerfWidget position='right-side-center-bottom' />
+            <App />
+          </SearchWidgetDataLayer>
+        </TopLevelContext.Provider>
+      </IDBSwitchersLayer>
     </CommonInfoLayer>
   </SnackbarProvider>,
 )

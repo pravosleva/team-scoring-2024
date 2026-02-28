@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { memo, useCallback, useEffect, useState, useRef } from 'react'
+import { memo, useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { UploadDocumentsStepper } from '~/shared/components/FileUploadInput/v4'
 import baseClasses from '~/App.module.scss'
-import { Alert, Button } from '@mui/material'
+import { Alert, Button, SwitchProps, Switch } from '@mui/material'
 import { ResponsiveBlock } from '~/shared/components'
 // import { Link } from 'react-router-dom'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
@@ -12,10 +12,17 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 // import ImageIcon from '@mui/icons-material/Image'
 import { idbInstance } from '~/shared/utils/indexed-db-ops'
 import { soundManager } from '~/shared'
-import { CommonInfoContext } from '~/shared/context'
+import { CommonInfoContext, TIDBSwitchers } from '~/shared/context'
 import { getHumanReadableSize } from '~/shared/utils/number-ops'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
+import { useLocalStorageState } from '~/shared/hooks'
 // import { useLoadedStore } from '../FileUploadInput/v4/context'
+// import HideImageIcon from '@mui/icons-material/HideImage'
+// import ImageIcon from '@mui/icons-material/Image'
+// import FormLabel from '@mui/material/FormLabel';
+import FormControl from '@mui/material/FormControl';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export type TState = {
   // TODO: #backlog По возможности описать корректно
@@ -166,6 +173,38 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
     return acc
   }, 0)
 
+  // -- TODO: Settings
+  const [idbSwitchersLSState, setIdbSwitchersLSState] = useLocalStorageState<TIDBSwitchers>({
+    key: 'teamScoring2024:idb-switchers',
+    initialValue: {},
+    isReadOnly: false,
+  })
+  const isImagesEnabled = useMemo(
+    () => idbSwitchersLSState[idbKey]?.on === 1 || false,
+    [idbKey, idbSwitchersLSState]
+  )
+  const handleEnableImagePack = useCallback(
+    () => !!idbKey && setIdbSwitchersLSState({ ...idbSwitchersLSState, [idbKey]: { on: 1 } }),
+    [setIdbSwitchersLSState, idbKey, idbSwitchersLSState]
+  )
+  const handleDisableImagePack = useCallback(
+    () => !!idbKey && setIdbSwitchersLSState({ ...idbSwitchersLSState, [idbKey]: { on: 0 } }),
+    [setIdbSwitchersLSState, idbKey, idbSwitchersLSState]
+  )
+  const handleSwitch = useCallback(
+    () => isImagesEnabled
+      ? handleDisableImagePack()
+      : handleEnableImagePack(),
+    [isImagesEnabled]
+  )
+  const idbSitchLabel = useMemo<SwitchProps>(
+    () => ({
+      checked: isImagesEnabled,
+      onChange: handleSwitch,
+    }),
+    [isImagesEnabled, handleSwitch]
+  )
+  // --
 
   if (!!renderer)
     return renderer({
@@ -241,26 +280,30 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
       {
         isEditable && isEditModeCollapsible && (
           <>
-            <CollapsibleText
-              // briefPrefix={!!targetJob.relations.parent || targetJob.relations.children.length > 0 || !!targetJob.descr ? '├─' : '└─'}
-              briefText='Edit images'
-              isClickableBrief
-              contentRender={() => (
-                <UploadDocumentsStepper
-                  control={control}
-                  filesQuantityLimit={12}
-                  totalSizeLimitMiB={10}
-                  // onResetInternalErrors={handleResetInternalErrors}
-                  onResetInternalErrors={() => undefined}
-                  // NOTE: 3/4
-                  // onUpdateFileStorageIds={() => {
-                  //   setCurrentSelectTs(new Date().getTime())
-                  // }}
-                  onAdd={() => setIsUpdated(true)}
-                  onRemove={() => setIsUpdated(true)}
+            {
+              isImagesEnabled && (
+                <CollapsibleText
+                  // briefPrefix={!!targetJob.relations.parent || targetJob.relations.children.length > 0 || !!targetJob.descr ? '├─' : '└─'}
+                  briefText='Edit images'
+                  isClickableBrief
+                  contentRender={() => (
+                    <UploadDocumentsStepper
+                      control={control}
+                      filesQuantityLimit={12}
+                      totalSizeLimitMiB={10}
+                      // onResetInternalErrors={handleResetInternalErrors}
+                      onResetInternalErrors={() => undefined}
+                      // NOTE: 3/4
+                      // onUpdateFileStorageIds={() => {
+                      //   setCurrentSelectTs(new Date().getTime())
+                      // }}
+                      onAdd={() => setIsUpdated(true)}
+                      onRemove={() => setIsUpdated(true)}
+                    />
+                  )}
                 />
-              )}
-            />
+              )
+            }
             {
               _hasGalleryContent && totalBytes > 0 && (
                 <PhotoProvider>
@@ -286,7 +329,36 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
               )
             }
             {
-              (isUpdated || isRemoveable) && (
+              isUpdated && (
+                <ResponsiveBlock
+                  className={baseClasses.specialActionsGrid}
+                  style={{
+                    // padding: '16px 0px 16px 0px',
+                    // border: '1px dashed red',
+                    // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+                    // position: 'sticky',
+                    // bottom: 0,
+                    backgroundColor: 'transparent',
+                    // zIndex: 3,
+                    marginTop: 'auto',
+                    // borderRadius: '16px 16px 0px 0px',
+                  }}
+                >
+                  <Button
+                    onClick={setImagePackToIDB}
+                    color='primary'
+                    variant='contained'
+                    // disabled={}
+                    startIcon={<SaveIcon />}
+                    fullWidth
+                  >
+                    Save images
+                  </Button>
+                </ResponsiveBlock>
+              )
+            }
+            {
+              isRemoveable && (
                 <ResponsiveBlock
                   className={baseClasses.specialActionsGrid}
                   style={{
@@ -302,17 +374,21 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
                   }}
                 >
                   {
-                    isUpdated && (
-                      <Button
-                        onClick={setImagePackToIDB}
-                        color='primary'
-                        variant='contained'
-                        // disabled={}
-                        startIcon={<SaveIcon />}
-                      >
-                        Save images
-                      </Button>
-                    )
+                    <FormControl>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Switch {...idbSitchLabel} />
+                          }
+                          label={
+                            isImagesEnabled
+                              ? 'Enabled'
+                              : 'Disabled'
+                          }
+                        />
+                      </FormGroup>
+                      {/* <FormHelperText>Images</FormHelperText> */}
+                    </FormControl>
                   }
                   {
                     isRemoveable && (
