@@ -1,1 +1,1 @@
-export * from './ClientPerfWidget'
+export * from './v2'

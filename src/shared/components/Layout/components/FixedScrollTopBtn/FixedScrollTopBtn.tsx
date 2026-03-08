@@ -7,7 +7,7 @@ import { scrollTop, scrollTopExtra } from '~/shared/components/Layout/utils'
 // import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop'
 import { useSearchParams } from 'react-router-dom'
-import baseClasses from '~/App.module.scss'
+// import baseClasses from '~/App.module.scss'
 
 export const FixedScrollTopBtn = memo(() => {
   const [, isMoreThan2Screens]: [IWindowDims, boolean] = useScrollPosition()
@@ -53,13 +53,13 @@ export const FixedScrollTopBtn = memo(() => {
             classes.wrapper,
             classes.fixed,
             // baseClasses.backdropBlurLite,
-            baseClasses.backdropBlurSuperLite,
+            // baseClasses.backdropBlurSuperLite,
             {
               [classes.isRequired]: isMoreThan2Screens,
             }
           )}
         >
-          <VerticalAlignTopIcon color='primary' />
+          <VerticalAlignTopIcon color='inherit' />
         </div>
       )}
     </>

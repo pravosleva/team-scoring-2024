@@ -284,6 +284,7 @@ const getFilteredJobs = ({ jobs: allJobs, activeFilters }) => {
                         } ${title}`,
                       descr,
                       updatedAgo: getTimeAgo({ dateInput: ts.updatedAt }),
+                      originalChecklistTs: ts,
                       links,
                       order,
                     })

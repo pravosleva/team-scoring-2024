@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
+import { memo, useMemo, useState, useCallback, useRef } from 'react'
 import baseClasses from '~/App.module.scss'
 import { TJob, TopLevelContext, TPointsetItem, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { CustomizedTextField } from '~/shared/components/Input'
@@ -17,11 +17,13 @@ import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
 import { groupLog } from '~/shared/utils'
 import { TreeNode } from 'ts-tree-lib'
 // import DirectionsIcon from '@mui/icons-material/Directions'
-import StarIcon from '@mui/icons-material/Star'
+// import StarIcon from '@mui/icons-material/Star'
+import HiveIcon from '@mui/icons-material/Hive'
 import { useElementInView } from 'use-element-in-view'
 import { usePoinsetTreeCalcWorker } from './hooks'
 import { TEnchancedPointByWorker } from './types'
 import { FixedBackToPointsetBtn } from './components'
+import { sort } from '~/shared/utils/array-ops/sort-array-objects@3.0.0';
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -80,9 +82,6 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   const [newDescr, setNewDescr] = useState<string>('')
   const [newStatusCode, setNewStatusCode] = useState<string | null>(!!activeStatusPackKey ? Object.keys(localStatusPacksSettings?.[activeStatusPackKey])[0] : null)
 
-  useEffect(() => {
-    console.log(`- eff:newStatusCode -> ${newStatusCode}`)
-  }, [newStatusCode])
   const [newParentId, setNewParentId] = useState<number | ''>('')
   const [activeChecklistId, setActiveChecklistId] = useState<null | number>(null)
   const activePointIdRef = useRef<number | null>(null)
@@ -93,7 +92,6 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       switch (isNew) {
         case true: {
           // NOTE: New
-          console.log(`--- New`)
           const ts = new Date().getTime()
           setActiveChecklistId(ts)
           activePointIdRef.current = ts
@@ -101,8 +99,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
           break
         }
         default: {
-          // NOTE: Exists?
-          console.log(`--- Exists`)
+          // NOTE: Exists
           if (!targetJob?.pointset) throw new Error('ERR1')
           const targetPointData = targetJob?.pointset.find((p) => p.id === id)
           if (!targetPointData) throw new Error('ERR2')
@@ -125,7 +122,15 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     } catch (err) {
       console.warn(err)
     }
-  }, [targetJob?.pointset, targetJob?.ts.update, localStatusPacksSettings, activeStatusPackKey, setNewParentId, setNewStatusCode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    targetJob?.pointset,
+    targetJob?.ts.update,
+    localStatusPacksSettings,
+    activeStatusPackKey,
+    setNewParentId,
+    setNewStatusCode,
+  ])
   const handleReset = useCallback(() => {
     setNewLabel('')
     setNewDescr('')
@@ -153,6 +158,21 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     handleClose()
     setTimeout(scrollBoxIntoViewFnRef.current, 300)
   }, [handleReset, handleClose])
+
+  const sortedPointSet = useMemo(() =>
+    Array.isArray(targetJob?.pointset)
+      ? sort(
+        targetJob?.pointset,
+        ['title'],
+        -1
+      )
+      : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      targetJob?.pointset,
+      targetJob?.ts.update,
+    ]
+  )
 
   const handleSubmit = () => {
     switch (true) {
@@ -221,9 +241,16 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   )
 
   const pointsOptionsWoActive = useMemo(
-    () => Object.keys(pointsMapping)
-      .filter((pidStr) => Number(pidStr) !== activePointIdRef.current)
-      .map((pidStr) => ({ label: pointsMapping[pidStr].title, value: String(pointsMapping[pidStr].id) })),
+    () => sort(
+      Object.keys(pointsMapping)
+        .filter((pidStr) => Number(pidStr) !== activePointIdRef.current)
+        .map((pidStr) => ({
+          label: pointsMapping[pidStr].title,
+          value: String(pointsMapping[pidStr].id),
+        })),
+      ['label'],
+      -1
+    ),
     [pointsMapping, activeChecklistId]
   )
   const statusPackOptions = useMemo(
@@ -509,13 +536,13 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       )}
 
       {
-        isEditable && !!targetJob && Array.isArray(targetJob.pointset) && targetJob.pointset.length > 0 && !isEditMode && (
+        isEditable && !!targetJob && sortedPointSet.length > 0 && !isEditMode && (
           <>
             <div
               className={clsx(baseClasses.truncate, baseClasses.stack1)}
             >
               {
-                targetJob?.pointset.map((p) => (
+                sortedPointSet.map((p) => (
                   <div
                     key={p.id}
                     className={clsx(baseClasses.truncate, baseClasses.stack0)}
@@ -527,7 +554,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
                         p.relations.children.length > 0
                           ? (
                             <div className={clsx(baseClasses.truncate)} style={{ display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center' }}>
-                              <StarIcon style={{ fontSize: '14px' }} />
+                              <HiveIcon style={{ fontSize: '14px' }} />
                               <span>[{p.relations.children.length}]</span>
                               <span className={clsx(baseClasses.truncate)}>{clsx(localStatusPacksSettings[activeStatusPackKey][p.statusCode]?.emoji, p.title)}</span>
                             </div>

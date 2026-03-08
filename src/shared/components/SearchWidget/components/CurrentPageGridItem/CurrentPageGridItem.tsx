@@ -10,22 +10,14 @@ import HiveIcon from '@mui/icons-material/Hive'
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components'
 import { SimpleJobPointsetChecker } from '~/shared/components/SimpleJobPointsetChecker'
-import dayjs from 'dayjs'
-import __TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
-import ru from 'javascript-time-ago/locale/ru'
 import { TFilteredJobsLogsMappingChunk } from './types'
 import { CopyToClipboardWrapper } from '~/shared/components/CopyToClipboardWrapper'
 import { getMatchedByAllStrings } from '~/shared/utils/string-ops'
 import { FileSteperExample, HighlightedText } from '~/shared/components'
-import clsx from 'clsx'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
+import { TimeLabel } from '~/shared/components/SearchWidget/components/TimeLabel'
 
-__TimeAgo.addDefaultLocale(en)
-__TimeAgo.addLocale(ru)
-
-const timeAgo = new __TimeAgo('en-US')
 // const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL || ''
 
 type TProps = {
@@ -79,6 +71,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <TimeLabel ts={j.ts.update} showTimeAgo />
             <div>
               <HighlightedText
                 comparedValue={j.title}
@@ -196,44 +189,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                     filteredJobsLogsMappingChunk
                       .map((log) => (
                         <div key={`logs-item-${j.id}-${log.original.ts}`} className={baseClasses.stack1}>
-                          <span
-                            style={{
-                              color: '#959eaa',
-                              // whiteSpace: 'pre-wrap',
-                              fontSize: 'x-small',
-                              fontWeight: 'bold',
-                              display: 'flex',
-                              flexDirection: 'row',
-                              gap: '6px',
-                              alignItems: 'center',
-                              // justifyContent: 'space-between',
-                            }}
-                          >
-                            <span
-                              style={{
-                                color: '#FFF',
-                                borderRadius: '16px',
-                                padding: '1px 6px',
-                                // backgroundColor: 'black',
-                                lineHeight: '16px',
-                              }}
-                              className={clsx(baseClasses.backdropBlurDark)}
-                            >
-                              {dayjs(log.original.ts).format('DD.MM.YYYY HH:mm')}
-                            </span>
-                            <span>({timeAgo.format(log.original.ts)})</span>
-                            {/* <span
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                gap: '8px',
-                                justifyContent: 'flex-start',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <a target='_blank' href={`${PUBLIC_URL}/#/jobs/${j.id}/logs/${log.original.ts}?lastSeenLogKey=job-${j.id}-log-${log.original.ts}`}>LOG ↗️</a>
-                            </span> */}
-                          </span>
+                          <TimeLabel ts={log.original.ts} showTimeAgo />
                           <HighlightedText
                             comparedValue={log.original.text}
                             testedValue={testedValue}
@@ -328,10 +284,9 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                       style={{ paddingLeft: '24px' }}
                                     >
                                       {
-                                        log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo: _updatedAgo }) => (
+                                        log._service.logLocalLinks.map(({ ui, descr, relativeUrl: _relativeUrl, id, updatedAgo: _updatedAgo, originalChecklistTs }) => (
                                           <div key={id} className={baseClasses.stack1}>
-                                            {/* <a target='_blank' href={`${PUBLIC_URL}/#${relativeUrl}`}>{ui} ↗️</a> */}
-
+                                            <TimeLabel ts={originalChecklistTs.updatedAt} showTimeAgo />
                                             <HighlightedText
                                               comparedValue={ui}
                                               testedValue={testedValue}
@@ -418,6 +373,7 @@ export const CurrentPageGridItem = memo(({ testedValue, job: j, filteredJobsLogs
                                       {
                                         log._service.logExternalLinks.map(({ url, ui, descr, logTs, jobId }) => (
                                           <div key={`${jobId}--${logTs}`} className={baseClasses.stack1}>
+                                            {/* <TimeLabel ts={logTs} showTimeAgo /> */}
                                             <HighlightedText
                                               comparedValue={ui}
                                               testedValue={testedValue}

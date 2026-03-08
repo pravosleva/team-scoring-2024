@@ -694,7 +694,7 @@ function SimpleCheckListFn<TAddInfo>({
                                             gap: '5px',
                                             alignItems: 'center',
                                             // border: '1px solid red',
-                                            opacity: 0.5,
+                                            opacity: checklistItem.isDisabled ? 1 : 0.5,
                                           }}
                                         >
                                           <span>[</span>

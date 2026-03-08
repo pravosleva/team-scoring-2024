@@ -3,6 +3,25 @@
   z-index: 50;
 }
 
+@property --g {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: false;
+}
+
+@keyframes scrollProgress {
+
+  0%,
+  50% {
+    --g: 0%;
+    /* Цвет зафиксирован до 50% скролла */
+  }
+
+  to {
+    --g: 100%;
+  }
+}
+
 .wrapper {
   bottom: 50%;
   right: 16px;
@@ -24,6 +43,19 @@
 
   justify-content: center;
   align-items: center;
+
+  /* Привязываем анимацию к скроллу всей страницы */
+  animation: scrollProgress linear;
+  animation-timeline: scroll();
+
+  /* Используем переменную для изменения цвета */
+  /* Например, переход от синего к красному через color-mix */
+  background-color: color-mix(in srgb, #FFF, #FF5733 var(--g));
+  color: color-mix(in srgb, #1976d2, #FFF var(--g));
+
+  /* Или через HSL (меняем тон от 0 до 100) */
+  /* border-color: hsl(calc(var(--g) * 1.2), 70%, 50%); */
+  // inset: 20px;
 }
 
 .isRequired {

@@ -320,7 +320,6 @@ export const LastJobActivityPage = memo(() => {
                                       typeof job.relations.parent === 'number' && (
                                         <FileSteperExample
                                           isEditable={false}
-                                          // idbKey={`job_id-${job.relations.parent}`}
                                           idbKey={getUniqueKey({ jobId: job.relations.parent })}
                                           renderer={({ counter, documents }) => counter === 0 ? null : (
                                             <CollapsibleText
@@ -361,56 +360,75 @@ export const LastJobActivityPage = memo(() => {
                                 flexDirection: 'row',
                                 alignItems: 'flex-start',
                                 gap: '16px',
-                                fontSize: 'small'
+                                fontSize: 'small',
                               }}
                             >
-                              <Link
+                              <div
                                 style={{
-                                  whiteSpace: 'nowrap',
-                                  display: 'inline-flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
+                                  display: 'flex',
+                                  flexDirection: 'column',
                                   gap: '8px',
                                 }}
-                                to={getFullUrl({
-                                  url: `/jobs/${job.id}`,
-                                  query: {
-                                    ...queryParams,
-                                    to: memoizedCurrentPage,
-                                    forwardActionUiText: targetJobs.length === 1 ? `History | ${targetJobs[0].title}` : `History of ${targetJobs.length} pinned`,
-                                  },
-                                  queryKeysToremove: ['from'],
-                                })}
                               >
-                                {/* <ArrowBackIcon sx={{ fontSize: '12px' }} /> */}
-                                <span>Job</span>
-                              </Link>
-                              <Link
-                                style={{
-                                  whiteSpace: 'nowrap',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '6px',
-                                  borderWidth: '1px',
-                                  borderColor: 'inherit',
-                                  borderStyle: 'solid',
-                                  borderRadius: '50%',
-                                  marginTop: '3px',
-                                }}
-                                to={getFullUrl({
-                                  url: getMemoizedCurrentPageWithoutJobId({ noJobId: job.id }), // `/jobs/${id}`,
-                                  query: {
-                                    ...queryParams,
-                                  },
-                                })}
-                              >
-                                <CloseIcon sx={{ fontSize: 'inherit' }} />
-                              </Link>
-                              <HighlightedText
-                                comparedValue={job.title}
-                                testedValue={clsx(searchValueBasic)}
-                                style={{ display: 'block', color: '#000' }}
-                              />
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-start',
+                                    gap: '16px',
+                                    fontSize: 'small',
+                                  }}
+                                >
+                                  <Link
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      display: 'inline-flex',
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                    }}
+                                    to={getFullUrl({
+                                      url: `/jobs/${job.id}`,
+                                      query: {
+                                        ...queryParams,
+                                        to: memoizedCurrentPage,
+                                        forwardActionUiText: targetJobs.length === 1 ? `History | ${targetJobs[0].title}` : `History of ${targetJobs.length} pinned`,
+                                      },
+                                      queryKeysToremove: ['from'],
+                                    })}
+                                  >
+                                    {/* <ArrowBackIcon sx={{ fontSize: '12px' }} /> */}
+                                    <span>Job</span>
+                                  </Link>
+                                  <Link
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      borderWidth: '1px',
+                                      borderColor: 'inherit',
+                                      borderStyle: 'solid',
+                                      borderRadius: '50%',
+                                      marginTop: '3px',
+                                    }}
+                                    to={getFullUrl({
+                                      url: getMemoizedCurrentPageWithoutJobId({ noJobId: job.id }), // `/jobs/${id}`,
+                                      query: {
+                                        ...queryParams,
+                                      },
+                                    })}
+                                  >
+                                    <CloseIcon sx={{ fontSize: 'inherit' }} />
+                                  </Link>
+                                </div>
+                                <HighlightedText
+                                  comparedValue={job.title}
+                                  testedValue={clsx(searchValueBasic)}
+                                  style={{ display: 'block', color: '#000' }}
+                                />
+                              </div>
+
                               {
                                 !!job.forecast.assignedTo && (
                                   <div
@@ -431,7 +449,6 @@ export const LastJobActivityPage = memo(() => {
                             </div>
                             <FileSteperExample
                               isEditable={false}
-                              // idbKey={`job_id-${job.id}`}
                               idbKey={getUniqueKey({ jobId: job.id })}
                               renderer={({ counter, documents }) => counter === 0 ? null : (
                                 <CollapsibleText
@@ -474,13 +491,13 @@ export const LastJobActivityPage = memo(() => {
                                       job.relations.children.length > 1 && (
                                         <Link
                                           to={getFullUrl({
-                                            url: `/last-activity/${job.relations.children.join(',')}`,
+                                            url: `/last-activity/${[job.id, ...job.relations.children].join(',')}`,
                                             query: {
                                               ...queryParams,
                                             },
                                           })}
                                         >
-                                          🔩 All children activity
+                                          FULL SUBTREE HISTORY (parent & children)
                                         </Link>
                                       )
                                     }
@@ -510,7 +527,7 @@ export const LastJobActivityPage = memo(() => {
                                           </Link>
                                           <FileSteperExample
                                             isEditable={false}
-                                            idbKey={`job_id-${j}`}
+                                            idbKey={getUniqueKey({ jobId: j })}
                                             renderer={({ counter, documents }) => counter === 0 ? null : (
                                               <CollapsibleText
                                                 briefPrefix={'└─'}

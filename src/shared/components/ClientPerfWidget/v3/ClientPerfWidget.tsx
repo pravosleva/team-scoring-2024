@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useState, useRef, useLayoutEffect, useMemo, useCallback, memo } from 'react'
+
+import { useState, useRef, useLayoutEffect, useCallback, memo, useMemo } from 'react'
 import clsx from 'clsx'
-import classes from './ClientPerfWidget.module.scss'
+import classes from '../ClientPerfWidget.module.scss'
 import { getPercentage } from '~/shared/utils/number-ops'
-import { ProgressBar } from './components/ProgressBar'
-// import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import { ProgressBar } from '../components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ArrowRight'
-// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MemoryIcon from '@mui/icons-material/Memory'
 import { soundManager } from '~/shared/soundManager'
 
@@ -15,20 +13,19 @@ type TProps = {
   isOpenedByDefault?: boolean;
   position: 'top-center' | 'top-right' | 'right-side-top' | 'right-side-center-bottom';
 }
-
 type TMainStackItem = {
   jsHeapSizeLimit: number;
   totalJSHeapSize: number;
   usedJSHeapSize: number;
 }
-const mainStackLimit = 500
-// const getMB = (b: number): number => b / (1024 * 1024)
-// const getGB = (b: number): number => b / (1024 * 1024 * 1024)
+const mainStackLimit = 1000
 const canvasCfg = {
   width: 200,
   height: 15,
 }
-const interval = 1 * 100
+// const interval = 1 * 100
+// const MEMORY_UPDATE_INTERVAL = 1000 // Текст обновляем раз в секунду
+const MAIN_COLOR = '#000' // '#959eaa'
 
 const getOffsetY = ({ data, fullPx, targetField }: {
   data: TMainStackItem;
@@ -55,11 +52,8 @@ const getStepX = ({ fullWidthPx, totalStackItems }: {
 }) => fullWidthPx / (totalStackItems * 2 < 100 ? 100 : totalStackItems * 2)
 
 export const ClientPerfWidget = memo((ps: TProps) => {
-  // const dispatch = useDispatch()
-  // const reduxState = useSelector((state: IRootState) => state)
   const [isBrowserMemoryMonitorEnabled, setIsBrowserMemoryMonitorEnabled] = useState<boolean>(ps.isOpenedByDefault || false)
-  // const isBrowserMemoryMonitorEnabled = useSelector((state: IRootState) => state.customDevTools.browserMemoryMonitor.isEnabled)
-  // const [isWidgetOpened, setIsWidgetOpened] = useState(false)
+  // const [isOpened, setIsOpened] = useState(ps.isOpenedByDefault || false)
   const handleOpenToggle = useCallback(() => {
     const wasOpened = isBrowserMemoryMonitorEnabled
     if (wasOpened) {
@@ -79,77 +73,87 @@ export const ClientPerfWidget = memo((ps: TProps) => {
         },
       })
     }
-    // setIsWidgetOpened((s) => !s)
-    // dispatch(toggleBrowserMemoryMonitor())
     setIsBrowserMemoryMonitorEnabled((s) => !s)
   }, [setIsBrowserMemoryMonitorEnabled, isBrowserMemoryMonitorEnabled])
+  const [state, setMemState] = useState<TMainStackItem | null>(null)
 
-  const [state, setMemState] = useState<any>(null)
-  const [counter, setCounter] = useState<number>(0)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const mainStackRef = useRef<TMainStackItem[]>([])
+  const requestRef = useRef<number>()
+  const lastUpdateRef = useRef<number>(0)
+
+  const draw = useCallback((time: number) => {
+    // @ts-expect-error - работаем с нестандартным API Chrome
+    const mem = window.performance?.memory
+    if (!mem) return
+
+    // 1. Обновляем данные раз в секунду (Троттлинг)
+    if (time - lastUpdateRef.current > 1000) {
+      const sample = {
+        jsHeapSizeLimit: mem.jsHeapSizeLimit,
+        totalJSHeapSize: mem.totalJSHeapSize,
+        usedJSHeapSize: mem.usedJSHeapSize
+      }
+      setMemState(sample)
+
+      if (mainStackRef.current.length >= mainStackLimit) mainStackRef.current.shift()
+      mainStackRef.current.push(sample)
+      lastUpdateRef.current = time
+    }
+
+    // 2. Отрисовка (каждый кадр, если есть данные)
+    const ctx = canvasRef.current?.getContext('2d')
+    if (ctx && mainStackRef.current.length > 0) {
+      const { width, height } = canvasCfg
+      const stepX = getStepX({ fullWidthPx: width, totalStackItems: mainStackRef.current.length })
+
+      ctx.clearRect(0, 0, width, height)
+      ctx.fillStyle = MAIN_COLOR
+
+      let x = 0
+      ctx.beginPath()
+      mainStackRef.current.forEach((data) => {
+        const total = getOffsetY({ data, fullPx: height, targetField: 'total' })
+        ctx.rect(x, total.strartY, stepX, total.hPx)
+        x += stepX
+
+        const used = getOffsetY({ data, fullPx: height, targetField: 'used' })
+        ctx.rect(x, used.strartY, stepX, used.hPx)
+        x += stepX
+      })
+      ctx.fill()
+    }
+
+    requestRef.current = requestAnimationFrame(draw)
+  }, [])
 
   useLayoutEffect(() => {
     // @ts-ignore
     if (!window.performance?.memory) return
 
-    intervalRef.current = setInterval(() => {
-      setCounter((s) => s + 1)
-    }, interval)
-
+    requestRef.current = requestAnimationFrame(draw)
     return () => {
-      if (!!intervalRef.current) clearInterval(intervalRef.current)
+      if (requestRef.current) cancelAnimationFrame(requestRef.current)
     }
-  }, [])
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  useLayoutEffect(() => {
-    // @ts-ignore
-    // if (!window.performance?.memory) return
-    const memState = window.performance?.memory
-    const isCorrect = !!memState?.jsHeapSizeLimit && !!memState?.totalJSHeapSize && !!memState?.usedJSHeapSize
+  }, [draw])
 
-    if (isCorrect) setMemState({
-      jsHeapSizeLimit: memState.jsHeapSizeLimit,
-      totalJSHeapSize: memState.totalJSHeapSize,
-      usedJSHeapSize: memState.usedJSHeapSize
-    })
-    if (isCorrect) {
-      if (mainStackRef.current.length < mainStackLimit) mainStackRef.current.push(memState)
-      else {
-        mainStackRef.current.shift()
-        mainStackRef.current.push(memState)
-      }
-      if (!!canvasRef.current) {
-        const cfg = canvasCfg
-        const ctx = canvasRef.current.getContext('2d')
-        let x = 0
-        const stepX = getStepX({ fullWidthPx: cfg.width, totalStackItems: mainStackRef.current.length })
-        if (!!ctx) setTimeout(() => {
-          // @ts-ignore
-          ctx.reset()
-          mainStackRef.current.forEach((data) => {
-            const c1 = getOffsetY({ data, fullPx: cfg.height, targetField: 'total' })
-            // NOTE: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillRect
-            ctx.rect(x, c1.strartY, stepX, c1.hPx)
-            // ctx.fill()
-            x += stepX
-
-            const c2 = getOffsetY({ data, fullPx: cfg.height, targetField: 'used' })
-            ctx.rect(x, c2.strartY, stepX, c2.hPx)
-            // ctx.fill()
-            x += stepX
-          })
-          ctx.fill()
-        }, 0)
-      }
+  // Расчеты для UI
+  const { limit, total, used, totalOfLimit, usedOfTotal } = useMemo(() => {
+    const l = (state?.jsHeapSizeLimit || 0) / 1024 / 1024
+    const t = (state?.totalJSHeapSize || 0) / 1024 / 1024
+    const u = (state?.usedJSHeapSize || 0) / 1024 / 1024
+    return {
+      limit: l, total: t, used: u,
+      totalOfLimit: getPercentage({ x: t, sum: l }),
+      usedOfTotal: getPercentage({ x: u, sum: t })
     }
-  }, [counter])
+  }, [state])
 
-  const limit = useMemo(() => (state?.jsHeapSizeLimit || 0) / 1024 / 1024, [state?.jsHeapSizeLimit])
-  const total = useMemo(() => (state?.totalJSHeapSize || 0) / 1024 / 1024, [state?.totalJSHeapSize])
-  const used = useMemo(() => (state?.usedJSHeapSize || 0) / 1024 / 1024, [state?.usedJSHeapSize])
-  const totalOfLimit = useMemo(() => getPercentage({ x: total, sum: limit }), [total, limit])
-  const usedOfTotal = useMemo(() => getPercentage({ x: used, sum: total }), [used, total])
+  // ВАЖНО: Если API не поддерживается, рисуем заглушку сразу
+  // @ts-ignore
+  if (!window.performance?.memory) {
+    return <div className={classes.wrapper}>Memory API not supported</div>
+  }
 
   return (
     <div
@@ -158,7 +162,6 @@ export const ClientPerfWidget = memo((ps: TProps) => {
         classes.stack1,
         classes.fixedBox,
         {
-          // [classes.bottomCenter]: ps.position === 'bottom-center',
           [classes.topCenter]: ps.position === 'top-center',
           [classes.topRight]: ps.position === 'top-right',
           [classes.rightSideTop]: ps.position === 'right-side-top',
@@ -200,19 +203,14 @@ export const ClientPerfWidget = memo((ps: TProps) => {
       <button
         className={clsx(
           classes.absoluteToggler,
-          // 'backdrop-blur--lite',
         )}
         onClick={handleOpenToggle}
       >
-        {/* <span>⚙️</span>
-        <span>Memory</span> */}
         {
           isBrowserMemoryMonitorEnabled
             ? <ExpandLessIcon style={{ fontSize: '24px' }} />
             : <MemoryIcon style={{ fontSize: '24px' }} />
         }
-        {/* <ExpandLessIcon style={{ fontSize: '16px' }} /> */}
-        {/* <span style={{ paddingRight: '8px' }}>Memory</span> */}
       </button>
 
     </div>
