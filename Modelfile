@@ -1,0 +1,17 @@
+# Базовая модель (лучшая для русского + кода)
+FROM qwen2.5-coder:7b-instruct
+
+PARAMETER num_ctx 4096
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+
+# Убираем кастомный TEMPLATE вообще, пусть Ollama использует встроенный для Qwen
+# Но добавим четкую инструкцию в SYSTEM
+SYSTEM """Ты — ассистент программиста. Отвечай только на русском языке. 
+Если видишь файлы в контексте, опиши их. Будь краток.
+Если тебе нужно прочитать файлы, используй команду ls в терминале"""
+
+# Finally:
+#ollama create qwen-ru-coder -f Modelfile
+# Если используете Redis, обязательно:
+#redis-cli flushall

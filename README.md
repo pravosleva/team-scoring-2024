@@ -162,6 +162,64 @@ read_env() {
 }
 ```
 
+## Ollama
+```
+# Базовая модель (лучшая для русского + кода)
+FROM qwen2.5-coder:1.5b-instruct
+
+PARAMETER num_ctx 4096
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+
+# Убираем кастомный TEMPLATE вообще, пусть Ollama использует встроенный для Qwen
+# Но добавим четкую инструкцию в SYSTEM
+SYSTEM """Ты — ассистент программиста. Отвечай только на русском языке. 
+Если видишь файлы в контексте, опиши их. Будь краток.
+Если тебе нужно прочитать файлы, используй команду ls в терминале"""
+
+# Finally:
+#ollama create qwen-ru-coder -f Modelfile
+# Если используете Redis, обязательно:
+#redis-cli flushall 
+```
+
+```
+{
+  "llm": {
+    "provider": "openai",
+    "model": "qwen-ru-coder",
+    "apiKey": "ollama",
+    "baseUrl": "http://localhost:11434/v1"
+  },
+  "project": {
+    "ignorePatterns": [
+      "node_modules",
+      "dist",
+      "_logs",
+      "logs",
+      ".git",
+      "build",
+      "tools.*",
+      "public",
+      "**/*.scss",
+      "**/*.css",
+      "**/*.sh"
+    ]
+  },
+  "tools": {
+    "autoExecute": true
+  },
+  "session": {
+    "enabled": false,
+    "redisUrl": "redis://localhost:6379"
+  },
+  "requests": {
+    "timeout": 120000,
+    "streamTimeout": 300000
+  }
+}
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

@@ -1,0 +1,32 @@
+{
+  "llm": {
+    "provider": "ollama",
+    "model": "qwen-ru-coder"
+  },
+  "project": {
+    "ignorePatterns": [
+      "node_modules",
+      "dist",
+      "_logs",
+      "logs",
+      ".git",
+      "build",
+      "tools.*",
+      "public",
+      "**/*.scss",
+      "**/*.css",
+      "**/*.sh"
+    ]
+  },
+  "tools": {
+    "autoExecute": true
+  },
+  "session": {
+    "enabled": false,
+    "redisUrl": "redis://localhost:6379"
+  },
+  "requests": {
+    "timeout": 120000,
+    "streamTimeout": 300000
+  }
+}
