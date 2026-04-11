@@ -398,7 +398,7 @@ const Logic = ({ children }: TProps) => {
     }
     if (!activeFilters.isAnyFilterActive) filteredJobs = allJobs
 
-    // NOTE: 1.2. Controls
+    // NOTE: 1.2. #CONTROLS_AS_QUERY_PARAMS
     const fromRouteValue = urlSearchParams.get('from')
     const fromRouteUiText = urlSearchParams.get('backActionUiText')
     const toRouteValue = urlSearchParams.get('to')
@@ -406,11 +406,11 @@ const Logic = ({ children }: TProps) => {
     const userRouteControls: TUserRouteControls = {}
     if (!!fromRouteValue) userRouteControls.from = {
       value: fromRouteValue,
-      uiText: fromRouteUiText || 'Back',
+      uiText: !!fromRouteUiText ? decodeURIComponent(fromRouteUiText) : 'Back',
     }
     if (!!toRouteValue) userRouteControls.to = {
       value: toRouteValue,
-      uiText: toRouteUiText || 'Forward',
+      uiText: !!toRouteUiText ? decodeURIComponent(toRouteUiText) : 'Forward',
     }
 
     setStore({ queryParams, debug: auxSettings.debug, filteredJobs, activeFilters, counters, userRouteControls })

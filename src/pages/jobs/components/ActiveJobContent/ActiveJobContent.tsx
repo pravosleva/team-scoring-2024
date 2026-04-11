@@ -32,6 +32,10 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import { ProductivityAnalysisGraph } from '~/shared/components/Job/components/JobStats/components/ProductivityAnalysisGraph'
 import { JobTimingStandartInfo } from '~/shared/components/Job/components/JobStats/components/SubjobsList/components/JobTimingStandartInfo'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import jsonSize from 'json-size'
+import { getHumanReadableSize } from '~/shared/utils/number-ops'
 
 type TProps = {
   isOpened: boolean;
@@ -263,7 +267,7 @@ export const ActiveJobContent = memo(({
               briefText='Details'
               contentRender={() => (
                 <div
-                  className={baseClasses.stack1}
+                  className={baseClasses.stack2}
                 >
                   {/* <div
                     style={{
@@ -328,8 +332,16 @@ export const ActiveJobContent = memo(({
                   <div style={{ fontSize: 'small' }}>
                     Grade: {ratingIcons[expressAppraiserStars].label}
                   </div>
-                  <div style={{ fontSize: 'small' }}>
+                  {/* <div style={{ fontSize: 'small' }}>
                     <Link to={`/report/exp/${job.id}`}>Report exp</Link>
+                  </div> */}
+
+                  <div>
+                    <CopyToClipboardWrapper
+                      text={JSON.stringify(job)}
+                      uiText={`Copy as json ${getHumanReadableSize({ bytes: jsonSize(job), decimals: 1 })}`}
+                      showNotifOnCopy
+                    />
                   </div>
 
                   <ResponsiveBlock

@@ -753,42 +753,42 @@ export const ReportPagerAbstracted = ({
       </div>
 
       {
-
-        <ResponsiveBlock
-          className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
-          style={{
-            padding: '16px 0 16px 0',
-            // border: '1px dashed red',
-            boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
-            position: 'sticky',
-            bottom: 0,
-            backgroundColor: '#fff',
-            zIndex: 3,
-            marginTop: 'auto',
-            // borderRadius: '16px 16px 0px 0px',
-          }}
-        >
-          {
-            !!userRouteControls.from && (
-              <Link
-                to={userRouteControls.from.value}
-                target='_self'
-                className={baseClasses.truncate}
-              >
-                <Button
-                  sx={{ borderRadius: 4 }}
-                  size='small'
-                  variant='outlined'
-                  startIcon={<ArrowBackIcon />}
-                  fullWidth
+        (!!userRouteControls.from) && (
+          <ResponsiveBlock
+            className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+            style={{
+              padding: '16px 0 16px 0',
+              // border: '1px dashed red',
+              boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
+              position: 'sticky',
+              bottom: 0,
+              backgroundColor: '#fff',
+              zIndex: 3,
+              marginTop: 'auto',
+              // borderRadius: '16px 16px 0px 0px',
+            }}
+          >
+            {
+              !!userRouteControls.from && (
+                <Link
+                  to={userRouteControls.from.value}
+                  target='_self'
                   className={baseClasses.truncate}
                 >
-                  <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
-                </Button>
-              </Link>
-            )
-          }
-          {/*
+                  <Button
+                    sx={{ borderRadius: 4 }}
+                    size='small'
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                    fullWidth
+                    className={baseClasses.truncate}
+                  >
+                    <span className={baseClasses.truncate}>{userRouteControls.from.uiText}</span>
+                  </Button>
+                </Link>
+              )
+            }
+            {/*
             !!outputWorkerData?.currentPage && outputWorkerData.pagination.totalPages > 1 && (
               <ResponsiveBlock
                 className={clsx(baseClasses.specialActionsAndPagerInfoGrid)}
@@ -849,8 +849,8 @@ export const ReportPagerAbstracted = ({
               </ResponsiveBlock>
             )
           */}
-        </ResponsiveBlock>
-
+          </ResponsiveBlock>
+        )
       }
     </>
   )

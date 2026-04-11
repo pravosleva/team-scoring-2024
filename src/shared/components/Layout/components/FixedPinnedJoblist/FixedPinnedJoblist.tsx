@@ -141,6 +141,10 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
   const isWidgetReqired = useMemo(() => typeof window !== 'undefined' && pinnedJobsIds.length > 0, [typeof window, pinnedJobsIds.length])
   const [searchValueBasic] = useSearchWidgetDataLayerContextStore((s) => s.searchValueBasic)
 
+  const goReportPage = useCallback(({ id }: { id: number }) => () => {
+    navigate(`/report/exp/${id}`)
+  }, [navigate])
+
   if (location.pathname === `/last-activity/${Object.keys(modifiedPinnedJobs).join(',')}`)
     return null
 
@@ -172,7 +176,7 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
           >
             <div
               className={clsx(
-                baseClasses.stack1,
+                baseClasses.stack2,
                 classes.pinnedItems,
                 baseClasses.fadeShadowBottom,
               )}
@@ -187,7 +191,6 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                       alignItems: 'flex-start',
                       gap: '8px',
                       fontWeight: 'bold',
-                      // border: '1px solid red',
                       // padding: '8px',
                       width: '100%',
                     }}
@@ -195,7 +198,6 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                   >
                     <div
                       style={{
-                        // border: '1px solid red',
                         maxWidth: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -203,41 +205,37 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         fontSize: 'small',
                       }}
                     >
-                      <code
-                        style={{
-                          fontSize: 'small',
-                          // wordBreak: 'keep-all',
-                          whiteSpace: 'nowrap',
-                          // paddingTop: '1px',
-                          // transform: 'translateY(-2px)',
-                          color: 'red',
-                        }}
-                        onClick={handleUnpinJob({ jobId: Number(id) })}
-                      >[ x ]</code>
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-start',
-                        gap: '8px',
-                        fontWeight: 'bold',
-                        // border: '1px solid red',
-                        // padding: '8px',
-                        width: '100%',
-                      }}
-                    // className={baseClasses.truncate}
-                    >
+                      <div>
+                        <code
+                          style={{
+                            fontSize: 'small',
+                            // wordBreak: 'keep-all',
+                            whiteSpace: 'nowrap',
+                            // paddingTop: '1px',
+                            // transform: 'translateY(-2px)',
+                            color: 'red',
+                          }}
+                          onClick={handleUnpinJob({ jobId: Number(id) })}
+                        >[ del ]</code>
+                        <code
+                          style={{
+                            fontSize: 'small',
+                            // wordBreak: 'keep-all',
+                            whiteSpace: 'nowrap',
+                            // paddingTop: '1px',
+                            // transform: 'translateY(-2px)',
+                            // color: 'red',
+                          }}
+                          onClick={goReportPage({ id: Number(id) })}
+                        >[ progress ]</code>
+                      </div>
                       <div
                         style={{
-                          // border: '1px solid red',
                           maxWidth: '100%',
                           display: 'flex',
                           flexDirection: 'column',
                           gap: '0px',
                           fontSize: 'small',
-
                           wordBreak: 'break-word',
                         }}
                         className={clsx(baseClasses.rowsLimited3)}
@@ -268,36 +266,38 @@ export const FixedPinnedJoblist = memo((ps: TProps) => {
                         {/* !!modifiedPinnedJobs[id].descr && (
                           <span
                             style={{
-                              fontSize: 'x-small',
+                              // fontSize: 'x-small',
                               color: '#959eaa'
                             }}
-                            className={clsx(baseClasses.rowsLimited1)}
+                            className={clsx(baseClasses.rowsLimited2)}
                           >{modifiedPinnedJobs[id].descr}</span>
                         ) */}
                       </div>
-
-                      {
-                        !!modifiedPinnedJobs[id].assignedToDisplayName && (
-                          <div
-                            style={{
-                              marginLeft: 'auto',
-                              display: 'inline-flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              fontSize: 'small',
-                              alignSelf: 'center',
-                            }}
-                          >
-                            <UserAva
-                              name={modifiedPinnedJobs[id].assignedToDisplayName}
-                              size={30}
-                            />
-                          </div>
-                        )
-                      }
                     </div>
-                  </div>
 
+                    {
+                      !!modifiedPinnedJobs[id].assignedToDisplayName && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'flex-start',
+                            gap: '8px',
+                            fontWeight: 'bold',
+                            width: 'auto',
+                            marginLeft: 'auto',
+                            fontSize: 'small',
+                          }}
+                        >
+                          <UserAva
+                            name={modifiedPinnedJobs[id].assignedToDisplayName}
+                            size={30}
+                          />
+                        </div>
+
+                      )
+                    }
+                  </div>
                 ))
               }
             </div>

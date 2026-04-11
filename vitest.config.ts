@@ -3,7 +3,7 @@ import path from 'path'
 
 export default defineConfig({
   test: {
-    globals: true,
+    globals: true, // Без этого "types": ["vitest/globals"] не будет работать в рантайме
     environment: 'jsdom',
     setupFiles: ['@vitest/web-worker', './src/test/setup.ts'],
   },

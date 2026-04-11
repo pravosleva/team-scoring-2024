@@ -14,6 +14,7 @@ import { CSSProperties } from '@mui/material/styles/createMixins'
 import { getMatchedByAnyString } from '~/shared/utils/string-ops'
 import { getIsNumeric } from '~/shared/utils/number-ops'
 import AnchorIcon from '@mui/icons-material/Anchor'
+import { scrollTop } from '~/shared/components/Layout/utils'
 
 export type TProject = {
   jobId: number;
@@ -154,6 +155,9 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
       specialScroll({
         id: `job_node_${jobId}`,
         _cfg: _specialNavigate,
+        cb: {
+          onErr: scrollTop,
+        }
       })
       // blinkNode({ id: `job_node_${jobId}` })
     }
@@ -229,6 +233,9 @@ export const ProjectsTree = memo(({ jobId, isDebugEnabled }: TProject) => {
     specialScroll({
       id: `job_node_${jobId}`,
       _cfg: _specialNavigate,
+      cb: {
+        onErr: scrollTop,
+      }
     })
     if (!!backToJobId) {
       setBackToActiveJob({ jobId: backToJobId, jobTitle })

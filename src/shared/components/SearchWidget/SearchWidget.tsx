@@ -62,6 +62,10 @@ type TTargetResultByWorker = {
           descr?: string;
           id: number;
           updatedAgo: string;
+          originalChecklistTs: {
+            createdAt: number;
+            updatedAt: number;
+          };
         }[];
         logExternalLinks: {
           url: string;

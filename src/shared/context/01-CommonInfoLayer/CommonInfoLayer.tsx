@@ -1,12 +1,11 @@
 import { PropsWithChildren, memo, useMemo, useEffect } from 'react'
-// import { useLocation } from 'react-router-dom';
-import { useLocalStorageState } from '~/shared/hooks';
+import { useLocalStorageState } from '~/shared/hooks'
 import { createFastContext } from '~/shared/utils'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import jsonSize from 'json-size'
-import { getHumanReadableSize } from '~/shared/utils/number-ops';
-import { TIDBInfo, idbInstance } from '~/shared/utils/indexed-db-ops';
+import { getHumanReadableSize } from '~/shared/utils/number-ops'
+import { TIDBInfo, idbInstance } from '~/shared/utils/indexed-db-ops'
 
 const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'No VITE_APP_VERSION'
 const BRAND_NAME = import.meta.env.VITE_BRAND_NAME || 'No VITE_BRAND_NAME'
@@ -50,7 +49,7 @@ const Logic = memo(({ children }: PropsWithChildren<unknown>) => {
 
   useEffect(() => {
     setCommonInfoContext({ isCreactedCurrentYear })
-  }, [isCreactedCurrentYear])
+  }, [isCreactedCurrentYear, setCommonInfoContext])
 
   const [fullMainLSState] = useLocalStorageState({
     key: 'teamScoring2024:topLevel',
@@ -66,7 +65,7 @@ const Logic = memo(({ children }: PropsWithChildren<unknown>) => {
         }),
       }
     })
-  }, [fullMainLSState])
+  }, [fullMainLSState, setCommonInfoContext])
   useEffect(() => {
     idbInstance.getAsyncSizeInfo()
       .then(({ result }) => setCommonInfoContext({ idb: result }))

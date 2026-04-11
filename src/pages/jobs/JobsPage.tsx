@@ -42,17 +42,22 @@ export const JobsPage = memo(() => {
 
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   // const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? jobs.find(({ id }) => id === activeJobId) : undefined, [jobs, activeJobId])
-  const activeJob = useMemo<TJob | undefined>(() => !!activeJobId ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
-    items: jobs,
-    target: {
-      path: '',
-      critery: {
-        path: 'id',
-        value: activeJobId,
-      },
-    },
-    sorted: 'DESC',
-  }).result : undefined, [jobs, activeJobId])
+  const activeJob = useMemo<TJob | undefined>(
+    () => !!activeJobId
+      ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
+        items: jobs,
+        target: {
+          path: '',
+          critery: {
+            path: 'id',
+            value: activeJobId,
+          },
+        },
+        sorted: 'DESC',
+      }).result
+      : undefined,
+    [jobs, activeJobId]
+  )
 
   const possibleDefaultActiveJobId = useMemo(
     () => shouldDrawerBeOpened && lastSeenJobID ? lastSeenJobID : null,

@@ -41,10 +41,10 @@ export const scrollToIdFactory = ({ timeout, offsetTop, elementHeightCritery }: 
               const elementPosition = targetElm.getBoundingClientRect().top
               const offsetPosition = elementPosition + window.pageYOffset - offsetTop
 
-              window.scrollTo({
+              window.requestAnimationFrame(() => window.scrollTo({
                 top: offsetPosition,
                 behavior: 'smooth',
-              })
+              }))
             }
           }
           switch (true) {
@@ -55,10 +55,10 @@ export const scrollToIdFactory = ({ timeout, offsetTop, elementHeightCritery }: 
                 if (typeof specialOffsetTop === 'number') {
                   console.log(`specialOffsetTop -> ${specialOffsetTop} (${typeof specialOffsetTop})`)
                   const offsetPosition = elementPosition + window.pageYOffset - specialOffsetTop
-                  window.scrollTo({
+                  window.requestAnimationFrame(() => window.scrollTo({
                     top: offsetPosition,
                     behavior: 'smooth',
-                  })
+                  }))
                 } else defaultLogic()
               }
               break

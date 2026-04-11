@@ -525,7 +525,7 @@ export const LogPage = memo(() => {
               }
 
               {
-                !!targetLog && (
+                !!targetLog && !userRouteControls.to && (
                   <Link
                     // to={`/last-activity?lastSeenJob=${targetJob.id}&lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}`}
                     to={`/last-activity/${targetJob.id}?lastSeenLogKey=job-${targetJob.id}-log-${targetLog.ts}`}
@@ -534,7 +534,6 @@ export const LogPage = memo(() => {
                     <Button
                       variant='outlined'
                       color='salmon'
-
                       fullWidth
                     >
                       Go to activity
@@ -550,7 +549,12 @@ export const LogPage = memo(() => {
                     target='_self'
                     className={baseClasses.truncate}
                   >
-                    <Button variant='contained' startIcon={<ArrowForwardIcon />} fullWidth className={baseClasses.truncate}>
+                    <Button
+                      variant='contained'
+                      endIcon={<ArrowForwardIcon />}
+                      fullWidth
+                      className={baseClasses.truncate}
+                    >
                       <span className={baseClasses.truncate}>{userRouteControls.to.uiText}</span>
                     </Button>
                   </Link>

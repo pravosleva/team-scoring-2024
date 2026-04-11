@@ -3,7 +3,15 @@
   z-index: 50;
 }
 
-@property --g {
+// bg color
+@property --bg-color {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: false;
+}
+
+// text color
+@property --text-color {
   syntax: "<percentage>";
   initial-value: 0%;
   inherits: false;
@@ -13,12 +21,22 @@
 
   0%,
   50% {
-    --g: 0%;
-    /* Цвет зафиксирован до 50% скролла */
+    --bg-color: 0%;
+    // Цвет зафиксирован до 50% скролла
+    --text-color: 0%;
   }
 
-  to {
-    --g: 100%;
+  70% {
+    --text-color: 0%;
+  }
+
+  70.1% {
+    --text-color: 100%;
+  }
+
+  100% {
+    --bg-color: 100%;
+    --text-color: 100%;
   }
 }
 
@@ -50,8 +68,8 @@
 
   /* Используем переменную для изменения цвета */
   /* Например, переход от синего к красному через color-mix */
-  background-color: color-mix(in srgb, #FFF, #FF5733 var(--g));
-  color: color-mix(in srgb, #1976d2, #FFF var(--g));
+  background-color: color-mix(in srgb, #FFF, #FF5733 var(--bg-color));
+  color: color-mix(in srgb, #1976d2, #FFFFFF var(--text-color));
 
   /* Или через HSL (меняем тон от 0 до 100) */
   /* border-color: hsl(calc(var(--g) * 1.2), 70%, 50%); */

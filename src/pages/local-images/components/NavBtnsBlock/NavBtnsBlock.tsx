@@ -28,10 +28,16 @@ export const NavBtnsBlock = memo(({ uniqueKey }: TProps) => {
   )
   const goJob = useCallback(() => {
     if (!!jobId)
-      navigate(getFullUrl({ url: `/jobs/${jobId}` }))
+      navigate(getFullUrl({
+        url: `/jobs/${jobId}`,
+        query: {
+          from: getFullUrl({ url: '/local-images', query: { activeItem: uniqueKey } }),
+          backActionUiText: 'Local images',
+        }
+      }))
     else
       console.warn('No')
-  }, [jobId])
+  }, [jobId, navigate, uniqueKey])
   const logTs = useMemo<number | undefined>(
     () => {
       const matches = getExtractedValues({
@@ -45,10 +51,29 @@ export const NavBtnsBlock = memo(({ uniqueKey }: TProps) => {
   )
   const goLog = useCallback(() => {
     if (!!jobId && !!logTs)
-      navigate(getFullUrl({ url: `/jobs/${jobId}/logs/${logTs}` }))
+      navigate(getFullUrl({
+        url: `/jobs/${jobId}/logs/${logTs}`,
+        query: {
+          from: getFullUrl({
+            url: '/local-images',
+            query: { activeItem: uniqueKey }
+          }),
+          backActionUiText: 'Local images',
+          to: getFullUrl({
+            url: `/last-activity/${jobId}`,
+            query: {
+              lastSeenLogKey: `job-${jobId}-log-${logTs}`,
+              // NOTE: Вернуться сюда из этого урла (it works)
+              from: getFullUrl({ url: '/local-images', query: { activeItem: uniqueKey } }),
+              backActionUiText: 'Local images',
+            }
+          }),
+          forwardActionUiText: 'Go to activity'
+        }
+      }))
     else
       console.warn('No')
-  }, [jobId, logTs])
+  }, [jobId, logTs, navigate, uniqueKey])
 
   return (
     <>
@@ -65,7 +90,7 @@ export const NavBtnsBlock = memo(({ uniqueKey }: TProps) => {
                 // bottom: 0,
                 backgroundColor: 'transparent',
                 // zIndex: 3,
-                marginTop: 'auto',
+                // marginTop: 'auto',
                 // borderRadius: '16px 16px 0px 0px',
               }}
             >

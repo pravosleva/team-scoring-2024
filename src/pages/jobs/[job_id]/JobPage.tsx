@@ -5,6 +5,7 @@ import { TJob, TopLevelContext, TUser, useSearchWidgetDataLayerContextStore } fr
 import Grid from '@mui/material/Grid2'
 import {
   CollapsibleBox,
+  CopyToClipboardWrapper,
   DistributionFunctionGraph,
   FileSteperExample,
   HighlightedText,
@@ -43,8 +44,12 @@ import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/s
 import { CollapsibleText } from './components/ProjectsTree/components'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import { getUniqueKey } from '~/shared/utils/indexed-db-ops'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import jsonSize from 'json-size'
+import { getHumanReadableSize } from '~/shared/utils/number-ops'
 
-const specialScroll = scrollToIdFactory({
+const _specialScroll = scrollToIdFactory({
   timeout: 200,
   offsetTop: 16,
   elementHeightCritery: 550,
@@ -235,6 +240,18 @@ export const JobPage = memo(() => {
               style={{ display: 'block', fontSize: 'small', fontStyle: 'italic', color: '#959eaa' }}
             />
           )}
+
+          {
+            !!targetJob && (
+              <div>
+                <CopyToClipboardWrapper
+                  text={JSON.stringify(targetJob)}
+                  uiText={`Copy as json ${getHumanReadableSize({ bytes: jsonSize(targetJob), decimals: 1 })}`}
+                  showNotifOnCopy
+                />
+              </div>
+            )
+          }
         </Box>
       </Grid>
 
@@ -383,8 +400,8 @@ export const JobPage = memo(() => {
                 <Grid size={12} className={baseClasses.autoShow}>
                   <CollapsibleBox
                     id='job-stats'
-                    onClose={({ id }) => specialScroll({ id })}
-                    onOpen={({ id }) => specialScroll({ id })}
+                    // onClose={({ id }) => specialScroll({ id })}
+                    // onOpen={({ id }) => specialScroll({ id })}
                     connectedOnThe={[]}
                     header={'Productivity Analysis'}
                     icon={<QueryStatsIcon fontSize='small' />}

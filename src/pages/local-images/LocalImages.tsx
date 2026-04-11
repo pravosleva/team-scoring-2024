@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState, useMemo } from 'react'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { FileSteperExample, Layout } from '~/shared/components'
 import ImageIcon from '@mui/icons-material/Image'
@@ -6,6 +6,46 @@ import baseClasses from '~/App.module.scss'
 import { idbInstance } from '~/shared/utils/indexed-db-ops'
 import { CommonInfoContext } from '~/shared/context'
 import { NavBtnsBlock } from './components'
+import { getSortedStrings } from '~/shared/utils/string-ops/getSortedStrings'
+import { useSearchParams } from 'react-router-dom'
+import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
+import { getExtractedValues } from '~/shared/utils/string-ops'
+
+const getExtractedKey = ({ idbKey }: { idbKey: string }): string => {
+  let res = ''
+  const jobIdMatches = getExtractedValues({
+    tested: [idbKey],
+    expectedKey: 'JOB_ID',
+    valueType: 'number',
+  })
+  if (!Number.isNaN(Number(jobIdMatches[0]))) {
+    res += jobIdMatches[0]
+  }
+  const logTsMatches = getExtractedValues({
+    tested: [idbKey],
+    expectedKey: 'LOG_TS',
+    valueType: 'number',
+  })
+  if (!Number.isNaN(Number(logTsMatches[0]))) {
+    res += '-'
+    res += logTsMatches[0]
+  }
+  const checklistItemIdMatches = getExtractedValues({
+    tested: [idbKey],
+    expectedKey: 'CHECKLIST_ITEM_ID',
+    valueType: 'number',
+  })
+  if (!Number.isNaN(Number(checklistItemIdMatches[0]))) {
+    res += '-'
+    res += checklistItemIdMatches[0]
+  }
+  return res
+}
+const specialScroll = scrollToIdFactory({
+  timeout: 200,
+  offsetTop: 16,
+  elementHeightCritery: 550,
+})
 
 const isDev = import.meta.env.NODE_ENV === 'development'
 
@@ -20,8 +60,19 @@ export const LocalImages = memo(() => {
         if (isDev) console.warn(err)
       })
   }, [])
-
   const [idb] = CommonInfoContext.useStore((s) => s.idb)
+  const sortedIdbKeys = useMemo(
+    () => getSortedStrings({ items: idbKeys || [], order: 'DESC' }),
+    [idbKeys]
+  )
+  // const params = useParams()
+  const [urlSearchParams] = useSearchParams()
+  useEffect(() => {
+    const activeItemEncodedKey = urlSearchParams.get('activeItem')
+    if (!!activeItemEncodedKey && sortedIdbKeys.length > 0) {
+      specialScroll({ id: getExtractedKey({ idbKey: decodeURIComponent(activeItemEncodedKey) }) })
+    }
+  }, [sortedIdbKeys, urlSearchParams])
 
   return (
     <Layout>
@@ -38,6 +89,10 @@ export const LocalImages = memo(() => {
             <span>Local images</span>
           </h1>
         </Grid>
+
+        {/* <Grid size={12}>
+          <pre className={baseClasses.preNormalized}>{JSON.stringify({ urlSearchParams }, null, 2)}</pre>
+        </Grid> */}
 
         {!!idb && (
           <>
@@ -76,17 +131,18 @@ export const LocalImages = memo(() => {
         )}
 
         {
-          idbKeys.length > 0 && (
+          sortedIdbKeys.length > 0 && (
             <Grid
               container
               spacing={4}
             >
               {
-                idbKeys.map((k) => (
+                sortedIdbKeys.map((k) => (
                   <Grid
                     container
                     spacing={2}
                     key={k}
+                    id={getExtractedKey({ idbKey: k })}
                   >
                     <Grid size={12}>
                       <FileSteperExample

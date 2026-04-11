@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { getMatchedByAnyString } from './getMatchedByAnyString';
 
 describe('Тестирование регулярок', () => {

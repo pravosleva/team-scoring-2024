@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
+import { memo } from 'react'
 import { TreeNode } from 'ts-tree-lib'
 import classes from './ProjectNode.module.scss'
 import { Link } from 'react-router-dom'
@@ -31,14 +31,14 @@ import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
 import { JobResultReviewShort } from '../../JobResultReviewShort'
 import { SubjobsExperimentalCards, cardsClasses } from './SubjobsExperimentalCards'
 import { UserAva } from '~/shared/components/Job/components'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+// import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Button } from '@mui/material'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 // import PushPinIcon from '@mui/icons-material/PushPin'
 // import LabelImportantIcon from '@mui/icons-material/LabelImportant'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
-import QueryStatsIcon from '@mui/icons-material/QueryStats'
+// import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import BioTechIcon from '@mui/icons-material/Biotech'
 // -- EXP
 import __TimeAgo from 'javascript-time-ago'
@@ -92,7 +92,7 @@ class JobAnalyzer {
 
 const stickyElementHeight = 58
 
-export const ProjectNode = ({
+export const ProjectNode = memo(({
   projectsTree,
   activeJobId,
   // currentJobId,
@@ -102,8 +102,6 @@ export const ProjectNode = ({
   onNavigateToJobNode,
   onScrollToStats,
 }: TProps) => {
-  const [isLastActivityOpened, setIsLastActivityOpened] = useState(false)
-  const toggleLastActivity = () => setIsLastActivityOpened((s) => !s)
   const [queryParams] = useParamsInspectorContextStore((ctx) => ctx.queryParams)
   const isActiveNode = activeJobId === projectsTree.model.id
   const isCompleted = projectsTree.model.completed
@@ -408,34 +406,106 @@ export const ProjectNode = ({
         />
       </div>
 
-      <Link
+      <div
         style={{
-          textDecoration: 'none',
-          width: 'fit-content',
+          // border: '1px solid red',
+          display: 'grid',
+          gridAutoFlow: 'column',
+          gridAutoColumns: '1fr',
+          gap: '8px',
+          width: '100%',
+
+          paddingRight: '8px',
         }}
-        to={getFullUrl({
-          url: `/report/exp/${projectsTree.model.id}`,
-          query: {
-            ...queryParams,
-            // from: `/jobs/${activeJobId}`,
-            from: `/jobs/${projectsTree.model.id}`,
-            backActionUiText: projectsTree.model.title,
-          },
-          // queryKeysToremove,
-        })}
       >
-        <Button
-          size='small'
-          startIcon={<BioTechIcon />}
-          endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
-          color='primary'
-          variant='contained'
-          // fullWidth
-          sx={{ boxShadow: 'none', borderRadius: 4 }}
+        <Link
+          style={{
+            textDecoration: 'none',
+            // width: 'fit-content',
+          }}
+          to={getFullUrl({
+            url: `/report/exp/${projectsTree.model.id}`,
+            query: {
+              ...queryParams,
+              // from: `/jobs/${activeJobId}`,
+              from: `/jobs/${projectsTree.model.id}`,
+              backActionUiText: projectsTree.model.title,
+            },
+            // queryKeysToremove,
+          })}
         >
-          Progress Tree
-        </Button>
-      </Link>
+          <Button
+            size='small'
+            startIcon={<BioTechIcon />}
+            // endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+            color='primary'
+            variant='contained'
+            fullWidth
+            sx={{ boxShadow: 'none', borderRadius: 4 }}
+          >
+            Progress
+          </Button>
+        </Link>
+        <Link
+          className={clsx(
+            // classes.lastActivityOfCurrentJobLink,
+            // baseClasses.underlineSolid,
+            baseClasses.truncate,
+          )}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            textDecoration: 'none'
+          }}
+          to={
+            [
+              `/last-activity/${projectsTree.model.id}`,
+              // !!activeJobId
+              //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
+              //   : '',
+              [
+                '?',
+                [
+                  `lastSeenLogKey=job-${activeJobId}-log-${projectsTree.model.logs.items[0].ts}`,
+                  `lastSeenJob=${activeJobId}`,
+                  !!activeJobName
+                    ? [
+                      `from=${encodeURIComponent(
+                        [
+                          `/jobs/${activeJobId}`,
+                          // '?',
+                          // `from=${!!activeJobName ? `backActionUiText=${activeJobName}` : ''}`
+                        ].join('')
+                      )}`,
+                      !!activeJobName ? `backActionUiText=${encodeURIComponent(activeJobName)}` : '',
+                    ].join('&')
+                    : '',
+                ].join('&')
+              ].join('')
+            ].join('')
+          }
+        >
+          <Button
+            size='small'
+            endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
+            variant='outlined'
+            // sx={
+            //   {
+            //     borderTopLeftRadius: 0,
+            //     borderTopRightRadius: '16px',
+            //     borderBottomRightRadius: '16px',
+            //     borderBottomLeftRadius: 0,
+            //   }
+            // }
+            startIcon={<SportsBasketballIcon />}
+            fullWidth
+            sx={{ boxShadow: 'none', borderRadius: 4 }}
+          >
+            <span className={baseClasses.truncate}>{dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
+          </Button>
+        </Link>
+      </div>
 
       {
         projectsTree.model.logs.items.length > 0 && (
@@ -450,156 +520,21 @@ export const ProjectNode = ({
               paddingRight: '8px',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '16px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: '2px',
-                }}
-              >
-                {
-                  activeJobId === projectsTree.model.id && (
-                    <Button
-                      // disabled={!projectsTree.model.completed}
-                      size='small'
-                      // endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
-                      color='salmon'
-                      variant='outlined'
-                      sx={
-                        {
-                          borderTopLeftRadius: '16px',
-                          borderTopRightRadius: 0,
-                          borderBottomRightRadius: 0,
-                          borderBottomLeftRadius: '16px',
-                        }
-                      }
-                      // startIcon={<SportsBasketballIcon />}
-                      onClick={onScrollToStats({ jobId: projectsTree.model.id })}
-                    >
-                      {/* <span className={baseClasses.truncate}>Stats</span> */}
-                      <QueryStatsIcon sx={{ fontSize: '23px' }} />
-                    </Button>
-                  )
-                }
-                {
-                  activeJobId === projectsTree.model.id
-                    ? (
-                      <Link
-                        className={clsx(
-                          // classes.lastActivityOfCurrentJobLink,
-                          // baseClasses.underlineSolid,
-                          baseClasses.truncate,
-                        )}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          textDecoration: 'none'
-                        }}
-                        to={
-                          [
-                            `/last-activity/${projectsTree.model.id}`,
-                            // !!activeJobId
-                            //   ? `?from=${encodeURIComponent(`/jobs/${activeJobId}`)}${!!activeJobName ? `&backActionUiText=${activeJobName}` : ''}`
-                            //   : '',
-                            [
-                              '?',
-                              [
-                                `lastSeenLogKey=job-${activeJobId}-log-${projectsTree.model.logs.items[0].ts}`,
-                                `lastSeenJob=${activeJobId}`,
-                                !!activeJobName
-                                  ? [
-                                    `from=${encodeURIComponent(
-                                      [
-                                        `/jobs/${activeJobId}`,
-                                        // '?',
-                                        // `from=${!!activeJobName ? `backActionUiText=${activeJobName}` : ''}`
-                                      ].join('')
-                                    )}`,
-                                    !!activeJobName ? `backActionUiText=${encodeURIComponent(activeJobName)}` : '',
-                                  ].join('&')
-                                  : '',
-                              ].join('&')
-                            ].join('')
-                          ].join('')
-                        }
-                      >
-                        <Button
-                          size='small'
-                          endIcon={<ArrowForwardIcon /*sx={{ fontSize: '12px' }}*/ />}
-                          variant='outlined'
-                          sx={
-                            {
-                              borderTopLeftRadius: 0,
-                              borderTopRightRadius: '16px',
-                              borderBottomRightRadius: '16px',
-                              borderBottomLeftRadius: 0,
-                            }
-                          }
-                          startIcon={<SportsBasketballIcon />}
-                        >
-                          <span className={baseClasses.truncate}>{dayjs(projectsTree.model.logs.items[0].ts).format('DD.MM.YYYY HH:mm')}</span>
-                        </Button>
-                      </Link>
-                    ) : (
-                      <b
-                        onClick={toggleLastActivity}
-                        className={baseClasses.underlineDashed}
-                        style={{ fontSize: 'small' }}
-                      >Last activity {dayjs(projectsTree.model.ts.update).format('DD.MM.YYYY HH:mm')}</b>
-                    )
-                }
-              </div>
-              <code
-                className={baseClasses.noBreakWords}
-                // style={{ fontSize: 'x-small', fontWeight: 'bold', cursor: 'pointer' }}
-                style={{
-                  marginLeft: 'auto',
-                  cursor: 'pointer',
-                  fontSize: 'x-small',
-                  fontWeight: 'bold',
-                  display: 'inline-flex',
-                  flexDirection: 'row',
-                  gap: '5px',
-                  alignItems: 'center',
-                  // border: '1px solid red'
-                }}
-                onClick={toggleLastActivity}
-              >
-                {/* <span>[</span> */}
-                {
-                  isLastActivityOpened
-                    ? (
-                      <ExpandLessIcon sx={{ fontSize: '20px' }} />
-                    )
-                    : (
-                      <ExpandMoreIcon sx={{ fontSize: '20px' }} />
-                    )
-                }
-                {/* <span>]</span> */}
-              </code>
-            </div>
             {
-              isLastActivityOpened && (
-                <>
-                  <span
-                    style={{ fontSize: 'small' }}
-                    className={classes.lastLog}
-                  >
-                    {projectsTree.model.logs.items[0].text}
-                  </span>
-                </>
+              projectsTree.model.logs.items.length > 0 && (
+                <CollapsibleText
+                  isClickableBrief
+                  briefText='Last log'
+                  targetText='(render-props)'
+                  contentRender={() => (
+                    <span
+                      style={{ fontSize: 'small' }}
+                      className={classes.lastLog}
+                    >
+                      {projectsTree.model.logs.items[0].text}
+                    </span>
+                  )}
+                />
               )
             }
 
@@ -913,4 +848,4 @@ export const ProjectNode = ({
       }
     </div >
   )
-}
+})
