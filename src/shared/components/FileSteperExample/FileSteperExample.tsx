@@ -77,7 +77,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
 
   // const auxSensor = useRef<number>(0)
   useEffect(() => {
-    // NOTE: 1. Get from indexed db
+    // NOTE: 1. Get images from indexed db
     idbInstance.loadImages({
       key: idbKey,
       cb: {
@@ -113,7 +113,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
     })
 
     // TODO: 2. Set to local state
-  }, [idbKey])
+  }, [idbKey, setValue])
 
   const [isUpdated, setIsUpdated] = useState(false)
   const [_c, setCommonInfoContext] = CommonInfoContext.useStore((s) => s)
@@ -144,7 +144,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
         onFuckup: console.warn,
       },
     })
-  }, [idbKey, setIsUpdated])
+  }, [idbKey, setIsUpdated, setCommonInfoContext, watch])
   const [isRemoved, setIsRemoved] = useState(false)
   const removeKeyFromIDB = useCallback(() => {
     const isConfirmed = window.confirm('⚡️ Will be removed forever. Yes?')
@@ -164,7 +164,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
         },
       }
     })
-  }, [idbKey])
+  }, [idbKey, setCommonInfoContext])
   // const [loadedStore] = useLoadedStore((s) => s);
   // const totalSize = useMemo(() => {}, [])
   const totalBytes = [...watch('documents').values()].reduce((acc, cur) => {
@@ -195,7 +195,7 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
     () => isImagesEnabled
       ? handleDisableImagePack()
       : handleEnableImagePack(),
-    [isImagesEnabled]
+    [isImagesEnabled, handleDisableImagePack, handleEnableImagePack]
   )
   const idbSitchLabel = useMemo<SwitchProps>(
     () => ({

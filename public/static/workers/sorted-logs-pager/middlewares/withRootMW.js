@@ -96,7 +96,7 @@ const withRootMW = (arg) => compose([
                     switch (true) {
                       case getMatchedByAnyString({
                         tested: log.text,
-                        expected: ['📣'],
+                        expected: ['📣', '📢'],
                       }):
                         logBorder = 'red'
                         break
@@ -116,6 +116,9 @@ const withRootMW = (arg) => compose([
                         expected: ['☝️', '⚡'],
                       }):
                         logBg = 'warn'
+                        break
+                      case curJob.completed:
+                        logBg = 'gray'
                         break
                       default:
                         break

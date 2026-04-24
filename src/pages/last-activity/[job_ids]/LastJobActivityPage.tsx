@@ -287,12 +287,7 @@ export const LastJobActivityPage = memo(() => {
                             {!!job.relations.parent && (
                               <CollapsibleText
                                 briefPrefix='┌─'
-                                briefText={
-                                  <HighlightedText
-                                    comparedValue={`Parent ${getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}`}
-                                    testedValue={clsx(searchValueBasic)}
-                                  />
-                                }
+                                briefText='Parent'
                                 contentRender={() => (
                                   <div
                                     style={{

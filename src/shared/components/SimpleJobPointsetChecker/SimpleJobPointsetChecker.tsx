@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useMemo, useState, useCallback, useRef } from 'react'
+import { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import baseClasses from '~/App.module.scss'
 import { TJob, TopLevelContext, TPointsetItem, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { CustomizedTextField } from '~/shared/components/Input'
@@ -14,7 +14,7 @@ import { getDefaultPointsetStatusListSpaceState } from '~/pages/local-settings/u
 import { TLocalSettingsStatusOption } from '~/pages/local-settings/types'
 import { Autocomplete } from '~/shared/components/Autocomplete'
 import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-import { groupLog } from '~/shared/utils'
+import { getFormattedDate, groupLog } from '~/shared/utils'
 import { TreeNode } from 'ts-tree-lib'
 // import DirectionsIcon from '@mui/icons-material/Directions'
 // import StarIcon from '@mui/icons-material/Star'
@@ -44,6 +44,20 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
   const [calc, setCalc] = useState<TreeNode<TEnchancedPointByWorker> | null>(null)
   const [reportText, setReportText] = useState<string | null>(null)
+  const [originalResponseDetails, setOriginalResponseDetails] = useState<{
+    etc: {
+      counters: {
+        total: number;
+        analyse: {
+          condited: number;
+          conditedPercentage: number;
+          details: {
+            [key: string]: number;
+          };
+        };
+      }
+    }
+  } | null>(null)
   const _isContentReady = !!calc
   const jobsActorRef = TopLevelContext.useActorRef()
   const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
@@ -306,6 +320,11 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
           if (!!data.originalResponse?.report.targetTree) {
             setReportText(data.originalResponse.report.targetTree)
           }
+
+          // -- TODO: Remove this
+          // const { calc: _calc, report: _report, ...originalResponseRest } = data.originalResponse
+          setOriginalResponseDetails({ etc: data.originalResponse.etc })
+          // --
         }
       },
       onFinalError: ({ id, reason }) => {
@@ -329,6 +348,38 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       statusPack: localStatusPacksSettings[activeStatusPackKey],
     },
   })
+  const roadmapLable = useMemo<string | null>(
+    () => !!originalResponseDetails
+      ? `Ready ${originalResponseDetails?.etc.counters.analyse.condited} of ${originalResponseDetails?.etc.counters.total} (~${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`
+      : null,
+    [originalResponseDetails]
+  )
+
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const copyToClipboardText = useMemo<string>(
+    () => {
+      const result: string[] = []
+      if (!!reportText) {
+        result.push(`Готовность на ${getFormattedDate(currentTime)} 👉 ${originalResponseDetails?.etc.counters.analyse.condited}/${originalResponseDetails?.etc.counters.total} (~${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`)
+        result.push('')
+        result.push(reportText)
+      }
+      return result.join('\n')
+    },
+    [
+      currentTime,
+      originalResponseDetails?.etc.counters.analyse.condited,
+      originalResponseDetails?.etc.counters.total,
+      originalResponseDetails?.etc.counters.analyse.conditedPercentage,
+      reportText
+    ]
+  );
 
   return (
     <div
@@ -345,7 +396,24 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
           gap: '6px',
         }}
       >
-        Roadmap | Pointset info
+        {
+          !!roadmapLable
+            ? (
+              <div
+                className={baseClasses.truncate}
+                style={{
+                  maxWidth: 'calc(250px)',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '6px',
+                }}
+              >
+                <span>Roadmap</span>
+                <span>|</span>
+                <span className={baseClasses.truncate}>{roadmapLable}</span>
+              </div>
+            ) : 'Roadmap'
+        }
       </div>
       {
         !!reportText && (
@@ -358,7 +426,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
             </pre>
             <div>
               <CopyToClipboardWrapper
-                text={reportText}
+                text={copyToClipboardText}
                 uiText='Copy as text'
                 showNotifOnCopy
               />
@@ -602,9 +670,13 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
                 ))
               }
             </div>
-            {/* <pre className={baseClasses.preNormalized}>
-              {JSON.stringify({ pointset: targetJob?.pointset }, null, 2)}
-            </pre> */}
+            {
+              !!originalResponseDetails && (
+                <pre className={baseClasses.preNormalized}>
+                  {JSON.stringify({ originalResponseDetails }, null, 2)}
+                </pre>
+              )
+            }
           </>
         )
       }

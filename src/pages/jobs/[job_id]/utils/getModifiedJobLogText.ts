@@ -37,7 +37,7 @@ export const getModifiedJobLogText = ({ text, jobs, users }: {
                   value: targetJobId
                 },
               },
-              sorted: 'ASC',
+              sorted: 'DESC',
             }).result
             if (!!targetJob)
               result = result.replace(`[${foundItem}]`, targetJob.title)

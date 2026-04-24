@@ -25,7 +25,22 @@ type TProps = {
   deps: TDeps;
   cb?: {
     beforeStart?: () => void;
-    onEachSuccessItemData: (data: NWService.TDataResult<{ calc: TreeNode<TPointsetItem>; report: { targetTree: string; } }>) => void;
+    onEachSuccessItemData: (data: NWService.TDataResult<{
+      calc: TreeNode<TPointsetItem>;
+      report: { targetTree: string; };
+      etc: {
+        counters: {
+          total: number;
+          analyse: {
+            condited: number;
+            conditedPercentage: number;
+            details: {
+              [key: string]: number;
+            };
+          };
+        };
+      }
+    }>) => void;
     onFinalError: (ps: { id: number; reason: string }) => void;
   };
 }
@@ -40,7 +55,22 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
       __eType: NWService.EWorkerToClientEvent;
       data: {
         type: NWService.EWorkerToClientEvent;
-        output: NWService.TDataResult<{ calc: TreeNode<TPointsetItem>; report: { targetTree: string; } }>;
+        output: NWService.TDataResult<{
+          calc: TreeNode<TPointsetItem>;
+          report: { targetTree: string; };
+          etc: {
+            counters: {
+              total: number;
+              analyse: {
+                condited: number;
+                conditedPercentage: number;
+                details: {
+                  [key: string]: number;
+                };
+              };
+            }
+          }
+        }>;
         // NOTE: Input data could be compared
         input: {
           opsEventType: NWService.EClientToWorkerEvent;

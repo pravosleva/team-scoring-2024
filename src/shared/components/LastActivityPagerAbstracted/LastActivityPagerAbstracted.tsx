@@ -39,7 +39,7 @@ const timeAgo = new __TimeAgo('en-US')
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
-type TLogBg = 'default' | 'green' | 'warn'
+type TLogBg = 'default' | 'green' | 'warn' | 'gray'
 
 type TModifiedLog = (TLogsItem & {
   jobId: number;
@@ -467,16 +467,17 @@ export const LastActivityPagerAbstracted = memo(({
                             // [baseClasses.stripedGrayLight]: log.jobType === 'globalTag',
                             // border, outline, color
                             [classes.defaultWrapper]: log.jobType === 'default',
-                            [baseClasses.stripedYellow]: log.jobType === 'globalTag',
+                            // [baseClasses.stripedYellow]: log.jobType === 'globalTag',
                             [classes.warningDashedBorder]: log.jobType === 'globalTag',
 
                             // NOTE: LOG BG & BORDER
                             [classes.whiteColor]:
                               log.logBg === 'green'
-                              || log.jobType === 'globalTag'
+                              // || log.jobType === 'globalTag'
                               || log.logBg === 'warn',
                             [baseClasses.stripedGreenHard]: log.logBg === 'green',
                             [baseClasses.stripedYellowLite4]: log.logBg === 'warn',
+                            [baseClasses.stripedGray]: log.logBg === 'gray',
                             // outline, color
                             [classes.redSolidBorder]: log.logBorder === 'red',
 

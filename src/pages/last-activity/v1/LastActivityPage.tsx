@@ -41,7 +41,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 type TJobType = 'default' | 'globalTag'
 type TLogBorder = 'default' | 'red'
-type TLogBg = 'default' | 'green' | 'warn'
+type TLogBg = 'default' | 'green' | 'warn' | 'gray'
 
 export const LastActivityPage = memo(() => {
   // const params = useParams()
@@ -165,6 +165,7 @@ export const LastActivityPage = memo(() => {
                           || log.logBg === 'warn',
                         [baseClasses.stripedGreenHard]: log.logBg === 'green',
                         [baseClasses.stripedYellowLite4]: log.logBg === 'warn',
+                        [baseClasses.stripedGray]: log.logBg === 'gray',
                         // outline, color
                         [lastActivityPageClasses.redSolidBorder]: log.logBorder === 'red',
 

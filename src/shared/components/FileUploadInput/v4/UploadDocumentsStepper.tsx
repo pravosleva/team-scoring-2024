@@ -78,6 +78,7 @@ type TProps = {
   // onSuccess?: ({ reason }: { reason: string }) => void;
   onResetInternalErrors?: () => void;
   onUpdateFileStorageIds?: (ps: { readyStuffForApi: NSAdministrativeTicket.TFinalFileInfoForApi[] }) => void;
+  beforeAdd?: () => void;
   onAdd?: () => void;
   onRemove?: () => void;
 }
@@ -96,7 +97,7 @@ const {
 const Logic = memo(({
   control, filesQuantityLimit, totalSizeLimitMiB, onResetInternalErrors,
   onUpdateFileStorageIds,
-  onAdd, onRemove
+  onAdd, onRemove, beforeAdd,
 }: TProps) => {
   const {
     append, fields, remove
@@ -125,6 +126,7 @@ const Logic = memo(({
 
   const [errQuantityMessage, setCommonInfoStore] = useCommonInfoStore((s) => s.errQuantityMessage);
   const __handleAddFiles: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    beforeAdd?.();
     originalInputLogger.log({
       label: '➕ handler called', err: null, evt: { originalEvent: event }
     });
@@ -266,7 +268,7 @@ const Logic = memo(({
         });
         setTimeout(() => hiddenFileInputRef.current?.click(), 0);
       }
-    }, [setLoadedStore, setRequiredStore, remove, setCommonInfoStore]);
+    }, [setLoadedStore, setRequiredStore, remove, setCommonInfoStore, onRemove]);
 
   const handleSuccessUpload = useCallback(({
     fileStoreId, size, fileName, localDocumentId, previewUrl
@@ -288,7 +290,7 @@ const Logic = memo(({
     // onSuccess?.({
     //   reason: 'Все проверки пройдены успешно',
     // });
-  }, [loadedStore]);
+  }, [setLoadedStore]);
 
   // const [loadedSize] = useCommonInfoStore((s) => s.loadedSize);
   useEffect(() => {
@@ -309,7 +311,7 @@ const Logic = memo(({
         return acc;
       }, [])
     });
-  }, [loadedStore]);
+  }, [loadedStore, onUpdateFileStorageIds, setCommonInfoStore]);
 
   const [requiredSize] = useCommonInfoStore((s) => s.requiredSize);
   useEffect(() => {
@@ -319,7 +321,7 @@ const Logic = memo(({
         return acc;
       }, 0),
     });
-  }, [requiredStore]);
+  }, [requiredStore, setCommonInfoStore]);
 
   const [errTotalSizeMessage] = useCommonInfoStore((s) => s.errTotalSizeMessage);
   useEffect(() => {
@@ -335,7 +337,7 @@ const Logic = memo(({
           : null
       });
     }
-  }, [requiredSize, totalSizeLimitMiB]);
+  }, [requiredSize, totalSizeLimitMiB, setCommonInfoStore]);
 
   return (
     <>

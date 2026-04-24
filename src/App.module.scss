@@ -471,6 +471,14 @@
       #000 20px);
 }
 
+.stripedGray {
+  background: repeating-linear-gradient(45deg,
+      #E8E8E8,
+      #E8E8E8 10px,
+      #F8F8F8 10px,
+      #F8F8F8 20px);
+}
+
 .stripedYellowLite5 {
   background: repeating-linear-gradient(45deg,
       #ffc99b,

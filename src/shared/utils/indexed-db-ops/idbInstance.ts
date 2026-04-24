@@ -221,6 +221,8 @@ class IDBSingleton {
     items: Blob[];
   }): void {
     const __getTargetActionResult = () => {
+      // TODO: Should firstly remove key from IndexedDB?
+
       const tsUpdate = new Date().getTime()
       const transaction = (this.db as any).transaction(this.STORE_NAME, 'readwrite')
       const store = transaction.objectStore(this.STORE_NAME)

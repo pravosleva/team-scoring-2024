@@ -23,6 +23,70 @@ const treeData = {
 
 importScripts('./middlewares/utils/math-ops/getPercentage.js')
 
+function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset = [] }) {
+  const details = {};
+  let condited = 0;
+
+  // Подготавливаем регулярки заранее
+  const matchers = fragments.map(f => ({
+    regex: new RegExp(`^${f.valueFragment.replace(/\*/g, '.*')}`),
+    path: f.path
+  }));
+
+  const getValueByPath = (obj, path) => {
+    return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+  };
+
+  pointset.forEach(item => {
+    // Для каждого элемента проверяем все возможные пути из fragments
+    // (так как в разных фрагментах могут быть разные пути)
+    const checkedPaths = [...new Set(fragments.map(f => f.path))];
+
+    let isMatched = false;
+    let matchedValue = null;
+
+    for (const path of checkedPaths) {
+      const value = getValueByPath(item, path);
+      if (!value) continue;
+
+      // Условие 1: Проверка по фрагментам (regex)
+      const matchesRegex = matchers
+        .filter(m => m.path === path)
+        .some(m => m.regex.test(value));
+
+      // Условие 2: Проверка по cfg и allowedEmojies
+      const hasAllowedEmoji = cfg[value] &&
+        allowedEmojies.includes(cfg[value].emoji);
+
+      if (matchesRegex || hasAllowedEmoji) {
+        isMatched = true;
+        matchedValue = value;
+        break; // Нашли совпадение, стоп для этого объекта
+      }
+    }
+
+    if (isMatched) {
+      details[matchedValue] = (details[matchedValue] || 0) + 1;
+      condited++;
+    }
+  });
+
+  const conditedPercentage = pointset.length > 0
+    ? (condited / pointset.length) * 100
+    : 0;
+
+  return {
+    analyse: {
+      condited,
+      conditedPercentage: Number(conditedPercentage.toFixed(0)),
+      details,
+      __conditionDetails: {
+        fragments,
+      },
+    }
+  };
+}
+
 const withTsTreeLibCalcService = async ({ eventData, cb }) => {
   const { __eType, input } = eventData
 
@@ -141,13 +205,19 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
 
             // -- NOTE: REPORT EXP
             const __reportExpTarget = getTreePartById({ currentPointData: { ...input.rootPoint }, noParent: true });
+            const counters = {
+              // adds: 0,
+              total: 0,
+            }
             const getNodeReportChunk = ({
               model, children, level, isLast, levelsInfoMap,
               getHeaderByModel, getDescriptionMessagesByModel, validateFn,
               // __onEacnIteration,
               emoji,
+              counters,
             }) => {
               const header = getHeaderByModel({ model })
+              counters.total += 1
               const mainStrChuncks = [
                 !isLast
                   ? `├─ ${header.label}`
@@ -176,24 +246,18 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
               const final = [
                 mainStrChuncks.join(''),
               ]
-              const counters = {
-                adds: 0,
-              }
+
               const percentage = {
                 done: header.readyPercentageVals || [],
               }
               if (typeof getDescriptionMessagesByModel === 'function') {
-                const adds = getDescriptionMessagesByModel({
-                  model,
-                  validateFn,
-                  __incCounter: () => counters.adds + 1
-                })
+                const adds = getDescriptionMessagesByModel({ model, validateFn })
                 if (adds.length > 0)
                   for (const str of adds) {
                     // final.push(['   '.repeat(level), str].join(`   • ${emoji} `))
                     if (!!emoji) final.push(['   '.repeat(level), str].join(`  ${emoji} `))
                     else final.push(['   '.repeat(level), str].join('   '))
-                    counters.adds += 1
+                    // counters.adds += 1
                   }
               }
 
@@ -211,9 +275,10 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                   getHeaderByModel,
                   getDescriptionMessagesByModel,
                   validateFn,
+                  counters,
                 })
                 subStrChuncks.push(nodeReport.result)
-                counters.adds += nodeReport.counters.adds
+                // counters.adds += nodeReport.counters.adds
                 for (let c of nodeReport.percentage.done) {
                   percentage.done.push(c)
                 }
@@ -250,20 +315,35 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
                   readyPercentageVals: [],
                 }
               },
-              getDescriptionMessagesByModel: ({ model, __incCounter }) =>
+              getDescriptionMessagesByModel: ({ model }) =>
                 !!model.descr
                   ? [model.descr]
-                  : []
+                  : [],
+              counters,
             })
             // --
 
             output.originalResponse = {
               calc,
-              // --- NOTE: Report as text
+              // --- NOTE: Target report as text
               report: {
                 targetTree: __targetTree.result,
-              }
+              },
               // ---
+              etc: {
+                counters: {
+                  ...__targetTree.counters,
+                  analyse: getCondited({
+                    fragments: [
+                      { valueFragment: 'ready*', path: 'statusCode' },
+                      // { valueFragment: 'test*', path: 'statusCode' }
+                    ],
+                    pointset: input.pointset,
+                    allowedEmojies: ['✅', '☑️', '🟢'],
+                  }).analyse,
+                },
+                percentage: __targetTree.percentage,
+              },
             }
 
             if (typeof cb[eventData?.input?.opsEventType] === 'function') {
