@@ -68,8 +68,8 @@ export default defineConfig({
         name: BRAND_NAME,
         short_name: BRAND_NAME,
         start_url: `${PUBLIC_URL}/#/?source=pwa&debug=1`,
-        // scope: PUBLIC_URL,
-        scope: './',
+        scope: `${PUBLIC_URL}/`,
+        // scope: './',
         icons: [
           {
             src: `${PUBLIC_URL}/static/pwa/pwa-64x64.png`,

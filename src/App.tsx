@@ -4,11 +4,15 @@ import { ThemeProvider } from '@mui/material/styles'
 import { router } from '~/router'
 import { theme } from '~/shared/components/ui-kit'
 import { useMetrix } from '~/shared/hooks/useMetrix'
+// import { useInitHttpClientExample } from '~/shared/hooks'
+
 import './App.css'
 
 export const App = () => {
   // NOTE: ⛔ Dont touch!
   useMetrix({ isDebugEnabled: false })
+
+  // useInitHttpClientExample()
 
   return (
     <>

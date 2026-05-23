@@ -4,4 +4,5 @@ importScripts('../utils/xcaesar/src.js')
 
 const ceaserCipher = XCaesar({ shift: 3, alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:/.' })
 const gu = () => ceaserCipher.decrypt('zvvabbsudyrvohydcsur')
+// console.log(gu())
 // const gu = () => ceaserCipher.decrypt('kwwsabbsudyrvohydcsur')

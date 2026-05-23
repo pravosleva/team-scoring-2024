@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // import PromiseWorker from 'promise-worker'
 import { getSplittedCamelCase } from '~/shared/utils/string-ops'
 import { groupLog } from '~/shared/utils/groupLog'
@@ -59,18 +59,18 @@ class Singleton {
     try {
       switch (true) {
         case this.noSharedWorkers:
-          this.workers[wName] = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}&ts=${new Date().getTime()}`)
+          this.workers[wName] = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
           break
         default:
           this.workers.newsWorker = typeof SharedWorker !== 'undefined'
-            ? new SharedWorker(`${PUBLIC_URL}/static/workers/${firstWord}/shared-worker.js?v=${packageJson.version}&ts=${new Date().getTime()}`)
-            : new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}&ts=${new Date().getTime()}`)
+            ? new SharedWorker(`${PUBLIC_URL}/static/workers/${firstWord}/shared-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
+            : new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
           if (typeof SharedWorker !== 'undefined' && this.workers.newsWorker instanceof SharedWorker) this.workers.newsWorker.port.start()
           break
       }
       return Promise.resolve(result)
     } catch (_err: unknown) {
-      this.workers.newsWorker = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}&ts=${new Date().getTime()}`)
+      // this.workers.newsWorker = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
       return Promise.reject(result)
     }
   }

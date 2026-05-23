@@ -4,24 +4,24 @@ import { proxy } from 'valtio'
 //   initialContractFormState,
 // } from '../xstate/stepMachine/initialState'
 // import { NSP } from '~/utils/httpClient'
-// import { TReqStateCode, TResponseDetailsInfo, TRequestDetailsInfo } from '~/utils/httpClient/API'
+import { TReqStateCode, TResponseDetailsInfo, TRequestDetailsInfo } from '~/shared/utils/httpClient/API'
 import { getRandomString } from '~/shared/utils/string-ops'
 // import { TStepMachineContextFormat, TContractForm, EStep, EAppModeMenu1, EAppModeMenu2 } from '../xstate/stepMachine/types'
-// import { mutateObject } from '~/shared/utils/object-ops'
-// import clsx from 'clsx'
+import { mutateObject } from '~/shared/utils/object-ops'
+import clsx from 'clsx'
 import pkg from '../../../../package.json'
 // import { TItem } from '../components/tailwind'
-// import { NViDevtools } from './types'
+import { NViDevtools } from './types'
 
-// const defaultXHRState: NViDevtools.TNetworkXHR = {
-//   total: {
-//     pending: 0,
-//     rejected_req: 0,
-//     rejected_res: 0,
-//     fulfilled: 0,
-//   },
-//   state: {},
-// }
+const defaultXHRState: NViDevtools.TNetworkXHR = {
+  total: {
+    pending: 0,
+    rejected_req: 0,
+    rejected_res: 0,
+    fulfilled: 0,
+  },
+  state: {},
+}
 
 class Singleton {
   private static instance: Singleton
@@ -49,7 +49,7 @@ class Singleton {
           __wasThereAFirstConnection: boolean;
           isConnected: boolean;
         };
-        // xhr: NViDevtools.TNetworkXHR;
+        xhr: NViDevtools.TNetworkXHR;
       };
     };
   }
@@ -88,7 +88,7 @@ class Singleton {
             // ---
             isConnected: false,
           },
-          // xhr: defaultXHRState,
+          xhr: defaultXHRState,
         },
       },
     })
@@ -110,89 +110,89 @@ class Singleton {
   // public disableDebugUI() {
   //   this._common.devtools.isUIEnabled = true
   // }
-  // public __fixXHRTotalCounters({ code }: { code: TReqStateCode }) {
-  //   try {
-  //     switch (code) {
-  //       case 'pending':
-  //         this._common.devtools.network.xhr.total.pending += 1
-  //         break
-  //       case 'fulfilled':
-  //         this._common.devtools.network.xhr.total.pending -= 1
-  //         this._common.devtools.network.xhr.total.fulfilled += 1
-  //         break
-  //       case 'rejected_req':
-  //         this._common.devtools.network.xhr.total.pending -= 1
-  //         this._common.devtools.network.xhr.total.rejected_req += 1
-  //         break
-  //       case 'rejected_res':
-  //         this._common.devtools.network.xhr.total.pending -= 1
-  //         this._common.devtools.network.xhr.total.rejected_res += 1
-  //         break
-  //       default:
-  //         throw new Error(`Incorrect state code: ${code}`)
-  //     }
-  //   } catch (err) {
-  //     console.warn(err)
-  //   }
-  // }
-  // public __fixXHRState({ url, code, ts, __resDetails, __reqDetails }: {
-  //   url: string;
-  //   code: TReqStateCode;
-  //   ts: number;
-  //   __resDetails?: TResponseDetailsInfo;
-  //   __reqDetails?: TRequestDetailsInfo;
-  // }) {
-  //   if (!this._common.devtools.network.xhr.state[url]) {
-  //     this._common.devtools.network.xhr.state[url] = {
-  //       [String(ts)]: {
-  //         code,
-  //       },
-  //     }
-  //     if (__resDetails) this._common.devtools.network.xhr.state[url][String(ts)].__resDetails = __resDetails
-  //     if (__reqDetails) this._common.devtools.network.xhr.state[url][String(ts)].__reqDetails = __reqDetails
-  //   } else {
-  //     if (!this._common.devtools.network.xhr.state[url][String(ts)])
-  //       this._common.devtools.network.xhr.state[url][String(ts)] = {
-  //         code,
-  //       }
-  //     else this._common.devtools.network.xhr.state[url][String(ts)].code = code
+  public __fixXHRTotalCounters({ code }: { code: TReqStateCode }) {
+    try {
+      switch (code) {
+        case 'pending':
+          this._common.devtools.network.xhr.total.pending += 1
+          break
+        case 'fulfilled':
+          this._common.devtools.network.xhr.total.pending -= 1
+          this._common.devtools.network.xhr.total.fulfilled += 1
+          break
+        case 'rejected_req':
+          this._common.devtools.network.xhr.total.pending -= 1
+          this._common.devtools.network.xhr.total.rejected_req += 1
+          break
+        case 'rejected_res':
+          this._common.devtools.network.xhr.total.pending -= 1
+          this._common.devtools.network.xhr.total.rejected_res += 1
+          break
+        default:
+          throw new Error(`Incorrect state code: ${code}`)
+      }
+    } catch (err) {
+      console.warn(err)
+    }
+  }
+  public __fixXHRState({ url, code, ts, __resDetails, __reqDetails }: {
+    url: string;
+    code: TReqStateCode;
+    ts: number;
+    __resDetails?: TResponseDetailsInfo;
+    __reqDetails?: TRequestDetailsInfo;
+  }) {
+    if (!this._common.devtools.network.xhr.state[url]) {
+      this._common.devtools.network.xhr.state[url] = {
+        [String(ts)]: {
+          code,
+        },
+      }
+      if (__resDetails) this._common.devtools.network.xhr.state[url][String(ts)].__resDetails = __resDetails
+      if (__reqDetails) this._common.devtools.network.xhr.state[url][String(ts)].__reqDetails = __reqDetails
+    } else {
+      if (!this._common.devtools.network.xhr.state[url][String(ts)])
+        this._common.devtools.network.xhr.state[url][String(ts)] = {
+          code,
+        }
+      else this._common.devtools.network.xhr.state[url][String(ts)].code = code
 
-  //     if (__resDetails) this._common.devtools.network.xhr.state[url][String(ts)].__resDetails = __resDetails
-  //     if (__reqDetails) this._common.devtools.network.xhr.state[url][String(ts)].__reqDetails = __reqDetails
-  //   }
-  // }
-  // public __fixRequest({ url, code, ts, __reqDetails }: { url: string; code: TReqStateCode; ts: number; __reqDetails?: TRequestDetailsInfo; }) {
-  //   try {
-  //     if (!url) throw new Error(`Incorrect url! expected: not empty string. received: ${clsx(url || 'empty', `(${typeof url})`)}`)
-  //     this.__fixXHRState({ url, code, ts, __reqDetails })
-  //     this.__fixXHRTotalCounters({ code })
-  //   } catch (err: any) {
-  //     console.warn(err?.message || 'Что-то пошло не так...')
-  //     console.warn(err)
-  //   }
-  // }
-  // public __fixResponse({ url, code, ts, __resDetails }: {
-  //   url: string;
-  //   code: TReqStateCode;
-  //   ts: number;
-  //   __resDetails?: TResponseDetailsInfo;
-  // }) {
-  //   try {
-  //     if (!url) throw new Error(`Incorrect url! expected: not empty string. received: ${clsx(url || 'empty', `(${typeof url})`)}`)
-  //     this.__fixXHRState({ url, code, ts, __resDetails })
-  //     this.__fixXHRTotalCounters({ code })
-  //   } catch (err: any) {
-  //     console.warn(err?.message || 'Что-то пошло не так...')
-  //     console.warn(err)
-  //   }
-  // }
-  // private __resetXHRStates() {
-  //   mutateObject({
-  //     target: this._common.devtools.network.xhr,
-  //     source: defaultXHRState,
-  //     removeIfUndefined: true,
-  //   })
-  // }
+      if (__resDetails) this._common.devtools.network.xhr.state[url][String(ts)].__resDetails = __resDetails
+      if (__reqDetails) this._common.devtools.network.xhr.state[url][String(ts)].__reqDetails = __reqDetails
+    }
+  }
+  public __fixRequest({ url, code, ts, __reqDetails }: { url: string; code: TReqStateCode; ts: number; __reqDetails?: TRequestDetailsInfo; }) {
+    try {
+      if (!url) throw new Error(`Incorrect url! expected: not empty string. received: ${clsx(url || 'empty', `(${typeof url})`)}`)
+      this.__fixXHRState({ url, code, ts, __reqDetails })
+      this.__fixXHRTotalCounters({ code })
+    } catch (err: unknown) {
+      console.warn((err as Error)?.message || 'Что-то пошло не так...')
+      console.warn(err)
+    }
+  }
+  public __fixResponse({ url, code, ts, __resDetails }: {
+    url: string;
+    code: TReqStateCode;
+    ts: number;
+    __resDetails?: TResponseDetailsInfo;
+  }) {
+    try {
+      if (!url) throw new Error(`Incorrect url! expected: not empty string. received: ${clsx(url || 'empty', `(${typeof url})`)}`)
+      this.__fixXHRState({ url, code, ts, __resDetails })
+      this.__fixXHRTotalCounters({ code })
+    } catch (err: unknown) {
+      console.warn((err as Error)?.message || 'Что-то пошло не так...')
+      console.warn(err)
+    }
+  }
+  private __resetXHRStates() {
+    mutateObject({
+      target: this._common.devtools.network.xhr,
+      source: defaultXHRState,
+      removeIfUndefined: true,
+    })
+  }
   // --
 
   // public setAppMode(value: EAppModeMenu1 | null) {
@@ -295,7 +295,7 @@ class Singleton {
   // public setContractStepResponse(res: NSP.TStandartMinimalResponse | null) {
   //   this._stepMachineState.contract.response = res
   // }
-  // public setPhoneCheckResponse(res: NSP.TCheckPhoneResponse | null) {
+  // public setPhoneCheckResponse(res: NSP.TExampleResponse | null) {
   //   this._stepMachineState.checkPhone.response = res
   // }
   // public setAcceptResponse({ res, reqState }: {

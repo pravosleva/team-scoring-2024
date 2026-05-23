@@ -1,4 +1,5 @@
 export * from './use[any]Storage'
 export * from './useDebounce'
 export * from './useElementSizes'
+export * from './useInitHttpClientExample'
 export * from './useScrollPosition'

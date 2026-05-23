@@ -18,7 +18,7 @@ import { TLocalSettingsStatusOption } from '~/pages/local-settings/types'
 import { getDefaultPointsetStatusListSpaceState } from './utils'
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+// import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ImageIcon from '@mui/icons-material/Image'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 
@@ -184,14 +184,15 @@ export const LocalSettings = memo(() => {
             <ResponsiveBlock
               isPaddedMobile
               isLimited
-              className={clsx(baseClasses.pagesGrid)}
+              className={clsx(baseClasses.specialActionsGrid)}
             >
               <Link to='/business-time'>
                 <Button
                   color='secondary'
                   variant='outlined'
                   startIcon={<WorkHistoryIcon />}
-                  endIcon={<ArrowForwardIcon />}
+                  // endIcon={<ArrowForwardIcon />}
+                  fullWidth
                 >
                   Business time
                 </Button>
@@ -201,7 +202,8 @@ export const LocalSettings = memo(() => {
                   color='secondary'
                   variant='outlined'
                   startIcon={<ImageIcon />}
-                  endIcon={<ArrowForwardIcon />}
+                  // endIcon={<ArrowForwardIcon />}
+                  fullWidth
                 >
                   Local images
                 </Button>

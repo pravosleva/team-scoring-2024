@@ -1,3 +1,4 @@
+export * from './counterFactory'
 export * from './getArithmeticalMean'
 export * from './getBytesFromMiB'
 export * from './getIsNumeric'

@@ -8,49 +8,67 @@ import CloseIcon from '@mui/icons-material/Close'
 import 'react-photo-view/dist/react-photo-view.css'
 import './special-experimental-styles.css'
 
-createRoot(document.getElementById('root')!).render(
-  <SnackbarProvider
-    maxSnack={3}
-    autoHideDuration={60000}
-    // preventDuplicate
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    style={{
-      borderRadius: '8px',
-      maxWidth: '430px',
-      whiteSpace: 'pre-wrap',
-    }}
-    action={(snackbarId) => (
-      <button
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: '50%',
-          border: '2px solid #FFF',
-          backgroundColor: 'transparent',
-          color: '#FFF',
-          width: '32px',
-          height: '32px',
-          cursor: 'pointer',
+async function enableMswMocking() {
+  if (process.env.NODE_ENV === 'development') {
+    const { worker } = await import('./mocks.msw/browser.ts')
+
+    return worker.start({
+      onUnhandledRequest: 'warn', // MSW напишет в консоль, если видит запрос, но нет подходящего обработчика
+      serviceWorker: {
+        url: '/mockServiceWorker.js'
+      }
+    })
+  }
+}
+
+const rootElement = createRoot(document.getElementById('root')!)
+
+enableMswMocking()
+  .then(() => {
+    rootElement.render(
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={60000}
+        // preventDuplicate
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
-        onClick={() => closeSnackbar(snackbarId)}
+        style={{
+          borderRadius: '8px',
+          maxWidth: '430px',
+          whiteSpace: 'pre-wrap',
+        }}
+        action={(snackbarId) => (
+          <button
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: '50%',
+              border: '2px solid #FFF',
+              backgroundColor: 'transparent',
+              color: '#FFF',
+              width: '32px',
+              height: '32px',
+              cursor: 'pointer',
+            }}
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            <CloseIcon fontSize='small' />
+          </button>
+        )}
       >
-        <CloseIcon fontSize='small' />
-      </button>
-    )}
-  >
-    <CommonInfoLayer>
-      <IDBSwitchersLayer>
-        <TopLevelContext.Provider>
-          <SearchWidgetDataLayer>
-            <ClientPerfWidget position='right-side-center-bottom' />
-            <App />
-          </SearchWidgetDataLayer>
-        </TopLevelContext.Provider>
-      </IDBSwitchersLayer>
-    </CommonInfoLayer>
-  </SnackbarProvider>,
-)
+        <CommonInfoLayer>
+          <IDBSwitchersLayer>
+            <TopLevelContext.Provider>
+              <SearchWidgetDataLayer>
+                <ClientPerfWidget position='right-side-center-bottom' />
+                <App />
+              </SearchWidgetDataLayer>
+            </TopLevelContext.Provider>
+          </IDBSwitchersLayer>
+        </CommonInfoLayer>
+      </SnackbarProvider>,
+    )
+  })

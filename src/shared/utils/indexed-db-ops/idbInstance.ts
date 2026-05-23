@@ -54,8 +54,34 @@ class IDBSingleton {
     }
   }
 
-  #openDB() {
+  async #openDB() {
     const self = window
+    async function checkStorage() {
+      if (!!navigator.storage && !!navigator.storage.persist) {
+        await navigator.storage.persist()
+          .then(async (granted) => {
+            if (granted) {
+              // alert("Хранилище защищено. Chrome свяжет IndexedDB с доменом, а не с WebAPK.")
+
+              // NOTE: Проверяем, затребовано ли устойчивое хранилище
+              const isPersisted = await navigator.storage.persisted()
+              console.log(`Хранилище защищено от автоматического удаления: ${isPersisted}`)
+              // NOTE: Это вынуждает Android Chrome регистрировать базу данных не как временный кэш WebAPK-пакета,
+              // а как постоянное дисковое хранилище домена, которое корректно подхватывается при переустановках
+
+              // NOTE: Запрашиваем персистентность (помогает Chrome правильно связать права)
+              if (!isPersisted) {
+                const requested = await navigator.storage.persist()
+                console.log(`Права на постоянное хранение предоставлены: ${requested}`)
+              }
+            } else throw new Error("В устойчивом хранилище отказано. Возможны проблемы при переустановке PWA.")
+          })
+          .catch((err) => {
+            alert(`ERR: ${err?.message || 'No err?.message'}`)
+          })
+      }
+    }
+    await checkStorage()
     return new Promise((resolve, reject) => {
       const request = self.indexedDB.open(this.DB_NAME, this.DB_VERSION)
 
@@ -161,12 +187,32 @@ class IDBSingleton {
         // @ts-ignore
         db = event.target?.result
         // NOTE: Database connection is open and ready for transactions
+
+        // alert(`Количество объектов: ${db.objectStoreNames.length}`)
+
         resolve(db)
       }
 
+      // request.onerror = (event) => {
+      //   // @ts-ignore
+      //   reject('Database error: ' + event.target?.error);
+      // }
       request.onerror = (event) => {
         // @ts-ignore
-        reject('Database error: ' + event.target?.error);
+        const error = event.target.error;
+
+        // Если права нарушены из-за переустановки, Chrome вернет SecurityError или UnknownError
+        if (error.name === "SecurityError" || error.name === "UnknownError") {
+          alert("База данных повреждена после переустановки. Сброс...");
+
+          // Принудительно удаляем старый заблокированный контейнер
+          indexedDB.deleteDatabase(this.DB_NAME);
+          // @ts-ignore
+          reject('Database error: ' + event.target?.error || 'No event.target?.error')
+
+          // Перезапускаем приложение для чистой инициализации
+          setTimeout(() => location.reload(), 500);
+        }
       }
     })
   }
