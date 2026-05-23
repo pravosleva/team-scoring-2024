@@ -350,7 +350,10 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   })
   const roadmapLable = useMemo<string | null>(
     () => !!originalResponseDetails
-      ? `Ready ${originalResponseDetails?.etc.counters.analyse.condited} of ${originalResponseDetails?.etc.counters.total} (~${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`
+      ? clsx(
+        `Ready ${originalResponseDetails?.etc.counters.analyse.condited} of ${originalResponseDetails?.etc.counters.total}`,
+        `(${originalResponseDetails?.etc.counters.analyse.conditedPercentage === 0 || originalResponseDetails?.etc.counters.analyse.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`,
+      )
       : null,
     [originalResponseDetails]
   )
@@ -366,7 +369,13 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     () => {
       const result: string[] = []
       if (!!reportText) {
-        result.push(`Готовность на ${getFormattedDate(currentTime)} 👉 ${originalResponseDetails?.etc.counters.analyse.condited}/${originalResponseDetails?.etc.counters.total} (~${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`)
+        result.push(
+          clsx(
+            `Готовность на ${getFormattedDate(currentTime)} 👉`,
+            `${originalResponseDetails?.etc.counters.analyse.condited}/${originalResponseDetails?.etc.counters.total}`,
+            `(${originalResponseDetails?.etc.counters.analyse.conditedPercentage === 0 || originalResponseDetails?.etc.counters.analyse.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`,
+          )
+        )
         result.push('')
         result.push(reportText)
       }
