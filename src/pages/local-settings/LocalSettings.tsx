@@ -175,7 +175,7 @@ export const LocalSettings = memo(() => {
           marginBottom: '24px',
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={2} mt={2}>
           <Grid size={12}>
             <h1 className={baseClasses.inlineH1}>
               <SettingsIcon fontSize='inherit' />

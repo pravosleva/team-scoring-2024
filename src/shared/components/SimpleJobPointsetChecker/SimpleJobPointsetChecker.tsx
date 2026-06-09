@@ -24,6 +24,7 @@ import { usePoinsetTreeCalcWorker } from './hooks'
 import { TEnchancedPointByWorker } from './types'
 import { FixedBackToPointsetBtn } from './components'
 import { sort } from '~/shared/utils/array-ops/sort-array-objects@3.0.0';
+import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components';
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -32,6 +33,18 @@ type TProps = {
   isCreatable: boolean;
   noFixedNavigateBtn?: boolean;
 }
+type TTrand = {
+  percentage: number;
+  text: string;
+  emoji: string;
+  currentCount: number;
+};
+type TMetrics = {
+  lastWeekTrand: TTrand;
+  lastMonthTrand: TTrand;
+  last3MonthTrand: TTrand;
+  lastHalfYearTrand: TTrand;
+};
 
 const specialScrollForExternalBox = scrollToIdFactory({
   timeout: 0,
@@ -48,12 +61,37 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     etc: {
       counters: {
         total: number;
-        analyse: {
+        ready: {
           condited: number;
           conditedPercentage: number;
           details: {
             [key: string]: number;
           };
+          metrics: TMetrics;
+        };
+        wip: {
+          condited: number;
+          conditedPercentage: number;
+          details: {
+            [key: string]: number;
+          };
+          metrics: TMetrics;
+        };
+        wait: {
+          condited: number;
+          conditedPercentage: number;
+          details: {
+            [key: string]: number;
+          };
+          metrics: TMetrics;
+        };
+        paused: {
+          condited: number;
+          conditedPercentage: number;
+          details: {
+            [key: string]: number;
+          };
+          metrics: TMetrics;
         };
       }
     }
@@ -351,8 +389,8 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   const roadmapLable = useMemo<string | null>(
     () => !!originalResponseDetails
       ? clsx(
-        `Ready ${originalResponseDetails?.etc.counters.analyse.condited} of ${originalResponseDetails?.etc.counters.total}`,
-        `(${originalResponseDetails?.etc.counters.analyse.conditedPercentage === 0 || originalResponseDetails?.etc.counters.analyse.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`,
+        `Ready ${originalResponseDetails?.etc.counters.ready.condited} of ${originalResponseDetails?.etc.counters.total}`,
+        `(${originalResponseDetails?.etc.counters.ready.conditedPercentage === 0 || originalResponseDetails?.etc.counters.ready.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.ready.conditedPercentage}%)`,
       )
       : null,
     [originalResponseDetails]
@@ -372,8 +410,8 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
         result.push(
           clsx(
             `Готовность на ${getFormattedDate(currentTime)} 👉`,
-            `${originalResponseDetails?.etc.counters.analyse.condited}/${originalResponseDetails?.etc.counters.total}`,
-            `(${originalResponseDetails?.etc.counters.analyse.conditedPercentage === 0 || originalResponseDetails?.etc.counters.analyse.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.analyse.conditedPercentage}%)`,
+            `${originalResponseDetails?.etc.counters.ready.condited}/${originalResponseDetails?.etc.counters.total}`,
+            `(${originalResponseDetails?.etc.counters.ready.conditedPercentage === 0 || originalResponseDetails?.etc.counters.ready.conditedPercentage === 100 ? '' : '~'}${originalResponseDetails?.etc.counters.ready.conditedPercentage}%)`,
           )
         )
         result.push('')
@@ -383,9 +421,9 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     },
     [
       currentTime,
-      originalResponseDetails?.etc.counters.analyse.condited,
+      originalResponseDetails?.etc.counters.ready.condited,
       originalResponseDetails?.etc.counters.total,
-      originalResponseDetails?.etc.counters.analyse.conditedPercentage,
+      originalResponseDetails?.etc.counters.ready.conditedPercentage,
       reportText
     ]
   );
@@ -424,6 +462,37 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
             ) : 'Roadmap'
         }
       </div>
+      {
+        !!originalResponseDetails && (
+          <CollapsibleText
+            briefText={`WIP ${originalResponseDetails.etc.counters.wip.conditedPercentage}% | Wait ${originalResponseDetails.etc.counters.wait.conditedPercentage}% | Paused ${originalResponseDetails.etc.counters.paused.conditedPercentage}%`}
+            isClickableBrief
+            contentRender={() => (
+              <pre className={baseClasses.preNormalized}>
+                {JSON.stringify({ originalResponseDetails }, null, 2)}
+              </pre>
+            )}
+          />
+        )
+      }
+      {
+        !!originalResponseDetails?.etc && (
+          <CollapsibleText
+            briefText={`Metrics | Ready status: Last week trand ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.text}`}
+            isClickableBrief
+            contentRender={() => (
+              <pre className={baseClasses.preNormalized}>
+                {JSON.stringify({
+                  ready: originalResponseDetails.etc.counters.ready.metrics,
+                  wip: originalResponseDetails.etc.counters.wip.metrics,
+                  wait: originalResponseDetails.etc.counters.wait.metrics,
+                  paused: originalResponseDetails.etc.counters.paused.metrics,
+                }, null, 2)}
+              </pre>
+            )}
+          />
+        )
+      }
       {
         !!reportText && (
           <>
@@ -679,13 +748,6 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
                 ))
               }
             </div>
-            {
-              !!originalResponseDetails && (
-                <pre className={baseClasses.preNormalized}>
-                  {JSON.stringify({ originalResponseDetails }, null, 2)}
-                </pre>
-              )
-            }
           </>
         )
       }

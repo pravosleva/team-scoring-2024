@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Layout } from '~/shared/components/Layout'
 import Grid from '@mui/material/Grid2'
 import baseClasses from '~/App.module.scss'
+import glitchEffectTextClasses from '~/GlitchEffectText.v3.module.scss'
 import { ResponsiveBlock } from '~/shared/components'
 import classes from './HomePage.module.scss'
 import clsx from 'clsx'
@@ -14,17 +15,25 @@ import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
 import SurroundSoundIcon from '@mui/icons-material/SurroundSound'
-import AnalyticsIcon from '@mui/icons-material/Analytics';
+// import AnalyticsIcon from '@mui/icons-material/Analytics';
 // import WebIcon from '@mui/icons-material/Web'
 
 export const HomePage = () => {
   return (
     <Layout>
-      <Grid container spacing={1} sx={{ mb: 2 }}>
-        <Grid size={12}>
+      <Grid container spacing={1} sx={{ mb: 2, mt: 2 }}>
+        {/* <Grid size={12}>
           <h1 className={baseClasses.inlineH1}>
             <AnalyticsIcon fontSize='inherit' />
-            <span>Estimate corrector</span>
+            <span>Home</span>
+          </h1>
+        </Grid> */}
+        <Grid size={12}>
+          <h1
+            style={{ margin: 0 }}
+            className={clsx(baseClasses.inlineH1, glitchEffectTextClasses.glitchEffect)}
+            data-text="Home">
+            <span>Home</span>
           </h1>
         </Grid>
         <Grid size={12}>
@@ -36,6 +45,13 @@ export const HomePage = () => {
               classes.grid,
             )}
           >
+            {/* <h2
+              style={{ margin: 0 }}
+              className={glitchEffectTextClasses.glitchSubtitle}
+              data-text="Main"
+            >
+              Main
+            </h2> */}
             <h2 style={{ color: '#959eaa' }}>Main</h2>
             <Link
               to='/last-activity'
@@ -80,6 +96,13 @@ export const HomePage = () => {
             </Link>
 
             <h2 style={{ color: '#959eaa' }}>Experimental</h2>
+            {/* <h2
+              style={{ margin: 0 }}
+              className={glitchEffectTextClasses.glitchSubtitle}
+              data-text="Experimental"
+            >
+              Experimental
+            </h2> */}
 
             {/* <Link
               to='/jobs-pager-exp'

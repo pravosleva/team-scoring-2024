@@ -1,0 +1,124 @@
+{
+  "id": 1778584558862,
+  "title": "39814 Изменения по флоу \"Врача-куратора\" + изменения в каркас-приложении",
+  "completed": false,
+  "forecast": {
+    "complexity": 2,
+    "assignedTo": 1778590925015,
+    "start": 1778569200000,
+    "estimate": 1783868400000
+  },
+  "ts": {
+    "create": 1778584558862,
+    "update": 1780932899834
+  },
+  "logs": {
+    "isEnabled": true,
+    "limit": 100,
+    "items": []
+  },
+  "descr": "Задача изначально не была декомпозирована на необходимое количество подзадач, поэтому достаточно объемная",
+  "relations": {
+    "parent": 1778663486133,
+    "children": []
+  },
+  "pointset": [
+    {
+      "id": 1780932734719,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "Форма: Правила / Тесты",
+      "statusCode": "paused",
+      "ts": {
+        "created": 1780932734719,
+        "updated": 1780932772767
+      },
+      "relations": {
+        "children": [],
+        "parent": 1779969080093
+      }
+    },
+    {
+      "id": 1780918109106,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "Форма: Стейт-машина; По аналогии с разделом \"Администратор договора и техподдержка\"? [В разработке: Фронт]",
+      "descr": "1) ✅ подтверждение от бэкенд разработчика, 2) ⏸️ в идеале посмотреть на готовые методы в swagger",
+      "statusCode": "paused",
+      "ts": {
+        "created": 1780918109106,
+        "updated": 1780921295418
+      },
+      "relations": {
+        "children": [],
+        "parent": 1779969080093
+      }
+    },
+    {
+      "id": 1780906165975,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "Реализовать постраничный флоу",
+      "statusCode": "wip:front",
+      "ts": {
+        "created": 1780906165975,
+        "updated": 1780906165975
+      },
+      "relations": {
+        "children": [],
+        "parent": 1778585008079
+      }
+    },
+    {
+      "id": 1779969140857,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "Флоу: Подтверждение кода по СМС",
+      "statusCode": "paused",
+      "ts": {
+        "created": 1779969140857,
+        "updated": 1780921650688
+      },
+      "relations": {
+        "children": [],
+        "parent": 1779969080093
+      },
+      "descr": "Нет понимания, как этот флоу работает с API (ждём бэк)"
+    },
+    {
+      "id": 1779969080093,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "Флоу: Основной (*)",
+      "statusCode": "paused",
+      "ts": {
+        "created": 1779969080093,
+        "updated": 1780932899834
+      },
+      "relations": {
+        "children": [
+          1780918109106,
+          1779969140857,
+          1780932734719
+        ],
+        "parent": 1778853598232
+      }
+    },
+    {
+      "id": 1779870518591,
+      "isDisabled": false,
+      "isDone": false,
+      "title": "/new-dms/telemed-hub",
+      "descr": "(не трогал эту часть)",
+      "statusCode": "initial",
+      "ts": {
+        "created": 1779870518591,
+        "updated": 1779870518591
+      },
+      "relations": {
+        "children": [],
+        "parent": 1778765798587
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-importScripts('./middlewares/utils/calc.v1.js')
+importScripts('./middlewares/utils/calc.v2.js')
 
 console.log('[LOADED] pointset-tree-calc/middlewares/withRootMW')
 

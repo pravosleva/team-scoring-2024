@@ -57,6 +57,11 @@ let _theme = createTheme({
         },
         input: {
           boxShadow: 'none',
+          fontFamily: 'monospace',
+          // '&::placeholder': {
+          //   fontFamily: 'monospace',
+          //   opacity: 1, // Необязательно: делает цвет плейсхолдера более насыщенным в некоторых браузерах
+          // },
         },
       },
     },

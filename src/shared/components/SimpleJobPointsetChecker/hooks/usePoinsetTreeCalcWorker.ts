@@ -19,6 +19,18 @@ type TDeps = {
     [key: string]: TLocalSettingsStatusOption;
   };
 }
+type TTrand = {
+  percentage: number;
+  text: string;
+  emoji: string;
+  currentCount: number;
+};
+type TMetrics = {
+  lastWeekTrand: TTrand;
+  lastMonthTrand: TTrand;
+  last3MonthTrand: TTrand;
+  lastHalfYearTrand: TTrand;
+};
 type TProps = {
   isEnabled: boolean;
   isDebugEnabled?: boolean;
@@ -31,12 +43,37 @@ type TProps = {
       etc: {
         counters: {
           total: number;
-          analyse: {
+          ready: {
             condited: number;
             conditedPercentage: number;
             details: {
               [key: string]: number;
             };
+            metrics: TMetrics;
+          };
+          wip: {
+            condited: number;
+            conditedPercentage: number;
+            details: {
+              [key: string]: number;
+            };
+            metrics: TMetrics;
+          };
+          wait: {
+            condited: number;
+            conditedPercentage: number;
+            details: {
+              [key: string]: number;
+            };
+            metrics: TMetrics;
+          };
+          paused: {
+            condited: number;
+            conditedPercentage: number;
+            details: {
+              [key: string]: number;
+            };
+            metrics: TMetrics;
           };
         };
       }
@@ -61,12 +98,37 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
           etc: {
             counters: {
               total: number;
-              analyse: {
+              ready: {
                 condited: number;
                 conditedPercentage: number;
                 details: {
                   [key: string]: number;
                 };
+                metrics: TMetrics;
+              };
+              wip: {
+                condited: number;
+                conditedPercentage: number;
+                details: {
+                  [key: string]: number;
+                };
+                metrics: TMetrics;
+              };
+              wait: {
+                condited: number;
+                conditedPercentage: number;
+                details: {
+                  [key: string]: number;
+                };
+                metrics: TMetrics;
+              };
+              paused: {
+                condited: number;
+                conditedPercentage: number;
+                details: {
+                  [key: string]: number;
+                };
+                metrics: TMetrics;
               };
             }
           }

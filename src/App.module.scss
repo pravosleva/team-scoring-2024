@@ -777,3 +777,117 @@
       -9px -9px 16px rgba(255, 255, 255, 0.5);
   }
 }
+
+/* GLITCH effect (images) */
+
+/* Контейнер для картинки (обязательно relative) */
+.glitchImgContainer {
+  position: relative;
+  width: 400px;
+  /* Укажите нужную ширину */
+  height: 300px;
+  /* Укажите нужную высоту */
+  overflow: hidden;
+  display: inline-block;
+  background: #000;
+  /* Темный фон усиливает эффект */
+}
+
+/* Стили для самой картинки и ее псевдоэлементов */
+.glitchImgContainer img,
+.glitchImgContainer::before,
+.glitchImgContainer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Исходная базовая картинка */
+.glitchImgContainer img {
+  position: relative;
+  z-index: 1;
+}
+
+/* Первый слой помех (красный оттенок) */
+.glitchImgContainer::before {
+  background-image: url('your-image.jpg');
+  /* Укажите путь к вашей картинке */
+  background-size: cover;
+  background-position: center;
+  z-index: 2;
+  mix-blend-mode: color-burn;
+  /* Смешивание цветов */
+  filter: hue-rotate(120deg) saturate(300%);
+  animation: glitch-img-anim-1 0.4s infinite linear alternate-reverse;
+}
+
+/* Второй слой помех (сине-зеленый оттенок) */
+.glitchImgContainer::after {
+  background-image: url('your-image.jpg');
+  /* Укажите путь к вашей картинке */
+  background-size: cover;
+  background-position: center;
+  z-index: 3;
+  mix-blend-mode: screen;
+  filter: hue-rotate(240deg) saturate(300%);
+  animation: glitch-img-anim-2 0.3s infinite linear alternate-reverse;
+}
+
+/* Анимация для первого слоя */
+@keyframes glitch-img-anim-1 {
+  0% {
+    clip-path: polygon(0 15%, 100% 15%, 100% 20%, 0 20%);
+    transform: translate(-5px, 2px);
+  }
+
+  30% {
+    clip-path: polygon(0 45%, 100% 45%, 100% 50%, 0 50%);
+    transform: translate(5px, -2px);
+  }
+
+  60% {
+    clip-path: polygon(0 75%, 100% 75%, 100% 78%, 0 78%);
+    transform: translate(-3px, 4px);
+  }
+
+  90% {
+    clip-path: polygon(0 5%, 100% 5%, 100% 8%, 0 8%);
+    transform: translate(4px, -4px);
+  }
+
+  100% {
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+    /* Слой временно исчезает */
+  }
+}
+
+/* Анимация для второго слоя */
+@keyframes glitch-img-anim-2 {
+  0% {
+    clip-path: polygon(0 30%, 100% 30%, 100% 32%, 0 32%);
+    transform: translate(4px, -3px);
+  }
+
+  25% {
+    clip-path: polygon(0 60%, 100% 60%, 100% 65%, 0 65%);
+    transform: translate(-4px, 3px);
+  }
+
+  50% {
+    clip-path: polygon(0 85%, 100% 85%, 100% 90%, 0 90%);
+    transform: translate(3px, -2px);
+  }
+
+  75% {
+    clip-path: polygon(0 10%, 100% 10%, 100% 12%, 0 12%);
+    transform: translate(-2px, 2px);
+  }
+
+  100% {
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+  }
+}

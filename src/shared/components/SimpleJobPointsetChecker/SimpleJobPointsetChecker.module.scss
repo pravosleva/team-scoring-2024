@@ -121,3 +121,16 @@
     border-radius: 0px 8px 8px 0px;
   }
 }
+
+.reportsWrapper {
+  &>pre:not(:last-child) {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  &>pre:not(:first-child) {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: 1px solid #959eaa;
+  }
+}

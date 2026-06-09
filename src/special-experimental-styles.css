@@ -8,8 +8,14 @@ input, textarea {
   animation: old-caret 2s infinite !important; */
   /* styling of the screen omitted for brevity */
 
-  caret-shape: underscore !important;
-  font-family: monospace;
+  /* caret-shape: underscore !important;
+  font-family: monospace; */
+
+  caret-shape: block;   /* Делает курсор прямоугольным */
+  caret-color: lightgray; /* Окрашивает курсор в зеленый цвет */
+  background-color: #000;
+  color: #ed6c02;
+  /* font-family: monospace;*/
 }
 
 a {
