@@ -1,8 +1,12 @@
 console.log('[LOADED] pointset-tree-calc/middlewares/utils/calc.v2')
 
 importScripts('./middlewares/utils/math-ops/getPercentage.js')
-importScripts('./middlewares/utils/math-ops/getCondited.js')
-// importScripts('./middlewares/utils/math-ops/_AdvancedTaskMetricsEvaluator.js')
+// importScripts('./middlewares/utils/math-ops/getCondited@5.0.1.js')
+importScripts('./middlewares/utils/math-ops/getCondited/utils/wrapText.js')
+importScripts('./middlewares/utils/math-ops/getCondited/utils/generateMobileAscii.js')
+importScripts('./middlewares/utils/math-ops/getCondited/utils/generateRecommendations.js')
+importScripts('./middlewares/utils/math-ops/getCondited/utils/getTrendAndForecast.js')
+importScripts('./middlewares/utils/math-ops/getCondited/getCondited@5.0.2.js')
 
 const withTsTreeLibCalcService = async ({ eventData, cb }) => {
   const { __eType, input } = eventData
@@ -154,6 +158,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
       pointset: input.pointset,
       allowedEmojies: ['✅', '☑️', '🟢'],
       cfg: input.statusPack,
+      _sensedSpeed: input._sensedSpeed,
     }).analyse
     output.originalResponse = {
       calc,

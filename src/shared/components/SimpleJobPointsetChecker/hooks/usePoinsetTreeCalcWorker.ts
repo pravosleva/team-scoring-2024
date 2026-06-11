@@ -18,12 +18,45 @@ type TDeps = {
   statusPack?: {
     [key: string]: TLocalSettingsStatusOption;
   };
+  _sensedSpeed?: number | null;
 }
 type TTrand = {
   percentage: number;
   text: string;
   emoji: string;
   currentCount: number;
+  linearForecast?: {
+    title: {
+      analytic: string;
+      engineer: string;
+      manager: string;
+    },
+    daysLeft: number;
+    text: string;
+    descr: string;
+    recommendations: {
+      tasksPerDay: number;
+      daysPerTask: number;
+      descr: string;
+    };
+    asciiMobileView: string;
+  };
+  adaptiveForecast?: {
+    title: {
+      analytic: string;
+      engineer: string;
+      manager: string;
+    },
+    daysLeft: number;
+    text: string;
+    descr: string;
+    recommendations: {
+      tasksPerDay: number;
+      daysPerTask: number;
+      descr: string;
+    };
+    asciiMobileView: string;
+  };
 };
 type TMetrics = {
   lastWeekTrand: TTrand;
@@ -263,6 +296,7 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
           rootPoint: deps.rootPoint,
           pointset: deps.pointset,
           statusPack: deps.statusPack,
+          _sensedSpeed: deps._sensedSpeed,
         }
       })
     else if (isDebugEnabled)
@@ -280,5 +314,6 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
     deps.pointset,
     deps.jobTsUpdate,
     deps.statusPack,
+    deps._sensedSpeed,
   ])
 }

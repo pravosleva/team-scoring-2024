@@ -4,12 +4,12 @@ import { NWService } from '~/shared/utils/wws/types'
 // import { TNewsItemDetails } from '~/common/store/reducers/newsSlice'
 import { NSWorstCalc } from '~/shared/utils/team-scoring'
 import { TJob } from '~/shared/xstate'
-import pkg from '../../../../../../../package.json'
+import pkg from '../../../package.json'
 
 // const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 
 type TDeps = {
-  job: TJob;
+  job?: TJob;
   otherUserJobsForAnalysis: TJob[];
 }
 type TProps = {
@@ -27,7 +27,7 @@ export const useWorstCalcWebWorker = ({ isEnabled, isDebugEnabled, deps, cb }: T
   // NOTE: 1.1 Use wws.subscribeOnData once only!
   useLayoutEffect(() => {
     if (typeof cb?.beforeStart === 'function') cb.beforeStart()
-    
+
     // wws.reInitWorker({ wName: 'taro-worst-calc', ifNecessaryOnly: true })
     wws.subscribeOnData<{
       __eType: NWService.EWorkerToClientEvent;
@@ -56,7 +56,7 @@ export const useWorstCalcWebWorker = ({ isEnabled, isDebugEnabled, deps, cb }: T
           //     items: ['e.data.data.input', e.data.data.input, 'e.data.data.output', e.data.data.output],
           //   })
           //   return
-          default:        
+          default:
             switch (e.data.__eType) {
               case NWService.EWorkerToClientEvent.WORST_CALC_OK:
                 if (isDebugEnabled) groupLog({
@@ -86,7 +86,7 @@ export const useWorstCalcWebWorker = ({ isEnabled, isDebugEnabled, deps, cb }: T
                 break
               }
             }
-          break
+            break
         }
       },
     })
@@ -177,7 +177,7 @@ export const useWorstCalcWebWorker = ({ isEnabled, isDebugEnabled, deps, cb }: T
     isDebugEnabled,
     sendSignalToNewsWorker,
     deps.job,
-    deps.job.ts.update,
+    deps.job?.ts.update,
     deps.otherUserJobsForAnalysis,
   ])
 }

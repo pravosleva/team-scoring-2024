@@ -1,10 +1,7 @@
 import dayjs from 'dayjs';
 import { useMemo, useState, memo } from 'react'
 import { AutoRefreshedProgressBar } from '~/shared/components/ProgressBar'
-import {
-  // getWorstCalc,
-  NSWorstCalc,
-} from '~/shared/utils/team-scoring'
+import { NSWorstCalc } from '~/shared/utils/team-scoring'
 import { TJob, TopLevelContext, TUser } from '~/shared/xstate'
 import { Alert, Grid2 as Grid } from '@mui/material'
 import { JobLogProgressGraph } from './components'
@@ -14,21 +11,16 @@ import { JobTimingInfo } from './components/SubjobsList/components'
 import { CollapsibleBox } from '~/shared/components'
 import { JobResultReviewShort } from '~/pages/jobs/[job_id]/components'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
-import { useWorstCalcWebWorker } from '~/shared/components/Job/components/JobStats/hooks/useWorstCalcWebWorker'
+import { useWorstCalcWebWorker } from '~/shared/hooks/useWorstCalcWebWorker'
 import { groupLog } from '~/shared/utils'
 import CircularProgress from '@mui/material/CircularProgress'
 import { getPercentage } from '~/shared/utils/number-ops'
-// import { JobTimingStandartInfo } from './components/SubjobsList/components/JobTimingStandartInfo'
-// import { ProductivityAnalysisGraph } from './components/ProductivityAnalysisGraph'
-// import { scrollToIdFactory } from '~/shared/utils/web-api-ops'
-// import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import baseClasses from '~/App.module.scss'
 
 type TProps = {
   job: TJob;
   isDebugEnabled?: boolean;
 }
-
 type TObjAnalysisProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   testedObj: any;
@@ -38,6 +30,7 @@ type TInputDataAnalysisResult = {
   missingProps: string[];
   expectedProps: string[];
 }
+
 const getInputDataAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): TInputDataAnalysisResult => {
   const res: TInputDataAnalysisResult = {
     missingProps: [],
@@ -48,7 +41,6 @@ const getInputDataAnalysis = ({ testedObj, requiredProps }: TObjAnalysisProps): 
   }
   return res
 }
-
 // const specialScroll = scrollToIdFactory({
 //   timeout: 200,
 //   offsetTop: 100,

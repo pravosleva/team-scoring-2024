@@ -13,7 +13,7 @@ import {
   SimpleJobPointsetChecker,
   SpeedsFunctionGraph,
 } from '~/shared/components'
-import { getWorstCalc } from '~/shared/utils/team-scoring'
+// import { getWorstCalc } from '~/shared/utils/team-scoring'
 // import { AutoRefreshedProgressBar } from '~/shared/components/ProgressBar'
 import dayjs from 'dayjs'
 import baseClasses from '~/App.module.scss'
@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom'
 import { Alert, Box, Button, Rating } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import { JobStats } from '~/shared/components/Job/components'
+// import { JobStats } from '~/shared/components/Job/components'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
@@ -95,21 +95,21 @@ export const JobPage = memo(() => {
       && targetJob?.forecast.complexity === forecast.complexity
     ), [targetUserJobs, params.job_id, targetJob])
 
-  const isJobDone = useMemo(() => !!targetJob?.forecast.finish, [targetJob])
-  const isJobStarted = useMemo(() => !!targetJob?.forecast.start, [targetJob])
-  const isJobEstimated = useMemo(() => !!targetJob?.forecast.estimate, [targetJob])
-  const isJobStartedAndEstimated = useMemo(() => !!targetJob?.forecast.start && !!targetJob.forecast.estimate, [targetJob])
+  // const isJobDone = useMemo(() => !!targetJob?.forecast.finish, [targetJob])
+  // const isJobStarted = useMemo(() => !!targetJob?.forecast.start, [targetJob])
+  // const isJobEstimated = useMemo(() => !!targetJob?.forecast.estimate, [targetJob])
+  // const isJobStartedAndEstimated = useMemo(() => !!targetJob?.forecast.start && !!targetJob.forecast.estimate, [targetJob])
   const targetUserNameUI = useMemo(() => getTargetUserNameUI({ user: targetUser }), [targetUser])
-  const worst100Date = useMemo<number | null>(() =>
-    !!targetJob && isJobStartedAndEstimated
-      ? getWorstCalc({
-        theJobList: otherUserJobsForAnalysis,
-        ts: {
-          testStart: targetJob.forecast.start as number,
-          testDiff: (targetJob.forecast.estimate as number) - (targetJob.forecast.start as number),
-        },
-      }).date100
-      : null, [targetJob, isJobStartedAndEstimated, otherUserJobsForAnalysis])
+  // const worst100Date = useMemo<number | null>(() =>
+  //   !!targetJob && isJobStartedAndEstimated
+  //     ? getWorstCalc({
+  //       theJobList: otherUserJobsForAnalysis,
+  //       ts: {
+  //         testStart: targetJob.forecast.start as number,
+  //         testDiff: (targetJob.forecast.estimate as number) - (targetJob.forecast.start as number),
+  //       },
+  //     }).date100
+  //     : null, [targetJob, isJobStartedAndEstimated, otherUserJobsForAnalysis])
 
   // const statusText = useMemo(() => getJobStatusText({
   //   job: targetJob,
@@ -425,7 +425,7 @@ export const JobPage = memo(() => {
         )
       }
 
-      {
+      {/*
         !isJobDone && (
           <Grid size={12}>
             <h2>[ Current stats ]</h2>
@@ -446,7 +446,7 @@ export const JobPage = memo(() => {
             }
           </Grid>
         )
-      }
+      */}
 
       {/* <Grid size={12}>
         <pre className={baseClasses.preNormalized}>

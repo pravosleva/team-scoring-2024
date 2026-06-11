@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import baseClasses from '~/App.module.scss'
-import { TJob, TopLevelContext, TPointsetItem, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
+import { TJob, TopLevelContext, TPointsetItem, TUser, useSearchWidgetDataLayerContextStore } from '~/shared/xstate'
 import { CustomizedTextField } from '~/shared/components/Input'
 import { CopyToClipboardWrapper, HighlightedText } from '~/shared/components'
 import { Alert, Button, Grid2 as Grid } from '@mui/material'
@@ -25,6 +25,11 @@ import { TEnchancedPointByWorker } from './types'
 import { FixedBackToPointsetBtn } from './components'
 import { sort } from '~/shared/utils/array-ops/sort-array-objects@3.0.0';
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components';
+import { NSWorstCalc } from '~/shared/utils/team-scoring';
+import { getBinarySearchedValueByDotNotation2 } from '~/shared/utils/array-ops/search/getBinarySearchedValueByDotNotation2';
+import { getIsNumeric } from '~/shared/utils/number-ops';
+import { useParams } from 'react-router-dom';
+import { useWorstCalcWebWorker } from '~/shared/hooks/useWorstCalcWebWorker';
 
 type TProps = {
   isDebugEnabled?: boolean;
@@ -38,6 +43,38 @@ type TTrand = {
   text: string;
   emoji: string;
   currentCount: number;
+  linearForecast?: {
+    title: {
+      analytic: string;
+      engineer: string;
+      manager: string;
+    },
+    daysLeft: number;
+    text: string;
+    descr: string;
+    recommendations: {
+      tasksPerDay: number;
+      daysPerTask: number;
+      descr: string;
+    };
+    asciiMobileView: string;
+  };
+  adaptiveForecast?: {
+    title: {
+      analytic: string;
+      engineer: string;
+      manager: string;
+    },
+    daysLeft: number;
+    text: string;
+    descr: string;
+    recommendations: {
+      tasksPerDay: number;
+      daysPerTask: number;
+      descr: string;
+    };
+    asciiMobileView: string;
+  };
 };
 type TMetrics = {
   lastWeekTrand: TTrand;
@@ -53,6 +90,100 @@ const specialScrollForExternalBox = scrollToIdFactory({
 })
 
 export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEditable, isCreatable, isDebugEnabled }: TProps) => {
+
+  // -- NOTE: v2 (Web Worker)
+  const params = useParams()
+  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  const job = useMemo(
+    () => getIsNumeric(params.job_id)
+      ? getBinarySearchedValueByDotNotation2<TJob, TJob>({
+        items: jobs,
+        target: {
+          path: '',
+          critery: {
+            path: 'id',
+            value: Number(params.job_id),
+          },
+        },
+        sorted: 'DESC',
+      }).result || null
+      : null,
+    [jobs, params.job_id]
+  )
+  const users = TopLevelContext.useSelector((s) => s.context.users.items)
+  const targetUser = useMemo<TUser | null>(() => {
+    const userId = Number(job?.forecast.assignedTo)
+    return users?.find(({ id }) => id === userId) || null
+  }, [users, job])
+  const targetUserJobs = useMemo(() => {
+    return !!targetUser ? jobs.filter(({ forecast }) => forecast.assignedTo === targetUser.id) : []
+  }, [jobs, targetUser])
+  // const targetUserNameUI = useMemo<string | null>(() =>
+  //   !!targetUser
+  //     ? targetUser?.displayName
+  //       ? targetUser?.displayName
+  //       : null //'INCORRECT USER FORMAT'
+  //     : null // 'NO TARGET USER'
+  //   , [targetUser]
+  // )
+  const otherUserJobsForAnalysis = useMemo(() => !!job
+    ? targetUserJobs
+      .filter(({ id, forecast }) =>
+        forecast.estimate
+        && forecast.start
+        && forecast.finish
+        && job?.id !== id
+        && forecast.assignedTo === targetUser?.id
+        && forecast.complexity === job.forecast.complexity
+      )
+    : [],
+    [targetUserJobs, targetUser?.id, job, job?.forecast.complexity, job?.id]
+  )
+
+  // const isJobDone = useMemo(() => !!job?.forecast.finish, [job])
+  // const isJobStarted = useMemo(() => !!job?.forecast.start, [job])
+  // const isJobEstimated = useMemo(() => !!job?.forecast.estimate, [job])
+  const isJobStartedAndEstimated = useMemo(() => !!job?.forecast.start && !!job.forecast.estimate, [job])
+  const [calc1, setCalc1] = useState<NSWorstCalc.TResult | null>(null)
+  const [calcErr1, setCalcErr1] = useState<string | null>(null)
+  const _isWorstCalc1ResultReady = useMemo(() => !!calc1 || !!calcErr1, [calc1, calcErr1])
+  const isWorkerEnabled = useMemo(() => isJobStartedAndEstimated, [isJobStartedAndEstimated])
+  useWorstCalcWebWorker({
+    isEnabled: isWorkerEnabled,
+    isDebugEnabled: true,
+    cb: {
+      onEachSuccessItemData: (data) => {
+        if (isDebugEnabled)
+          groupLog({
+            namespace: '[debug] useWorkers:onEachNewsItemData -> data',
+            items: [
+              data
+            ],
+          })
+        if (!!data.originalResponse) {
+          setCalcErr1(null)
+          setCalc1(data.originalResponse)
+        }
+      },
+      onFinalError: ({ id, reason }) => {
+        if (isDebugEnabled)
+          groupLog({
+            namespace: '[debug] useWorkers:onFinalError -> id, reason',
+            items: [
+              id,
+              reason
+            ],
+          })
+        setCalcErr1(reason)
+      },
+    },
+    deps: {
+      job: job || undefined,
+      otherUserJobsForAnalysis,
+    },
+  })
+  // --
+
   const { inView, assignRef } = useElementInView()
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
   const [calc, setCalc] = useState<TreeNode<TEnchancedPointByWorker> | null>(null)
@@ -98,7 +229,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   } | null>(null)
   const _isContentReady = !!calc
   const jobsActorRef = TopLevelContext.useActorRef()
-  const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
+  // const jobs = TopLevelContext.useSelector((s) => s.context.jobs.items)
   const targetJob = useMemo(() => jobs.find((j) => j.id === jobId), [jobs, jobId])
 
   const [activeStatusPackKey] = useLocalStorageState<string>({
@@ -384,6 +515,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       pointset: targetJob?.pointset || [],
       jobTsUpdate: targetJob?.ts.update,
       statusPack: localStatusPacksSettings[activeStatusPackKey],
+      _sensedSpeed: calc1?.averageSpeed || 1,
     },
   })
   const roadmapLable = useMemo<string | null>(
@@ -462,7 +594,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
             ) : 'Roadmap'
         }
       </div>
-      {
+      {/*
         !!originalResponseDetails && (
           <CollapsibleText
             briefText={`WIP ${originalResponseDetails.etc.counters.wip.conditedPercentage}% | Wait ${originalResponseDetails.etc.counters.wait.conditedPercentage}% | Paused ${originalResponseDetails.etc.counters.paused.conditedPercentage}%`}
@@ -474,16 +606,99 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
             )}
           />
         )
+      */}
+      {
+        !!originalResponseDetails?.etc && (
+          <CollapsibleText
+            briefText='Metrics | Ready status'
+            isClickableBrief
+            contentRender={() => (
+              <div className={clsx(baseClasses.stack1)}>
+                <CollapsibleText
+                  briefPrefix='├─'
+                  briefText={`Last week trend ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.text}`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <div
+                      className={clsx(classes.reportsWrapper, baseClasses.stack0)}
+                      style={{ paddingLeft: '16px', paddingRight: '16px' }}
+                    >
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.linearForecast?.asciiMobileView}
+                      </pre>
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.adaptiveForecast?.asciiMobileView}
+                      </pre>
+                    </div>
+                  )}
+                />
+                <CollapsibleText
+                  briefPrefix='├─'
+                  briefText={`Last month trend ${originalResponseDetails.etc.counters.ready.metrics.lastMonthTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.lastMonthTrand.text}`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <div
+                      className={clsx(classes.reportsWrapper, baseClasses.stack0)}
+                      style={{ paddingLeft: '16px', paddingRight: '16px' }}
+                    >
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastMonthTrand.linearForecast?.asciiMobileView}
+                      </pre>
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastMonthTrand.adaptiveForecast?.asciiMobileView}
+                      </pre>
+                    </div>
+                  )}
+                />
+                <CollapsibleText
+                  briefPrefix='├─'
+                  briefText={`Last 3 months trend ${originalResponseDetails.etc.counters.ready.metrics.last3MonthTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.last3MonthTrand.text}`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <div
+                      className={clsx(classes.reportsWrapper, baseClasses.stack0)}
+                      style={{ paddingLeft: '16px', paddingRight: '16px' }}
+                    >
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.last3MonthTrand.linearForecast?.asciiMobileView}
+                      </pre>
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.last3MonthTrand.adaptiveForecast?.asciiMobileView}
+                      </pre>
+                    </div>
+                  )}
+                />
+                <CollapsibleText
+                  briefPrefix='└─'
+                  briefText={`Last 6 months trend ${originalResponseDetails.etc.counters.ready.metrics.lastHalfYearTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.lastHalfYearTrand.text}`}
+                  isClickableBrief
+                  contentRender={() => (
+                    <div
+                      className={clsx(classes.reportsWrapper, baseClasses.stack0)}
+                      style={{ paddingLeft: '16px', paddingRight: '16px' }}
+                    >
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastHalfYearTrand.linearForecast?.asciiMobileView}
+                      </pre>
+                      <pre className={baseClasses.preNormalized}>
+                        {originalResponseDetails.etc.counters.ready.metrics.lastHalfYearTrand.adaptiveForecast?.asciiMobileView}
+                      </pre>
+                    </div>
+                  )}
+                />
+              </div>
+            )}
+          />
+        )
       }
       {
         !!originalResponseDetails?.etc && (
           <CollapsibleText
-            briefText={`Metrics | Ready status: Last week trand ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.emoji} ${originalResponseDetails.etc.counters.ready.metrics.lastWeekTrand.text}`}
+            briefText={`WIP ${originalResponseDetails.etc.counters.wip.condited} (${originalResponseDetails.etc.counters.wip.conditedPercentage}%), Wait ${originalResponseDetails.etc.counters.wait.condited} (${originalResponseDetails.etc.counters.wait.conditedPercentage}%), Paused ${originalResponseDetails.etc.counters.paused.condited} (${originalResponseDetails.etc.counters.paused.conditedPercentage}%)`}
             isClickableBrief
             contentRender={() => (
               <pre className={baseClasses.preNormalized}>
                 {JSON.stringify({
-                  ready: originalResponseDetails.etc.counters.ready.metrics,
                   wip: originalResponseDetails.etc.counters.wip.metrics,
                   wait: originalResponseDetails.etc.counters.wait.metrics,
                   paused: originalResponseDetails.etc.counters.paused.metrics,
