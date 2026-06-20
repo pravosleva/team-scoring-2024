@@ -1,4 +1,14 @@
-function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset = [], currentDate = new Date(), _sensedSpeed: sensedSpeed = null }) {
+function getCondited({
+  allowedEmojies = [],
+  cfg = {},
+  _businessTimeSettings,
+  _activeStatusPackKey,
+  fragments = [],
+  pointset = [],
+  currentDate = new Date(),
+  _sensedSpeed: sensedSpeed = null,
+  _costSettings = null,
+}) {
   const details = {};
   let condited = 0;
   let currentWeekCount = 0;
@@ -63,7 +73,6 @@ function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset =
     }
   });
   const totalTasks = pointset.length;
-  console.log(`totalTasks= ${totalTasks}, condited= ${condited}`)
   const remainingTasks = Math.max(0, totalTasks - condited);
   const conditedPercentage = totalTasks > 0 ? (condited / totalTasks) * 100 : 0;
   const roundedPercentage = Number(conditedPercentage.toFixed(0));
@@ -88,6 +97,9 @@ function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset =
       totalTasks,
       nowMs,
       oneDayMs,
+      businessTimeSettings: _businessTimeSettings,
+      _activeStatusPackKey,
+      _costSettings,
     }),
     lastMonthTrand: getTrendAndForecast({
       currentCount: currentMonthCount,
@@ -105,6 +117,8 @@ function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset =
       totalTasks,
       nowMs,
       oneDayMs,
+      businessTimeSettings: _businessTimeSettings,
+      _activeStatusPackKey,
     }),
     last3MonthTrand: getTrendAndForecast({
       currentCount: current3MonthCount,
@@ -122,6 +136,8 @@ function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset =
       totalTasks,
       nowMs,
       oneDayMs,
+      businessTimeSettings: _businessTimeSettings,
+      _activeStatusPackKey,
     }),
     lastHalfYearTrand: getTrendAndForecast({
       currentCount: currentHalfYearCount,
@@ -139,6 +155,8 @@ function getCondited({ allowedEmojies = [], cfg = {}, fragments = [], pointset =
       totalTasks,
       nowMs,
       oneDayMs,
+      businessTimeSettings: _businessTimeSettings,
+      _activeStatusPackKey,
     })
   };
   return {

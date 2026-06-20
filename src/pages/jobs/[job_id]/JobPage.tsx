@@ -17,6 +17,7 @@ import {
 // import { AutoRefreshedProgressBar } from '~/shared/components/ProgressBar'
 import dayjs from 'dayjs'
 import baseClasses from '~/App.module.scss'
+import bgClasses from '~/GradientBg.module.scss'
 import { Link } from 'react-router-dom'
 import { Alert, Box, Button, Rating } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -467,7 +468,7 @@ export const JobPage = memo(() => {
       </Grid> */}
 
       <ResponsiveBlock
-        className={clsx(baseClasses.stack1, baseClasses.backdropBlurSuperLite)}
+        className={clsx(baseClasses.stack1, bgClasses.backdropBlurDynamic)}
         style={{
           // padding: '16px 0 16px 0',
           padding: '0px 0px 0px 0px',

@@ -28,12 +28,12 @@ export const HomePage = () => {
             <span>Home</span>
           </h1>
         </Grid> */}
-        <Grid size={12}>
+        <Grid size={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <h1
             style={{ margin: 0 }}
             className={clsx(baseClasses.inlineH1, glitchEffectTextClasses.glitchEffect)}
-            data-text="Home">
-            <span>Home</span>
+            data-text="Retro Dice">
+            <span>Retro Dice</span>
           </h1>
         </Grid>
         <Grid size={12}>

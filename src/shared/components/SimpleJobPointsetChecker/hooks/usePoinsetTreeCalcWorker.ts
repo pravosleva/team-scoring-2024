@@ -8,7 +8,11 @@ import { TPointsetItem } from '~/shared/xstate'
 import { TreeNode } from 'ts-tree-lib'
 import { TLocalSettingsStatusOption } from '~/pages/local-settings/types';
 import pkg from '../../../../../package.json'
+import { TBusinessTimeData } from '~/pages/business-time/utils/types'
+import { useLocalStorageState } from '~/shared/hooks'
+import { getDefaultBusinessTimeConfig } from '~/pages/business-time/utils/getDefaultBusinessTimeConfig'
 
+const defaultBusinessTimeConfigItemName = '5/2 by Default'
 // const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 
 type TDeps = {
@@ -19,6 +23,10 @@ type TDeps = {
     [key: string]: TLocalSettingsStatusOption;
   };
   _sensedSpeed?: number | null;
+  _costSettings?: {
+    burnRatePerDay: number; // Стоимость одного дня работы команды (например, зарплаты + инфраструктура)
+    currency: 'RUB' | 'EUR'; // Валюта для отображения
+  };
 }
 type TTrand = {
   percentage: number;
@@ -116,6 +124,17 @@ type TProps = {
 }
 
 export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }: TProps) => {
+  const [businessTimeConfig] = useLocalStorageState<{ [key: string]: TBusinessTimeData }>({
+    key: 'teamScoring2024:businessTimeConfig',
+    initialValue: {
+      [defaultBusinessTimeConfigItemName]: getDefaultBusinessTimeConfig({ isReadOnly: true }),
+    },
+  })
+  const [activeStatusPackKey] = useLocalStorageState<string>({
+    key: 'teamScoring2024:localSettings:pointset-active-statuspack',
+    initialValue: defaultBusinessTimeConfigItemName,
+  })
+
   // NOTE: 1.1 Use wws.subscribeOnData once only!
   useLayoutEffect(() => {
     if (typeof cb?.beforeStart === 'function') cb.beforeStart()
@@ -169,6 +188,7 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
         // NOTE: Input data could be compared
         input: {
           opsEventType: NWService.EClientToWorkerEvent;
+          _businessTimeSettings: TBusinessTimeData['cfg'] | null;
         } & TDeps;
         _service: {
           id: number;
@@ -266,6 +286,12 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
   const sendSignalToNewsWorker = useCallback(({ input }: {
     input: {
       opsEventType: NWService.EClientToWorkerEvent;
+      _businessTimeSettings: TBusinessTimeData['cfg'] | null;
+      _activeStatusPackKey?: string;
+      _costSettings?: {
+        burnRatePerDay: number; // Стоимость одного дня работы команды (например, зарплаты + инфраструктура)
+        currency: 'RUB' | 'EUR'; // Валюта для отображения
+      };
     } & TDeps;
   }) => {
     wws.post<{
@@ -289,7 +315,8 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
 
   // NOTE: 2. Send event for each change of deps
   useLayoutEffect(() => {
-    if (isEnabled)
+    if (isEnabled) {
+      console.log('- send c-w')
       sendSignalToNewsWorker({
         input: {
           opsEventType: NWService.EClientToWorkerEvent.GET_POINTSET_TREE_CALC,
@@ -297,8 +324,12 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
           pointset: deps.pointset,
           statusPack: deps.statusPack,
           _sensedSpeed: deps._sensedSpeed,
+          _businessTimeSettings: businessTimeConfig?.[activeStatusPackKey]?.cfg || null,
+          _activeStatusPackKey: activeStatusPackKey,
+          _costSettings: deps._costSettings,
         }
       })
+    }
     else if (isDebugEnabled)
       groupLog({
         namespace: '[usePointsetTreeCalcWorker] by pointset-tree-calc 🚫 DISABLED',
@@ -315,5 +346,8 @@ export const usePoinsetTreeCalcWorker = ({ isEnabled, isDebugEnabled, deps, cb }
     deps.jobTsUpdate,
     deps.statusPack,
     deps._sensedSpeed,
+    deps._costSettings,
+    activeStatusPackKey,
+    businessTimeConfig,
   ])
 }

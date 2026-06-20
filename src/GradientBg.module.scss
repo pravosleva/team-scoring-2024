@@ -1,0 +1,52 @@
+// 1. Цветовая палитра
+$color-blur-1: rgba(255, 255, 255, 0.1);
+$color-blur-2: rgba(255, 255, 255, 0.4);
+$color-blur-3: rgba(255, 255, 255, 0.1);
+
+// 2. Переиспользуемый миксин для стеклянного динамического градиента
+@mixin glass-dynamic-blur($blur-radius: 2em, $duration: 12s) {
+  $gradient-schema: linear-gradient(135deg,
+      $color-blur-1,
+      $color-blur-2,
+      $color-blur-3,
+      $color-blur-2,
+      $color-blur-1 );
+
+  background: $gradient-schema;
+  background-size: 300% 300%;
+  animation: gradientMovement $duration ease infinite;
+
+  @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    background: $gradient-schema;
+    background-size: 300% 300%;
+    -webkit-backdrop-filter: blur($blur-radius);
+    backdrop-filter: blur($blur-radius);
+    // Для `@supports` используем ту же анимацию, она безопасна для размытия
+    animation: gradientMovement $duration ease infinite;
+  }
+}
+
+// 3. Исправленная анимация движения и мерцания
+@keyframes gradientMovement {
+  0% {
+    background-position: 0% 50%;
+    // filter: brightness(1);
+    /* Слегка приглушаем яркость самого градиента */
+  }
+
+  50% {
+    background-position: 100% 50%;
+    // filter: brightness(1);
+    /* Делаем цвета сочнее в пике движения */
+  }
+
+  100% {
+    background-position: 0% 50%;
+    // filter: brightness(1);
+  }
+}
+
+// 4. Применение класса в проекте
+.backdropBlurDynamic {
+  @include glass-dynamic-blur();
+}

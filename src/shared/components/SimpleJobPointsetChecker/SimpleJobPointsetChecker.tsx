@@ -153,6 +153,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     isDebugEnabled: true,
     cb: {
       onEachSuccessItemData: (data) => {
+        console.log('- received')
         if (isDebugEnabled)
           groupLog({
             namespace: '[debug] useWorkers:onEachNewsItemData -> data',
@@ -468,6 +469,13 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     }
   }, [jobId])
 
+  const costSettings = useMemo<{
+    burnRatePerDay: number; // Стоимость одного дня работы команды (например, зарплаты + инфраструктура)
+    currency: 'RUB' | 'EUR'; // Валюта для отображения
+  }>(() => ({
+    burnRatePerDay: 0, // Стоимость одного дня работы команды (например, зарплаты + инфраструктура)
+    currency: 'RUB', // Валюта для отображения
+  }), [])
   usePoinsetTreeCalcWorker({
     isEnabled: true,
     isDebugEnabled: true,
@@ -516,6 +524,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       jobTsUpdate: targetJob?.ts.update,
       statusPack: localStatusPacksSettings[activeStatusPackKey],
       _sensedSpeed: calc1?.averageSpeed || 1,
+      _costSettings: costSettings,
     },
   })
   const roadmapLable = useMemo<string | null>(

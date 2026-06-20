@@ -109,34 +109,45 @@ export const BusinessTime = () => {
       setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" }), 300)
   }
 
-  const __handleSaveDiagrams = useCallback(() => {
-    if (!!activeTab) {
-      // TODO: Confirm modal?
-      saveBusinessTimeConfig({
-        ...businessTimeConfig,
-        [activeTab]: {
-          ...businessTimeConfig[activeTab],
-          // cfg: notCommitedNormalizedCfgRef.current,
-          ts: {
-            createdAt: businessTimeConfig[activeTab].ts.createdAt,
-            updatedAt: new Date().getTime(),
-          },
-          _diagrams: notCommitedDiagramListRef.current[activeTab] || [],
-        },
-      })
-      removeInfoMessage()
-      setIsReadyForSave(false)
-      setInfoMessage(null)
-      // setNotCommitedNormalizedCfg(null)
-      setNotCommitedDiagramListRef({})
-      setIsEditModeEnabled(false)
-    }
-  }, [
-    businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave,
-    setInfoMessage,
-    setNotCommitedDiagramListRef,
-  ])
+  // const __handleSaveDiagrams = useCallback(() => {
+  //   if (!!activeTab) {
+  //     // TODO: Confirm modal?
+  //     console.log('-- SAVE DIAGRAMS')
+  //     console.dir({
+  //       activeTab,
+  //       cfg: notCommitedNormalizedCfgRef.current
+  //     })
+  //     saveBusinessTimeConfig({
+  //       ...businessTimeConfig,
+  //       [activeTab]: {
+  //         ...businessTimeConfig[activeTab],
+  //         /// cfg: notCommitedNormalizedCfgRef.current,
+  //         ts: {
+  //           createdAt: businessTimeConfig[activeTab].ts.createdAt,
+  //           updatedAt: new Date().getTime(),
+  //         },
+  //         _diagrams: notCommitedDiagramListRef.current[activeTab] || [],
+  //       },
+  //     })
+  //     console.log('-- /SAVE DIAGRAMS')
+  //     removeInfoMessage()
+  //     setIsReadyForSave(false)
+  //     setInfoMessage(null)
+  //     // setNotCommitedNormalizedCfg(null)
+  //     setNotCommitedDiagramListRef({})
+  //     setIsEditModeEnabled(false)
+  //   }
+  // }, [
+  //   businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave,
+  //   setInfoMessage,
+  //   setNotCommitedDiagramListRef,
+  // ])
   const handleSave = useCallback(() => {
+    console.log('-- SAVE')
+    console.dir({
+      activeTab,
+      cfg: notCommitedNormalizedCfgRef.current
+    })
     if (!!notCommitedNormalizedCfgRef.current && !!activeTab) {
       // TODO: Confirm modal?
       saveBusinessTimeConfig({
@@ -150,6 +161,7 @@ export const BusinessTime = () => {
           },
         },
       })
+      console.log('-- /SAVE')
       removeInfoMessage()
       setIsReadyForSave(false)
       setInfoMessage(null)
@@ -157,12 +169,12 @@ export const BusinessTime = () => {
       setNotCommitedDiagramListRef({})
       setIsEditModeEnabled(false)
     }
-    __handleSaveDiagrams()
+    // __handleSaveDiagrams()
   }, [
     businessTimeConfig, activeTab, saveBusinessTimeConfig, removeInfoMessage, setIsReadyForSave,
     setInfoMessage, setNotCommitedNormalizedCfg,
     setNotCommitedDiagramListRef,
-    __handleSaveDiagrams,
+    //__handleSaveDiagrams,
   ])
 
   const handleRenameTimeConfig = useCallback(() => {
@@ -350,7 +362,7 @@ export const BusinessTime = () => {
                             setNotCommitedNormalizedCfg(validatedResult.ok ? value : null)
                           }}
                         />
-                        <JsonEditor<{ _diagrams: string[] }>
+                        {/* <JsonEditor<{ _diagrams: string[] }>
                           key={`_diagrams-${counter}`}
                           initialState={{ _diagrams: businessTimeConfig[key]._diagrams || [] }}
                           // isReadOnly={(businessTimeConfig[key]?.isReadOnly && Object.keys(businessTimeConfig).length < 2) || !isEditModeEnabled}
@@ -371,7 +383,7 @@ export const BusinessTime = () => {
                             // setNotCommitedNormalizedCfg(validatedResult.ok ? value : null)
                             setNotCommitedDiagramListRef({ namespace: key, value: value._diagrams })
                           }}
-                        />
+                        /> */}
                       </div>
                     </TabPanel>
                   ))

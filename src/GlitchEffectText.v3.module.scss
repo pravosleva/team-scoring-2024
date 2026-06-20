@@ -14,21 +14,26 @@ $scanline-opacity: 0.65; // Полосы стали чуть четче, как 
   position: relative;
   display: block;
   color: $text-color;
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
-  letter-spacing: 3px;
-  font-family: 'Courier New', Courier, monospace; // Винтажный моноширинный шрифт усилит эффект
+  // letter-spacing: 3px;
+  font-family: 'Courier New', Courier, monospace;
 
-  // Легкое аналоговое размытие и свечение люминофора (Кинескопа)
+  // --- ДОБАВЛЕНО ДЛЯ ЦЕНТРИРОВАНИЯ ---
+  text-align: center;
+  margin: 0 auto;
+  width: max-content;
+  /* Сжимает блок строго по ширине текста */
+  // ----------------------------------
+
   text-shadow:
     0 0 4px rgba($text-color, 0.3),
     0 0 10px rgba($glow-left, 0.2),
     0 0 20px rgba($glow-right, 0.2);
 
-  // Винтажное вертикальное подергивание кадра (эффект зажеванной кассеты VHS)
   animation:
     main-shake $glitch-duration infinite linear,
-    vhs-vblank 0.15s infinite; // Постоянная мелкая аналоговая тряска по вертикали
+    vhs-vblank 0.15s infinite;
 
   &::before,
   &::after {
@@ -40,42 +45,40 @@ $scanline-opacity: 0.65; // Полосы стали чуть четче, как 
     height: 100%;
     background: transparent;
     overflow: hidden;
+
+    // --- ДОБАВЛЕНО ДЛЯ СОВПАДЕНИЯ СЛОЕВ ---
+    text-align: center;
+    // --------------------------------------
   }
 
-  // --- ЛЕВЫЙ СЛОЙ (Красное смещение + Чересстрочная развертка) ---
+  // --- ЛЕВЫЙ СЛОЙ ---
   &::before {
-    left: 3px;
-    // Размытый аналоговый шлейф цвета
+    // left: 0px; // Удалите или оставьте 0, чтобы не было статического сдвига
     text-shadow:
       -3px 0 $glow-left,
       -1px -1px 2px rgba($glow-left, 0.8),
       0 2px 4px rgba(255, 0, 0, 0.5);
 
-    // Сетка и затемнение краев (симуляция выпуклого экрана)
     background: linear-gradient(rgba(18, 16, 16, 0) 40%,
         rgba(0, 0, 0, $scanline-opacity) 60%),
       linear-gradient(90deg,
         rgba(255, 0, 0, 0.08),
         rgba(0, 255, 0, 0.04),
         rgba(0, 0, 255, 0.08));
-    background-size: 100% 5px, 6px 100%; // Полосы стали чуть толще (5px)
-
-    // Винтажное размытие хроматических искажений
+    background-size: 100% 5px, 6px 100%;
     filter: blur(0.5px);
-
     animation: tv-glitch-1 $glitch-duration infinite linear;
   }
 
-  // --- ПРАВЫЙ СЛОЙ (Синее смещение + VHS шум) ---
+  // --- ПРАВЫЙ СЛОЙ ---
   &::after {
-    left: -3px;
+    // left: -3px; // ВАЖНО: Уберите этот статический сдвиг влево, иначе текст разъедется в центре!
     text-shadow:
       3px 0 $glow-right,
       1px 1px 2px rgba($glow-right, 0.8),
       0 -2px 4px rgba(0, 0, 255, 0.5);
 
     filter: blur(0.3px);
-
     animation:
       tv-glitch-2 $glitch-duration infinite linear,
       noise-move $glitch-duration infinite steps(1);

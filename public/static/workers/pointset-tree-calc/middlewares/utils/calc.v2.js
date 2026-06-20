@@ -159,6 +159,9 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
       allowedEmojies: ['✅', '☑️', '🟢'],
       cfg: input.statusPack,
       _sensedSpeed: input._sensedSpeed,
+      _businessTimeSettings: input._businessTimeSettings,
+      _activeStatusPackKey: input._activeStatusPackKey,
+      _costSettings: input._costSettings,
     }).analyse
     output.originalResponse = {
       calc,
@@ -172,6 +175,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             pointset: input.pointset,
             allowedEmojies: ['🟡', '🔥'],
             cfg: input.statusPack,
+            _businessTimeSettings: input._businessTimeSettings,
           }).analyse,
           wait: getCondited({
             fragments: [
@@ -181,6 +185,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             pointset: input.pointset,
             allowedEmojies: ['🟡', '🔴'],
             cfg: input.statusPack,
+            _businessTimeSettings: input._businessTimeSettings,
           }).analyse,
           paused: getCondited({
             fragments: [
@@ -189,6 +194,7 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
             pointset: input.pointset,
             allowedEmojies: ['⏸️'],
             cfg: input.statusPack,
+            _businessTimeSettings: input._businessTimeSettings,
           }).analyse,
         },
         percentage,
@@ -198,7 +204,10 @@ const withTsTreeLibCalcService = async ({ eventData, cb }) => {
   } catch (err) {
     output.ok = false
     output.message = `Worker error: ${err?.message || 'No message'}; pointset-tree-calc/middlewares/utils/math-ops/calc.v2`
-  } finally {
-    cb[input?.opsEventType || eventData?.input?.opsEventType]({ output, input })
   }
+  // finally {
+  //   cb[input?.opsEventType || eventData?.input?.opsEventType]({ output, input })
+  // }
+
+  cb[input?.opsEventType || eventData?.input?.opsEventType]({ output, input })
 }
