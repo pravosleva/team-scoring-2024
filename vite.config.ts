@@ -72,7 +72,7 @@ export default defineConfig({
             options: {
               cacheName: 'audio-cache',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 50, // Ограничим количество, так как статус 0 раздувает кэш
                 maxAgeSeconds: 30 * 24 * 60 * 60, // Хранить 30 дней
               },
               cacheableResponse: {
@@ -90,15 +90,9 @@ export default defineConfig({
                 // КРИТИЧЕСКИ ВАЖНО: Этот плагин позволяет Workbox отвечать на Range-запросы из кэша
                 {
                   cachedResponseWillBeUsed: async ({ cachedResponse }) => {
-                    if (cachedResponse) {
-                      return cachedResponse;
-                    }
-                    return null;
+                    return cachedResponse || null
                   },
                 },
-                // Поддержка заголовков Range (запросы partial content)
-                // Примечание: Workbox автоматически добавит RangeRequestsPlugin под капотом, 
-                // если плагин видит работу с медиа, но для надежности мы изолируем кэш через cacheName.
               ],
             },
           },

@@ -154,12 +154,20 @@ class Singleton {
           audio = _self._cache[targetSrc].audio
           _self._activeAudio = audio
         } else {
-          audio = new Audio(`${PUBLIC_URL}/static/audio${targetSrc}`)
-          _self._activeAudio = audio
+          const fullAudioPath = `${PUBLIC_URL}/static/audio${targetSrc}`
 
-          _self._cache[targetSrc] = {
-            audio,
+          // -- NOTE: Позволяет запрашивать аудио с правильными CORS-заголовками.
+          // Если сервер их поддерживает, файл попадет в кэш со статусом 200, а не 0!
+          // Включаем CORS только если это локальный файл с вашего же домена,
+          // чтобы он гарантированно попал в кэш со статусом 200.
+          audio = new Audio(fullAudioPath)
+          if (!fullAudioPath.startsWith('http') || fullAudioPath.includes(window.location.hostname)) {
+            audio.crossOrigin = 'anonymous'
           }
+          // --
+
+          _self._activeAudio = audio
+          _self._cache[targetSrc] = { audio }
           if (!_self._loadStatus[targetSrc]) {
             _self._loadStatus[targetSrc] = {
               value: ELoadStatus.INACTIVE,
