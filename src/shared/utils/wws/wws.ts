@@ -3,7 +3,10 @@
 import { getSplittedCamelCase } from '~/shared/utils/string-ops'
 import { groupLog } from '~/shared/utils/groupLog'
 import { NWService } from './types'
-import packageJson from '../../../../package.json'
+// import packageJson from '../../../../package.json'
+// -- NOTE: убрали query-параметры ?v=...,
+// чтобы файлы успешно подхватывались настроенным ранее плагином VitePWA из оффлайн-кэша.
+// --
 
 const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL
 
@@ -57,23 +60,36 @@ class Singleton {
     }
 
     try {
-      switch (true) {
-        case this.noSharedWorkers:
-          this.workers[wName] = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
-          break
-        default:
-          this.workers.newsWorker = typeof SharedWorker !== 'undefined'
-            ? new SharedWorker(`${PUBLIC_URL}/static/workers/${firstWord}/shared-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
-            : new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
-          if (typeof SharedWorker !== 'undefined' && this.workers.newsWorker instanceof SharedWorker) this.workers.newsWorker.port.start()
-          break
+      // Проверяем, поддерживает ли браузер SharedWorker на самом деле
+      const isSharedWorkerNeeded = typeof SharedWorker !== 'undefined' && !this.noSharedWorkers;
+
+      if (isSharedWorkerNeeded) {
+        // Если ПК и поддержка есть — создаем SharedWorker и пишем в динамический ключ wName!
+        this.workers[wName] = new SharedWorker(`${PUBLIC_URL}/static/workers/${firstWord}/shared-worker.js`)
+
+        // Запускаем порт
+        const worker = this.workers[wName];
+        if (worker instanceof SharedWorker) {
+          worker.port.start();
+        }
+      } else {
+        // Если мобилка (нет поддержки) — создаем обычный Dedicated Worker в тот же ключ wName
+        this.workers[wName] = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js`)
       }
+
+      // Алиас для обратной совместимости, если у вас где-то в коде захардкожено имя ".newsWorker"
+      if (wName === 'taro-worst-calc') {
+        this.workers.newsWorker = this.workers[wName];
+      }
+
       return Promise.resolve(result)
-    } catch (_err: unknown) {
-      // this.workers.newsWorker = new Worker(`${PUBLIC_URL}/static/workers/${firstWord}/dedicated-worker.js?v=${packageJson.version}`) // &ts=${new Date().getTime()}
+    } catch (err: unknown) {
+      result.ok = false
+      result.message = err instanceof Error ? err.message : String(err)
       return Promise.reject(result)
     }
   }
+
   public reInitWorker({ wName, ifNecessaryOnly }: {
     wName: string;
     ifNecessaryOnly?: boolean;
@@ -187,15 +203,16 @@ class Singleton {
     wName: string;
     cb?: (d: unknown) => void;
   }) {
-    // if (!this.workers[wName]) throw new Error(`No worker ${wName} yet #4`)
     if (!this.workers[wName]) return
 
+    const currentWorker = this.workers[wName];
+
     switch (true) {
-      case this.workers[wName] instanceof Worker:
-        this.workers[wName].terminate()
+      case currentWorker instanceof Worker:
+        currentWorker.terminate()
         break
-      case typeof SharedWorker !== 'undefined' && this.workers[wName] instanceof SharedWorker:
-        this.workers[wName].port.postMessage({ __eType: NWService.EClientToWorkerEvent.DIE_WORKER })
+      case typeof SharedWorker !== 'undefined' && currentWorker instanceof SharedWorker:
+        currentWorker.port.postMessage({ __eType: NWService.EClientToWorkerEvent.DIE_WORKER })
         break
       default:
         break
@@ -222,6 +239,6 @@ class Singleton {
 }
 
 export const wws = Singleton.getInstance({
-  noSharedWorkers: true,
+  noSharedWorkers: false,
   isDebugEnabled: true,
 })
