@@ -22,7 +22,7 @@ import HiveIcon from '@mui/icons-material/Hive'
 import { useElementInView } from 'use-element-in-view'
 import { usePoinsetTreeCalcWorker } from './hooks'
 import { TEnchancedPointByWorker } from './types'
-import { FixedBackToPointsetBtn } from './components'
+import { FixedBackToPointsetBtn, FixedCreateRoadmapItemBtn } from './components'
 import { sort } from '~/shared/utils/array-ops/sort-array-objects@3.0.0';
 import { CollapsibleText } from '~/pages/jobs/[job_id]/components/ProjectsTree/components';
 import { NSWorstCalc } from '~/shared/utils/team-scoring';
@@ -185,7 +185,8 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
   })
   // --
 
-  const { inView, assignRef } = useElementInView()
+  const { inView: isRoadmapBoxInView, assignRef: roadmapBoxRef } = useElementInView()
+  const { inView: isCreateRoadmapItemBtnInView, assignRef: createRoadmapItemBtnRef } = useElementInView()
   const [calcErrMsg, setCalcErrMsg] = useState<string | null>(null)
   const [calc, setCalc] = useState<TreeNode<TEnchancedPointByWorker> | null>(null)
   const [reportText, setReportText] = useState<string | null>(null)
@@ -259,8 +260,11 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       id: 'checker-form-box',
     })
   })
-  const scrollBoxIntoViewFnRef = useRef(() => specialScrollForExternalBox({
+  const scrollRoadmapBoxIntoViewFnRef = useRef(() => specialScrollForExternalBox({
     id: 'checker-main-box',
+  }))
+  const scrollcreateRoadmapItemBtnIntoViewFnRef = useRef(() => specialScrollForExternalBox({
+    id: 'checker-main-box--create-roadmap-item',
   }))
   const [newLabel, setNewLabel] = useState<string>('')
   const [newDescr, setNewDescr] = useState<string>('')
@@ -340,7 +344,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     activePointIdRef.current = null
     handleReset()
     handleClose()
-    setTimeout(scrollBoxIntoViewFnRef.current, 300)
+    setTimeout(scrollRoadmapBoxIntoViewFnRef.current, 300)
   }, [handleReset, handleClose])
 
   const sortedPointSet = useMemo(() =>
@@ -573,7 +577,7 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
     <div
       className={clsx(classes.externalWrapper, classes.default, classes.rounded, baseClasses.stack2)}
       id='checker-main-box'
-      ref={assignRef}
+      ref={roadmapBoxRef}
     >
       <div
         className={clsx(baseClasses.truncate, classes.absoluteBadgeTopRight)}
@@ -740,13 +744,19 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
       {
         !noFixedNavigateBtn && !!targetJob?.pointset && targetJob?.pointset?.length > 0 && (
           <FixedBackToPointsetBtn
-            isRequired={!inView}
-            onClick={scrollBoxIntoViewFnRef.current}
-          // label='Roadmap'
+            isRequired={!isRoadmapBoxInView}
+            onClick={scrollRoadmapBoxIntoViewFnRef.current}
           />
         )
       }
-
+      {
+        !noFixedNavigateBtn && !!targetJob?.pointset && targetJob?.pointset?.length > 0 && (
+          <FixedCreateRoadmapItemBtn
+            isRequired={!isCreateRoadmapItemBtnInView}
+            onClick={scrollcreateRoadmapItemBtnIntoViewFnRef.current}
+          />
+        )
+      }
       {
         !targetJob && (
           <em>Target job not found</em>
@@ -889,6 +899,8 @@ export const SimpleJobPointsetChecker = memo(({ noFixedNavigateBtn, jobId, isEdi
                 variant='outlined'
                 color='primary'
                 onClick={handleEditToggle({})}
+                ref={createRoadmapItemBtnRef}
+                id='checker-main-box--create-roadmap-item'
               >
                 Create
               </Button>

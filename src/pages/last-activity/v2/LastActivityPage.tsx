@@ -259,14 +259,14 @@ export const LastActivityPage = memo(() => {
       {
         !!outputWorkerData?.currentPage && outputWorkerData.pagination.totalPages > 1 && (
           <ResponsiveBlock
-            className={clsx(baseClasses.stack1, baseClasses.fadeIn)}
+            className={clsx(baseClasses.stack1, baseClasses.fadeIn, 'liquid-glass-fixed')}
             style={{
               padding: '16px 16px 16px 16px',
-              // border: '1px dashed red',
+              border: '2px solid #fff',
               // boxShadow: '0 -10px 7px -8px rgba(34,60,80,.2)',
               position: 'sticky',
               bottom: '16px',
-              backgroundColor: '#fff',
+              // backgroundColor: '#fff',
               zIndex: 3,
               marginTop: 'auto',
               // borderRadius: '16px 16px 0px 0px',

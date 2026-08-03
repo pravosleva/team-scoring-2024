@@ -293,7 +293,7 @@ export const JobPage = memo(() => {
       {
         !!targetJob && (
           <Grid size={12}>
-            <SimpleJobPointsetChecker jobId={targetJob.id} isEditable={true} isCreatable={true} />
+            <SimpleJobPointsetChecker key={params.job_id} jobId={targetJob.id} isEditable={true} isCreatable={true} />
           </Grid>
         )
       }

@@ -1,2 +1,1 @@
-export * from './FixedBackToPointsetBtn'
 export * from './FixedCreateRoadmapItemBtn'

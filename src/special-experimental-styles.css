@@ -34,3 +34,28 @@ a:active {
 .PhotoView-Slider__Counter {
   white-space: nowrap;
 }
+
+.liquid-glass-fixed {
+  /* Базовый полупрозрачный слой */
+  background-color: rgba(255, 255, 255, 0.05);
+  
+  /* Жидкие блики и разводы внутри стекла (имитация преломления света) */
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.3) 0%, transparent 25%);
+
+  /* Стандартное размытие фона (отлично работает в Chromium) */
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  
+  /* Объемные стеклянные рамки и тени */
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),  /* Яркий верхний блик */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.05),      /* Нижнее затенение */
+    0 12px 40px rgba(0, 0, 0, 0.12);           /* Мягкая тень элемента */
+}

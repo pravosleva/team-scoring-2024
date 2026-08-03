@@ -1,10 +1,9 @@
 import { memo } from 'react'
 import clsx from 'clsx'
 import baseClasses from '~/App.module.scss'
-import classes from './FixedBackToPointsetBtn.module.scss'
+import classes from './FixedCreateRoadmapItemBtn.module.scss'
 // import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-// import EditRoadIcon from '@mui/icons-material/EditRoad'
-import EditRoadIcon from '@mui/icons-material/EditRoad'
+import AddRoadIcon from '@mui/icons-material/AddRoad'
 
 type TProps = {
   isRequired: boolean;
@@ -12,7 +11,7 @@ type TProps = {
   label?: string;
 }
 
-export const FixedBackToPointsetBtn = memo(({ isRequired, onClick, label }: TProps) => {
+export const FixedCreateRoadmapItemBtn = memo(({ isRequired, onClick, label }: TProps) => {
   return (
     <>
       {typeof window !== 'undefined' && (
@@ -35,7 +34,7 @@ export const FixedBackToPointsetBtn = memo(({ isRequired, onClick, label }: TPro
                 <span className={baseClasses.truncate}>{label}</span>
               )
               : (
-                <EditRoadIcon htmlColor='inherit' />
+                <AddRoadIcon htmlColor='inherit' />
               )
           }
         </div>

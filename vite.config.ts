@@ -52,6 +52,57 @@ export default defineConfig({
       workbox: {
         sourcemap: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 ** 2, // NOTE: 10 MB or set to something else
+        // NOTE: Указываем Workbox сканировать папку public (или dist во время сборки)
+        globDirectory: 'dist',
+        globPatterns: [
+          // NOTE: Кэшируем файлы сборки (js, css, html и т.д.)
+          '**/*.{js,css,html,ico,png,svg,webmanifest}',
+          // NOTE: Принудительно включаем абсолютно всю статику воркеров в оффлайн-кэш
+          'static/workers/**/*.{js,json}'
+        ],
+        // NOTE: Игнорируем query-параметры (?v=...), чтобы Workbox корректно находил файлы в кэше
+        ignoreURLParametersMatching: [/^v$/, /^ts$/],
+
+        runtimeCaching: [
+          {
+            // Перехватываем все файлы, заканчивающиеся на .mp3
+            urlPattern: /.*\.mp3/,
+            // Используем стратегию "Сначала кэш, если нет - сеть"
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'audio-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // Хранить 30 дней
+              },
+              cacheableResponse: {
+                // Кэшируем только успешные ответы (0 для непрозрачных CORS-запросов)
+                statuses: [0, 200],
+                // - 200 (OK) — стандартный успешный ответ от вашего сервера,
+                // когда файл найден и успешно отдается целиком.
+                // - 0 (Opaque/Непрозрачный статус) — критически важен,
+                // если ваши аудиофайлы загружаются со стороннего сервера или CDN (например, с другого домена или поддомена).
+                // Браузер из соображений безопасности скрывает точный статус ответа (делает его 0),
+                // если на сервере не настроены специфические CORS-заголовки.
+                // Если не указать 0, файлы с внешних ресурсов просто не будут кэшироваться.
+              },
+              plugins: [
+                // КРИТИЧЕСКИ ВАЖНО: Этот плагин позволяет Workbox отвечать на Range-запросы из кэша
+                {
+                  cachedResponseWillBeUsed: async ({ cachedResponse }) => {
+                    if (cachedResponse) {
+                      return cachedResponse;
+                    }
+                    return null;
+                  },
+                },
+                // Поддержка заголовков Range (запросы partial content)
+                // Примечание: Workbox автоматически добавит RangeRequestsPlugin под капотом, 
+                // если плагин видит работу с медиа, но для надежности мы изолируем кэш через cacheName.
+              ],
+            },
+          },
+        ],
       },
       registerType: 'autoUpdate',
       minify: false,
