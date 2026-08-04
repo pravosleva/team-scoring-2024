@@ -98,7 +98,7 @@ export default defineConfig({
           },
         ],
       },
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       minify: false,
       mode: isDev ? 'development' : 'production',
       srcDir: 'public/static/pwa/', // NOTE: Default 'public'

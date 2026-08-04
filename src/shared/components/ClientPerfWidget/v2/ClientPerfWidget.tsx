@@ -8,6 +8,7 @@ import { ProgressBar } from '../components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ArrowRight'
 import MemoryIcon from '@mui/icons-material/Memory'
 import { soundManager } from '~/shared/soundManager'
+import { StorageInfo } from '../../StorageInfo'
 
 type TProps = {
   isOpenedByDefault?: boolean;
@@ -254,6 +255,8 @@ export const ClientPerfWidget = memo((ps: TProps) => {
               </div>
               <ProgressBar value={totalOfLimit} label={`${total.toFixed(0)} MB`} />
             </div>
+
+            <StorageInfo />
           </>
         ) : (
           <div style={{ fontWeight: 'bold', padding: '0px 8px' }}>Memory stat isnt supported</div>
