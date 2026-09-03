@@ -3,12 +3,13 @@
 import { useState, useRef, useLayoutEffect, useMemo, useCallback, memo } from 'react'
 import clsx from 'clsx'
 import classes from '../ClientPerfWidget.module.scss'
-import { getPercentage } from '~/shared/utils/number-ops'
+import { getHumanReadableSize, getPercentage } from '~/shared/utils/number-ops'
 import { ProgressBar } from '../components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ArrowRight'
 import MemoryIcon from '@mui/icons-material/Memory'
 import { soundManager } from '~/shared/soundManager'
 import { StorageInfo } from '../../StorageInfo'
+import { Box } from '@mui/material'
 
 type TProps = {
   isOpenedByDefault?: boolean;
@@ -219,7 +220,7 @@ export const ClientPerfWidget = memo((ps: TProps) => {
     <div
       className={clsx(
         classes.wrapper,
-        classes.stack1,
+        classes.stack2,
         classes.fixedBox,
         {
           [classes.topCenter]: ps.position === 'top-center',
@@ -235,26 +236,28 @@ export const ClientPerfWidget = memo((ps: TProps) => {
       {
         !!state ? (
           <>
-            <canvas ref={canvasRef} className={classes.canvas} height={canvasCfg.height} width={canvasCfg.width} />
-            <div className={classes.stack0}>
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between' }}
-              >
-                <span><b>Used</b> of Total</span>
-                <span>{total.toFixed(0)} MB</span>
+            <Box sx={{ p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 2, maxWidth: 300 }}>
+              <canvas ref={canvasRef} className={classes.canvas} height={canvasCfg.height} width={canvasCfg.width} />
+              <div className={classes.stack0}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span><b>Used</b> of Total</span>
+                  <span>{getHumanReadableSize({ bytes: state?.totalJSHeapSize, decimals: 1 })}</span>
+                </div>
+                <ProgressBar value={usedOfTotal} label={getHumanReadableSize({ bytes: state?.usedJSHeapSize, decimals: 1 })} />
               </div>
-              <ProgressBar value={usedOfTotal} label={`${used.toFixed(0)} MB`} />
-            </div>
 
-            <div className={classes.stack0}>
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between' }}
-              >
-                <span><b>Total</b> of Limit</span>
-                <span>{limit.toFixed(0)} MB</span>
+              <div className={classes.stack0}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span><b>Total</b> of Limit</span>
+                  <span>{getHumanReadableSize({ bytes: state?.jsHeapSizeLimit, decimals: 1 })}</span>
+                </div>
+                <ProgressBar value={totalOfLimit} label={getHumanReadableSize({ bytes: state?.totalJSHeapSize, decimals: 1 })} />
               </div>
-              <ProgressBar value={totalOfLimit} label={`${total.toFixed(0)} MB`} />
-            </div>
+            </Box>
 
             <StorageInfo />
           </>

@@ -61,7 +61,7 @@ export const ReloadPrompt: React.FC = () => {
                 size="small"
                 variant="outlined"
                 onClick={() => updateServiceWorker(true)}
-                sx={{ borderColor: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}
+                sx={{ borderColor: 'rgba(255,255,255,0.5)', fontWeight: 'bold', borderRadius: 4 }}
               >
                 Обновить
               </Button>
