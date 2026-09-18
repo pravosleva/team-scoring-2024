@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Layout } from '~/shared/components/Layout'
 import Grid from '@mui/material/Grid2'
 import baseClasses from '~/App.module.scss'
-import glitchEffectTextClasses from '~/GlitchEffectText.v3-0.module.scss'
+// import glitchEffectTextClasses from '~/GlitchEffectText.v3-0.module.scss'
 import { ResponsiveBlock } from '~/shared/components'
 import classes from './HomePage.module.scss'
 import clsx from 'clsx'
@@ -15,10 +15,56 @@ import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import Brightness1Icon from '@mui/icons-material/Brightness1'
 import SurroundSoundIcon from '@mui/icons-material/SurroundSound'
+import { RetroDiceIntroSvg } from '~/shared/components/special-svg-content/RetroDiceIntroSvg.v4'
+import IconButton from '@mui/material/IconButton'
 // import AnalyticsIcon from '@mui/icons-material/Analytics';
 // import WebIcon from '@mui/icons-material/Web'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import { scrollToIdFactory } from '~/shared/utils/web-api-ops/scrollToIdFactory'
+import { useCallback, useRef } from 'react'
 
 export const HomePage = () => {
+  const scrollToIdRef = useRef(scrollToIdFactory({
+    timeout: 0,
+    offsetTop: 0,
+    elementHeightCritery: 2, // NOTE: Все что больше 2px по высоте будет проскроллено в топ страницы
+  }))
+  const scrollToContent = useCallback((e: React.MouseEvent<unknown>) => {
+    e.stopPropagation()
+    scrollToIdRef.current({
+      id: 'homepage-content',
+      _cfg: {
+        getOffsetTop: ({ targetElm }) => {
+          // НАДЕЖНЫЙ АБСОЛЮТНЫЙ РАСЧЕТ позиции элемента на странице с нуля
+          let absoluteTop = 0
+          let currentElm: HTMLElement | null = targetElm
+          while (currentElm) {
+            absoluteTop += currentElm.offsetTop
+            currentElm = currentElm.offsetParent as HTMLElement | null
+          }
+
+          const elementHeight = targetElm.offsetHeight
+          
+          // Если блок свернут (меньше 200px)
+          if (elementHeight <= 2) {
+            const windowHeight = window.innerHeight
+            // Вычисляем офсет сверху так, чтобы после вычитания в window.scrollTo 
+            // элемент оказался ровно по центру экрана
+            const targetCenterPos = absoluteTop - (windowHeight / 2) + (elementHeight / 2)
+            
+            // Нам нужно вернуть такое число, которое при вычитании из (getBoundingClientRect().top + pageYOffset)
+            // даст точно targetCenterPos. 
+            // Так как (getBoundingClientRect().top + pageYOffset) всегда равен нашему absoluteTop,
+            // то специальный офсет равен:
+            return absoluteTop - targetCenterPos
+          }
+          
+          return 0 // Стандартный отступ для больших блоков
+        }
+      }
+    })
+  }, [])
+  
   return (
     <Layout>
       <Grid container spacing={1} sx={{ mb: 2, mt: 2 }}>
@@ -28,15 +74,63 @@ export const HomePage = () => {
             <span>Home</span>
           </h1>
         </Grid> */}
-        <Grid size={12} style={{ display: 'flex', justifyContent: 'center' }}>
+        {/* <Grid size={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <h1
             style={{ margin: 0 }}
             className={clsx(baseClasses.inlineH1, glitchEffectTextClasses.glitchEffect)}
             data-text="Retro Dice">
             <span>Retro Dice</span>
           </h1>
+        </Grid> */}
+        
+        <Grid
+          size={12}
+          sx={{
+            height: 'calc(100svh - 32px)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Link
+              to='/jobs'
+              style={{
+                display: 'block',
+              }}
+            >
+              <IconButton
+                id="to-jobs"
+                color='primary'
+                sx={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'primary' }}
+              >
+                <ConstructionIcon />
+              </IconButton>
+            </Link>
+            <RetroDiceIntroSvg />
+            <span>
+              <IconButton
+                aria-label="more"
+                id="to-bottom"
+                aria-haspopup="true"
+                onClick={scrollToContent}
+                color='primary'
+                sx={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'primary' }}
+              >
+                <ArrowDownwardIcon />
+              </IconButton>
+            </span>
+          </div>
         </Grid>
-        <Grid size={12}>
+        <Grid size={12} id='homepage-content'>
           <ResponsiveBlock
             isPaddedMobile
             isLimited
