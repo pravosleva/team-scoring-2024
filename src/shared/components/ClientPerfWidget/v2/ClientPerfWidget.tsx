@@ -8,7 +8,7 @@ import { ProgressBar } from '../components/ProgressBar'
 import ExpandLessIcon from '@mui/icons-material/ArrowRight'
 import MemoryIcon from '@mui/icons-material/Memory'
 import { soundManager } from '~/shared/soundManager'
-import { StorageInfo } from '../../StorageInfo'
+import { StorageInfo } from '../../StorageInfo/StorageInfo'
 import { Box } from '@mui/material'
 
 type TProps = {

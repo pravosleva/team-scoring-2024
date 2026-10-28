@@ -22,7 +22,7 @@
 @media(max-width: #{$monitor-sm}px) {
   .wrapper {
     width: calc(100vw);
-    min-height: calc(100svh);
+    min-height: calc(100dvh);
     border-radius: 0px;
   }
 }
@@ -30,7 +30,7 @@
 @media(min-width:calc(#{$monitor-sm}px + 1px)) {
   .wrapper {
     width: 350px;
-    min-height: calc(100svh);
+    min-height: calc(100dvh);
     border-radius: 0px;
   }
 }
@@ -59,13 +59,13 @@
 
 @media(max-width: #{$monitor-sm}px) {
   .contentLimited {
-    min-height: calc(100svh - 40px - 16px - 24px - 24px - 24px - 16px - 80px + 4px);
+    min-height: calc(100dvh - 40px - 16px - 24px - 24px - 24px - 16px - 80px + 4px);
   }
 }
 
 @media(min-width:calc(#{$monitor-sm}px + 1px)) {
   .contentLimited {
-    min-height: calc(100svh - 40px - 16px - 24px - 24px - 24px - 16px - 80px + 4px);
+    min-height: calc(100dvh - 40px - 16px - 24px - 24px - 24px - 16px - 80px + 4px);
   }
 }
 

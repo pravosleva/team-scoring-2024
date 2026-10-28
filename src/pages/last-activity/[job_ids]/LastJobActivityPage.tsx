@@ -14,6 +14,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ConstructionIcon from '@mui/icons-material/Construction'
+import SportsBasketballIcon from '@mui/icons-material/SportsBasketball'
 import { getModifiedJobLogText } from '~/pages/jobs/[job_id]/utils'
 import CloseIcon from '@mui/icons-material/Close'
 import { AutoRefreshedJobMuiAva } from '~/shared/components/Job/utils'
@@ -298,19 +300,32 @@ export const LastJobActivityPage = memo(() => {
                                       gap: '8px',
                                     }}
                                   >
-                                    <Link
-                                      to={getFullUrl({
-                                        url: `/last-activity/${job.relations.parent}`,
-                                        query: {
-                                          ...queryParams,
-                                        },
-                                      })}
-                                    >
-                                      <HighlightedText
-                                        comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
-                                        testedValue={clsx(searchValueBasic)}
-                                      />
-                                    </Link>
+                                    <HighlightedText
+                                      comparedValue={getModifiedJobLogText({ text: `[job=${job.relations.parent}]`, jobs, users: users.items })}
+                                      testedValue={clsx(searchValueBasic)}
+                                    />
+                                    <div>
+                                      <Button
+                                        component={Link}
+                                        to={getFullUrl({
+                                          url: `/last-activity/${job.relations.parent}`,
+                                          query: {
+                                            ...queryParams,
+                                          },
+                                        })}
+                                        sx={{ 
+                                          borderRadius: 4,
+                                          color: 'primary.main',
+                                          borderColor: 'primary.main',
+                                          '&:hover': { color: 'primary.main' }
+                                        }}
+                                        size="small"
+                                        variant="outlined"
+                                        startIcon={<SportsBasketballIcon />}
+                                      >
+                                        Parent activity
+                                      </Button>
+                                    </div>
                                     {
                                       typeof job.relations.parent === 'number' && (
                                         <FileSteperExample
@@ -370,18 +385,12 @@ export const LastJobActivityPage = memo(() => {
                                     display: 'flex',
                                     flexDirection: 'row',
                                     alignItems: 'flex-start',
-                                    gap: '16px',
+                                    gap: '8px',
                                     fontSize: 'small',
                                   }}
                                 >
-                                  <Link
-                                    style={{
-                                      whiteSpace: 'nowrap',
-                                      display: 'inline-flex',
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      gap: '8px',
-                                    }}
+                                  <Button
+                                    component={Link}
                                     to={getFullUrl({
                                       url: `/jobs/${job.id}`,
                                       query: {
@@ -391,11 +400,39 @@ export const LastJobActivityPage = memo(() => {
                                       },
                                       queryKeysToremove: ['from'],
                                     })}
+                                    sx={{ 
+                                      borderRadius: 4,
+                                      color: 'primary.main',
+                                      borderColor: 'primary.main',
+                                      '&:hover': { color: 'primary.main' }
+                                    }}
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<ConstructionIcon />}
                                   >
-                                    {/* <ArrowBackIcon sx={{ fontSize: '12px' }} /> */}
-                                    <span>Job</span>
-                                  </Link>
-                                  <Link
+                                    Job
+                                  </Button>
+                                  <Button
+                                    component={Link}
+                                    to={getFullUrl({
+                                      url: getMemoizedCurrentPageWithoutJobId({ noJobId: job.id }), // `/jobs/${id}`,
+                                      query: {
+                                        ...queryParams,
+                                      },
+                                    })}
+                                    sx={{ 
+                                    borderRadius: 4,
+                                    color: 'error.main',
+                                    borderColor: 'error.main',
+                                    '&:hover': { color: 'error.main' }
+                                  }}
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<CloseIcon />}
+                                  >
+                                    Delete from list
+                                  </Button>
+                                  {/* <Link
                                     style={{
                                       whiteSpace: 'nowrap',
                                       display: 'inline-flex',
@@ -407,15 +444,10 @@ export const LastJobActivityPage = memo(() => {
                                       borderRadius: '50%',
                                       marginTop: '3px',
                                     }}
-                                    to={getFullUrl({
-                                      url: getMemoizedCurrentPageWithoutJobId({ noJobId: job.id }), // `/jobs/${id}`,
-                                      query: {
-                                        ...queryParams,
-                                      },
-                                    })}
+                                    
                                   >
-                                    <CloseIcon sx={{ fontSize: 'inherit' }} />
-                                  </Link>
+                                    
+                                  </Link> */}
                                 </div>
                                 <HighlightedText
                                   comparedValue={job.title}
@@ -484,16 +516,30 @@ export const LastJobActivityPage = memo(() => {
                                   >
                                     {
                                       job.relations.children.length > 1 && (
-                                        <Link
-                                          to={getFullUrl({
-                                            url: `/last-activity/${[job.id, ...job.relations.children].join(',')}`,
-                                            query: {
-                                              ...queryParams,
-                                            },
-                                          })}
-                                        >
-                                          FULL SUBTREE HISTORY (parent & children)
-                                        </Link>
+                                        <>
+                                          <div>
+                                            <Button
+                                              component={Link}
+                                              to={getFullUrl({
+                                                url: `/last-activity/${[job.id, ...job.relations.children].join(',')}`,
+                                                query: {
+                                                  ...queryParams,
+                                                },
+                                              })}
+                                              sx={{ 
+                                                borderRadius: 4,
+                                                color: 'primary.main',
+                                                borderColor: 'primary.main',
+                                                '&:hover': { color: 'primary.main' }
+                                              }}
+                                              size="small"
+                                              variant="outlined"
+                                              startIcon={<SportsBasketballIcon />}
+                                            >
+                                              Subtree activity (parent & children)
+                                            </Button>
+                                          </div>
+                                        </>
                                       )
                                     }
                                     {
@@ -506,20 +552,32 @@ export const LastJobActivityPage = memo(() => {
                                             gap: '8px',
                                           }}
                                         >
-                                          <Link
-                                            key={j}
-                                            to={getFullUrl({
-                                              url: `/last-activity/${j}`,
-                                              query: {
-                                                ...queryParams,
-                                              },
-                                            })}
-                                          >
-                                            <HighlightedText
-                                              comparedValue={`${a.length - i}. ${getModifiedJobLogText({ text: `[job=${j}]`, jobs, users: users.items })}`}
-                                              testedValue={clsx(searchValueBasic)}
-                                            />
-                                          </Link>
+                                          <HighlightedText
+                                            comparedValue={`${a.length - i}. ${getModifiedJobLogText({ text: `[job=${j}]`, jobs, users: users.items })}`}
+                                            testedValue={clsx(searchValueBasic)}
+                                          />
+                                          <div>
+                                            <Button
+                                              component={Link}
+                                              to={getFullUrl({
+                                                url: `/last-activity/${j}`,
+                                                query: {
+                                                  ...queryParams,
+                                                },
+                                              })}
+                                              sx={{ 
+                                                borderRadius: 4,
+                                                color: 'primary.main',
+                                                borderColor: 'primary.main',
+                                                '&:hover': { color: 'primary.main' }
+                                              }}
+                                              size="small"
+                                              variant="outlined"
+                                              startIcon={<SportsBasketballIcon />}
+                                            >
+                                              Activity
+                                            </Button>
+                                          </div>
                                           <FileSteperExample
                                             isEditable={false}
                                             idbKey={getUniqueKey({ jobId: j })}

@@ -94,29 +94,30 @@ export const Layout = ({ children, noPinnedJoblistBtn, noScrollTopBtn }: TProps)
         >
           {children}
         </ResponsiveBlock>
-        <ResponsiveBlock
-          isPaddedMobile
-          isLimitedForDesktop
-          style={{
-            height: '100%',
-            marginTop: 'auto',
-            borderTop: '1px solid lightgray',
-            paddingTop: '16px',
-            paddingBottom: '16px',
-            fontSize: 'x-small',
-            display: 'flex',
-            gap: '8px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <b>© {brandName}, {isCreactedCurrentYear ? currentYear : `${createdYear} — ${currentYear}`}</b>
-          <div>App version <code className={classes.code}>{appVersion}</code></div>
-          <div>GIT SHA-1 <code className={classes.code}>{gitSHA1}</code></div>
-          <div>GIT branch name <code className={classes.code}>{gitBranchName}</code></div>
-          {!!ls.sizeInfo && <div>LS size used <code className={classes.code}>{ls.sizeInfo}</code></div>}
-          {!!idb && <div>IndexedDB size used <code className={classes.code}>{idb.used.humanized} ({idb.used.percentage.toFixed(2)}%)</code></div>}
-        </ResponsiveBlock>
       </div>
+
+      <ResponsiveBlock
+        isPaddedMobile
+        isLimitedForDesktop
+        style={{
+          height: '100%',
+          marginTop: 'auto',
+          borderTop: '1px solid lightgray',
+          paddingTop: '16px',
+          paddingBottom: '16px',
+          fontSize: 'x-small',
+          display: 'flex',
+          gap: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <b>© {brandName}, {isCreactedCurrentYear ? currentYear : `${createdYear} — ${currentYear}`}</b>
+        <div>App version <code className={classes.code}>{appVersion}</code></div>
+        <div>GIT SHA-1 <code className={classes.code}>{gitSHA1}</code></div>
+        <div>GIT branch name <code className={classes.code}>{gitBranchName}</code></div>
+        {!!ls.sizeInfo && <div>LS size used <code className={classes.code}>{ls.sizeInfo}</code></div>}
+        {!!idb && <div>IndexedDB size used <code className={classes.code}>{idb.used.humanized} ({idb.used.percentage.toFixed(2)}%)</code></div>}
+      </ResponsiveBlock>
 
       <Backdrop
         open={speedDialOpened}

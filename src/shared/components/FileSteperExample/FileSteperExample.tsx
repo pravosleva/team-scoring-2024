@@ -75,6 +75,22 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
   // const [currentSelectTs, setCurrentSelectTs] = useState<null | number>(null)
   // const [wasLoadedFirstly, setWasLoadedFirstly] = useState(true)
 
+  useEffect(() => {
+  // Добавляем проверку на существование объекта и метода
+  if (!idbInstance || typeof idbInstance.loadImages !== 'function') {
+    console.error('IDB Instance is not initialized yet');
+    return;
+  }
+
+  idbInstance.loadImages({
+    key: idbKey,
+    cb: {
+      onSuccess: (ps) => { /* ... */ },
+      onFuckup: console.warn,
+    }
+  });
+}, [idbKey, setValue]);
+
   // const auxSensor = useRef<number>(0)
   useEffect(() => {
     // NOTE: 1. Get images from indexed db
@@ -106,6 +122,8 @@ export const FileSteperExample = memo(({ idbKey, isEditable, renderer, dontShowI
               auxSensor.current += 1
             }
             */
+
+            window.localStorage.removeItem('pwa_idb_cleaned_status');
           }
         },
         onFuckup: console.warn,

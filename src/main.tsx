@@ -21,6 +21,36 @@ async function enableMswMocking() {
   }
 }
 
+// Перехватываем запрос на удаление БД ДО старта React и инициализации idbInstance
+if (window.localStorage.getItem('pwa_force_clear_idb_pending') === 'true') {
+  // Временно блокируем отрисовку интерфейса, пока идет удаление
+  const DB_NAME = 'LocalImageDB';
+  
+  const req = window.indexedDB.deleteDatabase(DB_NAME);
+  
+  req.onsuccess = () => {
+    console.log(`✅ База данных ${DB_NAME} успешно удалена до старта приложения.`);
+    window.localStorage.removeItem('pwa_force_clear_idb_pending');
+    window.location.reload(); // Чистый перезапуск, теперь запустится новый IDBSingleton
+  };
+
+  req.onerror = () => {
+    window.localStorage.removeItem('pwa_force_clear_idb_pending');
+    window.location.reload();
+  };
+
+  req.onblocked = () => {
+    // Если вкладки всё еще мешают, принудительно очищаем флаг, чтобы приложение не зациклилось
+    window.localStorage.removeItem('pwa_force_clear_idb_pending');
+    alert('Очистка заблокирована другими вкладками. Пожалуйста, закройте остальные вкладки приложения.');
+    window.location.reload();
+  };
+} else {
+  // Здесь идет ваш стандартный запуск React приложения, например:
+  // const root = ReactDOM.createRoot(document.getElementById('root')!)
+  // root.render(<App />)
+}
+
 const rootElement = createRoot(document.getElementById('root')!)
 
 enableMswMocking()
