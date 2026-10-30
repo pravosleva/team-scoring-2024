@@ -41,3 +41,6 @@ tools.vitepress/.vitepress/cache/*
 public/vitepress/*
 public/typedoc/*
 tools.typedoc/output/*
+
+## Draft
+_draft.*
