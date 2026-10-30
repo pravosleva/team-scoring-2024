@@ -40,6 +40,7 @@ const modulesToSeparate = [
   'json-edit-react',
   'ts-tree-lib',
   'react-photo-view',
+  'browser-image-compression',
 ]
 const _chunksMap = new Map()
 

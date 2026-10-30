@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { debugFactory } from '~/shared/utils'
+import imageCompression from 'browser-image-compression'
 // ВАЖНО: Импортируем строго из файлов, чтобы не ломать типы круговой зависимостью!
 import { getAllKeys } from './getAllKeys'
 import { getIndexedDbSize } from './getIndexedDbSize'
@@ -201,18 +202,65 @@ export class IDBSingleton {
     };
     items: Blob[];
   }): void {
-    const __getTargetActionResult = () => {
+    const __getTargetActionResult = async () => {
       if (!this.db) return;
       const tsUpdate = new Date().getTime()
-      const transaction = this.db.transaction(this.STORE_NAME, 'readwrite')
-      const store = transaction.objectStore(this.STORE_NAME)
-      const request = store.put({ id: key, data: { items, ts: tsUpdate } })
 
-      request.onsuccess = () => {
-        cb.onSuccess({ ok: true, message: 'Saved successfully', ts: tsUpdate })
-      }
-      request.onerror = (event: any) => {
-        cb.onFuckup({ ok: false, message: event.target?.error?.message || 'Error', ts: tsUpdate })
+      try {
+        // Перед сжатием и сохранением проверяем лимит (например, 100 MB)
+        // Если места мало, метод удалит самую старую запись
+        await this.#ensureStorageLimit(100);
+        
+        // Подсчитываем исходный размер всех файлов в байтах
+        const originalBytes = items.reduce((acc, cur) => acc + (cur?.size || 0), 0)
+
+        const compressionOptions = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        }
+
+        const compressedItems = await Promise.all(
+          items.map(async (item) => {
+            if (item.type.startsWith('image/')) {
+              try {
+                return await imageCompression(item as File, compressionOptions)
+              } catch (compressErr) {
+                console.warn('Ошибка сжатия конкретного изображения, сохраняем оригинал:', compressErr)
+                return item
+              }
+            }
+            return item
+          })
+        )
+
+        // Подсчитываем размер после сжатия
+        const compressedBytes = compressedItems.reduce((acc, cur) => acc + (cur?.size || 0), 0)
+        
+        // Выводим красивый лог эффективности сжатия в консоль
+        const savedMb = ((originalBytes - compressedBytes) / (1024 * 1024)).toFixed(2)
+        const originalMb = (originalBytes / (1024 * 1024)).toFixed(2)
+        const compressedMb = (compressedBytes / (1024 * 1024)).toFixed(2)
+        
+        console.log(
+          `📉 [IDB Compression]: Ключ "${key}"\n` +
+          `   Было: ${originalMb} MB\n` +
+          `   Стало: ${compressedMb} MB\n` +
+          `   Экономия места на диске: ${savedMb} MB`
+        )
+
+        const transaction = this.db.transaction(this.STORE_NAME, 'readwrite')
+        const store = transaction.objectStore(this.STORE_NAME)
+        const request = store.put({ id: key, data: { items: compressedItems, ts: tsUpdate } })
+
+        request.onsuccess = () => {
+          cb.onSuccess({ ok: true, message: 'Saved and compressed successfully', ts: tsUpdate })
+        }
+        request.onerror = (event: any) => {
+          cb.onFuckup({ ok: false, message: event.target?.error?.message || 'Error', ts: tsUpdate })
+        }
+      } catch (globalOptionsErr: any) {
+        cb.onFuckup({ ok: false, message: globalOptionsErr?.message || 'Compression pipeline error', ts: tsUpdate })
       }
     }
 
@@ -227,6 +275,65 @@ export class IDBSingleton {
         })
     } else {
       __getTargetActionResult()
+    }
+  }
+
+  async #ensureStorageLimit(maxSizeMb = 50): Promise<void> {
+    if (!this.db) return;
+
+    try {
+      // 1. Проверяем текущее состояние хранилища через вашу утилиту
+      const sizeInfo = await this.getAsyncSizeInfo();
+      if (!sizeInfo.ok || !sizeInfo.result) return;
+
+      const currentUsedBytes = sizeInfo.result.used.bytes;
+      const maxAllowedBytes = maxSizeMb * 1024 * 1024;
+
+      // Если мы укладываемся в лимит, ничего делать не нужно
+      if (currentUsedBytes <= maxAllowedBytes) return;
+
+      console.log(`⚠️ [IDB Cache Vacuum]: Превышен лимит хранилища (${(currentUsedBytes / (1024*1024)).toFixed(2)} MB из ${maxSizeMb} MB). Запуск очистки...`);
+
+      // 2. Открываем транзакцию на чтение, чтобы собрать все записи с их таймстемпами
+      const transaction = this.db.transaction(this.STORE_NAME, 'readonly');
+      const store = transaction.objectStore(this.STORE_NAME);
+
+      const allRecords: { id: string; ts: number }[] = [];
+
+      await new Promise<void>((resolve, reject) => {
+        store.openCursor().onsuccess = (event: any) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            // Вытаскиваем id и ts (учитываем структуру данных { data: { ts } })
+            allRecords.push({
+              id: cursor.key as string,
+              ts: cursor.value?.data?.ts || 0,
+            });
+            cursor.continue();
+          } else {
+            resolve();
+          }
+        };
+        store.openCursor().onerror = (event: any) => reject(event.target.error);
+      });
+
+      // 3. Сортируем записи от старых к новым (по возрастанию ts)
+      allRecords.sort((a, b) => a.ts - b.ts);
+
+      // 4. Удаляем самые старые записи по одной, пока не освободим достаточно места
+      // (Удаляем в новой readwrite транзакции)
+      const writeTransaction = this.db.transaction(this.STORE_NAME, 'readwrite');
+      const writeStore = writeTransaction.objectStore(this.STORE_NAME);
+
+      // Будем удалять по одной старой записи
+      if (allRecords.length > 0) {
+        const oldestRecord = allRecords[0];
+        writeStore.delete(oldestRecord.id);
+        console.log(`🗑️ [IDB Cache Vacuum]: Автоматически удален старый кэш картинок для ключа: ${oldestRecord.id}`);
+      }
+
+    } catch (err) {
+      console.error('Ошибка во время автоматической ротации кэша IndexedDB:', err);
     }
   }
 
